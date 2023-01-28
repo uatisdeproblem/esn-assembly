@@ -1,0 +1,33 @@
+{
+  "editor.tabSize": 2,
+  "editor.rulers": [120],
+  "editor.wordWrapColumn": 120,
+  "editor.wordWrap": "bounded",
+  "files.eol": "\n",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/*.map": true,
+    "node_modules": true,
+    "npm-debug.log": true,
+    "back-end/**/node_modules": true,
+    "back-end/src/**/*.js": true,
+    "back-end/cdk.out": true,
+    "front-end/**/node_modules": true,
+    "front-end/npm-debug.log": true,
+    "front-end/www": true,
+    "front-end/.sourcemaps": true,
+    "front-end/.angular": true,
+    "www": true,
+    ".vs": true
+  },
+  "files.trimTrailingWhitespace": true,
+  "git.confirmSync": false,
+  "editor.renderLineHighlight": "all",
+  "workbench.iconTheme": "vs-seti",
+  "window.zoomLevel": 0,
+  "extensions.ignoreRecommendations": false,
+  "editor.guides.indentation": true
+}

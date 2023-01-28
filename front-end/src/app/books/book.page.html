@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons *ngIf="!editMode" slot="start">
+      <ion-button (click)="goBackToList()">
+        <ion-icon icon="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ getTitle() }}</ion-title>
+    <ion-buttons slot="end" *ngIf="isMyBookOrNew()">
+      <ng-container *ngIf="editMode">
+        <ion-button [title]="t._('COMMON.EXIT_EDIT_MODE')" (click)="exitEditMode()">
+          <ion-icon slot="icon-only" icon="close-circle"></ion-icon>
+        </ion-button>
+        <ion-button [title]="t._('COMMON.SAVE_CHANGES')" (click)="save()">
+          <ion-icon slot="icon-only" icon="checkmark-circle"></ion-icon>
+        </ion-button>
+      </ng-container>
+      <ng-container *ngIf="!editMode">
+        <ion-button [title]="t._('COMMON.ENTER_EDIT_MODE')" (click)="enterEditMode()">
+          <ion-icon slot="icon-only" icon="pencil"></ion-icon>
+        </ion-button>
+        <ion-button [title]="t._('COMMON.ACTIONS')" (click)="openActions()">
+          <ion-icon slot="icon-only" icon="ellipsis-horizontal"></ion-icon>
+        </ion-button>
+      </ng-container>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding" [class.viewMode]="!editMode">
+  <ion-list class="aList maxWidthContainer" *ngIf="book">
+    <p class="ion-text-center">
+      <ion-img
+        class="coverImage"
+        [src]="getCoverURL(book)"
+        (ionError)="setCoverFallbackURLOnImage($event?.target)"
+      ></ion-img>
+      <input id="book-cover" type="file" accept="image/*" style="display: none" (change)="uploadCover($event)" />
+      <ion-button fill="clear" color="medium" *ngIf="editMode" (click)="browseImagesForCover()">
+        <ion-icon icon="cloud-upload" slot="icon-only"></ion-icon>
+      </ion-button>
+    </p>
+    <p class="ion-text-center" *ngIf="!editMode && app.user">
+      <ion-button fill="clear" *ngFor="let n of app.generateNumericArray(5)" (click)="rateBook(n+1)">
+        <ion-icon [icon]="book.rating > n ? 'star' : 'star-outline'" slot="icon-only"></ion-icon>
+      </ion-button>
+    </p>
+    <ion-item [class.fieldHasError]="hasFieldAnError('title')">
+      <ion-label position="stacked">{{ 'BOOKS.TITLE' | translate }}</ion-label>
+      <ion-input [(ngModel)]="book.title" [disabled]="!editMode"></ion-input>
+    </ion-item>
+    <ion-item [class.fieldHasError]="hasFieldAnError('genre')">
+      <ion-label position="stacked">{{ 'BOOKS.GENRE' | translate }}</ion-label>
+      <ion-select interface="popover" [(ngModel)]="book.genre" [disabled]="!editMode">
+        <ion-select-option *ngFor="let genre of bookGenres" [value]="genre">{{ genre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item [class.fieldHasError]="hasFieldAnError('author')">
+      <ion-label position="stacked">{{ 'BOOKS.AUTHOR' | translate }}</ion-label>
+      <ion-input [(ngModel)]="book.author" [disabled]="!editMode"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="editMode !== UXMode.INSERT" [class.fieldHasError]="hasFieldAnError('publishDate')">
+      <ion-label position="stacked">{{ 'BOOKS.PUBLISH_DATE' | translate }}</ion-label>
+      <ion-input value="{{ book.publishDate | date }}" disabled></ion-input>
+    </ion-item>
+    <ion-item [class.fieldHasError]="hasFieldAnError('title')">
+      <ion-label position="stacked">{{ 'BOOKS.DESCRIPTION' | translate }}</ion-label>
+      <ion-textarea [(ngModel)]="book.description" [disabled]="!editMode" [rows]="4"></ion-textarea>
+    </ion-item>
+  </ion-list>
+</ion-content>

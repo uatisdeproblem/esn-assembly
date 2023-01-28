@@ -1,0 +1,31 @@
+{
+  "version": "0.0.1",
+  "name": "back-end",
+  "scripts": {
+    "lint": "eslint --ext .ts",
+    "compile": "tsc --build",
+    "deploy": "cdk deploy",
+    "cdk": "cdk",
+    "logs": "sam logs --tail --profile esn-ga --stack-name esn-ga-dev-api",
+    "deploy-quick": "npm run compile && cdk --profile esn-ga deploy esn-ga-dev-api --context stage=dev --exclusively --hotswap"
+  },
+  "dependencies": {
+    "idea-aws": "^3.x.x",
+    "idea-toolbox": "^6.x.x"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "@tsconfig/node16": "^1.0.3",
+    "@types/aws-lambda": "^8.10.109",
+    "@types/node": "^16.18.10",
+    "@typescript-eslint/eslint-plugin": "^5.47.0",
+    "@typescript-eslint/parser": "^5.47.0",
+    "aws-cdk": "^2.56.1",
+    "aws-cdk-lib": "^2.56.1",
+    "aws-sdk": "^2.1282.0",
+    "constructs": "^10.1.199",
+    "esbuild": "^0.16.10",
+    "eslint": "^8.30.0",
+    "typescript": "^4.8.4"
+  }
+}

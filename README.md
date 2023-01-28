@@ -1,2 +1,1 @@
-# esn-ga
-ESN General Assembly - Candidates app
+# ESN General Assembly - Candidates app

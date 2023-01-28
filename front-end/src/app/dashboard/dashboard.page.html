@@ -1,0 +1,52 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.openUserPreferences()">
+        <ion-icon name="menu" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>ESN GA Candidates app</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="app.reloadApp()">
+        <ion-icon name="refresh" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="maxWidthContainer">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title class="ion-text-center">
+          <h2>Welcome <span *ngIf="app.user.name">, {{ app.user.name }}</span>!</h2>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content *ngIf="app.user">
+        <ion-item>
+          <ion-label position="stacked">ID</ion-label>
+          <ion-input readonly [value]="app.user.userId"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input readonly [value]="app.user.email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Groups</ion-label>
+          <ion-input readonly [value]="app.user.groups"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">API Token</ion-label>
+          <ion-input #apiTokenElement readonly [value]="apiToken"></ion-input>
+          <ion-button slot="end" (click)="copyHTMLInputText(apiTokenElement)">
+            <ion-icon name="copy" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+    <ion-row>
+      <ion-col>
+        <ion-button expand="block" routerLink="/books">{{ 'BOOKS.BOOKS' | translate }}</ion-button>
+      </ion-col>
+    </ion-row>
+  </div>
+</ion-content>

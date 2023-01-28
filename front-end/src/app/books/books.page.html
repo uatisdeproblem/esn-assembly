@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="app.goTo([''])">
+        <ion-icon icon="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-segment [(ngModel)]="segment">
+      <ion-segment-button [value]="PageSegments.TOP_10">
+        <ion-label>{{ 'BOOKS.TOP_10' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="PageSegments.ALL">
+        <ion-label>{{ 'BOOKS.ALL_BOOKS' | translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="app.user" [title]="t._('COMMON.ADD')" (click)="newBook()">
+        <ion-icon icon="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="segment === PageSegments.ALL">
+    <ion-searchbar (ionChange)="filter($event?.target.value)"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ng-container *ngIf="segment === PageSegments.ALL">
+    <ion-list class="aList maxWidthContainer">
+      <ion-item *ngIf="books && !books.length">{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-item>
+      <app-book *ngIf="!books"></app-book>
+      <app-book *ngFor="let book of books; trackBy: trackBy" [book]="book" (select)="openBook(book)"></app-book>
+    </ion-list>
+    <ion-infinite-scroll (ionInfinite)="filter(searchbar?.value, $event?.target)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ng-container>
+  <ng-container *ngIf="segment === PageSegments.TOP_10">
+    <ion-grid>
+      <ion-row class="ion-justify-content-center">
+        <ion-col
+          *ngFor="let book of topBooks; let index = index"
+          [size]="12"
+          [sizeSm]="6"
+          [sizeMd]="4"
+          [sizeLg]="3"
+          [sizeXl]="2"
+        >
+          <ion-img
+            class="tappable coverImage"
+            [src]="getCoverURL(book)"
+            (ionError)="setCoverFallbackURLOnImage($event?.target)"
+            (click)="openBook(book)"
+          ></ion-img>
+          <p class="ion-text-center bookTitle"><b>#{{ index + 1 }} - {{ book.title }}</b></p>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+</ion-content>

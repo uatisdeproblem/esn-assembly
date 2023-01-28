@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Start local app",
+      "noDebug": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/front-end",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "start"]
+    }
+  ]
+}

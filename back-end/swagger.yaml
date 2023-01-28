@@ -1,0 +1,237 @@
+openapi: 3.0.3
+
+info:
+  title: ESN GA Candidates app
+  version: 0.0.1
+  contact:
+    name: Matteo Carbone
+    email: email@matteocarbone.com
+    url: https://matteocarbone.com
+
+servers:
+  - url: https://api.esn-ga.link/{environment}
+    variables:
+      environment:
+        enum: [dev, prod]
+        default: dev
+        description: The API stage
+
+externalDocs:
+  description: Models documentation
+  url: https://github.com/uatisdeproblem/esn-ga/tree/main/back-end/src/models
+
+tags:
+  - name: Books
+    description: The platform's books
+
+paths:
+  /books:
+    get:
+      summary: Get the books
+      tags: [Books]
+      parameters:
+        - name: top
+          in: query
+          description: Top 10
+          schema:
+            type: boolean
+        - name: publisherId
+          in: query
+          description: Publisher ID
+          schema:
+            type: string
+        - name: paginated
+          in: query
+          description: Whether the result should be paginated
+          schema:
+            type: boolean
+        - name: startFromBookId
+          in: query
+          description: In case of pagination, where it should start
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Books'
+    post:
+      summary: Insert a new book
+      tags: [Books]
+      security:
+        - CognitoUserPool: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        200:
+          $ref: '#/components/responses/Book'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on the books
+      tags: [Books]
+      security:
+        - CognitoUserPool: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_COVER_UPLOAD_URL]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /books/{bookId}:
+    get:
+      summary: Get a book
+      tags: [Books]
+      parameters:
+        - name: bookId
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Book'
+    put:
+      summary: Edit a book
+      description: You can edit only your books
+      tags: [Books]
+      security:
+        - CognitoUserPool: []
+      parameters:
+        - name: bookId
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        200:
+          $ref: '#/components/responses/Book'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a book
+      tags: [Books]
+      security:
+        - CognitoUserPool: []
+      parameters:
+        - name: bookId
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [RATE]
+                rating:
+                  type: number
+                  enum: [1, 2, 3, 4, 5]
+                  description: (RATE)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a book
+      description: You can delete only your books
+      tags: [Books]
+      security:
+        - CognitoUserPool: []
+      parameters:
+        - name: bookId
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+
+components:
+  # choose for each project one kind of documentation style: lazy or detailed
+  schemas:
+    # 1. lazy documentation example:
+    # Book:
+    #  type: object
+    #  additionalProperties: {}
+    # 2. detailed documentation example:
+    Book:
+      type: object
+      properties:
+        bookId:
+          type: string
+          description: The book ID.
+          example: 'abcdef123'
+        publisherId:
+          type: string
+          description: The book's publisher ID.
+          example: 00000000-0000-0000-0000-00000000000
+        title:
+          type: string
+          description: The title of the book.
+          example: Buy the milk
+
+  responses:
+    Book:
+      description: A book
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Book'
+    Books:
+      description: The books
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Book'
+    BadParameters:
+      description: Bad input parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: The request isn't valid
+    OperationCompleted:
+      description: Operation completed
+
+  securitySchemes:
+    CognitoUserPool:
+      type: apiKey
+      name: Authorization
+      in: header
