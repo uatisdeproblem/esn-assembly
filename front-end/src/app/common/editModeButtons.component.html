@@ -1,0 +1,23 @@
+<ion-toolbar color="primary">
+  <ion-buttons slot="start" *ngIf="!editMode">
+    <ion-button (click)="app.closePage()">
+      <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+  <ion-title *ngIf="title">{{ title }}</ion-title>
+  <ion-buttons slot="end">
+    <ng-container *ngIf="editMode">
+      <ion-button [title]="'COMMON.EXIT_EDIT_MODE' | translate" (click)="exit.emit()">
+        <ion-icon slot="icon-only" icon="close-circle"></ion-icon>
+      </ion-button>
+      <ion-button [title]="'COMMON.SAVE_CHANGES' | translate" (click)="save.emit()">
+        <ion-icon slot="icon-only" icon="checkmark-circle"></ion-icon>
+      </ion-button>
+    </ng-container>
+    <ng-container *ngIf="!editMode">
+      <ion-button [title]="'COMMON.ENTER_EDIT_MODE' | translate" (click)="enter.emit()">
+        <ion-icon slot="icon-only" icon="pencil"></ion-icon>
+      </ion-button>
+    </ng-container>
+  </ion-buttons>
+</ion-toolbar>

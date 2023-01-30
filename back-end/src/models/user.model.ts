@@ -1,5 +1,27 @@
 import { Resource } from 'idea-toolbox';
 
+/**
+ * The list of roles that, if owned, would grant administative privileges in the platform.
+ */
+export const ADMIN_GALAXY_ROLES = [
+  'International.CNRsecretary',
+  'International.AGMchair',
+  'International.CNRadministrator',
+  'International.Board'
+];
+
+/**
+ * The list of (known) interesting roles on which to assign permissions in the platform.
+ */
+export const KNOWN_GALAXY_ROLES = [
+  'International.CNRsecretary',
+  'International.AGMchair',
+  'International.CNRadministrator',
+  'International.Board',
+  'National.Board',
+  'Local.Board'
+];
+
 export class User extends Resource {
   /**
    * Username in Galaxy.
@@ -50,5 +72,12 @@ export class User extends Resource {
     this.section = this.clean(x.section, String);
     this.country = this.clean(x.country, String);
     this.avatarURL = this.clean(x.avatarURL, String);
+  }
+
+  /**
+   * Whether the user has administrative privileges in the platform.
+   */
+  isAdministrator(): boolean {
+    return ADMIN_GALAXY_ROLES.some(x => this.roles.includes(x));
   }
 }

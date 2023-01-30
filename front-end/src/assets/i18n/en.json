@@ -110,5 +110,24 @@
     "BY": "By",
     "ON": "On",
     "UPVOTE_QUESTION": "Upvote question"
+  },
+  "ARCHIVE": {
+    "COMING_SOON": "Coming soon..."
+  },
+  "CONFIGURATIONS": {
+    "ENTITIES": "Entities",
+    "CATEGORIES": "Categories",
+    "EVENTS": "Events"
+  },
+  "CATEGORIES": {
+    "CATEGORIES": "Categories",
+    "MANAGE_CATEGORY": "Manage category",
+    "NAME": "Name",
+    "COLOR": "Color"
+  },
+  "EVENTS": {
+    "EVENTS": "Events",
+    "MANAGE_EVENT": "Manage event",
+    "NAME": "Name"
   }
 }

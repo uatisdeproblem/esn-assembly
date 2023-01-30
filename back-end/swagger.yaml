@@ -23,6 +23,8 @@ externalDocs:
 tags:
   - name: Login
     description: Access the platform
+  - name: Categories
+    description: The platform's categories
   - name: Events
     description: The platform's events
 
@@ -42,6 +44,90 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
+  /categories:
+    get:
+      summary: Get the categories
+      tags: [Categories]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/Categories'
+    post:
+      summary: Insert a new category
+      description: Requires to be Administrator
+      tags: [Categories]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        200:
+          $ref: '#/components/responses/Category'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /categories/{categoryId}:
+    get:
+      summary: Get a category
+      tags: [Categories]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: categoryId
+          in: path
+          description: Category ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Category'
+    put:
+      summary: Edit a category
+      description: Requires to be Administrator
+      tags: [Categories]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: categoryId
+          in: path
+          description: Category ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        200:
+          $ref: '#/components/responses/Category'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a category
+      description: Requires to be Administrator
+      tags: [Categories]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: categoryId
+          in: path
+          description: Category ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /events:
     get:
       summary: Get the events
@@ -53,6 +139,7 @@ paths:
           $ref: '#/components/responses/Events'
     post:
       summary: Insert a new event
+      description: Requires to be Administrator
       tags: [Events]
       security:
         - AuthFunction: []
@@ -71,6 +158,8 @@ paths:
     get:
       summary: Get an event
       tags: [Events]
+      security:
+        - AuthFunction: []
       parameters:
         - name: eventId
           in: path
@@ -83,6 +172,7 @@ paths:
           $ref: '#/components/responses/Event'
     put:
       summary: Edit an event
+      description: Requires to be Administrator
       tags: [Events]
       security:
         - AuthFunction: []
@@ -106,6 +196,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     delete:
       summary: Delete an event
+      description: Requires to be Administrator
       tags: [Events]
       security:
         - AuthFunction: []
@@ -124,11 +215,29 @@ paths:
 
 components:
   schemas:
+    Category:
+      type: object
+      additionalProperties: {}
     Event:
       type: object
       additionalProperties: {}
 
   responses:
+    Category:
+      description: A category
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Category'
+    Categories:
+      description: The categories
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Category'
     Event:
       description: An event
       content:

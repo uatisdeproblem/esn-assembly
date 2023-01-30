@@ -5,9 +5,13 @@ import { Resource } from 'idea-toolbox';
  */
 export class Subject extends Resource {
   /**
-   * The ESN Galaxy username of the subject.
+   * The ESN Galaxy ID of the subject.
    */
-  username: string;
+  id: string;
+  /**
+   * The type of subject.
+   */
+  type: SubjectType;
   /**
    * The name of the subject.
    */
@@ -27,10 +31,34 @@ export class Subject extends Resource {
 
   load(x: any): void {
     super.load(x);
-    this.username = this.clean(x.username, String);
+    this.id = this.clean(x.id, String);
+    this.type = this.clean(x.type, String);
     this.name = this.clean(x.name, String);
     this.avatarURL = this.clean(x.avatarURL, String);
-    if (x.section) this.section = this.clean(x.section, String);
-    if (x.country) this.country = this.clean(x.country, String);
+    if (this.type === SubjectType.USER) {
+      if (x.section) this.section = this.clean(x.section, String);
+      if (x.country) this.country = this.clean(x.country, String);
+    }
   }
+
+  validate(): string[] {
+    const e = super.validate();
+    if (this.iE(this.id)) e.push('id');
+    if (this.iE(this.type)) e.push('type');
+    if (this.iE(this.name)) e.push('name');
+    if (this.type === SubjectType.USER) {
+      if (this.iE(this.section)) e.push('section');
+      if (this.iE(this.country)) e.push('country');
+    }
+    return e;
+  }
+}
+
+/**
+ * The possible type of subjects.
+ */
+export enum SubjectType {
+  USER = 'USER',
+  SECTION = 'SECTION',
+  COUNTRY = 'COUNTRY'
 }

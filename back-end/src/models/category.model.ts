@@ -38,6 +38,7 @@ export class TopicCategory extends Resource {
   validate(): string[] {
     const e = super.validate();
     if (this.iE(this.name)) e.push('name');
+    if (!CATEGORY_COLORS.includes(this.color)) e.push('color');
     return e;
   }
 }
@@ -66,3 +67,18 @@ export class TopicCategoryAttached extends Resource {
     this.color = this.clean(x.color, String);
   }
 }
+
+/**
+ * The possible colors for a category.
+ */
+export const CATEGORY_COLORS = [
+  'ESNcyan',
+  'ESNdarkBlue',
+  'ESNorange',
+  'ESNpink',
+  'ESNgreen',
+  'medium',
+  'light',
+  'dark',
+  'white'
+];

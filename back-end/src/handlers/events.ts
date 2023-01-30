@@ -5,6 +5,7 @@
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { TopicEvent } from '../models/event.model';
+import { User } from '../models/user.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -21,10 +22,12 @@ export const handler = (ev: any, _: any, cb: any): Promise<void> => new TopicEve
 ///
 
 class TopicEvents extends ResourceController {
+  galaxyUser: User;
   topicEvent: TopicEvent;
 
   constructor(event: any, callback: any) {
     super(event, callback, { resourceId: 'eventId' });
+    this.galaxyUser = new User(event.requestContext.authorizer.lambda.user);
   }
 
   protected async checkAuthBeforeRequest(): Promise<void> {
@@ -41,7 +44,10 @@ class TopicEvents extends ResourceController {
 
   protected async getResources(): Promise<TopicEvent[]> {
     const res: TopicEvent[] = await ddb.scan({ TableName: DDB_TABLES.events });
-    return res.map(x => new TopicEvent(x));
+    return res
+      .map(x => new TopicEvent(x))
+      .filter(x => !x.archivedAt)
+      .sort((a, b): number => a.name.localeCompare(b.name));
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<TopicEvent> {
@@ -56,6 +62,8 @@ class TopicEvents extends ResourceController {
   }
 
   protected async postResources(): Promise<TopicEvent> {
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
     this.topicEvent = new TopicEvent(this.body);
     this.topicEvent.eventId = await ddb.IUNID(PROJECT);
 
@@ -67,6 +75,8 @@ class TopicEvents extends ResourceController {
   }
 
   protected async putResource(): Promise<TopicEvent> {
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
     const oldEvent = new TopicEvent(this.topicEvent);
     this.topicEvent.safeLoad(this.body, oldEvent);
 
@@ -74,6 +84,9 @@ class TopicEvents extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.resourceId } });
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    this.topicEvent.archivedAt = new Date().toISOString();
+    await this.putSafeResource({ noOverwrite: false });
   }
 }

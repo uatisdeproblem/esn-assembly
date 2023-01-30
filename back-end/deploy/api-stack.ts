@@ -185,7 +185,7 @@ export class ApiStack extends cdk.Stack {
       lambdaFn.addPermission(`${resource.name}-permission`, {
         principal: new IAM.ServicePrincipal('apigateway.amazonaws.com'),
         action: 'lambda:InvokeFunction',
-        sourceArn: `arn:aws:execute-api:${region}:${account}:${params.api.ref}/*/*/*`
+        sourceArn: `arn:aws:execute-api:${region}:${account}:${params.api.ref}/*/*`
       });
 
       // integrate the AuthFunction into the Api definition

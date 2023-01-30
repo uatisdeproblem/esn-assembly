@@ -1,6 +1,6 @@
 <ng-container *ngIf="!row">
   <ion-item *ngIf="topic" button (click)="select.emit()">
-    <ion-badge slot="start" color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>
+    <!--<ion-badge slot="start" color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>-->
     <ion-label class="ion-text-wrap">
       <p>{{ topic.event.name }}</p>
       {{ topic.name }}
@@ -42,7 +42,7 @@
   </ion-row>
   <ion-row class="ion-align-items-center row tappable" *ngIf="!header && topic" (click)="select.emit()">
     <ion-col [sizeLg]="5" [sizeXl]="3">
-      <ion-badge color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>
+      <!--<ion-badge color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>-->
       <b>{{ topic.name }}</b>
     </ion-col>
     <ion-col [sizeLg]="3" [sizeXl]="2">

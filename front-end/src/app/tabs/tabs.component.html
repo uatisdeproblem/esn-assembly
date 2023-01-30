@@ -9,7 +9,7 @@
     <ion-tab-button tab="archive">
       <ion-label>{{ 'TABS.ARCHIVE' | translate }}</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="configurations" *ngIf="app.user">
+    <ion-tab-button tab="configurations" *ngIf="app.user.isAdministrator()">
       <ion-label>{{ 'TABS.CONFIGURATIONS' | translate }}</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
@@ -23,7 +23,7 @@
     <ion-tab-button tab="archive">
       <ion-icon icon="archive"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="configurations" *ngIf="app.user">
+    <ion-tab-button tab="configurations" *ngIf="app.user.isAdministrator()">
       <ion-icon icon="settings"></ion-icon>
     </ion-tab-button>
   </ion-tab-bar>
