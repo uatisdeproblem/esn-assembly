@@ -1,6 +1,7 @@
 {
   "COMMON": {
-    "APP_NAME": "ESN GA Candidates app",
+    "APP_NAME": "Candidates app",
+    "APP_DESCRIPTION": "ESN General Assembly",
     "VERSION": "Version {{v}}",
     "ARE_YOU_SURE": "Are you sure?",
     "ACTION_IS_IRREVERSIBLE": "The action is irreversible",
@@ -76,19 +77,38 @@
     "NOT_SELECTED": "Not selected"
   },
   "LANGUAGES": {
-    "IT": "Italian",
     "EN": "English"
   },
-  "BOOKS": {
-    "BOOKS": "Books",
-    "BOOK": "Book",
-    "NEW_BOOK": "New book",
-    "TITLE": "Title",
-    "GENRE": "Genre",
-    "AUTHOR": "Author",
-    "DESCRIPTION": "Description",
-    "PUBLISH_DATE": "Publish date",
-    "ALL_BOOKS": "All books",
-    "TOP_10": "Top 10"
+  "AUTH": {
+    "LOGIN_WITH_ESN_GALAXY": "Login with ESN Galaxy"
+  },
+  "TABS": {
+    "TOPICS": "Topics",
+    "ARCHIVE": "Archive",
+    "CONFIGURATIONS": "Configurations"
+  },
+  "TOPICS": {
+    "QUESTIONS": "Questions",
+    "TO_READ": "To read",
+    "NAME": "Topic",
+    "CATEGORY": "Category",
+    "EVENT": "Event",
+    "SUBJECTS": "Subjects",
+    "NUM_OF_QUESTIONS": "Questions",
+    "STATUS": "Status",
+    "STATUSES": {
+      "OPEN": "Open",
+      "CLOSED": "Closed"
+    },
+    "CREATED_AT": "Created",
+    "UPDATED_AT": "Updated",
+    "NO_ACTIVE_TOPICS": "No active topics",
+    "NO_QUESTIONS_ASKED_YET": "No questions asked yet",
+    "BACK_TO_OTHER_QUESTIONS": "Back to other questions"
+  },
+  "QUESTIONS": {
+    "BY": "By",
+    "ON": "On",
+    "UPVOTE_QUESTION": "Upvote question"
   }
 }

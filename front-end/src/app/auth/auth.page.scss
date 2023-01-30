@@ -1,0 +1,29 @@
+.flexBox {
+  background: var(--ion-color-white-shade);
+}
+.authCard {
+  min-width: 400px;
+  max-width: 500px;
+  margin: 0 auto;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 20px;
+  background-color: var(--ion-color-white);
+  border-radius: 10px;
+  text-align: center;
+  ion-img {
+    width: 150px;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }
+  ion-card-title {
+    font-size: 2.4em;
+  }
+  ion-card-subtitle {
+    font-size: 1.2em;
+  }
+  ion-card-content {
+    padding-top: 16px;
+  }
+}

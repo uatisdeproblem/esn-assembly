@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
 import { Platform, NavController } from '@ionic/angular';
-import { CognitoUser } from 'idea-toolbox';
 import { IDEAApiService, IDEAStorageService } from '@idea-ionic/common';
-import { IDEAAuthService } from '@idea-ionic/auth';
 
 import { AppService } from './app.service';
+
+import { User } from '@models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -13,7 +13,6 @@ export class AuthGuard implements CanActivate {
     private platform: Platform,
     private navCtrl: NavController,
     private storage: IDEAStorageService,
-    private auth: IDEAAuthService,
     private api: IDEAApiService,
     private app: AppService
   ) {}
@@ -25,24 +24,24 @@ export class AuthGuard implements CanActivate {
     await this.storage.ready();
 
     try {
-      await this.doAuth();
-      this.platform.resume.subscribe(() => this.doAuth());
+      await this.loadUserAndToken();
 
       if (window.location.pathname === '/') return this.navigateAndResolve([]);
-
-      return this.navigateAndResolve();
+      else return this.navigateAndResolve();
     } catch (err) {
       return this.navigateAndResolve(['auth']);
     }
   }
 
-  private async doAuth(): Promise<{ authToken: string; user: CognitoUser }> {
-    const authRes = await this.auth.isAuthenticated(false, freshIdToken => (this.api.authToken = freshIdToken));
+  private async loadUserAndToken(): Promise<void> {
+    const tokenExpiresAt = await this.storage.get('tokenExpiresAt');
+    if (!tokenExpiresAt || tokenExpiresAt < Date.now()) throw new Error('The token expired');
 
-    this.api.authToken = authRes.idToken;
-    this.app.user = new CognitoUser(authRes.userDetails);
+    this.api.authToken = await this.storage.get('token');
+    if (!this.api.authToken) throw new Error('Missing token');
 
-    return { authToken: this.api.authToken, user: this.app.user };
+    this.app.user = new User(await this.storage.get('user'));
+    if (!this.app.user) throw new Error('Missing user');
   }
   private navigateAndResolve(navigationPath?: string[]): boolean {
     if (navigationPath) this.navCtrl.navigateRoot(navigationPath);

@@ -1,0 +1,11 @@
+ion-item {
+  ion-label {
+    font-size: 0.9em;
+    p b {
+      font-weight: 500;
+    }
+  }
+}
+ion-item.current {
+  border-left: 8px solid var(--ion-color-primary);
+}

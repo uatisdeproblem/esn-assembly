@@ -1,0 +1,24 @@
+ion-tabs ion-tab-bar {
+  ion-tab-button {
+    border-bottom: 2px solid transparent;
+  }
+  ion-tab-button.tab-selected {
+    border-bottom-color: white;
+    ion-label {
+      font-weight: bold;
+    }
+  }
+}
+
+ion-tabs.desktopTabs {
+  ion-tab-bar {
+    justify-content: start;
+  }
+  ion-tab-button {
+    flex: none;
+    min-width: 100px;
+  }
+  ion-img {
+    width: 35px;
+  }
+}

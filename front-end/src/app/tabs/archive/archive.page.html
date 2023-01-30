@@ -1,0 +1,9 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-img [src]="app.getIcon()"></ion-img>
+    </ion-buttons>
+    <ion-title>{{ 'TABS.ARCHIVE' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>ARCHIVE</ion-content>

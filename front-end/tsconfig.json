@@ -6,7 +6,10 @@
     "paths": {
       "crypto": ["node_modules/crypto-js"],
       "@models/*": ["../back-end/src/models/*"],
-      "@env": ["../front-end/src/environments/environment.ts"]
+      "@env": ["../front-end/src/environments/environment.ts"],
+      "@app/*": ["../front-end/src/app/*"],
+      "@tabs/*": ["../front-end/src/app/tabs/*"],
+      "@common/*": ["../front-end/src/app/common/*"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,

@@ -21,98 +21,75 @@ externalDocs:
   url: https://github.com/uatisdeproblem/esn-ga/tree/main/back-end/src/models
 
 tags:
-  - name: Books
-    description: The platform's books
+  - name: Login
+    description: Access the platform
+  - name: Events
+    description: The platform's events
 
 paths:
-  /books:
+  /login:
     get:
-      summary: Get the books
-      tags: [Books]
+      summary: Manage the login accepted request from Galaxy and prepare a token to authenticate the user
+      description: Acquire the CAS ticket, validate it, create the user (if necessary) and return a token.
+      tags: [Login]
       parameters:
-        - name: top
+        - name: ticket
           in: query
-          description: Top 10
-          schema:
-            type: boolean
-        - name: publisherId
-          in: query
-          description: Publisher ID
-          schema:
-            type: string
-        - name: paginated
-          in: query
-          description: Whether the result should be paginated
-          schema:
-            type: boolean
-        - name: startFromBookId
-          in: query
-          description: In case of pagination, where it should start
+          description: The CAS ticket of successful login with Galaxy
+          required: true
           schema:
             type: string
       responses:
         200:
-          $ref: '#/components/responses/Books'
+          $ref: '#/components/responses/OperationCompleted'
+  /events:
+    get:
+      summary: Get the events
+      tags: [Events]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/Events'
     post:
-      summary: Insert a new book
-      tags: [Books]
+      summary: Insert a new event
+      tags: [Events]
       security:
-        - CognitoUserPool: []
+        - AuthFunction: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Book'
+              $ref: '#/components/schemas/Event'
       responses:
         200:
-          $ref: '#/components/responses/Book'
+          $ref: '#/components/responses/Event'
         400:
           $ref: '#/components/responses/BadParameters'
-    patch:
-      summary: Actions on the books
-      tags: [Books]
-      security:
-        - CognitoUserPool: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                action:
-                  type: string
-                  enum: [GET_COVER_UPLOAD_URL]
-      responses:
-        200:
-          $ref: '#/components/responses/OperationCompleted'
-        400:
-          $ref: '#/components/responses/BadParameters'
-  /books/{bookId}:
+  /events/{eventId}:
     get:
-      summary: Get a book
-      tags: [Books]
+      summary: Get an event
+      tags: [Events]
       parameters:
-        - name: bookId
+        - name: eventId
           in: path
-          description: Book ID
+          description: Event ID
           required: true
           schema:
             type: string
       responses:
         200:
-          $ref: '#/components/responses/Book'
+          $ref: '#/components/responses/Event'
     put:
-      summary: Edit a book
-      description: You can edit only your books
-      tags: [Books]
+      summary: Edit an event
+      tags: [Events]
       security:
-        - CognitoUserPool: []
+        - AuthFunction: []
       parameters:
-        - name: bookId
+        - name: eventId
           in: path
-          description: Book ID
+          description: Event ID
           required: true
           schema:
             type: string
@@ -121,53 +98,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Book'
+              $ref: '#/components/schemas/Event'
       responses:
         200:
-          $ref: '#/components/responses/Book'
-        400:
-          $ref: '#/components/responses/BadParameters'
-    patch:
-      summary: Actions on a book
-      tags: [Books]
-      security:
-        - CognitoUserPool: []
-      parameters:
-        - name: bookId
-          in: path
-          description: Book ID
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                action:
-                  type: string
-                  enum: [RATE]
-                rating:
-                  type: number
-                  enum: [1, 2, 3, 4, 5]
-                  description: (RATE)
-      responses:
-        200:
-          $ref: '#/components/responses/OperationCompleted'
+          $ref: '#/components/responses/Event'
         400:
           $ref: '#/components/responses/BadParameters'
     delete:
-      summary: Delete a book
-      description: You can delete only your books
-      tags: [Books]
+      summary: Delete an event
+      tags: [Events]
       security:
-        - CognitoUserPool: []
+        - AuthFunction: []
       parameters:
-        - name: bookId
+        - name: eventId
           in: path
-          description: Book ID
+          description: Event ID
           required: true
           schema:
             type: string
@@ -178,45 +123,27 @@ paths:
           $ref: '#/components/responses/BadParameters'
 
 components:
-  # choose for each project one kind of documentation style: lazy or detailed
   schemas:
-    # 1. lazy documentation example:
-    # Book:
-    #  type: object
-    #  additionalProperties: {}
-    # 2. detailed documentation example:
-    Book:
+    Event:
       type: object
-      properties:
-        bookId:
-          type: string
-          description: The book ID.
-          example: 'abcdef123'
-        publisherId:
-          type: string
-          description: The book's publisher ID.
-          example: 00000000-0000-0000-0000-00000000000
-        title:
-          type: string
-          description: The title of the book.
-          example: Buy the milk
+      additionalProperties: {}
 
   responses:
-    Book:
-      description: A book
+    Event:
+      description: An event
       content:
         application/json:
           schema:
             type: object
-            $ref: '#/components/schemas/Book'
-    Books:
-      description: The books
+            $ref: '#/components/schemas/Event'
+    Events:
+      description: The events
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/Book'
+              $ref: '#/components/schemas/Event'
     BadParameters:
       description: Bad input parameters
       content:
@@ -231,7 +158,7 @@ components:
       description: Operation completed
 
   securitySchemes:
-    CognitoUserPool:
+    AuthFunction:
       type: apiKey
       name: Authorization
       in: header

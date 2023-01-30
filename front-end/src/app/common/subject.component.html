@@ -1,0 +1,12 @@
+<ion-item [color]="color" [lines]="lines">
+  <ion-avatar slot="start">
+    <ion-img
+      [src]="subject.avatarURL ?? app.getAvatarFallbackURL()"
+      (ionError)="app.fallbackAvatar($event?.target)"
+    ></ion-img>
+  </ion-avatar>
+  <ion-label>
+    {{ subject.name }}
+    <p>{{ [subject.country, subject.section].join(' - ') }}</p>
+  </ion-label>
+</ion-item>

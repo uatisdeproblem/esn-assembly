@@ -1,0 +1,36 @@
+<ion-item button *ngIf="question" [detail]="!!current" [class.current]="!!current" (click)="select.emit()">
+  <ion-badge slot="start" color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>
+  <ion-avatar slot="start" class="ion-hide-lg-down">
+    <ion-img
+      [src]="question.creator.avatarURL ?? app.getAvatarFallbackURL()"
+      (ionError)="app.fallbackAvatar($event?.target)"
+    ></ion-img>
+  </ion-avatar>
+  <ion-label class="ion-text-wrap">
+    {{ question.summary }}
+    <p>
+      {{ 'QUESTIONS.BY' | translate | lowercase }}
+      <b>{{ question.creator.name }}</b>
+      <br />
+      {{ 'QUESTIONS.ON' | translate | lowercase }}
+      {{ question.updatedAt ?? question.createdAt | dateLocale : 'mediumDate' }}
+    </p>
+  </ion-label>
+  <ion-chip color="medium" class="ion-hide-sm-down">
+    <ion-icon name="chatbubbles"></ion-icon>
+    <ion-label>{{ question.numOfMessages }}</ion-label>
+  </ion-chip>
+  <ion-chip color="success" class="ion-hide-sm-down">
+    <ion-icon name="thumbs-up"></ion-icon>
+    <ion-label>{{ question.numOfUpvotes }}</ion-label>
+  </ion-chip>
+</ion-item>
+<!-- skeleton -->
+<ion-item *ngIf="!question">
+  <ion-avatar slot="start">
+    <ion-skeleton-text animated></ion-skeleton-text>
+  </ion-avatar>
+  <ion-label>
+    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+  </ion-label>
+</ion-item>

@@ -20,12 +20,12 @@ export interface ApiProps extends cdk.StackProps {
   resourceControllers: ResourceController[];
   tables: { [tableName: string]: DDBTable };
   mediaBucketArn: string;
-  cognito: { userPoolId: string; audience: string[] };
   removalPolicy: RemovalPolicy;
 }
 export interface ResourceController {
   name: string;
   paths?: string[];
+  isAuthFunction?: boolean;
 }
 export interface DDBTable {
   PK: DDB.Attribute;
@@ -60,9 +60,7 @@ export class ApiStack extends cdk.Stack {
       stackId: id,
       stage: props.stage,
       apiDomain: props.apiDomain,
-      apiDefinitionFile: props.apiDefinitionFile,
-      cognitoUserPoolId: props.cognito.userPoolId,
-      cognitoAudience: props.cognito.audience
+      apiDefinitionFile: props.apiDefinitionFile
     });
     new cdk.CfnOutput(this, 'HTTPApiURL', { value: api.attrApiEndpoint });
 
@@ -72,10 +70,6 @@ export class ApiStack extends cdk.Stack {
       defaultLambdaFnProps,
       project: props.project,
       stage: props.stage
-    });
-    this.allowLambdaFunctionsToAccessCognitoUserPool({
-      cognitoUserPoolId: props.cognito.userPoolId,
-      lambdaFunctions: Object.values(lambdaFunctions)
     });
     this.allowLambdaFunctionsToAccessIDEATablesAndFunctions({ lambdaFunctions: Object.values(lambdaFunctions) });
     this.allowLambdaFunctionsToAccessMediaBucketFoldersAndUploadAssets({
@@ -111,8 +105,6 @@ export class ApiStack extends cdk.Stack {
     stage: string;
     apiDefinitionFile: string;
     apiDomain: string;
-    cognitoUserPoolId: string;
-    cognitoAudience: string[];
   }): Promise<{ api: cdk.aws_apigatewayv2.CfnApi }> {
     const api = new ApiGw.CfnApi(this, 'HttpApi');
 
@@ -122,17 +114,6 @@ export class ApiStack extends cdk.Stack {
       allowOrigins: ['*'],
       allowMethods: ['*'],
       allowHeaders: ['Content-Type', 'Authorization']
-    };
-
-    // set the Cognito authorizer in the api definition (it will be created automatically with the api)
-    const region = cdk.Stack.of(this).region;
-    apiDefinition.components.securitySchemes['CognitoUserPool']['x-amazon-apigateway-authorizer'] = {
-      type: 'jwt',
-      identitySource: '$request.header.Authorization',
-      jwtConfiguration: {
-        issuer: `https://cognito-idp.${region}.amazonaws.com/${params.cognitoUserPoolId}`,
-        audience: params.cognitoAudience
-      }
     };
 
     // set metadata to recognize the API in the API Gateway console
@@ -207,6 +188,17 @@ export class ApiStack extends cdk.Stack {
         sourceArn: `arn:aws:execute-api:${region}:${account}:${params.api.ref}/*/*/*`
       });
 
+      // integrate the AuthFunction into the Api definition
+      if (resource.isAuthFunction)
+        params.api.body.components.securitySchemes['AuthFunction']['x-amazon-apigateway-authorizer'] = {
+          type: 'request',
+          identitySource: '$request.header.Authorization',
+          authorizerUri: `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${account}:function:${lambdaFnName}/invocations`,
+          authorizerPayloadFormatVersion: '2.0',
+          authorizerResultTtlInSeconds: 300,
+          enableSimpleResponses: true
+        };
+
       lambdaFn.addEnvironment('PROJECT', params.project);
       lambdaFn.addEnvironment('STAGE', params.stage);
       lambdaFn.addEnvironment('RESOURCE', resource.name);
@@ -215,26 +207,6 @@ export class ApiStack extends cdk.Stack {
     });
 
     return { lambdaFunctions };
-  }
-  private allowLambdaFunctionsToAccessCognitoUserPool(params: {
-    lambdaFunctions: NodejsFunction[];
-    cognitoUserPoolId: string;
-  }): void {
-    const region = cdk.Stack.of(this).region;
-    const account = cdk.Stack.of(this).account;
-    const accessCognitoPolicy = new IAM.Policy(this, 'ManageCognitoUserPool', {
-      statements: [
-        new IAM.PolicyStatement({
-          effect: IAM.Effect.ALLOW,
-          actions: ['cognito-idp:*'],
-          resources: [`arn:aws:cognito-idp:${region}:${account}:userpool/${params.cognitoUserPoolId}`]
-        })
-      ]
-    });
-    params.lambdaFunctions.forEach(lambdaFn => {
-      if (lambdaFn.role) lambdaFn.role.attachInlinePolicy(accessCognitoPolicy);
-      lambdaFn.addEnvironment('COGNITO_USER_POOL_ID', params.cognitoUserPoolId);
-    });
   }
   private allowLambdaFunctionsToAccessIDEATablesAndFunctions(params: { lambdaFunctions: NodejsFunction[] }): void {
     const region = cdk.Stack.of(this).region;

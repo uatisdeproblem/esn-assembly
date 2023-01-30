@@ -1,0 +1,39 @@
+ion-avatar {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+}
+ion-avatar[slot='end'] {
+  margin-left: 4px;
+}
+ion-badge[slot='end'] {
+  margin-left: 12px;
+}
+
+ion-item p.itemDetails {
+  padding-top: 6px;
+  padding-bottom: 4px;
+  ion-text {
+    vertical-align: super;
+  }
+}
+
+ion-row.headerRow {
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+ion-row.row {
+  font-size: 0.9em;
+  b {
+    font-weight: 500;
+  }
+}
+ion-row.row,
+ion-row.headerRow {
+  padding: 10px;
+  ion-badge,
+  ion-avatar {
+    vertical-align: sub;
+  }
+}

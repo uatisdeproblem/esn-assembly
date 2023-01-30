@@ -1,0 +1,30 @@
+<ion-tabs class="desktopTabs" *ngIf="!app.isInMobileMode()">
+  <ion-tab-bar color="ideaToolbar" slot="top">
+    <ion-tab-button (click)="app.goTo([''])">
+      <ion-img [src]="app.getIcon()"></ion-img>
+    </ion-tab-button>
+    <ion-tab-button tab="topics">
+      <ion-label>{{ 'TABS.TOPICS' | translate }}</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="archive">
+      <ion-label>{{ 'TABS.ARCHIVE' | translate }}</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="configurations" *ngIf="app.user">
+      <ion-label>{{ 'TABS.CONFIGURATIONS' | translate }}</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+<ion-tabs class="mobileTabs" *ngIf="app.isInMobileMode()">
+  <ion-tab-bar color="ideaToolbar" slot="bottom">
+    <ion-tab-button tab="topics">
+      <ion-icon icon="home"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="archive">
+      <ion-icon icon="archive"></ion-icon>
+    </ion-tab-button>
+    <ion-tab-button tab="configurations" *ngIf="app.user">
+      <ion-icon icon="settings"></ion-icon>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>

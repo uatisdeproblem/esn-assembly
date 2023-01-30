@@ -1,0 +1,24 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-img [src]="app.getIcon()"></ion-img>
+    </ion-buttons>
+    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list class="aList">
+    <ion-item lines="full" class="ion-text-center noElements" *ngIf="topics && !topics.length">
+      <ion-label>{{ 'TOPICS.NO_ACTIVE_TOPICS' | translate }}</ion-label>
+    </ion-item>
+    <ng-container *ngIf="app.isInMobileMode()">
+      <app-topic *ngIf="!topics"></app-topic>
+      <app-topic *ngFor="let topic of topics" [topic]="topic" (select)="openTopic(topic)"></app-topic>
+    </ng-container>
+    <ion-grid *ngIf="!app.isInMobileMode()">
+      <app-topic *ngIf="!topics" [row]="true"></app-topic>
+      <app-topic *ngIf="topics?.length" [row]="true" [header]="true"></app-topic>
+      <app-topic *ngFor="let topic of topics" [topic]="topic" [row]="true" (select)="openTopic(topic)"></app-topic>
+    </ion-grid>
+  </ion-list>
+</ion-content>

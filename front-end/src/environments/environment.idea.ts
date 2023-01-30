@@ -19,13 +19,7 @@ export const environment = {
       registrationIsPossible: false,
       singleSimultaneousSession: false
     },
-    ionicExtraModules: ['common', 'variables', 'auth'],
+    ionicExtraModules: ['common'],
     website: 'https://esn.org'
-  },
-  aws: {
-    cognito: {
-      userPoolId: 'eu-south-1_75DdHx8ba',
-      userPoolClientId: '7cijl800ukriibl0g6rbj3iu5r'
-    }
   }
 };

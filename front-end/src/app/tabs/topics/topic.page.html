@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.closePage()">
+        <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <ion-col [size]="12" [sizeLg]="6" *ngIf="!app.isInMobileMode() || !currentQuestion">
+        <ion-card color="white" *ngIf="topic">
+          <ion-card-header>
+            <ion-card-subtitle>{{ topic.event.name }}</ion-card-subtitle>
+            <ion-card-title>{{ topic.name }}</ion-card-title>
+            <p><ion-badge>{{ topic.category.name }}</ion-badge></p>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list class="aList" lines="none">
+              <app-subject color="white" *ngFor="let subject of topic.subjects" [subject]="subject"></app-subject>
+              <p class="description" *ngIf="topic.description">{{ topic.description }}</p>
+              <ion-item button *ngFor="let attachment of topic.attachments">
+                <ion-icon name="attach" slot="start"></ion-icon>
+                <ion-label>{{ attachment.name }}.{{ attachment.format }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+        <ion-list class="aList">
+          <ion-list-header>
+            <ion-label>
+              <h2>
+                {{ 'TOPICS.QUESTIONS' | translate }}
+                <ion-text *ngIf="questions.length">({{ questions.length }})</ion-text>
+              </h2>
+            </ion-label>
+          </ion-list-header>
+          <ion-searchbar></ion-searchbar>
+          <ion-item lines="full" class="ion-text-center noElements" *ngIf="questions && !questions.length">
+            <ion-label>{{ 'TOPICS.NO_QUESTIONS_ASKED_YET' | translate }}</ion-label>
+          </ion-item>
+          <app-question-summary *ngIf="!questions"></app-question-summary>
+          <app-question-summary
+            *ngFor="let question of questions"
+            [question]="question"
+            [current]="currentQuestion === question"
+            (select)="selectQuestion(question)"
+          ></app-question-summary>
+        </ion-list>
+      </ion-col>
+      <ion-col [size]="12" [sizeLg]="6" *ngIf="currentQuestion">
+        <p *ngIf="app.isInMobileMode()">
+          <ion-button color="medium" fill="clear" (click)="selectQuestion(null)">
+            <ion-icon slot="start" name="close"></ion-icon> {{ 'TOPICS.BACK_TO_OTHER_QUESTIONS' | translate }}
+          </ion-button>
+        </p>
+        <app-question [topic]="topic" [question]="currentQuestion"></app-question>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,19 @@
+<ion-card color="white" *ngIf="question">
+  <ion-card-header>
+    <ion-card-subtitle>{{ topic.name }}</ion-card-subtitle>
+    <ion-card-title>{{ question.summary }}</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p class="ion-text-right">
+      <ion-button fill="clear" color="ESNgreen" class="ion-text-capitalize">
+        {{ 'QUESTIONS.UPVOTE_QUESTION' | translate }} <ion-icon slot="end" icon="thumbs-up"></ion-icon>
+      </ion-button>
+    </p>
+    <app-message-bubble [text]="question.text" [creator]="question.creator"></app-message-bubble>
+    <app-message-bubble
+      [text]="messages[0].text"
+      [creator]="messages[0].creator"
+      [isSender]="true"
+    ></app-message-bubble>
+  </ion-card-content>
+</ion-card>

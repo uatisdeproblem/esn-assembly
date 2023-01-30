@@ -35,11 +35,11 @@
 // PROJECT custom
 //
 
-@font-face {
-  font-family: 'auth-title';
-  src: url('assets/fonts/LondrinaSolid-Light.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+@import 'typeface-poppins';
+
+:root {
+  --ion-font-family: 'Poppins';
+  letter-spacing: normal;
 }
 
 .maxWidthContainer {
@@ -50,4 +50,104 @@
 
 ion-list.aList {
   background: transparent;
+  ion-list-header {
+    border-top: none;
+    margin: 15px 0 5px 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    @media only screen and (max-width: 767px) {
+      padding-left: 16px;
+      padding-left: 16px;
+    }
+    ion-label {
+      margin-right: 12px;
+      h1,
+      h2,
+      h3 {
+        font-weight: 500;
+      }
+      h1 {
+        font-size: 1.5em;
+        margin-bottom: 5px;
+      }
+      h2 {
+        font-size: 1.3em;
+        margin-bottom: 5px;
+      }
+      h3 {
+        margin-bottom: 5px;
+      }
+      ion-badge {
+        margin: 3px 3px 10px 0;
+        font-size: 0.7em;
+      }
+      p:last-of-type {
+        margin-bottom: 10px;
+      }
+    }
+  }
+  ion-item-divider {
+    background-color: transparent;
+    border-bottom: none;
+    padding-top: 6px;
+    padding-left: 10px;
+    h3 {
+      color: var(--ion-color-dark);
+      font-weight: 500;
+    }
+  }
+  ion-row.row,
+  ion-item {
+    // all the three definitions are important
+    background-color: var(--ion-color-white);
+    --ion-background-color: var(--ion-color-white);
+    --background: var(--ion-color-white);
+  }
+  ion-row.row.odd,
+  ion-item.odd {
+    // all the three definitions are important
+    background-color: var(--ion-color-light);
+    --ion-background-color: var(--ion-color-light);
+    --background: var(--ion-color-light);
+  }
+  ion-row.row ion-item,
+  ion-row.headerRow ion-item {
+    // all the three definitions are important
+    background-color: transparent;
+    --ion-background-color: transparent;
+    --background: transparent;
+  }
+}
+
+ion-searchbar {
+  --background: var(--ion-color-white) !important;
+  --box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px !important;
+}
+
+ion-card {
+  box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+ion-item.noElements,
+ion-col.noElements {
+  ion-label {
+    font-style: italic;
+  }
+}
+
+ion-toolbar ion-buttons[slot='start'] ion-img {
+  width: 30px;
+  margin-left: 16px;
+}
+
+ion-badge {
+  font-weight: 600;
+}
+
+ion-badge.unreadDot {
+  vertical-align: middle !important;
+  border-radius: 50%;
+  padding: 0 5px;
+  margin-left: 6px;
+  margin-right: 16px;
 }

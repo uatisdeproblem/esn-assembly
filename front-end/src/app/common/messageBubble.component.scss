@@ -1,0 +1,37 @@
+div.bubble {
+  --bubble-bg-color: rgba(var(--ion-color-ESNcyan-rgb), 0.1);
+  margin: 8px 42px 8px 16px;
+  display: inline-block;
+  position: relative;
+  width: 90%;
+  height: auto;
+  background-color: var(--bubble-bg-color);
+  border: var(--ion-border-color);
+  border-radius: 30px;
+  padding: 16px;
+  p {
+    padding: 8px 16px;
+  }
+}
+div:before {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: -20px;
+  right: auto;
+  top: auto;
+  bottom: 20px;
+  border: 10px solid;
+  border-color: var(--bubble-bg-color) var(--bubble-bg-color) transparent transparent;
+}
+
+div.bubble.bubbleSender {
+  --bubble-bg-color: rgba(var(--ion-color-ESNgreen-rgb), 0.1);
+  margin: 8px 16px 8px 42px;
+}
+div.bubble.bubbleSender:before {
+  left: auto;
+  right: -20px;
+  border-color: var(--bubble-bg-color) transparent transparent var(--bubble-bg-color);
+}

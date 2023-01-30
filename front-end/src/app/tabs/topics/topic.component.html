@@ -1,0 +1,80 @@
+<ng-container *ngIf="!row">
+  <ion-item *ngIf="topic" button (click)="select.emit()">
+    <ion-badge slot="start" color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>
+    <ion-label class="ion-text-wrap">
+      <p>{{ topic.event.name }}</p>
+      {{ topic.name }}
+      <p class="itemDetails">
+        <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
+        <ion-text class="ion-padding-start">
+          {{ topic.numOfQuestions }} {{ 'TOPICS.QUESTIONS' | translate | lowercase }}
+        </ion-text>
+      </p>
+    </ion-label>
+    <ion-avatar slot="end" class="ion-hide-sm-down" *ngFor="let subject of topic.subjects" [title]="subject.name">
+      <ion-img
+        [src]="subject.avatarURL ?? app.getAvatarFallbackURL()"
+        (ionError)="app.fallbackAvatar($event?.target)"
+      ></ion-img>
+    </ion-avatar>
+    <ion-badge slot="end" [color]="topic.closedAt ? 'danger' : 'success'">
+      {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+    </ion-badge>
+  </ion-item>
+  <!-- skeleton -->
+  <ion-item *ngIf="!topic">
+    <ion-label>
+      <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      <p><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></p>
+    </ion-label>
+  </ion-item>
+</ng-container>
+<!-- row -->
+<ng-container *ngIf="row">
+  <ion-row class="ion-align-items-center headerRow" *ngIf="header">
+    <ion-col [sizeLg]="5" [sizeXl]="3">{{ 'TOPICS.NAME' | translate }}</ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2">{{ 'TOPICS.CATEGORY' | translate }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="2">{{ 'TOPICS.EVENT' | translate }}</ion-col>
+    <ion-col [sizeLg]="2">{{ 'TOPICS.SUBJECTS' | translate }}</ion-col>
+    <ion-col [sizeLg]="1">{{ 'TOPICS.NUM_OF_QUESTIONS' | translate }}</ion-col>
+    <ion-col [sizeLg]="1">{{ 'TOPICS.STATUS' | translate }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="1">{{ 'TOPICS.UPDATED_AT' | translate }}</ion-col>
+  </ion-row>
+  <ion-row class="ion-align-items-center row tappable" *ngIf="!header && topic" (click)="select.emit()">
+    <ion-col [sizeLg]="5" [sizeXl]="3">
+      <ion-badge color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>
+      <b>{{ topic.name }}</b>
+    </ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2">
+      <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
+    </ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="2">{{ topic.event.name }}</ion-col>
+    <ion-col [sizeLg]="2">
+      <ion-avatar *ngFor="let subject of topic.subjects" [title]="subject.name">
+        <ion-img
+          [src]="subject.avatarURL ?? app.getAvatarFallbackURL()"
+          (ionError)="app.fallbackAvatar($event?.target)"
+        ></ion-img>
+      </ion-avatar>
+    </ion-col>
+    <ion-col [sizeLg]="1">{{ topic.numOfQuestions }}</ion-col>
+    <ion-col [sizeLg]="1">
+      <ion-badge fill="outline" [color]="topic.closedAt ? 'danger' : 'success'">
+        {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+      </ion-badge>
+    </ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="1">
+      {{ topic.updatedAt ?? topic.createdAt | dateLocale : 'mediumDate' }}
+    </ion-col>
+  </ion-row>
+  <!-- skeleton -->
+  <ion-row class="ion-align-items-center row" *ngIf="!header && !topic">
+    <ion-col [sizeLg]="5" [sizeXl]="3"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="1"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="1"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="1"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+  </ion-row>
+</ng-container>
