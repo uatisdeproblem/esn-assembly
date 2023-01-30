@@ -48,11 +48,14 @@ export class TopicsPage {
   ].map(x => new Topic(x));
 
   constructor(public app: AppService) {}
-  ionViewDidEnter() {
+  ionViewDidEnter(): void {
     console.log(this.app.user);
   }
 
   openTopic(topic: Topic): void {
     this.app.goToInTabs(['topics', topic.topicId]);
+  }
+  addTopic(): void {
+    this.app.goToInTabs(['topics', 'new', 'manage']);
   }
 }

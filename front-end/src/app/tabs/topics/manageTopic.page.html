@@ -1,0 +1,20 @@
+<ion-content [class.viewMode]="!editMode">
+  <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
+    <app-edit-mode-buttons
+      [title]="'TOPICS.MANAGE_TOPIC' | translate"
+      [editMode]="!!editMode"
+      (enter)="enterEditMode()"
+      (exit)="exitEditMode()"
+      (save)="save()"
+    ></app-edit-mode-buttons>
+    <ion-item [class.fieldHasError]="hasFieldAnError('name')">
+      <ion-label position="stacked">
+        {{ 'TOPICS.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
+      </ion-label>
+      <ion-input [(ngModel)]="topic.name" [disabled]="!editMode"></ion-input>
+    </ion-item>
+    <p class="ion-padding ion-text-right" *ngIf="editMode === UXMode.EDIT">
+      <ion-button color="danger" (click)="archive()">{{ 'COMMON.ARCHIVE' | translate }}</ion-button>
+    </p>
+  </ion-list>
+</ion-content>

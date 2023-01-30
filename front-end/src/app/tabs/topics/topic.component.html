@@ -2,7 +2,7 @@
   <ion-item *ngIf="topic" button (click)="select.emit()">
     <!--<ion-badge slot="start" color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>-->
     <ion-label class="ion-text-wrap">
-      <p>{{ topic.event.name }}</p>
+      <p class="eventName">{{ topic.event.name }}</p>
       {{ topic.name }}
       <p class="itemDetails">
         <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>

@@ -27,6 +27,8 @@ tags:
     description: The platform's categories
   - name: Events
     description: The platform's events
+  - name: Topics
+    description: The platform's topics for Q&As
 
 paths:
   /login:
@@ -111,7 +113,7 @@ paths:
         400:
           $ref: '#/components/responses/BadParameters'
     delete:
-      summary: Delete a category
+      summary: Archive a category
       description: Requires to be Administrator
       tags: [Categories]
       security:
@@ -195,7 +197,7 @@ paths:
         400:
           $ref: '#/components/responses/BadParameters'
     delete:
-      summary: Delete an event
+      summary: Archive an event
       description: Requires to be Administrator
       tags: [Events]
       security:
@@ -212,6 +214,90 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /topics:
+    get:
+      summary: Get the topics
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/Topics'
+    post:
+      summary: Insert a new topic
+      description: Requires to be Administrator
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Topic'
+      responses:
+        200:
+          $ref: '#/components/responses/Topic'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}:
+    get:
+      summary: Get a topic
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Topic'
+    put:
+      summary: Edit a topic
+      description: Requires to be Administrator
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Topic'
+      responses:
+        200:
+          $ref: '#/components/responses/Topic'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Archive a topic
+      description: Requires to be Administrator
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -219,6 +305,9 @@ components:
       type: object
       additionalProperties: {}
     Event:
+      type: object
+      additionalProperties: {}
+    Topic:
       type: object
       additionalProperties: {}
 
@@ -253,6 +342,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Event'
+    Topic:
+      description: A topic
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Topic'
+    Topics:
+      description: The topics
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Topic'
     BadParameters:
       description: Bad input parameters
       content:

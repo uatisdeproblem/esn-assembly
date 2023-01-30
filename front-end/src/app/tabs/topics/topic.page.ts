@@ -74,4 +74,8 @@ export class TopicPage {
   selectQuestion(question: Question): void {
     this.currentQuestion = question;
   }
+
+  manageTopic(): void {
+    this.app.goToInTabs(['topics', this.topic.topicId, 'manage']);
+  }
 }

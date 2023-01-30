@@ -7,10 +7,12 @@ import { IDEATranslationsModule } from '@idea-ionic/common';
 import { TopicsRoutingModule } from './topics.routing.module';
 import { TopicsPage } from './topics.page';
 import { TopicPage } from './topic.page';
+import { ManageTopicPage } from './manageTopic.page';
 
 import { TopicModule } from '../topics/topic.module';
 import { QuestionModule } from './questions/question.module';
 import { SubjectModule } from '@common/subject.module';
+import { EditModeButtonsModule } from 'src/app/common/editModeButtons.module';
 
 @NgModule({
   imports: [
@@ -21,8 +23,9 @@ import { SubjectModule } from '@common/subject.module';
     TopicsRoutingModule,
     TopicModule,
     QuestionModule,
-    SubjectModule
+    SubjectModule,
+    EditModeButtonsModule
   ],
-  declarations: [TopicsPage, TopicPage]
+  declarations: [TopicsPage, TopicPage, ManageTopicPage]
 })
 export class TopicsModule {}

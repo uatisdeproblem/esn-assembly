@@ -14,6 +14,11 @@
       <ion-col [size]="12" [sizeLg]="6" *ngIf="!app.isInMobileMode() || !currentQuestion">
         <ion-card color="white" *ngIf="topic">
           <ion-card-header>
+            <div class="ion-text-right">
+              <ion-button size="small" color="medium" *ngIf="app.user.isAdministrator()" (click)="manageTopic()">
+                {{ 'COMMON.EDIT' | translate }}
+              </ion-button>
+            </div>
             <ion-card-subtitle>{{ topic.event.name }}</ion-card-subtitle>
             <ion-card-title>{{ topic.name }}</ion-card-title>
             <p><ion-badge>{{ topic.category.name }}</ion-badge></p>

@@ -104,7 +104,9 @@
     "UPDATED_AT": "Updated",
     "NO_ACTIVE_TOPICS": "No active topics",
     "NO_QUESTIONS_ASKED_YET": "No questions asked yet",
-    "BACK_TO_OTHER_QUESTIONS": "Back to other questions"
+    "BACK_TO_OTHER_QUESTIONS": "Back to other questions",
+    "TOPICS": "TOPICS",
+    "MANAGE_TOPIC": "Manage topic"
   },
   "QUESTIONS": {
     "BY": "By",

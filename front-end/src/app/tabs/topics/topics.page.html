@@ -8,6 +8,17 @@
 </ion-header>
 <ion-content>
   <ion-list class="aList">
+    <div class="ion-text-right">
+      <ion-button
+        size="small"
+        color="medium"
+        class="ion-margin-end ion-margin-bottom"
+        *ngIf="app.user.isAdministrator()"
+        (click)="addTopic()"
+      >
+        {{ 'COMMON.ADD' | translate }}
+      </ion-button>
+    </div>
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="topics && !topics.length">
       <ion-label>{{ 'TOPICS.NO_ACTIVE_TOPICS' | translate }}</ion-label>
     </ion-item>
