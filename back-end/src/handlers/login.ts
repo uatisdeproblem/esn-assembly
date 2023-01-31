@@ -55,10 +55,10 @@ class Login extends ResourceController {
 
       const data = jsonWithUserData['cas:serviceResponse']['cas:authenticationSuccess'][0];
       const attributes = data['cas:attributes'][0];
-      const username = data['cas:user'][0];
+      const userId = data['cas:user'][0];
 
       const user = new User({
-        username,
+        userId,
         email: attributes['cas:mail'][0],
         sectionCode: attributes['cas:sc'][0],
         firstName: attributes['cas:first'][0],

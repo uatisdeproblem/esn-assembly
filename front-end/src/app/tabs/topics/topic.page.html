@@ -11,7 +11,7 @@
 <ion-content>
   <ion-toolbar color="ideaToolbar" *ngIf="app.user.isAdministrator()">
     <ion-buttons slot="end">
-      <ion-button (click)="manageTopic()">{{ 'COMMON.MANAGE' | translate }}</ion-button>
+      <ion-button fill="solid" color="ESNcyan" (click)="manageTopic()">{{ 'COMMON.MANAGE' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
   <ion-grid class="ion-no-padding">
@@ -34,11 +34,7 @@
           <ion-card-content>
             <ion-list class="aList" lines="none">
               <app-subject color="white" *ngFor="let subject of topic.subjects" [subject]="subject"></app-subject>
-              <app-html-editor
-                *ngIf="topic.description"
-                [content]="topic.description"
-                [editMode]="false"
-              ></app-html-editor>
+              <app-html-editor *ngIf="topic.content" [content]="topic.content" [editMode]="false"></app-html-editor>
               <ion-item button *ngFor="let attachment of topic.attachments" (click)="downloadAttachment(attachment)">
                 <ion-icon name="attach" slot="start"></ion-icon>
                 <ion-label>{{ attachment.name }}.{{ attachment.format }}</ion-label>
@@ -46,19 +42,27 @@
             </ion-list>
           </ion-card-content>
         </ion-card>
-        <ion-list class="aList" *ngIf="topic">
+        <ion-list class="aList" *ngIf="topic && !newQuestion">
           <ion-list-header>
             <ion-label>
               <h2>
                 {{ 'TOPICS.QUESTIONS' | translate }}
-                <ion-text *ngIf="questions.length">({{ questions.length }})</ion-text>
+                <ion-text *ngIf="questions?.length">({{ questions.length }})</ion-text>
               </h2>
             </ion-label>
-            <ion-button fill="solid" size="small" *ngIf="!topic.closedAt">
+            <ion-button size="small" color="medium" (click)="filterQuestions(searchbar?.value, null, true)">
+              <ion-icon name="refresh" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="solid"
+              size="small"
+              *ngIf="!topic.closedAt && topic.canUserAskQuestions(app.user)"
+              (click)="startNewQuestion()"
+            >
               {{ 'TOPICS.MAKE_A_QUESTION' | translate }}
             </ion-button>
           </ion-list-header>
-          <ion-searchbar></ion-searchbar>
+          <ion-searchbar #searchbar (ionInput)="filterQuestions($event.target.value)"></ion-searchbar>
           <ion-item lines="full" class="ion-text-center noElements" *ngIf="questions && !questions.length">
             <ion-label>{{ 'TOPICS.NO_QUESTIONS_ASKED_YET' | translate }}</ion-label>
           </ion-item>
@@ -69,15 +73,57 @@
             [current]="currentQuestion === question"
             (select)="selectQuestion(question)"
           ></app-question-summary>
+          <ion-infinite-scroll (ionInfinite)="filterQuestions(searchbar.value, $event.target)">
+            <ion-infinite-scroll-content></ion-infinite-scroll-content>
+          </ion-infinite-scroll>
         </ion-list>
       </ion-col>
       <ion-col [size]="12" [sizeLg]="6" *ngIf="currentQuestion">
-        <p *ngIf="app.isInMobileMode()">
+        <p>
           <ion-button color="medium" fill="clear" (click)="selectQuestion(null)">
-            <ion-icon slot="start" name="close"></ion-icon> {{ 'TOPICS.BACK_TO_OTHER_QUESTIONS' | translate }}
+            <ion-icon slot="start" name="close"></ion-icon> {{ 'COMMON.CLOSE' | translate }}
           </ion-button>
         </p>
-        <app-question [topic]="topic" [question]="currentQuestion"></app-question>
+        <app-question
+          [topic]="topic"
+          [question]="currentQuestion"
+          (delete)="removeCurrentQuestionFromList()"
+        ></app-question>
+      </ion-col>
+      <ion-col [size]="12" [sizeLg]="6" *ngIf="newQuestion">
+        <ion-list class="aList" [class.ion-padding]="!app.isInMobileMode()">
+          <ion-list-header [class.fieldHasError]="hasFieldAnError('summary')">
+            <ion-label>
+              <h2>{{ 'QUESTIONS.SUMMARY_I' | translate }}</h2>
+              <p>{{ 'QUESTIONS.SUMMARY_II' | translate }}</p>
+            </ion-label>
+          </ion-list-header>
+          <ion-item>
+            <ion-input
+              [placeholder]="'QUESTIONS.SUMMARY_PLACEHOLDER' | translate"
+              [(ngModel)]="newQuestion.summary"
+            ></ion-input>
+          </ion-item>
+          <ion-list-header [class.fieldHasError]="hasFieldAnError('text')">
+            <ion-label>
+              <h2>{{ 'QUESTIONS.CONTENT_I' | translate }}</h2>
+              <p>{{ 'QUESTIONS.CONTENT_II' | translate }}</p>
+            </ion-label>
+          </ion-list-header>
+          <app-html-editor [(content)]="newQuestion.text" [editMode]="true"></app-html-editor>
+          <ion-row class="ion-margin">
+            <ion-col>
+              <ion-button fill="clear" color="dark" (click)="cancelNewQuestion()">
+                {{ 'COMMON.CANCEL' | translate }} <ion-icon icon="close" slot="start"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col class="ion-text-right">
+              <ion-button (click)="sendNewQuestion()">
+                {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-list>
       </ion-col>
     </ion-row>
   </ion-grid>

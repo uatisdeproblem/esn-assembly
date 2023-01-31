@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { IDEATranslationsModule } from '@idea-ionic/common';
+import { IDEACheckerModule, IDEATranslationsModule } from '@idea-ionic/common';
 
 import { TopicsRoutingModule } from './topics.routing.module';
 import { TopicsPage } from './topics.page';
@@ -22,6 +22,7 @@ import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
     FormsModule,
     IonicModule,
     IDEATranslationsModule,
+    IDEACheckerModule,
     TopicsRoutingModule,
     TopicModule,
     QuestionModule,

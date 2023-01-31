@@ -9,9 +9,18 @@ import { QuestionComponent } from './question.component';
 
 import { SubjectModule } from '@common/subject.module';
 import { MessageBubbleModule } from '@common/messageBubble.module';
+import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, SubjectModule, MessageBubbleModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    IDEATranslationsModule,
+    SubjectModule,
+    MessageBubbleModule,
+    HTMLEditorModule
+  ],
   declarations: [QuestionSummaryComponent, QuestionComponent],
   exports: [QuestionSummaryComponent, QuestionComponent]
 })

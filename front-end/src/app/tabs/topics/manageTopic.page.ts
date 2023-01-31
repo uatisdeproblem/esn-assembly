@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { Check } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
@@ -13,6 +14,7 @@ import { Topic } from '@models/topic.model';
 import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
 import { TopicEvent, TopicEventAttached } from '@models/event.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
+import { KNOWN_GALAXY_ROLES } from '@models/user.model';
 
 @Component({
   selector: 'manage-topic',
@@ -31,6 +33,8 @@ export class ManageTopicPage implements OnInit {
   events: TopicEvent[];
 
   SubjectTypes = SubjectTypes;
+
+  rolesAbleToAskQuestionsChecks = KNOWN_GALAXY_ROLES.map(role => new Check({ value: role }));
 
   constructor(
     private location: Location,
@@ -54,6 +58,9 @@ export class ManageTopicPage implements OnInit {
       if (topicId !== 'new') {
         this.topic = await this._topics.getById(topicId);
         this.editMode = UXMode.VIEW;
+        this.rolesAbleToAskQuestionsChecks.forEach(
+          c => (c.checked = this.topic.rolesAbleToAskQuestions.includes(String(c.value)))
+        );
       } else {
         this.topic = new Topic();
         this.editMode = UXMode.INSERT;
@@ -77,6 +84,14 @@ export class ManageTopicPage implements OnInit {
   }
   compareWithCategory(c1: TopicCategoryAttached, c2: TopicCategoryAttached): boolean {
     return c1 && c2 ? c1.categoryId === c2.categoryId : c1 === c2;
+  }
+
+  setRolesAbleToAskQuestionsFromChecks(): void {
+    if (this.rolesAbleToAskQuestionsChecks.every(x => x.checked)) this.topic.rolesAbleToAskQuestions = [];
+    else
+      this.topic.rolesAbleToAskQuestions = this.rolesAbleToAskQuestionsChecks
+        .filter(x => x.checked)
+        .map(x => String(x.value));
   }
 
   async save(): Promise<void> {

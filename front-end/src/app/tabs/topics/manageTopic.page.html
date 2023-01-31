@@ -22,7 +22,7 @@
       </ion-label>
       <ion-input [(ngModel)]="topic.name" [disabled]="!editMode"></ion-input>
     </ion-item>
-    <ion-item>
+    <ion-item [class.fieldHasError]="hasFieldAnError('category')">
       <ion-label position="stacked">
         {{ 'TOPICS.CATEGORY' | translate }} <ion-text class="obligatoryDot"></ion-text>
       </ion-label>
@@ -37,7 +37,7 @@
         </ion-select-option>
       </ion-select>
     </ion-item>
-    <ion-item>
+    <ion-item [class.fieldHasError]="hasFieldAnError('event')">
       <ion-label position="stacked">
         {{ 'TOPICS.EVENT' | translate }} <ion-text class="obligatoryDot"></ion-text>
       </ion-label>
@@ -52,24 +52,24 @@
     </ion-item>
 
     <ion-list-header>
-      <ion-label><h2>{{ 'TOPICS.DESCRIPTION' | translate }}</h2></ion-label>
+      <ion-label><h2>{{ 'TOPICS.CONTENT' | translate }}</h2></ion-label>
     </ion-list-header>
-    <ion-item class="noElements" *ngIf="!topic.description && !editMode">
-      <ion-label>{{ 'TOPICS.NO_DESCRIPTION' | translate }}</ion-label>
+    <ion-item class="noElements" *ngIf="!topic.content && !editMode">
+      <ion-label>{{ 'TOPICS.NO_CONTENT' | translate }}</ion-label>
     </ion-item>
     <app-html-editor
-      *ngIf="topic.description || editMode"
-      [(content)]="topic.description"
+      *ngIf="topic.content || editMode"
+      [(content)]="topic.content"
       [editMode]="!!editMode"
     ></app-html-editor>
 
-    <ion-list-header>
+    <ion-list-header [class.fieldHasError]="hasFieldAnError('subjects')">
       <ion-label><h2>{{ 'TOPICS.SUBJECTS' | translate }}</h2></ion-label>
     </ion-list-header>
     <ion-grid class="ion-no-padding">
       <ion-row
         class="ion-align-items-center row"
-        *ngFor="let subject of topic.subjects; let odd = odd"
+        *ngFor="let subject of topic.subjects; let index = index; let odd = odd"
         [class.fieldHasError]="hasFieldAnError('subject')"
         [class.odd]="odd"
       >
@@ -79,7 +79,7 @@
           </ion-button>
         </ion-col>
         <ion-col [size]="editMode ? 5 : 6">
-          <ion-item>
+          <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].type')">
             <ion-label position="stacked">
               {{ 'SUBJECTS.TYPE' | translate }} <ion-text class="obligatoryDot"></ion-text>
             </ion-label>
@@ -91,7 +91,7 @@
           </ion-item>
         </ion-col>
         <ion-col [size]="6">
-          <ion-item>
+          <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].id')">
             <ion-label position="stacked">
               {{ 'SUBJECTS.ID' | translate }} <ion-text class="obligatoryDot"></ion-text>
             </ion-label>
@@ -99,7 +99,7 @@
           </ion-item>
         </ion-col>
         <ion-col [size]="12">
-          <ion-item>
+          <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].name')">
             <ion-label position="stacked">
               {{ 'SUBJECTS.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
             </ion-label>
@@ -108,13 +108,13 @@
         </ion-col>
         <ng-container *ngIf="subject.type === SubjectTypes.USER">
           <ion-col [size]="12">
-            <ion-item>
+            <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].avatarURL')">
               <ion-label position="stacked">{{ 'SUBJECTS.AVATAR_URL' | translate }}</ion-label>
               <ion-input [(ngModel)]="subject.avatarURL" [disabled]="!editMode"></ion-input>
             </ion-item>
           </ion-col>
           <ion-col [size]="6">
-            <ion-item>
+            <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].section')">
               <ion-label position="stacked">
                 {{ 'SUBJECTS.SECTION' | translate }} <ion-text class="obligatoryDot"></ion-text>
               </ion-label>
@@ -123,7 +123,7 @@
           </ion-col>
         </ng-container>
         <ion-col [size]="6" *ngIf="subject.type !== SubjectTypes.COUNTRY">
-          <ion-item>
+          <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].country')">
             <ion-label position="stacked">
               {{ 'SUBJECTS.COUNTRY' | translate }} <ion-text class="obligatoryDot"></ion-text>
             </ion-label>
@@ -140,6 +140,18 @@
       <ion-label><h2>{{ 'TOPICS.ATTACHMENTS' | translate }}</h2> </ion-label>
     </ion-list-header>
     <app-attachments lines="inset" [attachments]="topic.attachments" [editMode]="!!editMode"></app-attachments>
+
+    <ion-list-header>
+      <ion-label><h2>{{ 'TOPICS.RESTRICT_QUESTIONS_TO_ROLES' | translate }}</h2> </ion-label>
+    </ion-list-header>
+    <idea-checker
+      [data]="rolesAbleToAskQuestionsChecks"
+      [label]="'TOPICS.ROLES_ALLOWED_TO_MAKE_QUESTIONS' | translate"
+      [allText]="'TOPICS.NO_ROLES_RESTRICTIONS' | translate"
+      [noneEqualsAll]="true"
+      [disabled]="!editMode"
+      (change)="setRolesAbleToAskQuestionsFromChecks()"
+    ></idea-checker>
 
     <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
       <ion-col>

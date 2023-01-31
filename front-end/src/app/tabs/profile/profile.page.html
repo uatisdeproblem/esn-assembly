@@ -19,7 +19,7 @@
     <ion-item>
       <ion-label class="ion-text-center">
         {{ app.user.firstName }} {{ app.user.lastName }}
-        <p>{{ [app.user.country, app.user.section].join(' - ') }}</p>
+        <p>{{ app.user.getSectionCountry() }}</p>
       </ion-label>
     </ion-item>
     <ion-list-header>

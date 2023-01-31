@@ -3,6 +3,7 @@ import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 import { TopicCategoryAttached } from './category.model';
 import { TopicEventAttached } from './event.model';
 import { Subject } from './subject.model';
+import { User } from './user.model';
 
 /**
  * A topic for a Q&A set.
@@ -19,7 +20,7 @@ export class Topic extends Resource {
   /**
    * A full-length description of the topic (content).
    */
-  description: string;
+  content: string;
   /**
    * The event for which the topic is discussed.
    */
@@ -56,12 +57,17 @@ export class Topic extends Resource {
    * The attachments to the topic.
    */
   attachments: Attachment[];
+  /**
+   * To be able to ask questions, a user must have at least a role (Galaxy) included in this list.
+   * An empty string means that any user (regardless the role) can ask questions.
+   */
+  rolesAbleToAskQuestions: string[];
 
   load(x: any): void {
     super.load(x);
     this.topicId = this.clean(x.topicId, String);
     this.name = this.clean(x.name, String);
-    this.description = this.clean(x.description, String);
+    this.content = this.clean(x.content, String);
     this.event = new TopicEventAttached(x.event);
     this.category = new TopicCategoryAttached(x.category);
     this.subjects = this.cleanArray(x.subjects, s => new Subject(s));
@@ -71,6 +77,7 @@ export class Topic extends Resource {
     if (x.closedAt) this.closedAt = this.clean(x.closedAt, d => new Date(d).toISOString());
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.attachments = this.cleanArray(x.attachments, a => new Attachment(a));
+    this.rolesAbleToAskQuestions = this.cleanArray(x.rolesAbleToAskQuestions, String);
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -91,5 +98,19 @@ export class Topic extends Resource {
     if (this.iE(this.subjects)) e.push('subjects');
     this.subjects.forEach((s, index): void => s.validate().forEach(ea => e.push(`subjects[${index}].${ea}`)));
     return e;
+  }
+
+  /**
+   * Whether the user is allowed to ask questions on the topic.
+   */
+  canUserAskQuestions(user: User): boolean {
+    if (!this.rolesAbleToAskQuestions.length) return true;
+    return user.roles.some(r => this.rolesAbleToAskQuestions.includes(r));
+  }
+  /**
+   * Whether the user is allowed to answer questions on the topic.
+   */
+  canUserAnswerQuestions(user: User, excludeAdmin = false): boolean {
+    return (user.isAdministrator() && !excludeAdmin) || this.subjects.some(s => s.id === user.userId);
   }
 }

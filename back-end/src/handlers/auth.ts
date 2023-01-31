@@ -23,7 +23,7 @@ export const handler = async (event: APIGatewayProxyEventV2WithRequestContext<Au
   const user = await verifyTokenAndGetGalaxyUser(authorization);
 
   if (user) {
-    result.context = { principalId: user.username, user };
+    result.context = { principalId: user.userId, user };
     result.isAuthorized = true;
   }
 

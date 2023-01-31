@@ -19,7 +19,15 @@ const apiResources: ResourceController[] = [
   { name: 'login', paths: ['/login'] },
   { name: 'categories', paths: ['/categories', '/categories/{categoryId}'] },
   { name: 'events', paths: ['/events', '/events/{eventId}'] },
-  { name: 'topics', paths: ['/topics', '/topics/{topicId}'] }
+  { name: 'topics', paths: ['/topics', '/topics/{topicId}'] },
+  { name: 'questions', paths: ['/topics/{topicId}/questions', '/topics/{topicId}/questions/{questionId}'] },
+  {
+    name: 'answers',
+    paths: [
+      '/topics/{topicId}/questions/{questionId}/answers',
+      '/topics/{topicId}/questions/{questionId}/answers/{answerId}'
+    ]
+  }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
@@ -40,6 +48,18 @@ const tables: { [tableName: string]: DDBTable } = {
         nonKeyAttributes: ['category', 'event']
       }
     ]
+  },
+  questions: {
+    PK: { name: 'topicId', type: DDB.AttributeType.STRING },
+    SK: { name: 'questionId', type: DDB.AttributeType.STRING }
+  },
+  answers: {
+    PK: { name: 'questionId', type: DDB.AttributeType.STRING },
+    SK: { name: 'answerId', type: DDB.AttributeType.STRING }
+  },
+  questionsUpvotes: {
+    PK: { name: 'questionId', type: DDB.AttributeType.STRING },
+    SK: { name: 'userId', type: DDB.AttributeType.STRING }
   }
 };
 

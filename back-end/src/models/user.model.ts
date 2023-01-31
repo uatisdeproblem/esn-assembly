@@ -26,7 +26,7 @@ export class User extends Resource {
   /**
    * Username in Galaxy.
    */
-  username: string;
+  userId: string;
   /**
    * Email address.
    */
@@ -63,7 +63,7 @@ export class User extends Resource {
 
   load(x: any): void {
     super.load(x);
-    this.username = this.clean(x.username, String);
+    this.userId = this.clean(x.userId, String);
     this.email = this.clean(x.email, String);
     this.firstName = this.clean(x.firstName, String);
     this.lastName = this.clean(x.lastName, String);
@@ -79,5 +79,14 @@ export class User extends Resource {
    */
   isAdministrator(): boolean {
     return ADMIN_GALAXY_ROLES.some(x => this.roles.includes(x));
+  }
+
+  /**
+   * Get a string representing the ESN Section and Country of the subject.
+   * @todo to solve a known error from Galaxy: the Country isn't returned correctly.
+   */
+  getSectionCountry(): string {
+    if (this.country === this.section) return this.section;
+    return [this.country, this.section].filter(x => x).join(' - ');
   }
 }

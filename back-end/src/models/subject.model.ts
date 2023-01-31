@@ -1,5 +1,7 @@
 import { Resource } from 'idea-toolbox';
 
+import { User } from './user.model';
+
 /**
  * The subject of a topic.
  */
@@ -29,6 +31,20 @@ export class Subject extends Resource {
    */
   country?: string;
 
+  /**
+   * Create a new subject starting from a user.
+   */
+  static fromUser(user: User): Subject {
+    return new Subject({
+      id: user.userId,
+      type: SubjectTypes.USER,
+      name: user.firstName.concat(' ', user.lastName),
+      avatarURL: user.avatarURL,
+      section: user.section,
+      country: user.country
+    });
+  }
+
   load(x: any): void {
     super.load(x);
     this.id = this.clean(x.id, String);
@@ -55,6 +71,8 @@ export class Subject extends Resource {
     if (this.iE(this.name)) e.push('name');
     if (this.type === SubjectTypes.USER) {
       if (this.iE(this.section)) e.push('section');
+    }
+    if (this.type !== SubjectTypes.COUNTRY) {
       if (this.iE(this.country)) e.push('country');
     }
     return e;
@@ -73,6 +91,15 @@ export class Subject extends Resource {
       case SubjectTypes.SECTION:
         return BASE_URL.concat('section/', this.id);
     }
+  }
+
+  /**
+   * Get a string representing the ESN Section and Country of the subject.
+   * @todo to solve a known error from Galaxy: the Country isn't returned correctly.
+   */
+  getSectionCountry(): string {
+    if (this.country === this.section) return this.section;
+    return [this.country, this.section].filter(x => x).join(' - ');
   }
 }
 

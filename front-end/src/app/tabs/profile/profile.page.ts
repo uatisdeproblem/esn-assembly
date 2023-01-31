@@ -12,7 +12,7 @@ export class ProfilePage {
   constructor(public app: AppService) {}
 
   async openGalaxyAccount(): Promise<void> {
-    const url = 'https://accounts.esn.org/user/'.concat(this.app.user.username);
+    const url = 'https://accounts.esn.org/user/'.concat(this.app.user.userId);
     await Browser.open({ url });
   }
 }

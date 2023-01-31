@@ -38,6 +38,13 @@
           <ion-select-option *ngFor="let event of events" [value]="event.eventId">{{ event.name }}</ion-select-option>
         </ion-select>
       </ion-item>
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-lg-down">
+        <ion-select interface="popover" [(ngModel)]="filterByStatus" (ionChange)="filter(searchbar.value)">
+          <ion-select-option value="">{{ 'TOPICS.ALL_STATUSES' | translate }}</ion-select-option>
+          <ion-select-option [value]="true">{{ 'TOPICS.STATUSES.OPEN' | translate }}</ion-select-option>
+          <ion-select-option [value]="false">{{ 'TOPICS.STATUSES.CLOSED' | translate }}</ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-item lines="none" color="ideaToolbar" class="ion-hide-md-down">
         <ion-select interface="popover" [(ngModel)]="sortBy" (ionChange)="filter(searchbar.value)">
           <ion-select-option *ngFor="let sortBy of TopicsSortBy | keyvalue" [value]="sortBy.key">
@@ -45,13 +52,7 @@
           </ion-select-option>
         </ion-select>
       </ion-item>
-      <ion-button
-        size="small"
-        color="white"
-        class="ion-margin-end ion-margin-bottom"
-        *ngIf="app.user.isAdministrator()"
-        (click)="addTopic()"
-      >
+      <ion-button fill="solid" color="ESNcyan" *ngIf="app.user.isAdministrator()" (click)="addTopic()">
         {{ 'COMMON.ADD' | translate }}
       </ion-button>
     </ion-buttons>

@@ -1,4 +1,8 @@
-<div class="bubble" [class.bubbleSender]="isSender">
+<div class="bubble" *ngIf="text" [class.bubbleSender]="isSender">
   <app-subject color="transparent" lines="none" [subject]="creator"></app-subject>
-  <p>{{ text }}</p>
+  <p [innerHtml]="sanitizedHtml"></p>
+</div>
+<!--skeleton-->
+<div class="bubble" *ngIf="!text" [class.bubbleSender]="isSender">
+  <ion-skeleton-text animated></ion-skeleton-text>
 </div>

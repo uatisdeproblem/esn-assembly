@@ -26,6 +26,8 @@ export class TopicsPage implements OnInit {
   events: TopicEvent[];
   filterByEvent: string = null;
 
+  filterByStatus: boolean;
+
   sortBy: TopicsSortBy = TopicsSortBy.CREATED_DATE_DESC;
   TopicsSortBy = TopicsSortBy;
 
@@ -48,6 +50,7 @@ export class TopicsPage implements OnInit {
       search,
       categoryId: this.filterByCategory,
       eventId: this.filterByEvent,
+      status: this.filterByStatus,
       withPagination: true,
       startPaginationAfterId,
       sortBy: this.sortBy

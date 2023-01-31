@@ -4,28 +4,23 @@ import { Subject } from './subject.model';
 import { User } from './user.model';
 
 /**
- * A question regarding a topic.
+ * An answer to a question.
  */
-export class Question extends Resource {
+export class Answer extends Resource {
   /**
-   * The ID of the topic to which the question is related.
-   */
-  topicId: string;
-  /**
-   * The ID of the question.
+   * The ID of the question to which the answer is related.
    */
   questionId: string;
   /**
-   * A brief text summarizing the question.
-   * Max 100 characters.
+   * The ID of the answer.
    */
-  summary: string;
+  answerId: string;
   /**
-   * The full text representing the question.
+   * The full text of the answer.
    */
   text: string;
   /**
-   * The creator of the question.
+   * The creator of the answer.
    */
   creator: Subject;
   /**
@@ -36,49 +31,35 @@ export class Question extends Resource {
    * The timestamp of last update.
    */
   updatedAt?: epochISOString;
-  /**
-   * The total number of answers to the question.
-   */
-  numOfAnswers: number;
-  /**
-   * The number of upvotes for the question.
-   */
-  numOfUpvotes: number;
 
   load(x: any): void {
     super.load(x);
-    this.topicId = this.clean(x.topicId, String);
     this.questionId = this.clean(x.questionId, String);
-    this.summary = this.clean(x.summary, String)?.slice(0, 100);
+    this.answerId = this.clean(x.answerId, String);
     this.text = this.clean(x.text, String);
     this.creator = new Subject(x.creator);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
-    this.numOfAnswers = this.clean(x.numOfAnswers, Number, 0);
-    this.numOfUpvotes = this.clean(x.numOfUpvotes, Number, 0);
   }
 
   safeLoad(newData: any, safeData: any): void {
     super.safeLoad(newData, safeData);
-    this.topicId = safeData.topicId;
     this.questionId = safeData.questionId;
+    this.answerId = safeData.answerId;
     this.creator = safeData.creator;
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
-    this.numOfAnswers = safeData.numOfAnswers;
-    this.numOfUpvotes = safeData.numOfUpvotes;
   }
 
   validate(): string[] {
     const e = super.validate();
-    if (this.iE(this.summary)) e.push('summary');
     if (this.iE(this.text)) e.push('text');
     if (this.creator.validate().length) e.push('creator');
     return e;
   }
 
   /**
-   * Whether the user is allowed to edit the question.
+   * Whether the user is allowed to edit the answer.
    */
   canUserEdit(user: User, excludeAdmin = false): boolean {
     return (user.isAdministrator() && !excludeAdmin) || user.userId === this.creator.id;

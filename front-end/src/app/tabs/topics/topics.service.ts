@@ -32,6 +32,7 @@ export class TopicsService {
       search?: string;
       categoryId?: string;
       eventId?: string;
+      status?: boolean;
       withPagination?: boolean;
       startPaginationAfterId?: string;
       sortBy?: TopicsSortBy;
@@ -48,12 +49,19 @@ export class TopicsService {
       filteredList = filteredList.filter(x =>
         options.search
           .split(' ')
-          .every(searchTerm => [x.name].filter(f => f).some(f => f.toLowerCase().includes(searchTerm)))
+          .every(searchTerm =>
+            [x.name, x.content, x.category.name, x.event.name, ...x.subjects.map(s => s.name)]
+              .filter(f => f)
+              .some(f => f.toLowerCase().includes(searchTerm))
+          )
       );
 
     if (options.categoryId) filteredList = filteredList.filter(x => x.category.categoryId === options.categoryId);
 
     if (options.eventId) filteredList = filteredList.filter(x => x.event.eventId === options.eventId);
+
+    if (options.status === true || options.status === false)
+      filteredList = filteredList.filter(x => (options.status ? !x.closedAt : x.closedAt));
 
     switch (options.sortBy) {
       case TopicsSortBy.CREATED_DATE_ASC:
@@ -196,8 +204,8 @@ export class TopicsService {
   /**
    * Delete a topic.
    */
-  async delete(event: Topic): Promise<void> {
-    await this.api.deleteResource(['topics', event.topicId]);
+  async delete(topic: Topic): Promise<void> {
+    await this.api.deleteResource(['topics', topic.topicId]);
   }
 }
 

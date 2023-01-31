@@ -136,6 +136,10 @@ ion-toolbar ion-buttons ion-button,
 ion-list-header ion-button {
   --box-shadow: none !important;
 }
+ion-toolbar ion-buttons ion-button[fill='solid'] {
+  margin-right: 8px;
+  margin-left: 8px;
+}
 
 ion-item.noElements,
 ion-col.noElements {

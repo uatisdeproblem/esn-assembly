@@ -1,15 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AlertController, IonContent, IonInfiniteScroll, IonSearchbar } from '@ionic/angular';
 import { Browser } from '@capacitor/browser';
-import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
+import { Attachment } from 'idea-toolbox';
+import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
 import { AttachmentsService } from 'src/app/common/attachments.service';
+import { QuestionsService } from './questions/questions.service';
 
 import { Topic } from '@models/topic.model';
 import { Question } from '@models/question.model';
-import { Attachment } from 'idea-toolbox';
+import { Subject } from '@models/subject.model';
 
 @Component({
   selector: 'topic',
@@ -18,49 +21,25 @@ import { Attachment } from 'idea-toolbox';
 })
 export class TopicPage {
   topic: Topic;
-  questions: Question[] = [
-    {
-      topicId: 't1',
-      questionId: 'q1',
-      summary: 'What do you think about the budget',
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed erat et nulla hendrerit lacinia ac eu metus. Mauris at sapien urna. Sed dictum risus ipsum, id tempus diam molestie elementum. Curabitur quis augue blandit nibh posuere semper. Proin condimentum sagittis hendrerit. Duis ut magna a lectus euismod gravida et eget nisl. Curabitur sed odio non lorem rhoncus vestibulum in non massa.',
-      creator: {
-        username: 'mc',
-        name: 'Giovanni Telesca',
-        country: 'ESN Italy',
-        section: 'ESN Chieti Pescara',
-        avatarURL: null
-      },
-      createdAt: Date.now(),
-      numOfMessages: 0,
-      numOfUpvotes: 0
-    },
-    {
-      topicId: 't1',
-      questionId: 'q2',
-      summary: 'A silly question',
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed erat et nulla hendrerit lacinia ac eu metus. Mauris at sapien urna. Sed dictum risus ipsum, id tempus diam molestie elementum. Curabitur quis augue blandit nibh posuere semper. Proin condimentum sagittis hendrerit. Duis ut magna a lectus euismod gravida et eget nisl. Curabitur sed odio non lorem rhoncus vestibulum in non massa.',
-      creator: {
-        username: 'mc',
-        name: 'Random Dude',
-        country: 'ESN Italy',
-        section: 'ESN Canicattì',
-        avatarURL: null
-      },
-      createdAt: Date.now(),
-      numOfMessages: 1,
-      numOfUpvotes: 2
-    }
-  ].map(x => new Question(x));
+  questions: Question[];
 
   currentQuestion: Question;
 
+  newQuestion: Question;
+  errors = new Set<string>();
+
+  @ViewChild('searchbar') searchbar: IonSearchbar;
+  @ViewChild(IonContent) content: IonContent;
+
   constructor(
     private route: ActivatedRoute,
+    private alertCtrl: AlertController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
+    private t: IDEATranslationsService,
     private _topics: TopicsService,
     private _attachments: AttachmentsService,
+    private _questions: QuestionsService,
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
@@ -68,6 +47,7 @@ export class TopicPage {
     try {
       await this.loading.show();
       this.topic = await this._topics.getById(topicId);
+      await this.filterQuestions(this.searchbar?.value, null, true);
     } catch (error) {
       this.message.error('COMMON.NOT_FOUND');
     } finally {
@@ -77,6 +57,11 @@ export class TopicPage {
 
   selectQuestion(question: Question): void {
     this.currentQuestion = question;
+    if (this.currentQuestion) this.content.scrollToTop(500);
+  }
+  async removeCurrentQuestionFromList(): Promise<void> {
+    this.currentQuestion = null;
+    await this.filterQuestions(this.searchbar?.value, null, true);
   }
 
   manageTopic(): void {
@@ -93,5 +78,70 @@ export class TopicPage {
     } finally {
       this.loading.hide();
     }
+  }
+
+  async filterQuestions(search = '', scrollToNextPage?: IonInfiniteScroll, force = false): Promise<void> {
+    let startPaginationAfterId = null;
+    if (scrollToNextPage && this.questions?.length)
+      startPaginationAfterId = this.questions[this.questions.length - 1].topicId;
+
+    this.questions = await this._questions.getListOfTopic(this.topic, {
+      force,
+      search,
+      withPagination: true,
+      startPaginationAfterId
+    });
+
+    if (scrollToNextPage) setTimeout((): Promise<void> => scrollToNextPage.complete(), 100);
+  }
+
+  startNewQuestion(): void {
+    this.selectQuestion(null);
+    this.newQuestion = new Question({ creator: Subject.fromUser(this.app.user) });
+  }
+  async cancelNewQuestion(): Promise<void> {
+    if (!this.newQuestion.summary && !this.newQuestion.text) {
+      this.newQuestion = null;
+      return;
+    }
+
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('QUESTIONS.YOU_WILL_LOSE_THE_CONTENT');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: (): void => (this.newQuestion = null) }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
+  }
+  async sendNewQuestion(): Promise<void> {
+    this.errors = new Set(this.newQuestion.validate());
+    if (this.errors.size) return this.message.error('COMMON.FORM_HAS_ERROR_TO_CHECK');
+
+    const doSend = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._questions.insert(this.topic, this.newQuestion);
+        await this.filterQuestions(this.searchbar?.value, null, true);
+        this.newQuestion = null;
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (err) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('QUESTIONS.IS_YOUR_QUESTION_READY');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.SEND'), role: 'destructive', handler: doSend }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
+  }
+  hasFieldAnError(field: string): boolean {
+    return this.errors.has(field);
   }
 }

@@ -4,16 +4,60 @@
     <ion-card-title>{{ question.summary }}</ion-card-title>
   </ion-card-header>
   <ion-card-content>
-    <p class="ion-text-right">
-      <ion-button fill="clear" color="ESNgreen" class="ion-text-capitalize">
-        {{ 'QUESTIONS.UPVOTE_QUESTION' | translate }} <ion-icon slot="end" icon="thumbs-up"></ion-icon>
+    <ion-row>
+      <ion-col *ngIf="answers && !answers.length && question.canUserEdit(app.user)">
+        <ion-button color="danger" fill="clear" (click)="deleteQuestion()">
+          {{ 'QUESTIONS.DELETE_QUESTION' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col class="ion-text-right">
+        <ion-button fill="clear" [color]="userUpvoted ? 'medium' : 'ESNgreen'" (click)="upvoteQuestion(!userUpvoted)">
+          {{ (userUpvoted ? 'QUESTIONS.CANCEL_UPVOTE_QUESTION' : 'QUESTIONS.UPVOTE_QUESTION') | translate }}
+          <ion-icon slot="end" icon="thumbs-up"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <ng-container *ngIf="!answers">
+      <app-message-bubble></app-message-bubble>
+      <app-message-bubble [isSender]="true"></app-message-bubble>
+    </ng-container>
+    <ng-container *ngIf="answers">
+      <app-message-bubble [text]="question.text" [creator]="question.creator"></app-message-bubble>
+      <app-message-bubble
+        *ngFor="let answer of answers"
+        [text]="answer.text"
+        [creator]="answer.creator"
+        [isSender]="true"
+      ></app-message-bubble>
+
+      <ion-item class="noElements ion-margin-top" *ngIf="!answers.length && !newAnswer">
+        <ion-label>{{ 'QUESTIONS.NO_ANSWERS_YET' | translate }}</ion-label>
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top"
+        *ngIf="topic.canUserAnswerQuestions(app.user) && !newAnswer"
+        (click)="writeAnswer()"
+      >
+        {{ 'QUESTIONS.ANSWER' | translate }} <ion-icon name="pencil" slot="end"></ion-icon>
       </ion-button>
-    </p>
-    <app-message-bubble [text]="question.text" [creator]="question.creator"></app-message-bubble>
-    <app-message-bubble
-      [text]="messages[0].text"
-      [creator]="messages[0].creator"
-      [isSender]="true"
-    ></app-message-bubble>
+      <ng-container *ngIf="newAnswer">
+        <app-html-editor [(content)]="newAnswer.text" [editMode]="true"></app-html-editor>
+        <ion-row class="ion-margin">
+          <ion-col>
+            <ion-button fill="clear" color="dark" (click)="cancelNewAnswer()">
+              {{ 'COMMON.CANCEL' | translate }} <ion-icon icon="close" slot="start"></ion-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col class="ion-text-right">
+            <ion-button (click)="sendNewAnswer()">
+              {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+    </ng-container>
   </ion-card-content>
 </ion-card>

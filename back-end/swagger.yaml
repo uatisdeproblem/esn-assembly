@@ -29,6 +29,10 @@ tags:
     description: The platform's events
   - name: Topics
     description: The platform's topics for Q&As
+  - name: Questions
+    description: The questions on a topic
+  - name: Answers
+    description: The answers to the questions
 
 paths:
   /login:
@@ -429,6 +433,301 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/questions:
+    get:
+      summary: Get the questions of a topic
+      tags: [Questions]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Questions'
+    post:
+      summary: Insert a new question on a topic
+      description: Permissions depend on topic configuration
+      tags: [Questions]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Question'
+      responses:
+        200:
+          $ref: '#/components/responses/Question'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/questions/{questionId}:
+    get:
+      summary: Get the question on a topic
+      tags: [Questions]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Question'
+    put:
+      summary: Edit the question on a topic
+      description: Requires to be Administrator or the creator
+      tags: [Questions]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Question'
+      responses:
+        200:
+          $ref: '#/components/responses/Question'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a question
+      tags: [Questions]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [UPVOTE, UPVOTE_CANCEL, IS_UPVOTED]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete the question on a topic
+      description: Requires to be Administrator or the creator
+      tags: [Questions]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/questions/{questionId}/answers:
+    get:
+      summary: Get the answers to a question
+      tags: [Answers]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Answers'
+    post:
+      summary: Insert a new answer to a question
+      description: Requires to be Administrator or a subject of the topic
+      tags: [Answers]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Answer'
+      responses:
+        200:
+          $ref: '#/components/responses/Answer'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/questions/{questionId}/answers/{answerId}:
+    get:
+      summary: Get the answer to a question
+      tags: [Answers]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+        - name: answerId
+          in: path
+          description: Answer ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Answer'
+    put:
+      summary: Edit the answer to a question
+      description: Requires to be Administrator or the creator
+      tags: [Answers]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+        - name: answerId
+          in: path
+          description: Answer ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Answer'
+      responses:
+        200:
+          $ref: '#/components/responses/Answer'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete the answer to a question
+      description: Requires to be Administrator or the creator
+      tags: [Answers]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+        - name: answerId
+          in: path
+          description: Answer ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -439,6 +738,12 @@ components:
       type: object
       additionalProperties: {}
     Topic:
+      type: object
+      additionalProperties: {}
+    Question:
+      type: object
+      additionalProperties: {}
+    Answer:
       type: object
       additionalProperties: {}
 
@@ -488,6 +793,36 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Topic'
+    Question:
+      description: A question
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Question'
+    Questions:
+      description: The questions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Question'
+    Answer:
+      description: An answer
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Answer'
+    Answers:
+      description: The answers
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Answer'
     BadParameters:
       description: Bad input parameters
       content:

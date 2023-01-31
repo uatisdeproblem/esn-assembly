@@ -1,4 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { SecurityContext } from '@angular/core';
 
 import { AppService } from '@app/app.service';
 
@@ -9,11 +11,11 @@ import { Subject } from '@models/subject.model';
   templateUrl: 'messageBubble.component.html',
   styleUrls: ['messageBubble.component.scss']
 })
-export class MessageBubbleComponent {
+export class MessageBubbleComponent implements OnInit {
   /**
-   * The text to show.
+   * The text to show; if null, load a skeleton instead.
    */
-  @Input() text: string;
+  @Input() text: string | null;
   /**
    * The creator of the text.
    */
@@ -23,5 +25,10 @@ export class MessageBubbleComponent {
    */
   @Input() isSender = false;
 
-  constructor(public app: AppService) {}
+  sanitizedHtml: string;
+
+  constructor(private sanitizer: DomSanitizer, public app: AppService) {}
+  ngOnInit(): void {
+    this.sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, this.text);
+  }
 }

@@ -7,6 +7,6 @@
   </ion-avatar>
   <ion-label>
     {{ subject.name }}
-    <p *ngIf="description">{{ description }}</p>
+    <p *ngIf="subject.getSectionCountry()">{{ subject.getSectionCountry() }}</p>
   </ion-label>
 </ion-item>
