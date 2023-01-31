@@ -25,7 +25,7 @@ export class AttachmentsComponent {
 
   uploadErrors: UploadError[] = [];
 
-  acceptedAttachmentsFormats = ['image/*', '.pdf', '.doc', '.docx'].join(',');
+  acceptedAttachmentsFormats = ['image/*', '.pdf', '.doc', '.docx', '.xls', '.xlsx'].join(',');
 
   constructor(
     private loading: IDEALoadingService,
