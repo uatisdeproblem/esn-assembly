@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
@@ -16,7 +16,7 @@ import { Subject } from '@models/subject.model';
   templateUrl: 'question.component.html',
   styleUrls: ['question.component.scss']
 })
-export class QuestionComponent implements OnInit {
+export class QuestionComponent implements OnChanges {
   /**
    * The question's topic.
    */
@@ -46,11 +46,12 @@ export class QuestionComponent implements OnInit {
     private _answers: AnswersService,
     public app: AppService
   ) {}
-  async ngOnInit(): Promise<void> {
-    [this.answers, this.userUpvoted] = await Promise.all([
-      this._answers.getListOfQuestion(this.question),
-      this._questions.userHasUpvoted(this.topic, this.question)
-    ]);
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (changes.question?.currentValue)
+      [this.answers, this.userUpvoted] = await Promise.all([
+        this._answers.getListOfQuestion(this.question, { force: true }),
+        this._questions.userHasUpvoted(this.topic, this.question)
+      ]);
   }
 
   async upvoteQuestion(upvote: boolean): Promise<void> {
