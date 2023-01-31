@@ -8,8 +8,8 @@ export const environment = {
       version: '0.0.1',
       url: 'https://esn-ga.link',
       mediaUrl: 'https://media.esn-ga.link',
-      title: 'ESN GA Candidates app',
-      hasIntroPage: false
+      title: 'ESN General Assembly Q&A',
+      maxFileUploadSizeMB: 10
     },
     api: {
       url: 'api.esn-ga.link',

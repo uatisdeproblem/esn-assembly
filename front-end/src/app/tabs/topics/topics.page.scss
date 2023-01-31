@@ -1,3 +1,15 @@
+ion-toolbar.filtersBar {
+  ion-button,
+  ion-label,
+  ion-select {
+    font-size: 0.9em;
+  }
+}
+
+ion-list.aList {
+  padding-top: 0;
+}
+
 ion-grid {
   padding: 0;
 }

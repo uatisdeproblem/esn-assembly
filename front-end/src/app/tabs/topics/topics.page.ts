@@ -1,7 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { IonInfiniteScroll, IonSearchbar } from '@ionic/angular';
 
 import { AppService } from '@app/app.service';
+import { TopicsService, TopicsSortBy } from './topics.service';
+import { TopicCategoryService } from '../configurations/categories/categories.service';
+import { TopicEventsService } from '../configurations/events/events.service';
 
+import { TopicCategory } from '@models/category.model';
+import { TopicEvent } from '@models/event.model';
 import { Topic } from '@models/topic.model';
 
 @Component({
@@ -9,47 +15,45 @@ import { Topic } from '@models/topic.model';
   templateUrl: 'topics.page.html',
   styleUrls: ['topics.page.scss']
 })
-export class TopicsPage {
-  topics: Topic[] = [
-    {
-      topicId: 't1',
-      name: 'GA Secretary: Matteo Carbone',
-      description:
-        'ESN Moderna, Italy\n\nCiao, beautiful people!\n\nFollowing a magical Erasmus experience in Sweden, I joined ESN Modena (<3) in 2016 and have enjoyed volunteering throughout the three levels of our Network since then. I’m a proud nerd, and my love for technology is only comparable to the cherishing of travelling and experiencing new things. In fact, it’s easier to find me working with my computer — Rock music in my earphones — all around Europe rather than at home or my office.\n\nI adore ESN because it brings us together and pushes us towards our better selves while doing something valuable for others. For this reason, even after several years of local, national and international events and roles, I’m still boosted with energy whenever I have the chance to work or meet with old and new volunteers to grow together and create a positive impact.\n\nHugs!',
-      event: { eventId: 'e1', name: 'GA Spring 2023' },
-      category: { categoryId: 'c2', name: 'Chairing Team', color: 'ESNdarkBlue' },
-      subjects: [{ username: 'mc', name: 'Matteo Carbone', avatarURL: 'https://matteocarbone.com/media/MC.png' }],
-      numOfQuestions: 2
-    },
-    {
-      topicId: 't2',
-      name: 'IB President: Juan Rayon',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed erat et nulla hendrerit lacinia ac eu metus. Mauris at sapien urna. Sed dictum risus ipsum, id tempus diam molestie elementum. Curabitur quis augue blandit nibh posuere semper. Proin condimentum sagittis hendrerit. Duis ut magna a lectus euismod gravida et eget nisl. Curabitur sed odio non lorem rhoncus vestibulum in non massa.',
-      event: { eventId: 'e1', name: 'GA Spring 2023' },
-      category: { categoryId: 'c1', name: 'International Board', color: 'ESNpink' },
-      subjects: [{ username: 'mc', name: 'Juan Rayon', avatarURL: null }],
-      numOfQuestions: 2
-    },
-    {
-      topicId: 't3',
-      name: 'OC EGM 2024',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed erat et nulla hendrerit lacinia ac eu metus. Mauris at sapien urna. Sed dictum risus ipsum, id tempus diam molestie elementum. Curabitur quis augue blandit nibh posuere semper. Proin condimentum sagittis hendrerit. Duis ut magna a lectus euismod gravida et eget nisl. Curabitur sed odio non lorem rhoncus vestibulum in non massa.',
-      event: { eventId: 'e1', name: 'GA Spring 2023' },
-      category: { categoryId: 'c1', name: 'Event', color: 'ESNorange' },
-      subjects: [
-        { username: 'mc', name: 'Juan Rayon', avatarURL: null },
-        { username: 'mc', name: 'MC', avatarURL: null }
-      ],
-      numOfQuestions: 2,
-      closedAt: Date.now()
-    }
-  ].map(x => new Topic(x));
+export class TopicsPage implements OnInit {
+  topics: Topic[];
 
-  constructor(public app: AppService) {}
-  ionViewDidEnter(): void {
-    console.log(this.app.user);
+  @ViewChild('searchbar') searchbar: IonSearchbar;
+
+  categories: TopicCategory[];
+  filterByCategory: string = null;
+
+  events: TopicEvent[];
+  filterByEvent: string = null;
+
+  sortBy: TopicsSortBy = TopicsSortBy.CREATED_DATE_DESC;
+  TopicsSortBy = TopicsSortBy;
+
+  constructor(
+    private _topics: TopicsService,
+    private _categories: TopicCategoryService,
+    private _events: TopicEventsService,
+    public app: AppService
+  ) {}
+  async ngOnInit(): Promise<void> {
+    this.topics = await this._topics.getList({ withPagination: true });
+    [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
+  }
+
+  async filter(search = '', scrollToNextPage?: IonInfiniteScroll): Promise<void> {
+    let startPaginationAfterId = null;
+    if (scrollToNextPage && this.topics?.length) startPaginationAfterId = this.topics[this.topics.length - 1].topicId;
+
+    this.topics = await this._topics.getList({
+      search,
+      categoryId: this.filterByCategory,
+      eventId: this.filterByEvent,
+      withPagination: true,
+      startPaginationAfterId,
+      sortBy: this.sortBy
+    });
+
+    if (scrollToNextPage) setTimeout((): Promise<void> => scrollToNextPage.complete(), 100);
   }
 
   openTopic(topic: Topic): void {

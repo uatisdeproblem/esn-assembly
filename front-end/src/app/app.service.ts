@@ -22,6 +22,10 @@ const THUMBNAILS_BASE_URL = env.idea.app.mediaUrl.concat('/thumbnails/images/', 
  */
 const AVATAR_FALLBACK_URL = './assets/imgs/no-avatar.jpg';
 /**
+ * A local generic fallback URL for the images.
+ */
+const ESN_STAR_FALLBACK_URL = './assets/icons/icon.svg';
+/**
  * The local URL to the icon.
  */
 const APP_ICON_PATH = 'assets/icons/icon.svg';
@@ -121,14 +125,15 @@ export class AppService {
   /**
    * Load a fallback URL when an avatar is missing.
    */
-  fallbackAvatar(targetImg: any): void {
-    if (targetImg && targetImg.src !== AVATAR_FALLBACK_URL) targetImg.src = AVATAR_FALLBACK_URL;
+  fallbackAvatar(targetImg: any, star = false): void {
+    const fallbackURL = star ? ESN_STAR_FALLBACK_URL : AVATAR_FALLBACK_URL;
+    if (targetImg && targetImg.src !== fallbackURL) targetImg.src = AVATAR_FALLBACK_URL;
   }
   /**
    * Get the URL to the fallback avatar's image.
    */
-  getAvatarFallbackURL(): string {
-    return AVATAR_FALLBACK_URL;
+  getAvatarFallbackURL(star = false): string {
+    return star ? ESN_STAR_FALLBACK_URL : AVATAR_FALLBACK_URL;
   }
 
   /**

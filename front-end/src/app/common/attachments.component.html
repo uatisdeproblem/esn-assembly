@@ -1,0 +1,67 @@
+<ion-item class="attachmentItem" *ngFor="let att of attachments" [lines]="editMode ? 'inset' : 'none'">
+  <ion-label>{{ att.name }}.{{ att.format }}</ion-label>
+  <ion-spinner
+    size="small"
+    color="medium"
+    slot="end"
+    *ngIf="!att.attachmentId"
+    [title]="t._('ATTACHMENTS.UPLOADING')"
+  ></ion-spinner>
+  <ion-button
+    slot="end"
+    color="danger"
+    fill="clear"
+    *ngIf="editMode"
+    [title]="t._('ATTACHMENTS.REMOVE_ATTACHMENT')"
+    (click)="removeAttachment(att)"
+  >
+    <ion-icon icon="remove" slot="icon-only"></ion-icon>
+  </ion-button>
+  <ion-button
+    slot="end"
+    color="medium"
+    fill="clear"
+    [title]="t._('ATTACHMENTS.DOWNLOAD_ATTACHMENT')"
+    (click)="downloadAttachment(att)"
+  >
+    <ion-icon icon="cloud-download-outline" slot="icon-only"></ion-icon>
+  </ion-button>
+</ion-item>
+<!----->
+<ion-item button *ngIf="editMode" (click)="browseFiles()">
+  <input
+    id="attachmentPicker"
+    type="file"
+    multiple
+    style="display: none"
+    [accept]="acceptedAttachmentsFormats"
+    (change)="addAttachmentFromFile($event)"
+  />
+  <ion-label>
+    <i>{{ 'ATTACHMENTS.TAP_TO_ADD_ATTACHMENT' | translate }}</i>
+  </ion-label>
+</ion-item>
+<!----->
+<div>
+  <ion-item class="attachmentItem error" [lines]="editMode ? 'inset' : 'none'" *ngFor="let err of uploadErrors">
+    <ion-label color="danger" class="ion-text-wrap">
+      {{ err.file }}
+      <p>{{ err.error ?? ('ATTACHMENTS.ERROR_UPLOADING_ATTACHMENT' | translate) }}</p>
+    </ion-label>
+    <ion-button
+      slot="end"
+      color="danger"
+      fill="clear"
+      [title]="t._('ATTACHMENTS.HIDE_ERROR')"
+      (click)="removeErrorFromList(err)"
+    >
+      <ion-icon name="close" slot="icon-only"></ion-icon>
+    </ion-button>
+  </ion-item>
+</div>
+<!----->
+<ion-item-divider *ngIf="editMode">{{ 'ATTACHMENTS.TAP_TO_ADD_ATTACHMENT_I' | translate }}</ion-item-divider>
+<!----->
+<ion-item class="noElements" *ngIf="!editMode && !attachments.length">
+  <ion-label>{{ 'ATTACHMENTS.NO_ATTACHMENTS' | translate }}</ion-label>
+</ion-item>

@@ -9,25 +9,34 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
+  <ion-toolbar color="ideaToolbar" *ngIf="app.user.isAdministrator()">
+    <ion-buttons slot="end">
+      <ion-button (click)="manageTopic()">{{ 'COMMON.MANAGE' | translate }}</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
   <ion-grid class="ion-no-padding">
     <ion-row>
       <ion-col [size]="12" [sizeLg]="6" *ngIf="!app.isInMobileMode() || !currentQuestion">
         <ion-card color="white" *ngIf="topic">
           <ion-card-header>
-            <div class="ion-text-right">
-              <ion-button size="small" color="medium" *ngIf="app.user.isAdministrator()" (click)="manageTopic()">
-                {{ 'COMMON.EDIT' | translate }}
-              </ion-button>
-            </div>
             <ion-card-subtitle>{{ topic.event.name }}</ion-card-subtitle>
             <ion-card-title>{{ topic.name }}</ion-card-title>
-            <p><ion-badge>{{ topic.category.name }}</ion-badge></p>
+            <p>
+              <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
+              <ion-badge slot="end" [color]="topic.closedAt ? 'danger' : 'success'">
+                {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+              </ion-badge>
+            </p>
           </ion-card-header>
           <ion-card-content>
             <ion-list class="aList" lines="none">
               <app-subject color="white" *ngFor="let subject of topic.subjects" [subject]="subject"></app-subject>
-              <p class="description" *ngIf="topic.description">{{ topic.description }}</p>
-              <ion-item button *ngFor="let attachment of topic.attachments">
+              <app-html-editor
+                *ngIf="topic.description"
+                [content]="topic.description"
+                [editMode]="false"
+              ></app-html-editor>
+              <ion-item button *ngFor="let attachment of topic.attachments" (click)="downloadAttachment(attachment)">
                 <ion-icon name="attach" slot="start"></ion-icon>
                 <ion-label>{{ attachment.name }}.{{ attachment.format }}</ion-label>
               </ion-item>

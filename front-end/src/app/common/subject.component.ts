@@ -1,15 +1,16 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Browser } from '@capacitor/browser';
 
 import { AppService } from '@app/app.service';
 
-import { Subject } from '@models/subject.model';
+import { Subject, SubjectTypes } from '@models/subject.model';
 
 @Component({
   selector: 'app-subject',
   templateUrl: 'subject.component.html',
   styleUrls: ['subject.component.scss']
 })
-export class SubjectComponent {
+export class SubjectComponent implements OnInit {
   /**
    * The subject to show.
    */
@@ -23,5 +24,17 @@ export class SubjectComponent {
    */
   @Input() lines: string;
 
+  SubjectTypes = SubjectTypes;
+
+  description: string;
+
   constructor(public app: AppService) {}
+  ngOnInit(): void {
+    this.description = [this.subject.country, this.subject.section].filter(x => x).join(' - ');
+  }
+
+  async openOnGalaxy(): Promise<void> {
+    const url = this.subject.getURL();
+    await Browser.open({ url });
+  }
 }

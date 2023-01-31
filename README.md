@@ -1,1 +1,1 @@
-# ESN General Assembly - Candidates app
+# ESN General Assembly Q&A

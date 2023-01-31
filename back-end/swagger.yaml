@@ -52,6 +52,12 @@ paths:
       tags: [Categories]
       security:
         - AuthFunction: []
+      parameters:
+        - name: all
+          in: query
+          description: Whether to include archived categories
+          schema:
+            type: boolean
       responses:
         200:
           $ref: '#/components/responses/Categories'
@@ -112,8 +118,35 @@ paths:
           $ref: '#/components/responses/Category'
         400:
           $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a category
+      tags: [Categories]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: categoryId
+          in: path
+          description: Category ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [ARCHIVE, UNARCHIVE]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
     delete:
-      summary: Archive a category
+      summary: Delete a category
       description: Requires to be Administrator
       tags: [Categories]
       security:
@@ -136,6 +169,12 @@ paths:
       tags: [Events]
       security:
         - AuthFunction: []
+      parameters:
+        - name: all
+          in: query
+          description: Whether to include archived events
+          schema:
+            type: boolean
       responses:
         200:
           $ref: '#/components/responses/Events'
@@ -196,8 +235,35 @@ paths:
           $ref: '#/components/responses/Event'
         400:
           $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on an event
+      tags: [Events]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: eventId
+          in: path
+          description: Event ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [ARCHIVE, UNARCHIVE]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
     delete:
-      summary: Archive an event
+      summary: Delete an event
       description: Requires to be Administrator
       tags: [Events]
       security:
@@ -238,6 +304,29 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/Topic'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on the topics
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_ATTACHMENT_UPLOAD_URL, GET_ATTACHMENT_DOWNLOAD_URL]
+                attachmentId:
+                  type: string
+                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
   /topics/{topicId}:
@@ -281,7 +370,7 @@ paths:
         400:
           $ref: '#/components/responses/BadParameters'
     delete:
-      summary: Archive a topic
+      summary: Delete a topic
       description: Requires to be Administrator
       tags: [Topics]
       security:
@@ -293,6 +382,33 @@ paths:
           required: true
           schema:
             type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a topic
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [OPEN, CLOSE, ARCHIVE, UNARCHIVE]
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'

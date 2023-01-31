@@ -13,8 +13,8 @@
     </ion-label>
     <ion-avatar slot="end" class="ion-hide-sm-down" *ngFor="let subject of topic.subjects" [title]="subject.name">
       <ion-img
-        [src]="subject.avatarURL ?? app.getAvatarFallbackURL()"
-        (ionError)="app.fallbackAvatar($event?.target)"
+        [src]="subject.avatarURL ?? app.getAvatarFallbackURL(subject.type !== SubjectTypes.USER)"
+        (ionError)="app.fallbackAvatar($event?.target, subject.type !== SubjectTypes.USER)"
       ></ion-img>
     </ion-avatar>
     <ion-badge slot="end" [color]="topic.closedAt ? 'danger' : 'success'">
@@ -32,7 +32,7 @@
 <!-- row -->
 <ng-container *ngIf="row">
   <ion-row class="ion-align-items-center headerRow" *ngIf="header">
-    <ion-col [sizeLg]="5" [sizeXl]="3">{{ 'TOPICS.NAME' | translate }}</ion-col>
+    <ion-col [sizeLg]="5" [sizeXl]="3">{{ 'TOPICS.TOPIC' | translate }}</ion-col>
     <ion-col [sizeLg]="3" [sizeXl]="2">{{ 'TOPICS.CATEGORY' | translate }}</ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="2">{{ 'TOPICS.EVENT' | translate }}</ion-col>
     <ion-col [sizeLg]="2">{{ 'TOPICS.SUBJECTS' | translate }}</ion-col>
@@ -52,8 +52,8 @@
     <ion-col [sizeLg]="2">
       <ion-avatar *ngFor="let subject of topic.subjects" [title]="subject.name">
         <ion-img
-          [src]="subject.avatarURL ?? app.getAvatarFallbackURL()"
-          (ionError)="app.fallbackAvatar($event?.target)"
+          [src]="subject.avatarURL ?? app.getAvatarFallbackURL(subject.type !== SubjectTypes.USER)"
+          (ionError)="app.fallbackAvatar($event?.target, subject.type !== SubjectTypes.USER)"
         ></ion-img>
       </ion-avatar>
     </ion-col>

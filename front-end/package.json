@@ -23,6 +23,7 @@
     "@idea-ionic/common": "^6.9.0",
     "@ionic/angular": "^6.4.1",
     "@ionic/storage-angular": "^3.0.6",
+    "@kolkov/angular-editor": "^3.0.0-beta.0",
     "idea-toolbox": "^6.6.7",
     "rxjs": "^7.8.0",
     "tslib": "^2.4.1",

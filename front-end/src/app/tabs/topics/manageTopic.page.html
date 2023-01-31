@@ -1,20 +1,153 @@
 <ion-content [class.viewMode]="!editMode">
+  <app-edit-mode-buttons
+    [title]="'TOPICS.MANAGE_TOPIC' | translate"
+    [editMode]="!!editMode"
+    (enter)="enterEditMode()"
+    (exit)="exitEditMode()"
+    (save)="save()"
+  ></app-edit-mode-buttons>
+
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
-    <app-edit-mode-buttons
-      [title]="'TOPICS.MANAGE_TOPIC' | translate"
-      [editMode]="!!editMode"
-      (enter)="enterEditMode()"
-      (exit)="exitEditMode()"
-      (save)="save()"
-    ></app-edit-mode-buttons>
+    <p class="ion-text-right" *ngIf="!editMode">
+      <ion-button [color]="topic.closedAt ? 'success': 'danger'" (click)="manageTopicStatus()">
+        {{ (topic.closedAt ? 'COMMON.OPEN' : 'COMMON.CLOSE') | translate }}
+      </ion-button>
+    </p>
+    <ion-list-header>
+      <ion-label><h2>{{ 'TOPICS.ATTRIBUTES' | translate }}</h2> </ion-label>
+    </ion-list-header>
     <ion-item [class.fieldHasError]="hasFieldAnError('name')">
       <ion-label position="stacked">
         {{ 'TOPICS.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
       </ion-label>
       <ion-input [(ngModel)]="topic.name" [disabled]="!editMode"></ion-input>
     </ion-item>
-    <p class="ion-padding ion-text-right" *ngIf="editMode === UXMode.EDIT">
-      <ion-button color="danger" (click)="archive()">{{ 'COMMON.ARCHIVE' | translate }}</ion-button>
-    </p>
+    <ion-item>
+      <ion-label position="stacked">
+        {{ 'TOPICS.CATEGORY' | translate }} <ion-text class="obligatoryDot"></ion-text>
+      </ion-label>
+      <ion-select
+        interface="popover"
+        [compareWith]="compareWithCategory"
+        [(ngModel)]="topic.category"
+        [disabled]="!editMode || !categories"
+      >
+        <ion-select-option *ngFor="let category of categories" [value]="category">
+          {{ category.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">
+        {{ 'TOPICS.EVENT' | translate }} <ion-text class="obligatoryDot"></ion-text>
+      </ion-label>
+      <ion-select
+        interface="popover"
+        [compareWith]="compareWithEvent"
+        [(ngModel)]="topic.event"
+        [disabled]="!editMode || !events"
+      >
+        <ion-select-option *ngFor="let event of events" [value]="event">{{ event.name }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-list-header>
+      <ion-label><h2>{{ 'TOPICS.DESCRIPTION' | translate }}</h2></ion-label>
+    </ion-list-header>
+    <ion-item class="noElements" *ngIf="!topic.description && !editMode">
+      <ion-label>{{ 'TOPICS.NO_DESCRIPTION' | translate }}</ion-label>
+    </ion-item>
+    <app-html-editor
+      *ngIf="topic.description || editMode"
+      [(content)]="topic.description"
+      [editMode]="!!editMode"
+    ></app-html-editor>
+
+    <ion-list-header>
+      <ion-label><h2>{{ 'TOPICS.SUBJECTS' | translate }}</h2></ion-label>
+    </ion-list-header>
+    <ion-grid class="ion-no-padding">
+      <ion-row
+        class="ion-align-items-center row"
+        *ngFor="let subject of topic.subjects; let odd = odd"
+        [class.fieldHasError]="hasFieldAnError('subject')"
+        [class.odd]="odd"
+      >
+        <ion-col *ngIf="editMode" [size]="1">
+          <ion-button fill="clear" color="danger" size="small" (click)="removeSubject(subject)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col [size]="editMode ? 5 : 6">
+          <ion-item>
+            <ion-label position="stacked">
+              {{ 'SUBJECTS.TYPE' | translate }} <ion-text class="obligatoryDot"></ion-text>
+            </ion-label>
+            <ion-select interface="popover" [(ngModel)]="subject.type" [disabled]="!editMode">
+              <ion-select-option *ngFor="let type of SubjectTypes | keyvalue" [value]="type.value">
+                {{ ('SUBJECTS.TYPES.' + type.value) | translate}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col [size]="6">
+          <ion-item>
+            <ion-label position="stacked">
+              {{ 'SUBJECTS.ID' | translate }} <ion-text class="obligatoryDot"></ion-text>
+            </ion-label>
+            <ion-input [(ngModel)]="subject.id" [disabled]="!editMode"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col [size]="12">
+          <ion-item>
+            <ion-label position="stacked">
+              {{ 'SUBJECTS.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
+            </ion-label>
+            <ion-input [(ngModel)]="subject.name" [disabled]="!editMode"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ng-container *ngIf="subject.type === SubjectTypes.USER">
+          <ion-col [size]="12">
+            <ion-item>
+              <ion-label position="stacked">{{ 'SUBJECTS.AVATAR_URL' | translate }}</ion-label>
+              <ion-input [(ngModel)]="subject.avatarURL" [disabled]="!editMode"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col [size]="6">
+            <ion-item>
+              <ion-label position="stacked">
+                {{ 'SUBJECTS.SECTION' | translate }} <ion-text class="obligatoryDot"></ion-text>
+              </ion-label>
+              <ion-input [(ngModel)]="subject.section" [disabled]="!editMode"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ng-container>
+        <ion-col [size]="6" *ngIf="subject.type !== SubjectTypes.COUNTRY">
+          <ion-item>
+            <ion-label position="stacked">
+              {{ 'SUBJECTS.COUNTRY' | translate }} <ion-text class="obligatoryDot"></ion-text>
+            </ion-label>
+            <ion-input [(ngModel)]="subject.country" [disabled]="!editMode"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <ion-item *ngIf="editMode" button (click)="addSubject()">
+      <i>{{ 'TOPICS.TAP_TO_ADD_SUBJECT' | translate }}</i>
+    </ion-item>
+
+    <ion-list-header>
+      <ion-label><h2>{{ 'TOPICS.ATTACHMENTS' | translate }}</h2> </ion-label>
+    </ion-list-header>
+    <app-attachments lines="inset" [attachments]="topic.attachments" [editMode]="!!editMode"></app-attachments>
+
+    <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
+      <ion-col>
+        <ion-button color="warning" (click)="archiveTopic()">{{ 'COMMON.ARCHIVE' | translate }}</ion-button>
+      </ion-col>
+      <ion-col class="ion-text-right">
+        <ion-button color="danger" (click)="deleteTopic()">{{ 'COMMON.DELETE' | translate }}</ion-button>
+      </ion-col>
+    </ion-row>
   </ion-list>
 </ion-content>

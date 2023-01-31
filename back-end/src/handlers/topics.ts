@@ -2,7 +2,10 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
+import { SignedURL } from 'idea-toolbox';
+import { TopicCategoryAttached } from '../models/category.model';
+import { TopicEventAttached } from '../models/event.model';
 
 import { Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
@@ -18,6 +21,10 @@ const DDB_TABLES = {
   events: process.env.DDB_TABLE_events
 };
 const ddb = new DynamoDB();
+
+const S3_BUCKET_MEDIA = process.env.S3_BUCKET_MEDIA;
+const S3_ATTACHMENTS_FOLDER = process.env.S3_ATTACHMENTS_FOLDER;
+const s3 = new S3();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new Topics(ev, cb).handleRequest();
 
@@ -49,15 +56,33 @@ class Topics extends ResourceController {
     return res
       .map(x => new Topic(x))
       .filter(x => !x.archivedAt)
-      .sort((a, b): number => a.name.localeCompare(b.name));
+      .sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Topic> {
     const errors = this.topic.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
 
+    try {
+      this.topic.category = new TopicCategoryAttached(
+        await ddb.get({ TableName: DDB_TABLES.categories, Key: { categoryId: this.topic.category.categoryId } })
+      );
+    } catch (error) {
+      throw new RCError('Category not found');
+    }
+
+    try {
+      this.topic.event = new TopicEventAttached(
+        await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.topic.event.eventId } })
+      );
+    } catch (error) {
+      throw new RCError('Event not found');
+    }
+
     const putParams: any = { TableName: DDB_TABLES.topics, Item: this.topic };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(topicId)';
+    else this.topic.updatedAt = new Date().toISOString();
+
     await ddb.put(putParams);
 
     return this.topic;
@@ -70,6 +95,37 @@ class Topics extends ResourceController {
     this.topic.topicId = await ddb.IUNID(PROJECT);
 
     return await this.putSafeResource({ noOverwrite: true });
+  }
+
+  protected async patchResources(): Promise<SignedURL> {
+    switch (this.body.action) {
+      case 'GET_ATTACHMENT_UPLOAD_URL':
+        return await this.getSignedURLToUploadAttachment();
+      case 'GET_ATTACHMENT_DOWNLOAD_URL':
+        return await this.getSignedURLToDownloadAttachment();
+      default:
+        throw new RCError('Unsupported action');
+    }
+  }
+  private async getSignedURLToUploadAttachment(): Promise<SignedURL> {
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    const attachmentId = await ddb.IUNID(PROJECT.concat('-attachment'));
+
+    const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}.png`;
+    const signedURL = s3.signedURLPut(S3_BUCKET_MEDIA, key);
+    signedURL.id = attachmentId;
+
+    return signedURL;
+  }
+  private async getSignedURLToDownloadAttachment(): Promise<SignedURL> {
+    const { attachmentId } = this.body;
+    if (!attachmentId) throw new RCError('Missing attachment ID');
+
+    const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}.png`;
+    const signedURL = s3.signedURLGet(S3_BUCKET_MEDIA, key);
+
+    return signedURL;
   }
 
   protected async getResource(): Promise<Topic> {
@@ -85,10 +141,44 @@ class Topics extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
+  protected async patchResource(): Promise<Topic> {
+    switch (this.body.action) {
+      case 'OPEN':
+        return await this.manageStatus(true);
+      case 'CLOSE':
+        return await this.manageStatus(false);
+      case 'ARCHIVE':
+        return await this.manageArchive(true);
+      case 'UNARCHIVE':
+        return await this.manageArchive(false);
+      default:
+        throw new RCError('Unsupported action');
+    }
+  }
+  private async manageStatus(open: boolean): Promise<Topic> {
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    if (open) delete this.topic.closedAt;
+    else this.topic.closedAt = new Date().toISOString();
+
+    await ddb.put({ TableName: DDB_TABLES.topics, Item: this.topic });
+    return this.topic;
+  }
+  private async manageArchive(archive: boolean): Promise<Topic> {
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    if (archive) {
+      this.topic.archivedAt = new Date().toISOString();
+      if (!this.topic.closedAt) this.topic.closedAt = this.topic.archivedAt;
+    } else delete this.topic.archivedAt;
+
+    await ddb.put({ TableName: DDB_TABLES.topics, Item: this.topic });
+    return this.topic;
+  }
+
   protected async deleteResource(): Promise<void> {
     if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
 
-    this.topic.archivedAt = new Date().toISOString();
-    await this.putSafeResource({ noOverwrite: false });
+    await ddb.delete({ TableName: DDB_TABLES.topics, Key: { topicId: this.topic.topicId } });
   }
 }

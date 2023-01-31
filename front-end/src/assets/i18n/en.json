@@ -1,6 +1,7 @@
 {
   "COMMON": {
-    "APP_NAME": "Candidates app",
+    "APP_NAME": "General Assembly Q&A",
+    "APP_NAME_SHORT": "Q&A",
     "APP_DESCRIPTION": "ESN General Assembly",
     "VERSION": "Version {{v}}",
     "ARE_YOU_SURE": "Are you sure?",
@@ -74,7 +75,8 @@
     "ENTER_EDIT_MODE": "Enter in edit mod",
     "SAVE_CHANGES": "Save changes",
     "NOT_FOUND": "Not found",
-    "NOT_SELECTED": "Not selected"
+    "NOT_SELECTED": "Not selected",
+    "MANAGE": "Manage"
   },
   "LANGUAGES": {
     "EN": "English"
@@ -85,12 +87,15 @@
   "TABS": {
     "TOPICS": "Topics",
     "ARCHIVE": "Archive",
+    "PROFILE": "Profile",
     "CONFIGURATIONS": "Configurations"
   },
   "TOPICS": {
+    "TOPIC": "Topic",
     "QUESTIONS": "Questions",
     "TO_READ": "To read",
-    "NAME": "Topic",
+    "NAME": "Name",
+    "DESCRIPTION": "Description",
     "CATEGORY": "Category",
     "EVENT": "Event",
     "SUBJECTS": "Subjects",
@@ -102,11 +107,27 @@
     },
     "CREATED_AT": "Created",
     "UPDATED_AT": "Updated",
-    "NO_ACTIVE_TOPICS": "No active topics",
+    "NO_ACTIVE_TOPICS": "No active topics found",
     "NO_QUESTIONS_ASKED_YET": "No questions asked yet",
     "BACK_TO_OTHER_QUESTIONS": "Back to other questions",
     "TOPICS": "TOPICS",
-    "MANAGE_TOPIC": "Manage topic"
+    "MANAGE_TOPIC": "Manage topic",
+    "SORT_BY": "Sort by",
+    "SORT_BY_OPTIONS": {
+      "CREATED_DATE_ASC": "Creation date ⬆",
+      "CREATED_DATE_DESC": "Creation date ⬇",
+      "UPDATED_DATE_ASC": "Edit date ⬆",
+      "UPDATED_DATE_DESC": "Edit date ⬇",
+      "NUM_OF_QUESTIONS_ASC": "# of questions ⬆",
+      "NUM_OF_QUESTIONS_DESC": "# of questions ⬇"
+    },
+    "ALL_CATEGORIES": "All categories",
+    "ALL_EVENTS": "All events",
+    "FILTER_ACTIVE_TOPICS": "Filter active topics",
+    "ATTACHMENTS": "Attachments",
+    "ATTRIBUTES": "Attributes",
+    "TAP_TO_ADD_SUBJECT": "Tap to add a subject...",
+    "NO_DESCRIPTION": "No description"
   },
   "QUESTIONS": {
     "BY": "By",
@@ -131,5 +152,31 @@
     "EVENTS": "Events",
     "MANAGE_EVENT": "Manage event",
     "NAME": "Name"
+  },
+  "ATTACHMENTS": {
+    "ERROR_UPLOADING_ATTACHMENT": "Error while uploading the attachment",
+    "HIDE_ERROR": "Hide the error",
+    "REMOVE_ATTACHMENT": "Remove the attachment",
+    "TAP_TO_ADD_ATTACHMENT": "Tap to attach a document...",
+    "TAP_TO_ADD_ATTACHMENT_I": "The preferred format is images or PDF documents. Max size of 10MB per attachment.",
+    "UPLOADING": "Uploading...",
+    "FILE_IS_TOO_BIG": "The file is too big",
+    "NO_ATTACHMENTS": "No attachments"
+  },
+  "SUBJECTS": {
+    "ID": "ESN Galaxy ID/username",
+    "TYPE": "Type",
+    "TYPES": {
+      "USER": "User",
+      "SECTION": "Section",
+      "COUNTRY": "Country"
+    },
+    "NAME": "Name",
+    "AVATAR_URL": "Avatar URL",
+    "SECTION": "ESN Section",
+    "COUNTRY": "ESN Country"
+  },
+  "PROFILE": {
+    "MANAGE_ACCOUNT_ON_GALAXY": "Manage account on ESN Galaxy"
   }
 }

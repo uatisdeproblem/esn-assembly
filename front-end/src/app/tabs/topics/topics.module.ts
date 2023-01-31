@@ -13,6 +13,8 @@ import { TopicModule } from '../topics/topic.module';
 import { QuestionModule } from './questions/question.module';
 import { SubjectModule } from '@common/subject.module';
 import { EditModeButtonsModule } from 'src/app/common/editModeButtons.module';
+import { AttachmentsModule } from 'src/app/common/attachments.module';
+import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
 
 @NgModule({
   imports: [
@@ -24,7 +26,9 @@ import { EditModeButtonsModule } from 'src/app/common/editModeButtons.module';
     TopicModule,
     QuestionModule,
     SubjectModule,
-    EditModeButtonsModule
+    EditModeButtonsModule,
+    AttachmentsModule,
+    HTMLEditorModule
   ],
   declarations: [TopicsPage, TopicPage, ManageTopicPage]
 })

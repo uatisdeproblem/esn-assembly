@@ -1,9 +1,15 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Browser } from '@capacitor/browser';
+import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
+import { TopicsService } from './topics.service';
+import { AttachmentsService } from 'src/app/common/attachments.service';
 
 import { Topic } from '@models/topic.model';
 import { Question } from '@models/question.model';
+import { Attachment } from 'idea-toolbox';
 
 @Component({
   selector: 'topic',
@@ -11,28 +17,7 @@ import { Question } from '@models/question.model';
   styleUrls: ['topic.page.scss']
 })
 export class TopicPage {
-  topic: Topic = new Topic({
-    topicId: 't1',
-    name: 'GA Secretary: Matteo Carbone',
-    description:
-      'ESN Moderna, Italy\n\nCiao, beautiful people!\n\nFollowing a magical Erasmus experience in Sweden, I joined ESN Modena (<3) in 2016 and have enjoyed volunteering throughout the three levels of our Network since then. I’m a proud nerd, and my love for technology is only comparable to the cherishing of travelling and experiencing new things. In fact, it’s easier to find me working with my computer — Rock music in my earphones — all around Europe rather than at home or my office.\n\nI adore ESN because it brings us together and pushes us towards our better selves while doing something valuable for others. For this reason, even after several years of local, national and international events and roles, I’m still boosted with energy whenever I have the chance to work or meet with old and new volunteers to grow together and create a positive impact.\n\nHugs!',
-    event: { eventId: 'e1', name: 'GA Spring 2022' },
-    category: { categoryId: 'c2', name: 'Chairing Team', color: 'ESNdarkBlue' },
-    subjects: [
-      {
-        username: 'mc',
-        name: 'Matteo Carbone',
-        section: 'ESN Modena',
-        country: 'ESN Italy',
-        avatarURL: 'https://matteocarbone.com/media/MC.png'
-      }
-    ],
-    numOfQuestions: 2,
-    attachments: [
-      { name: 'Motivation letter', format: 'pdf' },
-      { name: 'CV', format: 'pdf' }
-    ]
-  });
+  topic: Topic;
   questions: Question[] = [
     {
       topicId: 't1',
@@ -70,12 +55,43 @@ export class TopicPage {
 
   currentQuestion: Question;
 
-  constructor(public app: AppService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private loading: IDEALoadingService,
+    private message: IDEAMessageService,
+    private _topics: TopicsService,
+    private _attachments: AttachmentsService,
+    public app: AppService
+  ) {}
+  async ionViewWillEnter(): Promise<void> {
+    const topicId = this.route.snapshot.paramMap.get('topicId');
+    try {
+      await this.loading.show();
+      this.topic = await this._topics.getById(topicId);
+    } catch (error) {
+      this.message.error('COMMON.NOT_FOUND');
+    } finally {
+      this.loading.hide();
+    }
+  }
+
   selectQuestion(question: Question): void {
     this.currentQuestion = question;
   }
 
   manageTopic(): void {
     this.app.goToInTabs(['topics', this.topic.topicId, 'manage']);
+  }
+
+  async downloadAttachment(attachment: Attachment): Promise<void> {
+    try {
+      await this.loading.show();
+      const url = await this._attachments.download(attachment);
+      await Browser.open({ url });
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      this.loading.hide();
+    }
   }
 }

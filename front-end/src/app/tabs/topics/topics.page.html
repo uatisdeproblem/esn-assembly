@@ -7,18 +7,56 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-list class="aList">
-    <div class="ion-text-right">
+  <ion-toolbar class="filtersBar" color="ideaToolbar">
+    <ion-searchbar
+      #searchbar
+      [placeholder]="'TOPICS.FILTER_ACTIVE_TOPICS' | translate"
+      (ionInput)="filter($event.target.value)"
+    ></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-lg-down">
+        <ion-select
+          interface="popover"
+          [(ngModel)]="filterByCategory"
+          [disabled]="!categories"
+          (ionChange)="filter(searchbar.value)"
+        >
+          <ion-select-option value="">{{ 'TOPICS.ALL_CATEGORIES' | translate }}</ion-select-option>
+          <ion-select-option *ngFor="let category of categories" [value]="category.categoryId">
+            {{ category.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-lg-down">
+        <ion-select
+          interface="popover"
+          [(ngModel)]="filterByEvent"
+          [disabled]="!events"
+          (ionChange)="filter(searchbar.value)"
+        >
+          <ion-select-option value="">{{ 'TOPICS.ALL_EVENTS' | translate }}</ion-select-option>
+          <ion-select-option *ngFor="let event of events" [value]="event.eventId">{{ event.name }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-md-down">
+        <ion-select interface="popover" [(ngModel)]="sortBy" (ionChange)="filter(searchbar.value)">
+          <ion-select-option *ngFor="let sortBy of TopicsSortBy | keyvalue" [value]="sortBy.key">
+            {{ 'TOPICS.SORT_BY' | translate }} {{ ('TOPICS.SORT_BY_OPTIONS.' + sortBy.key) | translate | lowercase }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-button
         size="small"
-        color="medium"
+        color="white"
         class="ion-margin-end ion-margin-bottom"
         *ngIf="app.user.isAdministrator()"
         (click)="addTopic()"
       >
         {{ 'COMMON.ADD' | translate }}
       </ion-button>
-    </div>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-list class="aList">
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="topics && !topics.length">
       <ion-label>{{ 'TOPICS.NO_ACTIVE_TOPICS' | translate }}</ion-label>
     </ion-item>
@@ -31,5 +69,8 @@
       <app-topic *ngIf="topics?.length" [row]="true" [header]="true"></app-topic>
       <app-topic *ngFor="let topic of topics" [topic]="topic" [row]="true" (select)="openTopic(topic)"></app-topic>
     </ion-grid>
+    <ion-infinite-scroll (ionInfinite)="filter(searchbar.value, $event.target)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   </ion-list>
 </ion-content>

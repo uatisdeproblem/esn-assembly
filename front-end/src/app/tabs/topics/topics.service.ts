@@ -29,9 +29,12 @@ export class TopicsService {
     options: {
       force?: boolean;
       search?: string;
+      categoryId?: string;
+      eventId?: string;
       withPagination?: boolean;
       startPaginationAfterId?: string;
-    } = {}
+      sortBy?: TopicsSortBy;
+    } = { sortBy: TopicsSortBy.CREATED_DATE_DESC }
   ): Promise<Topic[]> {
     if (!this.topics || options.force) await this.loadList();
     if (!this.topics) return null;
@@ -46,6 +49,31 @@ export class TopicsService {
           .split(' ')
           .every(searchTerm => [x.name].filter(f => f).some(f => f.toLowerCase().includes(searchTerm)))
       );
+
+    if (options.categoryId) filteredList = filteredList.filter(x => x.category.categoryId === options.categoryId);
+
+    if (options.eventId) filteredList = filteredList.filter(x => x.event.eventId === options.eventId);
+
+    switch (options.sortBy) {
+      case TopicsSortBy.CREATED_DATE_ASC:
+        filteredList = filteredList.sort((a, b): number => a.createdAt.localeCompare(b.createdAt));
+        break;
+      case TopicsSortBy.CREATED_DATE_DESC:
+        filteredList = filteredList.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
+        break;
+      case TopicsSortBy.UPDATED_DATE_ASC:
+        filteredList = filteredList.sort((a, b): number => a.updatedAt.localeCompare(b.updatedAt));
+        break;
+      case TopicsSortBy.CREATED_DATE_DESC:
+        filteredList = filteredList.sort((a, b): number => b.updatedAt.localeCompare(a.updatedAt));
+        break;
+      case TopicsSortBy.NUM_OF_QUESTIONS_ASC:
+        filteredList = filteredList.sort((a, b): number => a.numOfQuestions - b.numOfQuestions);
+        break;
+      case TopicsSortBy.NUM_OF_QUESTIONS_DESC:
+        filteredList = filteredList.sort((a, b): number => b.numOfQuestions - a.numOfQuestions);
+        break;
+    }
 
     if (options.withPagination && filteredList.length > this.MAX_PAGE_SIZE) {
       let indexOfLastOfPreviousPage = 0;
@@ -79,9 +107,47 @@ export class TopicsService {
   }
 
   /**
+   * Open a topic.
+   */
+  async open(topic: Topic): Promise<void> {
+    await this.api.patchResource(['topics', topic.topicId], { body: { action: 'OPEN' } });
+  }
+  /**
+   * Close a topic.
+   */
+  async close(topic: Topic): Promise<void> {
+    await this.api.patchResource(['topics', topic.topicId], { body: { action: 'CLOSE' } });
+  }
+
+  /**
    * Archive a topic.
    */
   async archive(topic: Topic): Promise<void> {
-    await this.api.deleteResource(['topics', topic.topicId]);
+    await this.api.patchResource(['topics', topic.topicId], { body: { action: 'ARCHIVE' } });
   }
+  /**
+   * Unarchive a topic.
+   */
+  async unarchive(topic: Topic): Promise<void> {
+    await this.api.patchResource(['topics', topic.topicId], { body: { action: 'UNARCHIVE' } });
+  }
+
+  /**
+   * Delete a topic.
+   */
+  async delete(event: Topic): Promise<void> {
+    await this.api.deleteResource(['topics', event.topicId]);
+  }
+}
+
+/**
+ * The possible sorting mechanisms for the topics.
+ */
+export enum TopicsSortBy {
+  CREATED_DATE_ASC = 'CREATED_DATE_ASC',
+  CREATED_DATE_DESC = 'CREATED_DATE_DESC',
+  UPDATED_DATE_ASC = 'UPDATED_DATE_ASC',
+  UPDATED_DATE_DESC = 'UPDATED_DATE_DESC',
+  NUM_OF_QUESTIONS_ASC = 'NUM_OF_QUESTIONS_ASC',
+  NUM_OF_QUESTIONS_DESC = 'NUM_OF_QUESTIONS_DESC'
 }

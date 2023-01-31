@@ -67,14 +67,15 @@ ion-list.aList {
         font-weight: 500;
       }
       h1 {
-        font-size: 1.5em;
+        font-size: 1.4em;
         margin-bottom: 5px;
       }
       h2 {
-        font-size: 1.3em;
+        font-size: 1.2em;
         margin-bottom: 5px;
       }
       h3 {
+        font-size: 1.1em;
         margin-bottom: 5px;
       }
       ion-badge {
@@ -128,6 +129,13 @@ ion-card {
   box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
+ion-button:not([fill='clear'], [fill='outline']) {
+  --box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+ion-toolbar ion-buttons ion-button {
+  --box-shadow: none !important;
+}
+
 ion-item.noElements,
 ion-col.noElements {
   ion-label {
@@ -150,4 +158,19 @@ ion-badge.unreadDot {
   padding: 0 5px;
   margin-left: 6px;
   margin-right: 16px;
+}
+
+.angular-editor-wrapper {
+  background-color: var(--ion-color-white) !important;
+}
+.angular-editor-toolbar,
+.angular-editor-textarea {
+  border-color: var(--ion-border-color) !important;
+}
+.angular-editor-toolbar {
+  background-color: var(--ion-color-light) !important;
+}
+.angular-editor-button {
+  background-color: var(--ion-color-white) !important;
+  border-color: var(--ion-color-light) !important;
 }

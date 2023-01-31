@@ -82,6 +82,19 @@ export class TopicCategoryService {
    * Archive a category.
    */
   async archive(category: TopicCategory): Promise<void> {
+    await this.api.patchResource(['categories', category.categoryId], { body: { action: 'ARCHIVE' } });
+  }
+  /**
+   * Unarchive a category.
+   */
+  async unarchive(category: TopicCategory): Promise<void> {
+    await this.api.patchResource(['categories', category.categoryId], { body: { action: 'UNARCHIVE' } });
+  }
+
+  /**
+   * Delete a category.
+   */
+  async delete(category: TopicCategory): Promise<void> {
     await this.api.deleteResource(['categories', category.categoryId]);
   }
 }

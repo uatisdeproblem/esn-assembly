@@ -1,0 +1,10 @@
+ion-item.attachmentItem {
+  --padding-start: 24px;
+  --padding-end: 0;
+}
+ion-item.attachmentItem.error {
+  font-size: 0.8em;
+  p {
+    font-size: 0.8em;
+  }
+}

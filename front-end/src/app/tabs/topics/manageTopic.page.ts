@@ -1,26 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { AlertController } from '@ionic/angular';
+import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
+import { TopicCategoryService } from '../configurations/categories/categories.service';
+import { TopicEventsService } from '../configurations/events/events.service';
 
 import { Topic } from '@models/topic.model';
-import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
-import { AlertController } from '@ionic/angular';
+import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
+import { TopicEvent, TopicEventAttached } from '@models/event.model';
+import { Subject, SubjectTypes } from '@models/subject.model';
 
 @Component({
   selector: 'manage-topic',
   templateUrl: 'manageTopic.page.html',
   styleUrls: ['manageTopic.page.scss']
 })
-export class ManageTopicPage {
+export class ManageTopicPage implements OnInit {
   topic: Topic;
 
   editMode = UXMode.VIEW;
   UXMode = UXMode;
   errors = new Set<string>();
   entityBeforeChange: Topic;
+
+  categories: TopicCategory[];
+  events: TopicEvent[];
+
+  SubjectTypes = SubjectTypes;
 
   constructor(
     private location: Location,
@@ -30,8 +40,13 @@ export class ManageTopicPage {
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
     private _topics: TopicsService,
+    private _categories: TopicCategoryService,
+    private _events: TopicEventsService,
     public app: AppService
   ) {}
+  async ngOnInit(): Promise<void> {
+    [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
+  }
   async ionViewWillEnter(): Promise<void> {
     const topicId = this.route.snapshot.paramMap.get('topicId') ?? 'new';
     try {
@@ -48,6 +63,20 @@ export class ManageTopicPage {
     } finally {
       this.loading.hide();
     }
+  }
+
+  addSubject(): void {
+    this.topic.subjects.push(new Subject({ type: SubjectTypes.USER }));
+  }
+  removeSubject(subject: Subject): void {
+    this.topic.subjects.splice(this.topic.subjects.indexOf(subject), 1);
+  }
+
+  compareWithEvent(e1: TopicEventAttached, e2: TopicEventAttached): boolean {
+    return e1 && e2 ? e1.eventId === e2.eventId : e1 === e2;
+  }
+  compareWithCategory(c1: TopicCategoryAttached, c2: TopicCategoryAttached): boolean {
+    return c1 && c2 ? c1.categoryId === c2.categoryId : c1 === c2;
   }
 
   async save(): Promise<void> {
@@ -73,11 +102,12 @@ export class ManageTopicPage {
     return this.errors.has(field);
   }
 
-  async archive(): Promise<void> {
-    const doDelete = async (): Promise<void> => {
+  async manageTopicStatus(open = true): Promise<void> {
+    const doStatusChange = async (): Promise<void> => {
       try {
         await this.loading.show();
-        await this._topics.archive(this.topic);
+        if (open) await this._topics.open(this.topic);
+        else await this._topics.close(this.topic);
         this.message.success('COMMON.OPERATION_COMPLETED');
         this.app.closePage();
       } catch (error) {
@@ -89,9 +119,53 @@ export class ManageTopicPage {
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.ARCHIVE'), role: 'destructive', handler: doDelete }
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doStatusChange }
     ];
     const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
+  }
+  async archiveTopic(archive = true): Promise<void> {
+    const doArchive = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        if (archive) await this._topics.archive(this.topic);
+        else await this._topics.unarchive(this.topic);
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.closePage();
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.ARCHIVE'), role: 'destructive', handler: doArchive }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
+  }
+  async deleteTopic(): Promise<void> {
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._topics.delete(this.topic);
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.closePage();
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
 

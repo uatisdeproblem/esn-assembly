@@ -43,11 +43,10 @@ class TopicCategories extends ResourceController {
   }
 
   protected async getResources(): Promise<TopicCategory[]> {
-    const res: TopicCategory[] = await ddb.scan({ TableName: DDB_TABLES.categories });
-    return res
-      .map(x => new TopicCategory(x))
-      .filter(x => !x.archivedAt)
-      .sort((a, b): number => a.name.localeCompare(b.name));
+    let categories: TopicCategory[] = await ddb.scan({ TableName: DDB_TABLES.categories });
+    categories = categories.map(x => new TopicCategory(x));
+    if (!this.queryParams.all) categories = categories.filter(x => !x.archivedAt);
+    return categories.sort((a, b): number => a.name.localeCompare(b.name));
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<TopicCategory> {
@@ -83,10 +82,29 @@ class TopicCategories extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
+  protected async patchResource(): Promise<TopicCategory> {
+    switch (this.body.action) {
+      case 'ARCHIVE':
+        return await this.manageArchive(true);
+      case 'UNARCHIVE':
+        return await this.manageArchive(false);
+      default:
+        throw new RCError('Unsupported action');
+    }
+  }
+  private async manageArchive(archive: boolean): Promise<TopicCategory> {
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    if (archive) this.topicCategory.archivedAt = new Date().toISOString();
+    else delete this.topicCategory.archivedAt;
+
+    await ddb.put({ TableName: DDB_TABLES.categories, Item: this.topicCategory });
+    return this.topicCategory;
+  }
+
   protected async deleteResource(): Promise<void> {
     if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
 
-    this.topicCategory.archivedAt = new Date().toISOString();
-    await this.putSafeResource({ noOverwrite: false });
+    await ddb.delete({ TableName: DDB_TABLES.categories, Key: { categoryId: this.topicCategory.categoryId } });
   }
 }

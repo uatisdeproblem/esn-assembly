@@ -2,9 +2,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { AppService } from '../app.service';
 
-/**
- * Standard header for the pages, to handle the difference between mobile and desktop UI.
- */
 @Component({
   selector: 'app-edit-mode-buttons',
   templateUrl: 'editModeButtons.component.html',

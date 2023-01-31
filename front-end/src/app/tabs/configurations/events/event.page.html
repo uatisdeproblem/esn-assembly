@@ -1,20 +1,25 @@
 <ion-content [class.viewMode]="!editMode">
+  <app-edit-mode-buttons
+    [title]="'EVENTS.MANAGE_EVENT' | translate"
+    [editMode]="!!editMode"
+    (enter)="enterEditMode()"
+    (exit)="exitEditMode()"
+    (save)="save()"
+  ></app-edit-mode-buttons>
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="event">
-    <app-edit-mode-buttons
-      [title]="'EVENTS.MANAGE_EVENT' | translate"
-      [editMode]="!!editMode"
-      (enter)="enterEditMode()"
-      (exit)="exitEditMode()"
-      (save)="save()"
-    ></app-edit-mode-buttons>
     <ion-item [class.fieldHasError]="hasFieldAnError('name')">
       <ion-label position="stacked">
         {{ 'EVENTS.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
       </ion-label>
       <ion-input [(ngModel)]="event.name" [disabled]="!editMode"></ion-input>
     </ion-item>
-    <p class="ion-padding ion-text-right" *ngIf="editMode === UXMode.EDIT">
-      <ion-button color="danger" (click)="archive()">{{ 'COMMON.ARCHIVE' | translate }}</ion-button>
-    </p>
+    <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
+      <ion-col>
+        <ion-button color="warning" (click)="archiveEvent()">{{ 'COMMON.ARCHIVE' | translate }}</ion-button>
+      </ion-col>
+      <ion-col class="ion-text-right">
+        <ion-button color="danger" (click)="deleteEvent()">{{ 'COMMON.DELETE' | translate }}</ion-button>
+      </ion-col>
+    </ion-row>
   </ion-list>
 </ion-content>

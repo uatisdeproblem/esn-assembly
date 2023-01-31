@@ -7,16 +7,18 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-list class="aList maxWidthContainer">
-    <ion-list-header>
-      <ion-button color="medium" (click)="app.closePage()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.closePage()">
         <ion-icon name="arrow-back" slot="end"></ion-icon>
       </ion-button>
-      <ion-label><h1>{{ 'CATEGORIES.CATEGORIES' | translate }}</h1></ion-label>
-      <ion-button (click)="addCategory()">
-        {{ 'COMMON.ADD' | translate }} <ion-icon name="add" slot="end"></ion-icon>
-      </ion-button>
-    </ion-list-header>
+    </ion-buttons>
+    <ion-title>{{ 'CATEGORIES.CATEGORIES' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addCategory()">{{ 'COMMON.ADD' | translate }}</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-list class="aList maxWidthContainer">
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="categories && !categories.length">
       <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
     </ion-item>

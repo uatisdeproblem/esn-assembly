@@ -15,8 +15,4 @@ export class TabsComponent {
   ];
 
   constructor(public app: AppService) {}
-  getA(): string {
-    console.log('a', this.app.isInMobileMode());
-    return this.app.isInMobileMode() ? 'bottom' : 'top';
-  }
 }

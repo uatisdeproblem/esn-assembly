@@ -79,9 +79,22 @@ export class TopicEventsService {
   }
 
   /**
-   * Archive a event.
+   * Archive an event.
    */
   async archive(event: TopicEvent): Promise<void> {
+    await this.api.patchResource(['events', event.eventId], { body: { action: 'ARCHIVE' } });
+  }
+  /**
+   * Unarchive an event.
+   */
+  async unarchive(event: TopicEvent): Promise<void> {
+    await this.api.patchResource(['events', event.eventId], { body: { action: 'UNARCHIVE' } });
+  }
+
+  /**
+   * Delete an event.
+   */
+  async delete(event: TopicEvent): Promise<void> {
     await this.api.deleteResource(['events', event.eventId]);
   }
 }

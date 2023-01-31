@@ -1,12 +1,12 @@
-<ion-item [color]="color" [lines]="lines">
+<ion-item button [color]="color" [lines]="lines" (click)="openOnGalaxy()">
   <ion-avatar slot="start">
     <ion-img
-      [src]="subject.avatarURL ?? app.getAvatarFallbackURL()"
-      (ionError)="app.fallbackAvatar($event?.target)"
+      [src]="subject.avatarURL ?? app.getAvatarFallbackURL(subject.type !== SubjectTypes.USER)"
+      (ionError)="app.fallbackAvatar($event?.target, subject.type !== SubjectTypes.USER)"
     ></ion-img>
   </ion-avatar>
   <ion-label>
     {{ subject.name }}
-    <p>{{ [subject.country, subject.section].join(' - ') }}</p>
+    <p *ngIf="description">{{ description }}</p>
   </ion-label>
 </ion-item>

@@ -74,11 +74,12 @@ export class CategoryPage {
     return this.errors.has(field);
   }
 
-  async archive(): Promise<void> {
-    const doDelete = async (): Promise<void> => {
+  async archiveCategory(archive = true): Promise<void> {
+    const doArchive = async (): Promise<void> => {
       try {
         await this.loading.show();
-        await this._categories.archive(this.category);
+        if (archive) await this._categories.archive(this.category);
+        else await this._categories.unarchive(this.category);
         this.message.success('COMMON.OPERATION_COMPLETED');
         this.app.closePage();
       } catch (error) {
@@ -90,9 +91,31 @@ export class CategoryPage {
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.ARCHIVE'), role: 'destructive', handler: doDelete }
+      { text: this.t._('COMMON.ARCHIVE'), role: 'destructive', handler: doArchive }
     ];
     const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
+  }
+  async deleteCategory(): Promise<void> {
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._categories.delete(this.category);
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.closePage();
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
 

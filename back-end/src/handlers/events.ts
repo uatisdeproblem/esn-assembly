@@ -43,11 +43,10 @@ class TopicEvents extends ResourceController {
   }
 
   protected async getResources(): Promise<TopicEvent[]> {
-    const res: TopicEvent[] = await ddb.scan({ TableName: DDB_TABLES.events });
-    return res
-      .map(x => new TopicEvent(x))
-      .filter(x => !x.archivedAt)
-      .sort((a, b): number => a.name.localeCompare(b.name));
+    let events: TopicEvent[] = await ddb.scan({ TableName: DDB_TABLES.events });
+    events = events.map(x => new TopicEvent(x));
+    if (!this.queryParams.all) events = events.filter(x => !x.archivedAt);
+    return events.sort((a, b): number => a.name.localeCompare(b.name));
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<TopicEvent> {
@@ -83,10 +82,29 @@ class TopicEvents extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
+  protected async patchResource(): Promise<TopicEvent> {
+    switch (this.body.action) {
+      case 'ARCHIVE':
+        return await this.manageArchive(true);
+      case 'UNARCHIVE':
+        return await this.manageArchive(false);
+      default:
+        throw new RCError('Unsupported action');
+    }
+  }
+  private async manageArchive(archive: boolean): Promise<TopicEvent> {
+    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    if (archive) this.topicEvent.archivedAt = new Date().toISOString();
+    else delete this.topicEvent.archivedAt;
+
+    await ddb.put({ TableName: DDB_TABLES.events, Item: this.topicEvent });
+    return this.topicEvent;
+  }
+
   protected async deleteResource(): Promise<void> {
     if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
 
-    this.topicEvent.archivedAt = new Date().toISOString();
-    await this.putSafeResource({ noOverwrite: false });
+    await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.topicEvent.eventId } });
   }
 }
