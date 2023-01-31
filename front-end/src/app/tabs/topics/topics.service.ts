@@ -6,6 +6,7 @@ import { Topic } from '@models/topic.model';
 @Injectable({ providedIn: 'root' })
 export class TopicsService {
   private topics: Topic[];
+  private archivedTopics: Topic[];
 
   /**
    * The number of topics to consider for the pagination, when active.
@@ -15,17 +16,17 @@ export class TopicsService {
   constructor(private api: IDEAApiService) {}
 
   /**
-   * Load the tems from the back-end.
+   * Load the active topics from the back-end.
    */
-  private async loadList(): Promise<void> {
-    const topics: Topic[] = await this.api.getResource('topics');
+  private async loadActiveList(): Promise<void> {
+    const topics: Topic[] = await this.api.getResource('topics', { params: { archived: false } });
     this.topics = topics.map(x => new Topic(x));
   }
   /**
-   * Get (and optionally filter) the list of topics.
+   * Get (and optionally filter) the list of active topics.
    * Note: it's a slice of the array.
    */
-  async getList(
+  async getActiveList(
     options: {
       force?: boolean;
       search?: string;
@@ -36,7 +37,7 @@ export class TopicsService {
       sortBy?: TopicsSortBy;
     } = { sortBy: TopicsSortBy.CREATED_DATE_DESC }
   ): Promise<Topic[]> {
-    if (!this.topics || options.force) await this.loadList();
+    if (!this.topics || options.force) await this.loadActiveList();
     if (!this.topics) return null;
 
     options.search = options.search ? String(options.search).toLowerCase() : '';
@@ -53,6 +54,66 @@ export class TopicsService {
     if (options.categoryId) filteredList = filteredList.filter(x => x.category.categoryId === options.categoryId);
 
     if (options.eventId) filteredList = filteredList.filter(x => x.event.eventId === options.eventId);
+
+    switch (options.sortBy) {
+      case TopicsSortBy.CREATED_DATE_ASC:
+        filteredList = filteredList.sort((a, b): number => a.createdAt.localeCompare(b.createdAt));
+        break;
+      case TopicsSortBy.CREATED_DATE_DESC:
+        filteredList = filteredList.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
+        break;
+      case TopicsSortBy.UPDATED_DATE_ASC:
+        filteredList = filteredList.sort((a, b): number => a.updatedAt.localeCompare(b.updatedAt));
+        break;
+      case TopicsSortBy.CREATED_DATE_DESC:
+        filteredList = filteredList.sort((a, b): number => b.updatedAt.localeCompare(a.updatedAt));
+        break;
+      case TopicsSortBy.NUM_OF_QUESTIONS_ASC:
+        filteredList = filteredList.sort((a, b): number => a.numOfQuestions - b.numOfQuestions);
+        break;
+      case TopicsSortBy.NUM_OF_QUESTIONS_DESC:
+        filteredList = filteredList.sort((a, b): number => b.numOfQuestions - a.numOfQuestions);
+        break;
+    }
+
+    if (options.withPagination && filteredList.length > this.MAX_PAGE_SIZE) {
+      let indexOfLastOfPreviousPage = 0;
+      if (options.startPaginationAfterId)
+        indexOfLastOfPreviousPage = filteredList.findIndex(x => x.topicId === options.startPaginationAfterId) || 0;
+      filteredList = filteredList.slice(0, indexOfLastOfPreviousPage + this.MAX_PAGE_SIZE);
+    }
+
+    return filteredList;
+  }
+
+  /**
+   * Load the archived topics from the back-end.
+   */
+  private async loadArchivedList(categoryId?: string, eventId?: string): Promise<void> {
+    const params: any = { archived: true };
+    if (categoryId) params.categoryId = categoryId;
+    if (eventId) params.eventId = eventId;
+    const topics: Topic[] = await this.api.getResource('topics', { params });
+    this.archivedTopics = topics.map(x => new Topic(x));
+  }
+  /**
+   * Get (and optionally filter) the list of archived topics.
+   * Note: it's a slice of the array.
+   */
+  async getArchivedList(
+    options: {
+      force?: boolean;
+      categoryId?: string;
+      eventId?: string;
+      withPagination?: boolean;
+      startPaginationAfterId?: string;
+      sortBy?: TopicsSortBy;
+    } = { sortBy: TopicsSortBy.CREATED_DATE_DESC }
+  ): Promise<Topic[]> {
+    if (!this.archivedTopics || options.force) await this.loadArchivedList(options.categoryId, options.eventId);
+    if (!this.archivedTopics) return null;
+
+    let filteredList = this.archivedTopics.slice();
 
     switch (options.sortBy) {
       case TopicsSortBy.CREATED_DATE_ASC:

@@ -15,7 +15,7 @@ export class TopicEventsService {
   constructor(private api: IDEAApiService) {}
 
   /**
-   * Load the tems from the back-end.
+   * Load the events from the back-end.
    */
   private async loadList(): Promise<void> {
     const events: TopicEvent[] = await this.api.getResource('events');

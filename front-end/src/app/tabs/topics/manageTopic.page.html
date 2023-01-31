@@ -8,7 +8,7 @@
   ></app-edit-mode-buttons>
 
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
-    <p class="ion-text-right" *ngIf="!editMode">
+    <p class="ion-text-right" *ngIf="!editMode && !topic.archivedAt">
       <ion-button [color]="topic.closedAt ? 'success': 'danger'" (click)="manageTopicStatus()">
         {{ (topic.closedAt ? 'COMMON.OPEN' : 'COMMON.CLOSE') | translate }}
       </ion-button>
@@ -143,7 +143,9 @@
 
     <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
       <ion-col>
-        <ion-button color="warning" (click)="archiveTopic()">{{ 'COMMON.ARCHIVE' | translate }}</ion-button>
+        <ion-button color="warning" (click)="archiveTopic(!topic.archivedAt)">
+          {{ (topic.archivedAt ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
+        </ion-button>
       </ion-col>
       <ion-col class="ion-text-right">
         <ion-button color="danger" (click)="deleteTopic()">{{ 'COMMON.DELETE' | translate }}</ion-button>

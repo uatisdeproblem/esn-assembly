@@ -67,6 +67,7 @@
     "IMPOSSIBLE_TO_PROCEED": "Impossible to proceed",
     "OPEN": "Open",
     "ARCHIVE": "Archive",
+    "UNARCHIVE": "Unarchive",
     "ARCHIVED": "Archived",
     "NO_ELEMENTS": "No elements",
     "COULDNT_LOAD_LIST": "Error while loading the list",
@@ -127,7 +128,9 @@
     "ATTACHMENTS": "Attachments",
     "ATTRIBUTES": "Attributes",
     "TAP_TO_ADD_SUBJECT": "Tap to add a subject...",
-    "NO_DESCRIPTION": "No description"
+    "NO_DESCRIPTION": "No description",
+    "MAKE_A_QUESTION": "Ask a question",
+    "ARCHIVED": "Archived"
   },
   "QUESTIONS": {
     "BY": "By",
@@ -135,7 +138,8 @@
     "UPVOTE_QUESTION": "Upvote question"
   },
   "ARCHIVE": {
-    "COMING_SOON": "Coming soon..."
+    "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters and search through the action bar above.",
+    "NO_ELEMENT_FOUND_WITH_FILTERS": "No topics found with the filters selected"
   },
   "CONFIGURATIONS": {
     "ENTITIES": "Entities",
@@ -146,12 +150,16 @@
     "CATEGORIES": "Categories",
     "MANAGE_CATEGORY": "Manage category",
     "NAME": "Name",
-    "COLOR": "Color"
+    "COLOR": "Color",
+    "CANT_DELETE_IF_USED_WARNING": "The deletion will fail in case the category is used in any topic. In that case, prefer the archive action instead.",
+    "CANT_DELETE_IF_USED_ERROR": "You can't delete a category if it's used in at least a topic."
   },
   "EVENTS": {
     "EVENTS": "Events",
     "MANAGE_EVENT": "Manage event",
-    "NAME": "Name"
+    "NAME": "Name",
+    "CANT_DELETE_IF_USED_WARNING": "The deletion will fail in case the event is used in any topic. In that case, prefer the archive action instead.",
+    "CANT_DELETE_IF_USED_ERROR": "You can't delete an event if it's used in at least a topic."
   },
   "ATTACHMENTS": {
     "ERROR_UPLOADING_ATTACHMENT": "Error while uploading the attachment",

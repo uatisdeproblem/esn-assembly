@@ -132,7 +132,8 @@ ion-card {
 ion-button:not([fill='clear'], [fill='outline']) {
   --box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
-ion-toolbar ion-buttons ion-button {
+ion-toolbar ion-buttons ion-button,
+ion-list-header ion-button {
   --box-shadow: none !important;
 }
 

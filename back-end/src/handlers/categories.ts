@@ -5,6 +5,7 @@
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { TopicCategory } from '../models/category.model';
+import { Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
 
 ///
@@ -12,7 +13,7 @@ import { User } from '../models/user.model';
 ///
 
 const PROJECT = process.env.PROJECT;
-const DDB_TABLES = { categories: process.env.DDB_TABLE_categories };
+const DDB_TABLES = { categories: process.env.DDB_TABLE_categories, topics: process.env.DDB_TABLE_topics };
 const ddb = new DynamoDB();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new TopicCategories(ev, cb).handleRequest();
@@ -104,6 +105,10 @@ class TopicCategories extends ResourceController {
 
   protected async deleteResource(): Promise<void> {
     if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
+    const topicsWithCategory = topics.filter(x => x.category.categoryId === this.topicCategory.categoryId);
+    if (topicsWithCategory.length > 0) throw new RCError('Category is used');
 
     await ddb.delete({ TableName: DDB_TABLES.categories, Key: { categoryId: this.topicCategory.categoryId } });
   }

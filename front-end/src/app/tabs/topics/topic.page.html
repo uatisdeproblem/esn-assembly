@@ -26,6 +26,9 @@
               <ion-badge slot="end" [color]="topic.closedAt ? 'danger' : 'success'">
                 {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
               </ion-badge>
+              <ion-badge slot="end" color="warning" *ngIf="topic.archivedAt">
+                {{ 'TOPICS.ARCHIVED' | translate }}
+              </ion-badge>
             </p>
           </ion-card-header>
           <ion-card-content>
@@ -43,7 +46,7 @@
             </ion-list>
           </ion-card-content>
         </ion-card>
-        <ion-list class="aList">
+        <ion-list class="aList" *ngIf="topic">
           <ion-list-header>
             <ion-label>
               <h2>
@@ -51,6 +54,9 @@
                 <ion-text *ngIf="questions.length">({{ questions.length }})</ion-text>
               </h2>
             </ion-label>
+            <ion-button fill="solid" size="small" *ngIf="!topic.closedAt">
+              {{ 'TOPICS.MAKE_A_QUESTION' | translate }}
+            </ion-button>
           </ion-list-header>
           <ion-searchbar></ion-searchbar>
           <ion-item lines="full" class="ion-text-center noElements" *ngIf="questions && !questions.length">

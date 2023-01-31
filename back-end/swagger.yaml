@@ -147,7 +147,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     delete:
       summary: Delete a category
-      description: Requires to be Administrator
+      description: Requires to be Administrator; it works only if it's not used in any topic.
       tags: [Categories]
       security:
         - AuthFunction: []
@@ -264,7 +264,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     delete:
       summary: Delete an event
-      description: Requires to be Administrator
+      description: Requires to be Administrator; it works only if it's not used in any topic.
       tags: [Events]
       security:
         - AuthFunction: []
@@ -340,6 +340,21 @@ paths:
           in: path
           description: Topic ID
           required: true
+          schema:
+            type: string
+        - name: archived
+          in: query
+          description: Whether to filter based on the archivation status
+          schema:
+            type: boolean
+        - name: categoryId
+          in: query
+          description: The category ID to filter
+          schema:
+            type: string
+        - name: eventId
+          in: query
+          description: The event ID to filter
           schema:
             type: string
       responses:

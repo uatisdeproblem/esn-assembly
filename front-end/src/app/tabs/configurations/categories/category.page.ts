@@ -91,7 +91,7 @@ export class CategoryPage {
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.ARCHIVE'), role: 'destructive', handler: doArchive }
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doArchive }
     ];
     const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();
@@ -104,18 +104,20 @@ export class CategoryPage {
         this.message.success('COMMON.OPERATION_COMPLETED');
         this.app.closePage();
       } catch (error) {
-        this.message.error('COMMON.OPERATION_FAILED');
+        if (error.message === 'Category is used') this.message.error('CATEGORIES.CANT_DELETE_IF_USED_ERROR');
+        else this.message.error('COMMON.OPERATION_FAILED');
       } finally {
         this.loading.hide();
       }
     };
     const header = this.t._('COMMON.ARE_YOU_SURE');
-    const message = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const subHeader = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const message = this.t._('CATEGORIES.CANT_DELETE_IF_USED_WARNING');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
       { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
     ];
-    const alert = await this.alertCtrl.create({ header, message, buttons });
+    const alert = await this.alertCtrl.create({ header, subHeader, message, buttons });
     alert.present();
   }
 

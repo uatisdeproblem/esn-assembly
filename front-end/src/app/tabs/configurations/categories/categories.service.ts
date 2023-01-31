@@ -15,7 +15,7 @@ export class TopicCategoryService {
   constructor(private api: IDEAApiService) {}
 
   /**
-   * Load the tems from the back-end.
+   * Load the categories from the back-end.
    */
   private async loadList(): Promise<void> {
     const categories: TopicCategory[] = await this.api.getResource('categories');

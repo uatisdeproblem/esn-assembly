@@ -15,7 +15,9 @@
     </ion-item>
     <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
       <ion-col>
-        <ion-button color="warning" (click)="archiveEvent()">{{ 'COMMON.ARCHIVE' | translate }}</ion-button>
+        <ion-button color="warning" (click)="archiveEvent(!event.archivedAt)">
+          {{ (event.archivedAt ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
+        </ion-button>
       </ion-col>
       <ion-col class="ion-text-right">
         <ion-button color="danger" (click)="deleteEvent()">{{ 'COMMON.DELETE' | translate }}</ion-button>

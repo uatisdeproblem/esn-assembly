@@ -141,7 +141,7 @@ export class ManageTopicPage implements OnInit {
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.ARCHIVE'), role: 'destructive', handler: doArchive }
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doArchive }
     ];
     const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();

@@ -36,7 +36,7 @@ export class TopicsPage implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    this.topics = await this._topics.getList({ withPagination: true });
+    this.topics = await this._topics.getActiveList({ withPagination: true });
     [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
   }
 
@@ -44,7 +44,7 @@ export class TopicsPage implements OnInit {
     let startPaginationAfterId = null;
     if (scrollToNextPage && this.topics?.length) startPaginationAfterId = this.topics[this.topics.length - 1].topicId;
 
-    this.topics = await this._topics.getList({
+    this.topics = await this._topics.getActiveList({
       search,
       categoryId: this.filterByCategory,
       eventId: this.filterByEvent,

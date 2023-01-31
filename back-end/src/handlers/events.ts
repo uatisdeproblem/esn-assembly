@@ -5,6 +5,7 @@
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { TopicEvent } from '../models/event.model';
+import { Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
 
 ///
@@ -12,7 +13,7 @@ import { User } from '../models/user.model';
 ///
 
 const PROJECT = process.env.PROJECT;
-const DDB_TABLES = { events: process.env.DDB_TABLE_events };
+const DDB_TABLES = { events: process.env.DDB_TABLE_events, topics: process.env.DDB_TABLE_topics };
 const ddb = new DynamoDB();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new TopicEvents(ev, cb).handleRequest();
@@ -104,6 +105,10 @@ class TopicEvents extends ResourceController {
 
   protected async deleteResource(): Promise<void> {
     if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
+    const topicsWithEvent = topics.filter(x => x.event.eventId === this.topicEvent.eventId);
+    if (topicsWithEvent.length > 0) throw new RCError('Event is used');
 
     await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.topicEvent.eventId } });
   }

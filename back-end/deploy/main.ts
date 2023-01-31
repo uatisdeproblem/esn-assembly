@@ -30,7 +30,16 @@ const tables: { [tableName: string]: DDBTable } = {
     PK: { name: 'eventId', type: DDB.AttributeType.STRING }
   },
   topics: {
-    PK: { name: 'topicId', type: DDB.AttributeType.STRING }
+    PK: { name: 'topicId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'topicId-meta-index',
+        partitionKey: { name: 'topicId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'name', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.INCLUDE,
+        nonKeyAttributes: ['category', 'event']
+      }
+    ]
   }
 };
 
