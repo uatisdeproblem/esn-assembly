@@ -46,7 +46,6 @@ export class HTMLEditorComponent implements OnChanges {
         'insertImage',
         'insertVideo',
         'insertHorizontalRule',
-        'removeFormat',
         'toggleEditorMode'
       ]
     ]
