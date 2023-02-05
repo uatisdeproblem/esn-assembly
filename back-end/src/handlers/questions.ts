@@ -84,7 +84,7 @@ class Questions extends ResourceController {
   }
 
   protected async postResources(): Promise<Question> {
-    if (this.topic.closedAt) throw new RCError('Topic is closed');
+    if (this.topic.isClosed()) throw new RCError('Topic is closed');
     if (!this.topic.canUserAskQuestions(this.galaxyUser)) throw new Error('Role not allowed to ask questions');
 
     this.question = new Question(this.body);
@@ -105,7 +105,7 @@ class Questions extends ResourceController {
   protected async putResource(): Promise<Question> {
     if (!this.question.canUserEdit(this.galaxyUser)) throw new RCError('Unauthorized');
 
-    if (this.topic.closedAt) throw new RCError('Topic is closed');
+    if (this.topic.isClosed()) throw new RCError('Topic is closed');
     if (await this.questionHasAnswers()) throw new RCError('Question has answers');
 
     const oldQuestion = new Question(this.question);
@@ -157,7 +157,7 @@ class Questions extends ResourceController {
   protected async deleteResource(): Promise<void> {
     if (!this.question.canUserEdit(this.galaxyUser)) throw new RCError('Unauthorized');
 
-    if (this.topic.closedAt) throw new RCError('Topic is closed');
+    if (this.topic.isClosed()) throw new RCError('Topic is closed');
     if (await this.questionHasAnswers()) throw new RCError('Question has answers');
 
     await ddb.delete({

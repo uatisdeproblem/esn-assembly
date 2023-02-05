@@ -95,7 +95,7 @@ class Answers extends ResourceController {
   }
 
   protected async postResources(): Promise<Answer> {
-    if (this.topic.closedAt) throw new RCError('Topic is closed');
+    if (this.topic.isClosed()) throw new RCError('Topic is closed');
     if (!this.topic.canUserAnswerQuestions(this.galaxyUser)) throw new Error('Not allowed to answer');
 
     this.answer = new Answer(this.body);
@@ -116,7 +116,7 @@ class Answers extends ResourceController {
   protected async putResource(): Promise<Answer> {
     if (!this.answer.canUserEdit(this.galaxyUser)) throw new RCError('Unauthorized');
 
-    if (this.topic.closedAt) throw new RCError('Topic is closed');
+    if (this.topic.isClosed()) throw new RCError('Topic is closed');
 
     const oldAnswer = new Answer(this.answer);
     this.answer.safeLoad(this.body, oldAnswer);
@@ -127,7 +127,7 @@ class Answers extends ResourceController {
   protected async deleteResource(): Promise<void> {
     if (!this.answer.canUserEdit(this.galaxyUser)) throw new RCError('Unauthorized');
 
-    if (this.topic.closedAt) throw new RCError('Topic is closed');
+    if (this.topic.isClosed()) throw new RCError('Topic is closed');
 
     await ddb.delete({
       TableName: DDB_TABLES.answers,

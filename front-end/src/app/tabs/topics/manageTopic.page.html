@@ -60,10 +60,14 @@
       <ion-label>{{ 'TOPICS.SET_DEADLINE' | translate }}</ion-label>
       <ion-checkbox [(ngModel)]="hasDeadline" (ionChange)="shouldResetDeadline()"></ion-checkbox>
     </ion-item>
-    <ion-item *ngIf="hasDeadline" [class.fieldHasError]="hasFieldAnError('willCloseAt')">
-      <ion-label position="stacked">{{ 'TOPICS.DEADLINE' | translate }}</ion-label>
-      <ion-input type="datetime-local" [min]="now" [(ngModel)]="deadline"></ion-input>
-    </ion-item>
+    <idea-date-time
+      *ngIf="hasDeadline"
+      [(date)]="topic.willCloseAt"
+      [useISOFormat]="true"
+      [timePicker]="true"
+      [label]="'TOPICS.DEADLINE' | translate"
+      [class.fieldHasError]="hasFieldAnError('willCloseAt')"
+    ></idea-date-time>
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.CONTENT' | translate }}</h2></ion-label>
     </ion-list-header>

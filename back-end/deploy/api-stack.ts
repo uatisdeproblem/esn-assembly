@@ -10,6 +10,8 @@ import * as ApiGw from 'aws-cdk-lib/aws-apigatewayv2';
 import * as DDB from 'aws-cdk-lib/aws-dynamodb';
 import * as S3 from 'aws-cdk-lib/aws-s3';
 import * as S3Deployment from 'aws-cdk-lib/aws-s3-deployment';
+import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { LambdaFunction as LambdaFunctionTarget } from 'aws-cdk-lib/aws-events-targets';
 
 export interface ApiProps extends cdk.StackProps {
   project: string;
@@ -95,6 +97,14 @@ export class ApiStack extends cdk.Stack {
     //
 
     // @idea insert here project-custom constructs if needed
+
+    if (lambdaFunctions['scheduledOps']) {
+      const rule = new Rule(this, 'EventRuleScheduledOps', {
+        ruleName: props.project.concat('-', props.stage, '-scheduledOps'),
+        schedule: Schedule.rate(Duration.minutes(5))
+      });
+      rule.addTarget(new LambdaFunctionTarget(lambdaFunctions['scheduledOps']));
+    }
   }
 
   //

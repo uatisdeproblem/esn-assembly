@@ -27,7 +27,8 @@ const apiResources: ResourceController[] = [
       '/topics/{topicId}/questions/{questionId}/answers',
       '/topics/{topicId}/questions/{questionId}/answers/{answerId}'
     ]
-  }
+  },
+  { name: 'scheduledOps' }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
@@ -46,6 +47,12 @@ const tables: { [tableName: string]: DDBTable } = {
         sortKey: { name: 'name', type: DDB.AttributeType.STRING },
         projectionType: DDB.ProjectionType.INCLUDE,
         nonKeyAttributes: ['category', 'event']
+      },
+      {
+        indexName: 'topicId-willCloseAt-index',
+        partitionKey: { name: 'topicId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'willCloseAt', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.KEYS_ONLY
       }
     ]
   },

@@ -15,7 +15,7 @@ import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
 import { TopicEvent, TopicEventAttached } from '@models/event.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { KNOWN_GALAXY_ROLES } from '@models/user.model';
-import { FAVORITE_TIMEZONE, fromISOStringToDateInputHTML, parseDateInputHTML } from '@models/favoriteTimezone.const';
+import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'manage-topic',
@@ -34,7 +34,6 @@ export class ManageTopicPage implements OnInit {
   events: TopicEvent[];
 
   hasDeadline = false;
-  deadline: epochISODateString;
   now = new Date().toISOString().slice(0, 16);
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
@@ -64,10 +63,7 @@ export class ManageTopicPage implements OnInit {
       if (topicId !== 'new') {
         this.topic = await this._topics.getById(topicId);
         this.editMode = UXMode.VIEW;
-        if (this.topic.willCloseAt) {
-          this.hasDeadline = true;
-          this.deadline = fromISOStringToDateInputHTML(this.topic.willCloseAt);
-        }
+        if (this.topic.willCloseAt) this.hasDeadline = true;
         this.rolesAbleToAskQuestionsChecks.forEach(
           c => (c.checked = this.topic.rolesAbleToAskQuestions.includes(String(c.value)))
         );
@@ -90,10 +86,7 @@ export class ManageTopicPage implements OnInit {
   }
 
   shouldResetDeadline(): void {
-    if (!this.hasDeadline) {
-      this.deadline = null;
-      this.topic.willCloseAt = null;
-    }
+    if (!this.hasDeadline) this.topic.willCloseAt = null;
   }
 
   addSubject(): void {
@@ -112,8 +105,6 @@ export class ManageTopicPage implements OnInit {
   }
 
   async save(): Promise<void> {
-    if (this.deadline) this.topic.willCloseAt = parseDateInputHTML(this.deadline);
-
     this.errors = new Set(this.topic.validate());
     if (this.errors.size) return this.message.error('COMMON.FORM_HAS_ERROR_TO_CHECK');
 

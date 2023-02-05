@@ -2,6 +2,7 @@ import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 
 import { TopicCategoryAttached } from './category.model';
 import { TopicEventAttached } from './event.model';
+import { FAVORITE_TIMEZONE, getDateStringInFavoriteTimezone } from './favoriteTimezone.const';
 import { Subject } from './subject.model';
 import { User } from './user.model';
 
@@ -46,7 +47,7 @@ export class Topic extends Resource {
    */
   updatedAt?: epochISOString;
   /**
-   * The timestamp when the topic will close (deadline).
+   * The timestamp when the topic will close. Note: it's a sparse index for queries.
    */
   willCloseAt?: epochISOString;
   /**
@@ -120,5 +121,13 @@ export class Topic extends Resource {
    */
   canUserAnswerQuestions(user: User, excludeAdmin = false): boolean {
     return (user.isAdministrator() && !excludeAdmin) || this.subjects.some(s => s.id === user.userId);
+  }
+
+  /**
+   * Whether the topic is closed.
+   */
+  isClosed(): boolean {
+    const now = getDateStringInFavoriteTimezone(new Date(), FAVORITE_TIMEZONE);
+    return !!this.closedAt || getDateStringInFavoriteTimezone(this.willCloseAt, FAVORITE_TIMEZONE) < now;
   }
 }

@@ -1,16 +1,18 @@
 import { epochISODateString } from 'idea-toolbox';
 
 export const FAVORITE_TIMEZONE = 'Europe/Brussels';
+export const GMT_0_TIMEZONE = 'Europe/Dublin';
 
-export const parseDateInputHTML = (dateInputFormat: string): epochISODateString =>
-  new Date(
-    Date.UTC(
-      Number(dateInputFormat.slice(0, 4)),
-      Number(dateInputFormat.slice(5, 7)) - 1,
-      Number(dateInputFormat.slice(8, 10)),
-      Number(dateInputFormat.slice(11, 13)),
-      Number(dateInputFormat.slice(14, 16))
-    )
-  ).toISOString();
-
-export const fromISOStringToDateInputHTML = (isoString: epochISODateString): string => isoString.slice(0, 16);
+export const getDateStringInFavoriteTimezone = (date: Date | epochISODateString, timezone: string): string => {
+  const sortableFormattingLocale = 'sv-SE';
+  const formatter = new Intl.DateTimeFormat(sortableFormattingLocale, {
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZone: timezone
+  });
+  return formatter.format(new Date(date));
+};
