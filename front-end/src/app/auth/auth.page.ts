@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { IDEAApiService, IDEAStorageService } from '@idea-ionic/common';
+import { IDEAStorageService } from '@idea-ionic/common';
 
 import { AppService } from '../app.service';
 
@@ -12,25 +12,19 @@ import { environment as env } from '@env';
   styleUrls: ['auth.page.scss']
 })
 export class AuthPage implements OnInit {
-  constructor(
-    private storage: IDEAStorageService,
-    private route: ActivatedRoute,
-    private api: IDEAApiService,
-    public app: AppService
-  ) {}
+  constructor(private storage: IDEAStorageService, private route: ActivatedRoute, public app: AppService) {}
   async ngOnInit(): Promise<void> {
     const apiToken = this.route.snapshot.paramMap.get('token');
     // complete the flow from ESN Galaxy
     if (apiToken) {
-      this.api.apiKey = apiToken;
       const user = parseJWT(apiToken);
       const tokenExpiresAt = user.exp * 1000;
       if (tokenExpiresAt > Date.now()) {
         await this.storage.set('token', apiToken);
         await this.storage.set('tokenExpiresAt', tokenExpiresAt);
         await this.storage.set('user', user);
-        this.app.goTo(['']);
       }
+      window.location.assign('');
     }
   }
 
