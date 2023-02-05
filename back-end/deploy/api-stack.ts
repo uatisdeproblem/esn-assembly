@@ -101,7 +101,7 @@ export class ApiStack extends cdk.Stack {
     if (lambdaFunctions['scheduledOps']) {
       const rule = new Rule(this, 'EventRuleScheduledOps', {
         ruleName: props.project.concat('-', props.stage, '-scheduledOps'),
-        schedule: Schedule.rate(Duration.minutes(5))
+        schedule: Schedule.rate(Duration.hours(1))
       });
       rule.addTarget(new LambdaFunctionTarget(lambdaFunctions['scheduledOps']));
     }
