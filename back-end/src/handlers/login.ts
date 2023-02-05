@@ -16,6 +16,8 @@ import { User } from '../models/user.model';
 const CAS_URL = 'https://accounts.esn.org/cas';
 const JWT_EXPIRE_TIME = '1 day';
 
+const APP_URL = process.env.STAGE === 'prod' ? 'https://esn-ga.link' : 'https://dev.esn-ga.link';
+
 const SECRETS_PATH = 'esn-ga/auth';
 const secretsManager = new SecretsManager();
 
@@ -34,6 +36,7 @@ class Login extends ResourceController {
 
   constructor(event: any, callback: any) {
     super(event, callback);
+    console.log(event);
     this.callback = callback;
     this.host = event.headers?.host ?? null;
     this.referer = event.headers?.referer ?? null;
@@ -74,7 +77,7 @@ class Login extends ResourceController {
       const token = sign(userData, secret, { expiresIn: JWT_EXPIRE_TIME });
 
       // redirect to the front-end with the fresh new token (instead of resolving)
-      this.callback(null, { statusCode: 302, headers: { Location: `${this.referer}/auth/${token}` } });
+      this.callback(null, { statusCode: 302, headers: { Location: `${APP_URL}/auth/${token}` } });
     } catch (err) {
       this.logger.error('VALIDATE CAS TICKET', err);
       throw new RCError('Login failed');
