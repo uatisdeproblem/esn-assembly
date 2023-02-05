@@ -16,6 +16,11 @@ ion-list.aList {
   ion-list-header ion-label h2 {
     margin-bottom: 0;
   }
+  ion-item.deadline {
+    font-size: 0.9em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
 }
 
 app-html-editor {

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController } from '@ionic/angular';
-import { Check } from 'idea-toolbox';
+import { Check, epochISODateString } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
@@ -15,6 +15,7 @@ import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
 import { TopicEvent, TopicEventAttached } from '@models/event.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { KNOWN_GALAXY_ROLES } from '@models/user.model';
+import { FAVORITE_TIMEZONE, fromISOStringToDateInputHTML, parseDateInputHTML } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'manage-topic',
@@ -31,6 +32,11 @@ export class ManageTopicPage implements OnInit {
 
   categories: TopicCategory[];
   events: TopicEvent[];
+
+  hasDeadline = false;
+  deadline: epochISODateString;
+  now = new Date().toISOString().slice(0, 16);
+  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   SubjectTypes = SubjectTypes;
 
@@ -58,6 +64,10 @@ export class ManageTopicPage implements OnInit {
       if (topicId !== 'new') {
         this.topic = await this._topics.getById(topicId);
         this.editMode = UXMode.VIEW;
+        if (this.topic.willCloseAt) {
+          this.hasDeadline = true;
+          this.deadline = fromISOStringToDateInputHTML(this.topic.willCloseAt);
+        }
         this.rolesAbleToAskQuestionsChecks.forEach(
           c => (c.checked = this.topic.rolesAbleToAskQuestions.includes(String(c.value)))
         );
@@ -72,18 +82,25 @@ export class ManageTopicPage implements OnInit {
     }
   }
 
-  addSubject(): void {
-    this.topic.subjects.push(new Subject({ type: SubjectTypes.USER }));
-  }
-  removeSubject(subject: Subject): void {
-    this.topic.subjects.splice(this.topic.subjects.indexOf(subject), 1);
-  }
-
   compareWithEvent(e1: TopicEventAttached, e2: TopicEventAttached): boolean {
     return e1 && e2 ? e1.eventId === e2.eventId : e1 === e2;
   }
   compareWithCategory(c1: TopicCategoryAttached, c2: TopicCategoryAttached): boolean {
     return c1 && c2 ? c1.categoryId === c2.categoryId : c1 === c2;
+  }
+
+  shouldResetDeadline(): void {
+    if (!this.hasDeadline) {
+      this.deadline = null;
+      this.topic.willCloseAt = null;
+    }
+  }
+
+  addSubject(): void {
+    this.topic.subjects.push(new Subject({ type: SubjectTypes.USER }));
+  }
+  removeSubject(subject: Subject): void {
+    this.topic.subjects.splice(this.topic.subjects.indexOf(subject), 1);
   }
 
   setRolesAbleToAskQuestionsFromChecks(): void {
@@ -95,6 +112,8 @@ export class ManageTopicPage implements OnInit {
   }
 
   async save(): Promise<void> {
+    if (this.deadline) this.topic.willCloseAt = parseDateInputHTML(this.deadline);
+
     this.errors = new Set(this.topic.validate());
     if (this.errors.size) return this.message.error('COMMON.FORM_HAS_ERROR_TO_CHECK');
 

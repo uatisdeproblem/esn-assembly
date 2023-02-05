@@ -133,7 +133,10 @@
     "ARCHIVED": "Archived",
     "RESTRICT_QUESTIONS_TO_ROLES": "Restrict ability to ask questions",
     "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "Galaxy roles allowed to ask questions",
-    "NO_ROLES_RESTRICTIONS": "Any user can ask question"
+    "NO_ROLES_RESTRICTIONS": "Any user can ask question",
+    "DEADLINE": "Deadline",
+    "SET_DEADLINE": "Set deadline",
+    "DEADLINE_IN_FAVORITE_TIMEZONE": "The deadline must be in the timezone {{timezone}}"
   },
   "QUESTIONS": {
     "BY": "By",

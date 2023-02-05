@@ -13,6 +13,7 @@ import { QuestionsService } from './questions/questions.service';
 import { Topic } from '@models/topic.model';
 import { Question } from '@models/question.model';
 import { Subject } from '@models/subject.model';
+import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'topic',
@@ -30,6 +31,8 @@ export class TopicPage {
 
   @ViewChild('searchbar') searchbar: IonSearchbar;
   @ViewChild(IonContent) content: IonContent;
+
+  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   constructor(
     private route: ActivatedRoute,

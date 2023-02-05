@@ -34,8 +34,18 @@
           <ion-card-content>
             <ion-list class="aList" lines="none">
               <app-subject color="white" *ngFor="let subject of topic.subjects" [subject]="subject"></app-subject>
+              <ion-item class="ion-margin-top ion-text-right deadline" *ngIf="topic.willCloseAt">
+                <ion-label>{{ topic.willCloseAt | date: 'MMM d, y (H:mm z)' : FAVORITE_TIMEZONE }}</ion-label>
+                <ion-badge slot="end" color="medium">{{ 'TOPICS.DEADLINE' | translate }}</ion-badge>
+              </ion-item>
               <app-html-editor *ngIf="topic.content" [content]="topic.content" [editMode]="false"></app-html-editor>
-              <ion-item button *ngFor="let attachment of topic.attachments" (click)="downloadAttachment(attachment)">
+              <ion-item
+                lines="inset"
+                class="ion-margin-top"
+                *ngFor="let attachment of topic.attachments"
+                button
+                (click)="downloadAttachment(attachment)"
+              >
                 <ion-icon name="attach" slot="start"></ion-icon>
                 <ion-label>{{ attachment.name }}.{{ attachment.format }}</ion-label>
               </ion-item>

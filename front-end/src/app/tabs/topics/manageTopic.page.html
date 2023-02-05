@@ -50,7 +50,20 @@
         <ion-select-option *ngFor="let event of events" [value]="event">{{ event.name }}</ion-select-option>
       </ion-select>
     </ion-item>
-
+    <ion-list-header>
+      <ion-label>
+        <h2>{{ 'TOPICS.DEADLINE' | translate }}</h2>
+        <p>{{ 'TOPICS.DEADLINE_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+      </ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-label>{{ 'TOPICS.SET_DEADLINE' | translate }}</ion-label>
+      <ion-checkbox [(ngModel)]="hasDeadline" (ionChange)="shouldResetDeadline()"></ion-checkbox>
+    </ion-item>
+    <ion-item *ngIf="hasDeadline" [class.fieldHasError]="hasFieldAnError('willCloseAt')">
+      <ion-label position="stacked">{{ 'TOPICS.DEADLINE' | translate }}</ion-label>
+      <ion-input type="datetime-local" [min]="now" [(ngModel)]="deadline"></ion-input>
+    </ion-item>
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.CONTENT' | translate }}</h2></ion-label>
     </ion-list-header>

@@ -46,6 +46,10 @@ export class Topic extends Resource {
    */
   updatedAt?: epochISOString;
   /**
+   * The timestamp when the topic will close (deadline).
+   */
+  willCloseAt?: epochISOString;
+  /**
    * The timestamp when the topic was closed.
    */
   closedAt?: epochISOString;
@@ -74,6 +78,8 @@ export class Topic extends Resource {
     this.numOfQuestions = this.clean(x.numOfQuestions, Number, 0);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
+    if (x.willCloseAt) this.willCloseAt = this.clean(x.willCloseAt, d => new Date(d).toISOString());
+    else delete this.willCloseAt;
     if (x.closedAt) this.closedAt = this.clean(x.closedAt, d => new Date(d).toISOString());
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.attachments = this.cleanArray(x.attachments, a => new Attachment(a));
@@ -95,6 +101,8 @@ export class Topic extends Resource {
     if (this.iE(this.name)) e.push('name');
     if (this.iE(this.event?.eventId)) e.push('event');
     if (this.iE(this.category?.categoryId)) e.push('category');
+    if (this.willCloseAt && (this.iE(this.willCloseAt, 'date') || this.willCloseAt < new Date().toISOString()))
+      e.push('willCloseAt');
     if (this.iE(this.subjects)) e.push('subjects');
     this.subjects.forEach((s, index): void => s.validate().forEach(ea => e.push(`subjects[${index}].${ea}`)));
     return e;
