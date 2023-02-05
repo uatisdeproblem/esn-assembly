@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController } from '@ionic/angular';
-import { Check, epochISODateString } from 'idea-toolbox';
+import { Check } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
@@ -34,10 +34,13 @@ export class ManageTopicPage implements OnInit {
   events: TopicEvent[];
 
   hasDeadline = false;
-  now = new Date().toISOString().slice(0, 16);
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   SubjectTypes = SubjectTypes;
+
+  activeTopics: Topic[];
+  relatedTopics: Topic[];
+  relatedTopicsChecks: Check[];
 
   rolesAbleToAskQuestionsChecks = KNOWN_GALAXY_ROLES.map(role => new Check({ value: role }));
 
@@ -54,7 +57,11 @@ export class ManageTopicPage implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
+    [this.categories, this.events, this.activeTopics] = await Promise.all([
+      this._categories.getList(),
+      this._events.getList(),
+      this._topics.getActiveList()
+    ]);
   }
   async ionViewWillEnter(): Promise<void> {
     const topicId = this.route.snapshot.paramMap.get('topicId') ?? 'new';
@@ -62,13 +69,26 @@ export class ManageTopicPage implements OnInit {
       await this.loading.show();
       if (topicId !== 'new') {
         this.topic = await this._topics.getById(topicId);
-        this.editMode = UXMode.VIEW;
         if (this.topic.willCloseAt) this.hasDeadline = true;
+        this.relatedTopics = await this._topics.getRelated(this.topic);
+        this.relatedTopicsChecks = this.activeTopics
+          .filter(x => x.topicId !== this.topic.topicId)
+          .map(
+            x =>
+              new Check({
+                value: x.topicId,
+                name: x.name,
+                checked: this.relatedTopics.some(y => x.topicId === y.topicId)
+              })
+          );
         this.rolesAbleToAskQuestionsChecks.forEach(
           c => (c.checked = this.topic.rolesAbleToAskQuestions.includes(String(c.value)))
         );
+        this.editMode = UXMode.VIEW;
       } else {
         this.topic = new Topic();
+        this.relatedTopics = [];
+        this.relatedTopicsChecks = this.activeTopics.map(x => new Check({ value: x.topicId, name: x.name }));
         this.editMode = UXMode.INSERT;
       }
     } catch (error) {
@@ -115,6 +135,7 @@ export class ManageTopicPage implements OnInit {
       else result = await this._topics.update(this.topic);
       this.topic.load(result);
       this.location.replaceState(this.location.path().replace('/new', '/'.concat(this.topic.topicId)));
+      await this.handleChangesInRelated();
       this.editMode = UXMode.VIEW;
       this.message.success('COMMON.OPERATION_COMPLETED');
     } catch (err) {
@@ -125,6 +146,29 @@ export class ManageTopicPage implements OnInit {
   }
   hasFieldAnError(field: string): boolean {
     return this.errors.has(field);
+  }
+  private async handleChangesInRelated(): Promise<void> {
+    const checkedTopics = this.relatedTopicsChecks.filter(x => x.checked).map(x => String(x.value));
+    const toRemove = this.relatedTopics.filter(x => !checkedTopics.includes(x.topicId)).map(x => x.topicId);
+    const toAdd = checkedTopics.filter(x => !this.relatedTopics.some(y => y.topicId === x));
+
+    for (const topicId of toRemove) {
+      try {
+        await this._topics.unlinkByIds(this.topic.topicId, topicId);
+      } catch (error) {
+        // no problem
+      }
+    }
+
+    for (const topicId of toAdd) {
+      try {
+        await this._topics.linkByIds(this.topic.topicId, topicId);
+      } catch (error) {
+        // no problem
+      }
+    }
+
+    this.relatedTopics = this.activeTopics.filter(x => checkedTopics.includes(x.topicId));
   }
 
   async manageTopicStatus(open = true): Promise<void> {
@@ -177,9 +221,10 @@ export class ManageTopicPage implements OnInit {
         await this.loading.show();
         await this._topics.delete(this.topic);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.closePage();
+        this.app.closePage(null, ['']);
       } catch (error) {
-        this.message.error('COMMON.OPERATION_FAILED');
+        if (error.message === 'Unlink related topics first') this.message.error('TOPICS.CANT_DELETE_IF_LINKED_ERROR');
+        else this.message.error('COMMON.OPERATION_FAILED');
       } finally {
         this.loading.hide();
       }

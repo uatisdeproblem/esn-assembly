@@ -433,6 +433,77 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/related:
+    get:
+      summary: Get the related topics
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Topics'
+  /topics/{topicId}/related/{relatedId}:
+    post:
+      summary: Link two topics together
+      description: Requires to be Administrator
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: relatedId
+          in: path
+          description: Related Topic ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Topic'
+      responses:
+        200:
+          $ref: '#/components/responses/Topic'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete the relation between two topics
+      description: Requires to be Administrator
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: relatedId
+          in: path
+          description: Related Topic ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /topics/{topicId}/questions:
     get:
       summary: Get the questions of a topic

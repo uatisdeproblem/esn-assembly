@@ -20,6 +20,7 @@ const apiResources: ResourceController[] = [
   { name: 'categories', paths: ['/categories', '/categories/{categoryId}'] },
   { name: 'events', paths: ['/events', '/events/{eventId}'] },
   { name: 'topics', paths: ['/topics', '/topics/{topicId}'] },
+  { name: 'relatedTopics', paths: ['/topics/{topicId}/related', '/topics/{topicId}/related/{relatedId}'] },
   { name: 'questions', paths: ['/topics/{topicId}/questions', '/topics/{topicId}/questions/{questionId}'] },
   {
     name: 'answers',
@@ -55,6 +56,10 @@ const tables: { [tableName: string]: DDBTable } = {
         projectionType: DDB.ProjectionType.KEYS_ONLY
       }
     ]
+  },
+  relatedTopics: {
+    PK: { name: 'topicA', type: DDB.AttributeType.STRING },
+    SK: { name: 'topicB', type: DDB.AttributeType.STRING }
   },
   questions: {
     PK: { name: 'topicId', type: DDB.AttributeType.STRING },

@@ -7,7 +7,7 @@ import { SignedURL } from 'idea-toolbox';
 import { TopicCategoryAttached } from '../models/category.model';
 import { TopicEventAttached } from '../models/event.model';
 
-import { Topic } from '../models/topic.model';
+import { RelatedTopic, Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
 
 ///
@@ -17,6 +17,7 @@ import { User } from '../models/user.model';
 const PROJECT = process.env.PROJECT;
 const DDB_TABLES = {
   topics: process.env.DDB_TABLE_topics,
+  relatedTopics: process.env.DDB_TABLE_relatedTopics,
   categories: process.env.DDB_TABLE_categories,
   events: process.env.DDB_TABLE_events
 };
@@ -184,6 +185,13 @@ class Topics extends ResourceController {
 
   protected async deleteResource(): Promise<void> {
     if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+
+    const topics: RelatedTopic[] = await ddb.query({
+      TableName: DDB_TABLES.relatedTopics,
+      KeyConditionExpression: 'topicA = :topicId',
+      ExpressionAttributeValues: { ':topicId': this.topic.topicId }
+    });
+    if (topics.length > 0) throw new RCError('Unlink related topics first');
 
     await ddb.delete({ TableName: DDB_TABLES.topics, Key: { topicId: this.topic.topicId } });
   }

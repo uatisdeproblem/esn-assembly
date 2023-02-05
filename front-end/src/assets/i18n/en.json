@@ -131,12 +131,16 @@
     "NO_CONTENT": "No content",
     "MAKE_A_QUESTION": "Ask a question",
     "ARCHIVED": "Archived",
-    "RESTRICT_QUESTIONS_TO_ROLES": "Restrict ability to ask questions",
     "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "Galaxy roles allowed to ask questions",
     "NO_ROLES_RESTRICTIONS": "Any user can ask question",
     "DEADLINE": "Deadline",
     "SET_DEADLINE": "Set deadline",
-    "DEADLINE_IN_FAVORITE_TIMEZONE": "The deadline must be in the timezone {{timezone}}"
+    "DEADLINE_IN_FAVORITE_TIMEZONE": "The deadline must be in the timezone {{timezone}}",
+    "OTHER_OPTIONS": "Other options",
+    "RELATED_TOPICS": "Related topics",
+    "NO_RELATED_TOPICS": "No related topics",
+    "RELATED_TO": "Related to",
+    "CANT_DELETE_IF_LINKED_ERROR": "Unlink all related topics first"
   },
   "QUESTIONS": {
     "BY": "By",

@@ -50,6 +50,7 @@
         <ion-select-option *ngFor="let event of events" [value]="event">{{ event.name }}</ion-select-option>
       </ion-select>
     </ion-item>
+
     <ion-list-header>
       <ion-label>
         <h2>{{ 'TOPICS.DEADLINE' | translate }}</h2>
@@ -159,8 +160,14 @@
     <app-attachments lines="inset" [attachments]="topic.attachments" [editMode]="!!editMode"></app-attachments>
 
     <ion-list-header>
-      <ion-label><h2>{{ 'TOPICS.RESTRICT_QUESTIONS_TO_ROLES' | translate }}</h2> </ion-label>
+      <ion-label><h2>{{ 'TOPICS.OTHER_OPTIONS' | translate }}</h2></ion-label>
     </ion-list-header>
+    <idea-checker
+      [data]="relatedTopicsChecks"
+      [label]="'TOPICS.RELATED_TOPICS' | translate"
+      [noneText]="'TOPICS.NO_RELATED_TOPICS' | translate"
+      [disabled]="!editMode || !relatedTopicsChecks"
+    ></idea-checker>
     <idea-checker
       [data]="rolesAbleToAskQuestionsChecks"
       [label]="'TOPICS.ROLES_ALLOWED_TO_MAKE_QUESTIONS' | translate"

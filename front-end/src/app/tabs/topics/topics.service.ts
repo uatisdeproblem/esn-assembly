@@ -207,6 +207,26 @@ export class TopicsService {
   async delete(topic: Topic): Promise<void> {
     await this.api.deleteResource(['topics', topic.topicId]);
   }
+
+  /**
+   * Get the related topics.
+   */
+  async getRelated(topic: Topic): Promise<Topic[]> {
+    const topics: Topic[] = await this.api.getResource(['topics', topic.topicId, 'related']);
+    return topics.map(x => new Topic(x));
+  }
+  /**
+   * Link two topics together.
+   */
+  async linkByIds(topicA: string, topicB: string): Promise<void> {
+    await this.api.postResource(['topics', topicA, 'related', topicB]);
+  }
+  /**
+   * Unlink two topics together.
+   */
+  async unlinkByIds(topicA: string, topicB: string): Promise<void> {
+    await this.api.deleteResource(['topics', topicA, 'related', topicB]);
+  }
 }
 
 /**

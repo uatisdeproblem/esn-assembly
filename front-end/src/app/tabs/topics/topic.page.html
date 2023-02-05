@@ -49,6 +49,18 @@
                 <ion-icon name="attach" slot="start"></ion-icon>
                 <ion-label>{{ attachment.name }}.{{ attachment.format }}</ion-label>
               </ion-item>
+              <ion-item
+                lines="inset"
+                class="ion-margin-top"
+                *ngFor="let related of relatedTopics"
+                button
+                (click)="openTopic(related)"
+              >
+                <ion-label>
+                  <p>{{ 'TOPICS.RELATED_TO' | translate }}</p>
+                  {{ related.name }}
+                </ion-label>
+              </ion-item>
             </ion-list>
           </ion-card-content>
         </ion-card>

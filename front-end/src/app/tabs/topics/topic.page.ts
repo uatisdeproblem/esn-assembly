@@ -34,6 +34,8 @@ export class TopicPage {
 
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
+  relatedTopics: Topic[];
+
   constructor(
     private route: ActivatedRoute,
     private alertCtrl: AlertController,
@@ -51,6 +53,7 @@ export class TopicPage {
       await this.loading.show();
       this.topic = await this._topics.getById(topicId);
       await this.filterQuestions(this.searchbar?.value, null, true);
+      this.relatedTopics = await this._topics.getRelated(this.topic);
     } catch (error) {
       this.message.error('COMMON.NOT_FOUND');
     } finally {
@@ -146,5 +149,9 @@ export class TopicPage {
   }
   hasFieldAnError(field: string): boolean {
     return this.errors.has(field);
+  }
+
+  openTopic(topic: Topic): void {
+    this.app.goToInTabs(['topics', topic.topicId]);
   }
 }
