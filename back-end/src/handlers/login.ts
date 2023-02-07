@@ -31,22 +31,20 @@ export const handler = (ev: any, _: any, cb: any): Promise<void> => new Login(ev
 
 class Login extends ResourceController {
   host: string;
-  referer: string;
   stage: string;
 
   constructor(event: any, callback: any) {
     super(event, callback);
-    console.log(event);
     this.callback = callback;
     this.host = event.headers?.host ?? null;
-    this.referer = event.headers?.referer ?? null;
     this.stage = process.env.STAGE ?? null;
   }
 
   protected async getResources(): Promise<any> {
     try {
-      // build a URL to valid the ticket received
-      const serviceURL = `https://${this.host}/${this.stage}/login`;
+      // build a URL to valid the ticket received (consider also the localhost exception)
+      const localhost = this.queryParams.localhost ? `?localhost=${this.queryParams.localhost}` : '';
+      const serviceURL = `https://${this.host}/${this.stage}/login${localhost}`;
       const validationURL = `${CAS_URL}/serviceValidate?service=${serviceURL}&ticket=${this.queryParams.ticket}`;
 
       const ticketValidation = await Axios.get(validationURL);
@@ -77,7 +75,8 @@ class Login extends ResourceController {
       const token = sign(userData, secret, { expiresIn: JWT_EXPIRE_TIME });
 
       // redirect to the front-end with the fresh new token (instead of resolving)
-      this.callback(null, { statusCode: 302, headers: { Location: `${APP_URL}/auth/${token}` } });
+      const appURL = this.queryParams.localhost ? `http://localhost:${this.queryParams.localhost}` : APP_URL;
+      this.callback(null, { statusCode: 302, headers: { Location: `${appURL}/auth/${token}` } });
     } catch (err) {
       this.logger.error('VALIDATE CAS TICKET', err);
       throw new RCError('Login failed');

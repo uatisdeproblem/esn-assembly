@@ -30,7 +30,8 @@ export class AuthPage implements OnInit {
 
   startLoginFlowWithESNGalaxy(): void {
     const apiLoginURL = `https://${env.idea.api.url}/${env.idea.api.stage}/login`;
-    window.location.assign(`https://accounts.esn.org/cas/login?service=${apiLoginURL}`);
+    const localhost = location.hostname.startsWith('localhost') ? '?localhost=8100' : '';
+    window.location.assign(`https://accounts.esn.org/cas/login?service=${apiLoginURL}${localhost}`);
   }
 }
 
