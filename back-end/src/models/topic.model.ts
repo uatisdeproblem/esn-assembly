@@ -128,7 +128,10 @@ export class Topic extends Resource {
    */
   isClosed(): boolean {
     const now = getDateStringInFavoriteTimezone(new Date(), FAVORITE_TIMEZONE);
-    return !!this.closedAt || getDateStringInFavoriteTimezone(this.willCloseAt, FAVORITE_TIMEZONE) < now;
+    return (
+      !!this.closedAt ||
+      (this.willCloseAt && getDateStringInFavoriteTimezone(this.willCloseAt, FAVORITE_TIMEZONE) < now)
+    );
   }
 }
 
