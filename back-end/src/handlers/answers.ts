@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
 
 import { Topic } from '../models/topic.model';
 import { Question } from '../models/question.model';
@@ -20,6 +20,15 @@ const DDB_TABLES = {
   answers: process.env.DDB_TABLE_answers
 };
 const ddb = new DynamoDB();
+
+const QUESTION_BASE_URL = 'https://esn-ga.link/t/topics/';
+const SES_CONFIG = {
+  sourceName: 'ESN General Assembly Q&A',
+  source: process.env.SES_SOURCE_ADDRESS,
+  sourceArn: process.env.SES_IDENTITY_ARN,
+  region: process.env.SES_REGION
+};
+const ses = new SES();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new Answers(ev, cb).handleRequest();
 
@@ -106,6 +115,8 @@ class Answers extends ResourceController {
 
     await this.updateCountersOfQuestion();
 
+    await this.sendNotificationToQuestionMaker(this.topic, this.question);
+
     return this.answer;
   }
 
@@ -150,5 +161,16 @@ class Answers extends ResourceController {
     } catch (error) {
       this.logger.warn('Counters not updated', error, { questionId: this.question.questionId });
     }
+  }
+
+  private async sendNotificationToQuestionMaker(topic: Topic, question: Question): Promise<void> {
+    const template = 'notify-new-answer';
+    const templateData = {
+      userName: question.creator.name,
+      topic: topic.name,
+      question: question.summary,
+      url: QUESTION_BASE_URL.concat(topic.topicId)
+    };
+    await ses.sendTemplatedEmail({ toAddresses: [question.creator.email], template, templateData }, SES_CONFIG);
   }
 }

@@ -148,6 +148,12 @@
             <ion-input [(ngModel)]="subject.country" [disabled]="!editMode"></ion-input>
           </ion-item>
         </ion-col>
+        <ion-col [size]="12">
+          <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].email')">
+            <ion-label position="stacked">{{ 'SUBJECTS.EMAIL_FOR_NOTIFICATIONS' | translate }}</ion-label>
+            <ion-input type="email" [(ngModel)]="subject.email" [disabled]="!editMode"></ion-input>
+          </ion-item>
+        </ion-col>
       </ion-row>
     </ion-grid>
     <ion-item *ngIf="editMode" button (click)="addSubject()">

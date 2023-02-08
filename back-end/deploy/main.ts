@@ -5,6 +5,7 @@ import * as DDB from 'aws-cdk-lib/aws-dynamodb';
 import { IDEAStack } from './idea-stack';
 import { MediaStack } from './media-stack';
 import { ApiDomainStack } from './api-domain-stack';
+import { SESStack } from './ses-stack';
 import { ResourceController, ApiStack, DDBTable } from './api-stack';
 import { FrontEndStack } from './front-end-stack';
 
@@ -108,6 +109,13 @@ const createApp = async (): Promise<void> => {
     domain: parameters.apiDomain
   });
 
+  const sesStack = new SESStack(app, `${parameters.project}-ses`, {
+    env,
+    project: parameters.project,
+    domain: parameters.apiDomain,
+    testEmailAddress: parameters.firstAdminEmail
+  });
+
   //
   // STAGE-DEPENDANT RESOURCES
   //
@@ -122,10 +130,12 @@ const createApp = async (): Promise<void> => {
     resourceControllers: apiResources,
     tables,
     mediaBucketArn: mediaStack.mediaBucketArn,
+    ses: { identityArn: sesStack.identityArn, notificationTopicArn: sesStack.notificationTopicArn },
     removalPolicy: STAGE_VARIABLES.destroyDataOnDelete ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN
   });
   apiStack.addDependency(mediaStack);
   apiStack.addDependency(apiDomainStack);
+  apiStack.addDependency(sesStack);
 
   new FrontEndStack(app, `${parameters.project}-${STAGE}-front-end`, {
     env,

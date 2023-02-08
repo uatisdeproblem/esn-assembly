@@ -10,6 +10,7 @@ import * as ApiGw from 'aws-cdk-lib/aws-apigatewayv2';
 import * as DDB from 'aws-cdk-lib/aws-dynamodb';
 import * as S3 from 'aws-cdk-lib/aws-s3';
 import * as S3Deployment from 'aws-cdk-lib/aws-s3-deployment';
+import { Subscription, SubscriptionProtocol, Topic } from 'aws-cdk-lib/aws-sns';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction as LambdaFunctionTarget } from 'aws-cdk-lib/aws-events-targets';
 
@@ -22,6 +23,7 @@ export interface ApiProps extends cdk.StackProps {
   resourceControllers: ResourceController[];
   tables: { [tableName: string]: DDBTable };
   mediaBucketArn: string;
+  ses: { identityArn: string; notificationTopicArn: string };
   removalPolicy: RemovalPolicy;
 }
 export interface ResourceController {
@@ -83,6 +85,11 @@ export class ApiStack extends cdk.Stack {
       otherFolders: ['attachments', 'downloads', 'images']
     });
     this.allowLambdaFunctionsToSecretsManager({ lambdaFunctions: Object.values(lambdaFunctions) });
+    this.allowLambdaFunctionsToAccessSES({
+      lambdaFunctions: Object.values(lambdaFunctions),
+      sesIdentityArn: props.ses.identityArn,
+      apiDomain: props.apiDomain
+    });
 
     this.createDDBTablesAndAllowLambdaFunctions({
       stackId: id,
@@ -97,6 +104,12 @@ export class ApiStack extends cdk.Stack {
     //
 
     // @idea insert here project-custom constructs if needed
+
+    new Subscription(this, 'SESSubscriptionToHandleSESBounces', {
+      topic: Topic.fromTopicArn(this, 'SESTopicToHandleSESBounces', props.ses.notificationTopicArn),
+      protocol: SubscriptionProtocol.EMAIL,
+      endpoint: props.firstAdminEmail
+    });
 
     if (lambdaFunctions['scheduledOps']) {
       const rule = new Rule(this, 'EventRuleScheduledOps', {
@@ -287,6 +300,31 @@ export class ApiStack extends cdk.Stack {
     });
     params.lambdaFunctions.forEach(lambdaFn => {
       if (lambdaFn.role) lambdaFn.role.attachInlinePolicy(accessSecretsManagerPolicy);
+    });
+  }
+  private allowLambdaFunctionsToAccessSES(params: {
+    lambdaFunctions: NodejsFunction[];
+    sesIdentityArn: string;
+    apiDomain: string;
+  }): void {
+    const region = cdk.Stack.of(this).region;
+    const account = cdk.Stack.of(this).account;
+
+    const accessSES = new IAM.Policy(this, 'ManageSES', {
+      statements: [
+        new IAM.PolicyStatement({
+          effect: IAM.Effect.ALLOW,
+          actions: ['ses:*'],
+          resources: [`arn:aws:ses:${region}:${account}:identity/*`, `arn:aws:ses:${region}:${account}:template/*`]
+        })
+      ]
+    });
+    params.lambdaFunctions.forEach(lambdaFn => {
+      if (lambdaFn.role) lambdaFn.role.attachInlinePolicy(accessSES);
+      lambdaFn.addEnvironment('SES_IDENTITY_ARN', params.sesIdentityArn);
+      const domainName = params.apiDomain.split('.').slice(-2).join('.');
+      lambdaFn.addEnvironment('SES_SOURCE_ADDRESS', `no-reply@${domainName}`);
+      lambdaFn.addEnvironment('SES_REGION', region);
     });
   }
 

@@ -204,7 +204,8 @@
     "NAME": "Name",
     "AVATAR_URL": "Avatar URL",
     "SECTION": "ESN Section",
-    "COUNTRY": "ESN Country"
+    "COUNTRY": "ESN Country",
+    "EMAIL_FOR_NOTIFICATIONS": "Email address for notifications"
   },
   "PROFILE": {
     "MANAGE_ACCOUNT_ON_GALAXY": "Manage account on ESN Galaxy"

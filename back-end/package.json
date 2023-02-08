@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
+    "@iter-idea/ses-verify-identities": "^1.0.2",
     "@tsconfig/node16": "^1.0.3",
     "@types/aws-lambda": "^8.10.109",
     "@types/jsonwebtoken": "^9.0.1",

@@ -30,6 +30,10 @@ export class Subject extends Resource {
    * The name of the subject's ESN country.
    */
   country?: string;
+  /**
+   * The email for notifications.
+   */
+  email: string;
 
   /**
    * Create a new subject starting from a user.
@@ -41,7 +45,8 @@ export class Subject extends Resource {
       name: user.firstName.concat(' ', user.lastName),
       avatarURL: user.avatarURL,
       section: user.section,
-      country: user.country
+      country: user.country,
+      email: user.email
     });
   }
 
@@ -62,6 +67,7 @@ export class Subject extends Resource {
     } else {
       delete this.country;
     }
+    this.email = this.clean(x.email, String);
   }
 
   validate(): string[] {
