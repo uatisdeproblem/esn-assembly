@@ -1,4 +1,4 @@
-<ion-content [class.viewMode]="!editMode">
+<ion-header class="ion-no-border">
   <app-edit-mode-buttons
     [title]="'TOPICS.MANAGE_TOPIC' | translate"
     [editMode]="!!editMode"
@@ -6,7 +6,8 @@
     (exit)="exitEditMode()"
     (save)="save()"
   ></app-edit-mode-buttons>
-
+</ion-header>
+<ion-content [class.viewMode]="!editMode">
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
     <p class="ion-text-right" *ngIf="!editMode && !topic.archivedAt">
       <ion-button [color]="topic.closedAt ? 'success': 'danger'" (click)="manageTopicStatus(!!topic.closedAt)">
