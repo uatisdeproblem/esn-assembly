@@ -168,9 +168,11 @@ ion-badge.unreadDot {
 .angular-editor-wrapper {
   background-color: var(--ion-color-white) !important;
 }
-.angular-editor-toolbar,
+.angular-editor-toolbar {
+  border-color: var(--ion-color-light) !important;
+}
 .angular-editor-textarea {
-  border-color: var(--ion-border-color) !important;
+  border-color: var(--ion-color-light-shade) !important;
 }
 .angular-editor-toolbar {
   background-color: var(--ion-color-light) !important;
@@ -178,4 +180,5 @@ ion-badge.unreadDot {
 .angular-editor-button {
   background-color: var(--ion-color-white) !important;
   border-color: var(--ion-color-light) !important;
+  color: var(--ion-text-color) !important;
 }
