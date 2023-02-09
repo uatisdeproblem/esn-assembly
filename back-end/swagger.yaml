@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: ESN GA Candidates app
-  version: 1.0.0
+  version: 1.0.1
   contact:
     name: Matteo Carbone
     email: email@matteocarbone.com
