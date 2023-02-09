@@ -137,4 +137,34 @@ export class QuestionComponent implements OnChanges {
   hasFieldAnError(field: string): boolean {
     return this.errors.has(field);
   }
+
+  getLastAnswer(): Answer {
+    return this.answers?.length ? this.answers[this.answers.length - 1] : null;
+  }
+  async deleteLastAnswer(): Promise<void> {
+    const lastAnswer = this.getLastAnswer();
+    if (!lastAnswer) return;
+
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._answers.delete(this.question, lastAnswer);
+        this.answers.splice(this.answers.indexOf(lastAnswer), 1);
+        this.question.numOfAnswers--;
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
+  }
 }

@@ -30,6 +30,11 @@
         [creator]="answer.creator"
         [isSender]="true"
       ></app-message-bubble>
+      <p class="ion-text-right" *ngIf="getLastAnswer()?.canUserEdit(app.user)">
+        <ion-button color="danger" fill="clear" (click)="deleteLastAnswer()">
+          {{ 'QUESTIONS.DELETE_ANSWER' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
+        </ion-button>
+      </p>
 
       <ion-item class="noElements ion-margin-top" *ngIf="!answers.length && !newAnswer">
         <ion-label>{{ 'QUESTIONS.NO_ANSWERS_YET' | translate }}</ion-label>

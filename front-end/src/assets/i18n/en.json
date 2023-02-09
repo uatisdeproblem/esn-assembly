@@ -157,7 +157,8 @@
     "NO_ANSWERS_YET": "No answers yet.",
     "DELETE_QUESTION": "Delete question",
     "ANSWER": "Answer",
-    "IS_YOUR_ANSWER_READY": "Is your answer ready?"
+    "IS_YOUR_ANSWER_READY": "Is your answer ready?",
+    "DELETE_ANSWER": "Delete answer"
   },
   "ARCHIVE": {
     "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters and search through the action bar above.",
