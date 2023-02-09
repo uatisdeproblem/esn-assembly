@@ -9,7 +9,7 @@
 
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
     <p class="ion-text-right" *ngIf="!editMode && !topic.archivedAt">
-      <ion-button [color]="topic.closedAt ? 'success': 'danger'" (click)="manageTopicStatus()">
+      <ion-button [color]="topic.closedAt ? 'success': 'danger'" (click)="manageTopicStatus(!!topic.closedAt)">
         {{ (topic.closedAt ? 'COMMON.OPEN' : 'COMMON.CLOSE') | translate }}
       </ion-button>
     </p>

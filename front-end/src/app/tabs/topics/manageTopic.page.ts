@@ -171,7 +171,7 @@ export class ManageTopicPage implements OnInit {
     this.relatedTopics = this.activeTopics.filter(x => checkedTopics.includes(x.topicId));
   }
 
-  async manageTopicStatus(open = true): Promise<void> {
+  async manageTopicStatus(open: boolean): Promise<void> {
     const doStatusChange = async (): Promise<void> => {
       try {
         await this.loading.show();
