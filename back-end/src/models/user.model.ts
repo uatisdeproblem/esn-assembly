@@ -1,26 +1,47 @@
 import { Resource } from 'idea-toolbox';
 
 /**
+ * The list of interesting roles on which to assign permissions in the platform.
+ */
+export enum UserRoles {
+  INTERNATIONAL_BOARD = 'INTERNATIONAL_BOARD',
+  INTERNATIONAL_SECRETARIAT = 'INTERNATIONAL_SECRETARIAT',
+  INTERNATIONAL_LEVEL = 'INTERNATIONAL_LEVEL',
+  INTERNATIONAL_GA_CT = 'INTERNATIONAL_GA_CT',
+  INTERNATIONAL_AB = 'INTERNATIONAL_AB',
+  INTERNATIONAL_AC = 'INTERNATIONAL_AC',
+  NATIONAL_BOARD = 'NATIONAL_BOARD',
+  NATIONAL_LEVEL = 'NATIONAL_LEVEL',
+  LOCAL_BOARD = 'LOCAL_BOARD',
+  LOCAL_LEVEL = 'LOCAL_LEVEL'
+}
+
+/**
  * The list of roles that, if owned, would grant administative privileges in the platform.
  */
-export const ADMIN_GALAXY_ROLES = [
-  'International.CNRsecretary',
-  'International.AGMchair',
-  'International.CNRadministrator',
-  'International.Board'
+export const ADMIN_ROLES = [
+  UserRoles.INTERNATIONAL_GA_CT,
+  UserRoles.INTERNATIONAL_BOARD,
+  UserRoles.INTERNATIONAL_SECRETARIAT
 ];
 
 /**
- * The list of (known) interesting roles on which to assign permissions in the platform.
+ * The map between the platform's roles with the (known) interesting roles on Galaxy.
+ * Roles that ends with "*" are intended to be: "any role with that prefix".
+ * Note: all roles are lower-cased (since they will be handled with a case-insensitive logic).
  */
-export const KNOWN_GALAXY_ROLES = [
-  'International.CNRsecretary',
-  'International.AGMchair',
-  'International.CNRadministrator',
-  'International.Board',
-  'National.Board',
-  'Local.Board'
-];
+export const GALAXY_ROLES_MAP: { [userRole: string]: string[] } = {
+  INTERNATIONAL_BOARD: ['international.board'], // @todo
+  INTERNATIONAL_SECRETARIAT: ['international.secretariat'], // @todo
+  INTERNATIONAL_LEVEL: ['international.*'],
+  INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradministrator'],
+  INTERNATIONAL_AB: ['international.ab*'], // @todo
+  INTERNATIONAL_AC: ['international.ac*'], // @todo
+  NATIONAL_BOARD: ['national.board'], // @todo
+  NATIONAL_LEVEL: ['national.*'],
+  LOCAL_BOARD: ['local.regularboardmember'],
+  LOCAL_LEVEL: ['local.*']
+};
 
 export class User extends Resource {
   /**
@@ -61,6 +82,24 @@ export class User extends Resource {
    */
   avatarURL: string;
 
+  /**
+   * Whether the user has one of the allowed roles.
+   */
+  static isAllowedBasedOnRoles = (user: User, allowedRoles: UserRoles[]): boolean => {
+    const allowedGalaxyRoles: string[] = [];
+    for (const role of allowedRoles) allowedGalaxyRoles.push(...GALAXY_ROLES_MAP[role]);
+
+    return user.roles
+      .map(userRole => userRole.toLowerCase())
+      .some(userRole =>
+        allowedGalaxyRoles.some(allowedRole =>
+          allowedRole.endsWith('*')
+            ? userRole.startsWith(allowedRole.slice(0, allowedRole.length - 1))
+            : allowedRole === userRole
+        )
+      );
+  };
+
   load(x: any): void {
     super.load(x);
     this.userId = this.clean(x.userId, String);
@@ -78,7 +117,7 @@ export class User extends Resource {
    * Whether the user has administrative privileges in the platform.
    */
   isAdministrator(): boolean {
-    return ADMIN_GALAXY_ROLES.some(x => this.roles.includes(x));
+    return User.isAllowedBasedOnRoles(this, ADMIN_ROLES);
   }
 
   /**

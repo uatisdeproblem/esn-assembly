@@ -210,5 +210,17 @@
   },
   "PROFILE": {
     "MANAGE_ACCOUNT_ON_GALAXY": "Manage account on ESN Galaxy"
+  },
+  "USER_ROLES": {
+    "INTERNATIONAL_BOARD": "International Board",
+    "INTERNATIONAL_SECRETARIAT": "International Secretariat",
+    "INTERNATIONAL_LEVEL": "International level (any role)",
+    "INTERNATIONAL_GA_CT": "General Assembly CT",
+    "INTERNATIONAL_AB": "Arbitration Board",
+    "INTERNATIONAL_AC": "Audit Commission",
+    "NATIONAL_BOARD": "National Boards",
+    "NATIONAL_LEVEL": "National level (any role)",
+    "LOCAL_BOARD": "Local Boards",
+    "LOCAL_LEVEL": "Local level (any role)"
   }
 }

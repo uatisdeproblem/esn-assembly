@@ -4,7 +4,7 @@ import { TopicCategoryAttached } from './category.model';
 import { TopicEventAttached } from './event.model';
 import { FAVORITE_TIMEZONE, getDateStringInFavoriteTimezone } from './favoriteTimezone.const';
 import { Subject } from './subject.model';
-import { User } from './user.model';
+import { User, UserRoles } from './user.model';
 
 /**
  * A topic for a Q&A set.
@@ -66,7 +66,7 @@ export class Topic extends Resource {
    * To be able to ask questions, a user must have at least a role (Galaxy) included in this list.
    * An empty string means that any user (regardless the role) can ask questions.
    */
-  rolesAbleToAskQuestions: string[];
+  rolesAbleToAskQuestions: UserRoles[];
 
   load(x: any): void {
     super.load(x);
@@ -114,7 +114,7 @@ export class Topic extends Resource {
    */
   canUserAskQuestions(user: User): boolean {
     if (!this.rolesAbleToAskQuestions.length) return true;
-    return user.roles.some(r => this.rolesAbleToAskQuestions.includes(r));
+    return User.isAllowedBasedOnRoles(user, this.rolesAbleToAskQuestions);
   }
   /**
    * Whether the user is allowed to answer questions on the topic.

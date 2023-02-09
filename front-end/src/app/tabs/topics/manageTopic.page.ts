@@ -14,7 +14,7 @@ import { Topic } from '@models/topic.model';
 import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
 import { TopicEvent, TopicEventAttached } from '@models/event.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
-import { KNOWN_GALAXY_ROLES } from '@models/user.model';
+import { UserRoles } from '@models/user.model';
 import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
@@ -42,7 +42,7 @@ export class ManageTopicPage implements OnInit {
   relatedTopics: Topic[];
   relatedTopicsChecks: Check[];
 
-  rolesAbleToAskQuestionsChecks = KNOWN_GALAXY_ROLES.map(role => new Check({ value: role }));
+  rolesAbleToAskQuestionsChecks: Check[];
 
   constructor(
     private location: Location,
@@ -57,11 +57,16 @@ export class ManageTopicPage implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
+    if (!this.app.user.isAdministrator()) return this.app.closePage('COMMON.UNAUTHORIZED');
+
     [this.categories, this.events, this.activeTopics] = await Promise.all([
       this._categories.getList(),
       this._events.getList(),
       this._topics.getActiveList()
     ]);
+    this.rolesAbleToAskQuestionsChecks = Object.entries(UserRoles).map(
+      role => new Check({ value: role[0], name: this.t._('USER_ROLES.'.concat(role[1])) })
+    );
   }
   async ionViewWillEnter(): Promise<void> {
     const topicId = this.route.snapshot.paramMap.get('topicId') ?? 'new';
@@ -82,7 +87,7 @@ export class ManageTopicPage implements OnInit {
               })
           );
         this.rolesAbleToAskQuestionsChecks.forEach(
-          c => (c.checked = this.topic.rolesAbleToAskQuestions.includes(String(c.value)))
+          c => (c.checked = this.topic.rolesAbleToAskQuestions.includes(c.value as UserRoles))
         );
         this.editMode = UXMode.VIEW;
       } else {
@@ -121,7 +126,7 @@ export class ManageTopicPage implements OnInit {
     else
       this.topic.rolesAbleToAskQuestions = this.rolesAbleToAskQuestionsChecks
         .filter(x => x.checked)
-        .map(x => String(x.value));
+        .map(x => x.value as UserRoles);
   }
 
   async save(): Promise<void> {
