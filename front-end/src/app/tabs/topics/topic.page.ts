@@ -103,6 +103,10 @@ export class TopicPage {
   startNewQuestion(): void {
     this.selectQuestion(null);
     this.newQuestion = new Question({ creator: Subject.fromUser(this.app.user) });
+    setTimeout((): void => {
+      const newQuestionElement = document.getElementById('newQuestion');
+      if (newQuestionElement) this.content.scrollToPoint(0, newQuestionElement.getBoundingClientRect().top - 100, 500);
+    }, 100);
   }
   async cancelNewQuestion(): Promise<void> {
     if (!this.newQuestion.summary && !this.newQuestion.text) {
