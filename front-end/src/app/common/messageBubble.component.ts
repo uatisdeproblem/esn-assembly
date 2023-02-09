@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SecurityContext } from '@angular/core';
 
@@ -11,7 +11,7 @@ import { Subject } from '@models/subject.model';
   templateUrl: 'messageBubble.component.html',
   styleUrls: ['messageBubble.component.scss']
 })
-export class MessageBubbleComponent implements OnInit {
+export class MessageBubbleComponent implements OnChanges {
   /**
    * The text to show; if null, load a skeleton instead.
    */
@@ -28,7 +28,7 @@ export class MessageBubbleComponent implements OnInit {
   sanitizedHtml: string;
 
   constructor(private sanitizer: DomSanitizer, public app: AppService) {}
-  ngOnInit(): void {
-    this.sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, this.text);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.text?.currentValue) this.sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, this.text);
   }
 }
