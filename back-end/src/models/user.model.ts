@@ -31,13 +31,13 @@ export const ADMIN_ROLES = [
  * Note: all roles are lower-cased (since they will be handled with a case-insensitive logic).
  */
 export const GALAXY_ROLES_MAP: { [userRole: string]: string[] } = {
-  INTERNATIONAL_BOARD: ['international.board'], // @todo
+  INTERNATIONAL_BOARD: ['international.regularBoardMember'], // @todo
   INTERNATIONAL_SECRETARIAT: ['international.secretariat'], // @todo
   INTERNATIONAL_LEVEL: ['international.*'],
   INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradministrator'],
   INTERNATIONAL_AB: ['international.ab*'], // @todo
   INTERNATIONAL_AC: ['international.ac*'], // @todo
-  NATIONAL_BOARD: ['national.board'], // @todo
+  NATIONAL_BOARD: ['national.regularBoardMember'],
   NATIONAL_LEVEL: ['national.*'],
   LOCAL_BOARD: ['local.regularboardmember'],
   LOCAL_LEVEL: ['local.*']
