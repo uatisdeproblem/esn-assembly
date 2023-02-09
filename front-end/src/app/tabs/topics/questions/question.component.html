@@ -4,8 +4,8 @@
     <ion-card-title>{{ question.summary }}</ion-card-title>
   </ion-card-header>
   <ion-card-content>
-    <ion-row>
-      <ion-col *ngIf="answers && !answers.length && question.canUserEdit(app.user)">
+    <ion-row *ngIf="!topic.archivedAt">
+      <ion-col *ngIf="!topic.isClosed() && answers && !answers.length && question.canUserEdit(app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteQuestion()">
           {{ 'QUESTIONS.DELETE_QUESTION' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
         </ion-button>
@@ -30,20 +30,20 @@
         [creator]="answer.creator"
         [isSender]="true"
       ></app-message-bubble>
-      <p class="ion-text-right" *ngIf="getLastAnswer()?.canUserEdit(app.user)">
+      <p class="ion-text-right" *ngIf="!topic.isClosed() && getLastAnswer()?.canUserEdit(app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteLastAnswer()">
           {{ 'QUESTIONS.DELETE_ANSWER' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
         </ion-button>
       </p>
 
-      <ion-item color="white" class="noElements ion-margin-top" *ngIf="!answers.length && !newAnswer">
+      <ion-item color="white" lines="none" class="noElements ion-margin-top" *ngIf="!answers.length && !newAnswer">
         <ion-label>{{ 'QUESTIONS.NO_ANSWERS_YET' | translate }}</ion-label>
       </ion-item>
 
       <ion-button
         expand="block"
         class="ion-margin-top"
-        *ngIf="topic.canUserAnswerQuestions(app.user) && !newAnswer"
+        *ngIf="!topic.archivedAt && topic.canUserAnswerQuestions(app.user) && !newAnswer"
         (click)="writeAnswer()"
       >
         {{ 'QUESTIONS.ANSWER' | translate }} <ion-icon name="pencil" slot="end"></ion-icon>
