@@ -29,7 +29,8 @@
         </ion-select>
       </ion-item>
       <ion-button fill="solid" color="ESNcyan" (click)="search()">
-        {{ 'COMMON.SEARCH' | translate }} <ion-icon name="search" slot="end"></ion-icon>
+        <ng-container *ngIf="!app.isInMobileMode()">{{ 'COMMON.SEARCH' | translate }}</ng-container>
+        <ion-icon name="search" [slot]="app.isInMobileMode() ? 'icon-only' : 'end'"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

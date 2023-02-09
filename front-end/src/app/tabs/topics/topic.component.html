@@ -17,7 +17,7 @@
         (ionError)="app.fallbackAvatar($event?.target, subject.type !== SubjectTypes.USER)"
       ></ion-img>
     </ion-avatar>
-    <ion-badge slot="end" [color]="topic.closedAt ? 'danger' : 'success'">
+    <ion-badge slot="end" *ngIf="!topic.archivedAt" [color]="topic.closedAt ? 'danger' : 'success'">
       {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
     </ion-badge>
   </ion-item>
@@ -59,7 +59,7 @@
     </ion-col>
     <ion-col [sizeLg]="1">{{ topic.numOfQuestions }}</ion-col>
     <ion-col [sizeLg]="1">
-      <ion-badge fill="outline" [color]="topic.closedAt ? 'danger' : 'success'">
+      <ion-badge fill="outline" *ngIf="!topic.archivedAt" [color]="topic.closedAt ? 'danger' : 'success'">
         {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
       </ion-badge>
     </ion-col>

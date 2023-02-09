@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonInfiniteScroll, IonSearchbar } from '@ionic/angular';
+import { IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
 
 import { AppService } from '@app/app.service';
 import { TopicsService, TopicsSortBy } from './topics.service';
@@ -38,8 +38,16 @@ export class TopicsPage implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    this.topics = await this._topics.getActiveList({ withPagination: true });
+    await this.loadResources();
+  }
+  private async loadResources(): Promise<void> {
+    this.topics = await this._topics.getActiveList({ force: true, withPagination: true });
     [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
+  }
+  async handleRefresh(refresh: IonRefresher): Promise<void> {
+    this.topics = null;
+    await this.loadResources();
+    refresh.complete();
   }
 
   async filter(search = '', scrollToNextPage?: IonInfiniteScroll): Promise<void> {

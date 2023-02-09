@@ -57,6 +57,9 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
+  <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-list class="aList">
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="topics && !topics.length">
       <ion-label>{{ 'TOPICS.NO_ACTIVE_TOPICS' | translate }}</ion-label>

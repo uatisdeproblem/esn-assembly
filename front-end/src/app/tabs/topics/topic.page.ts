@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, IonContent, IonInfiniteScroll, IonSearchbar } from '@ionic/angular';
+import { AlertController, IonContent, IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
 import { Attachment } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
@@ -47,17 +47,25 @@ export class TopicPage {
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
-    const topicId = this.route.snapshot.paramMap.get('topicId');
     try {
       await this.loading.show();
-      this.topic = await this._topics.getById(topicId);
-      await this.filterQuestions(this.searchbar?.value, null, true);
-      this.relatedTopics = await this._topics.getRelated(this.topic);
+      await this.loadResources();
     } catch (error) {
       this.message.error('COMMON.NOT_FOUND');
     } finally {
       this.loading.hide();
     }
+  }
+  private async loadResources(): Promise<void> {
+    const topicId = this.route.snapshot.paramMap.get('topicId');
+    this.topic = await this._topics.getById(topicId);
+    await this.filterQuestions(this.searchbar?.value, null, true);
+    this.relatedTopics = await this._topics.getRelated(this.topic);
+  }
+  async handleRefresh(refresh: IonRefresher): Promise<void> {
+    this.questions = null;
+    await this.loadResources();
+    refresh.complete();
   }
 
   selectQuestion(question: Question): void {
