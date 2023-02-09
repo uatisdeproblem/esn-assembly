@@ -3,5 +3,5 @@
   *ngIf="editMode"
   [(ngModel)]="content"
   [config]="editorConfig"
-  (input)="contentChange.emit($event.target.innerHTML)"
+  (blur)="contentChange.emit(content)"
 ></angular-editor>
