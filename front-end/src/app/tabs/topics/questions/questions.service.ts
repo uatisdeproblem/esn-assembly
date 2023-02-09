@@ -90,16 +90,16 @@ export class QuestionsService {
   /**
    * Upvote a question.
    */
-  async upvote(topic: Topic, question: Question): Promise<void> {
+  async upvote(topic: Topic, question: Question): Promise<Question> {
     const path = ['topics', topic.topicId, 'questions', question.questionId];
-    await this.api.patchResource(path, { body: { action: 'UPVOTE' } });
+    return new Question(await this.api.patchResource(path, { body: { action: 'UPVOTE' } }));
   }
   /**
    * Cancel the upvote to a question.
    */
-  async upvoteCancel(topic: Topic, question: Question): Promise<void> {
+  async upvoteCancel(topic: Topic, question: Question): Promise<Question> {
     const path = ['topics', topic.topicId, 'questions', question.questionId];
-    await this.api.patchResource(path, { body: { action: 'UPVOTE_CANCEL' } });
+    return new Question(await this.api.patchResource(path, { body: { action: 'UPVOTE_CANCEL' } }));
   }
   /**
    * Whether the current user upvoted the question.

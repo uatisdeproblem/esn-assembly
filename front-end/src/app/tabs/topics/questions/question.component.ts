@@ -57,8 +57,8 @@ export class QuestionComponent implements OnChanges {
   async upvoteQuestion(upvote: boolean): Promise<void> {
     try {
       this.userUpvoted = upvote;
-      if (upvote) await this._questions.upvote(this.topic, this.question);
-      else await this._questions.upvoteCancel(this.topic, this.question);
+      if (upvote) this.question.load(await this._questions.upvote(this.topic, this.question));
+      else this.question.load(await this._questions.upvoteCancel(this.topic, this.question));
     } catch (error) {
       this.userUpvoted = !upvote;
       this.message.error('COMMON.OPERATION_FAILED');
@@ -114,6 +114,7 @@ export class QuestionComponent implements OnChanges {
       try {
         await this.loading.show();
         const answer = await this._answers.insert(this.question, this.newAnswer);
+        this.question.numOfAnswers++;
         this.answers.push(answer);
         this.newAnswer = null;
         this.message.success('COMMON.OPERATION_COMPLETED');
