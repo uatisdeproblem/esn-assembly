@@ -5,7 +5,7 @@ export const environment = {
   idea: {
     project: 'esn-ga',
     app: {
-      version: '0.0.1',
+      version: '1.0.0',
       url: 'https://esn-ga.link',
       mediaUrl: 'https://media.esn-ga.link',
       title: 'ESN General Assembly Q&A',
