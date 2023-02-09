@@ -16,11 +16,11 @@
       {{ question.updatedAt ?? question.createdAt | dateLocale : 'mediumDate' }}
     </p>
   </ion-label>
-  <ion-chip color="medium" class="ion-hide-sm-down">
+  <ion-chip color="medium" class="ion-hide-sm-down" disabled>
     <ion-icon name="chatbubbles"></ion-icon>
     <ion-label>{{ question.numOfAnswers }}</ion-label>
   </ion-chip>
-  <ion-chip color="success" class="ion-hide-sm-down">
+  <ion-chip color="success" class="ion-hide-sm-down" disabled>
     <ion-icon name="thumbs-up"></ion-icon>
     <ion-label>{{ question.numOfUpvotes }}</ion-label>
   </ion-chip>

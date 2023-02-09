@@ -5,6 +5,9 @@ ion-item {
       font-weight: 500;
     }
   }
+  ion-chip[disabled] {
+    opacity: 1 !important;
+  }
 }
 ion-item.current {
   border-left: 8px solid var(--ion-color-primary);
