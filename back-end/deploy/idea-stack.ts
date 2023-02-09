@@ -28,5 +28,13 @@ export class IDEAStack extends cdk.Stack {
       billingMode: DDB.BillingMode.PAY_PER_REQUEST,
       pointInTimeRecovery: true
     });
+
+    new DDB.Table(this, 'idea_emailsBlocklist', {
+      tableName: 'idea_emailsBlocklist',
+      partitionKey: { name: 'email', type: DDB.AttributeType.STRING },
+      billingMode: DDB.BillingMode.PAY_PER_REQUEST,
+      pointInTimeRecovery: true,
+      timeToLiveAttribute: 'expiresAt'
+    });
   }
 }

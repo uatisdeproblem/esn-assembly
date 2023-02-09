@@ -30,7 +30,8 @@ const apiResources: ResourceController[] = [
       '/topics/{topicId}/questions/{questionId}/answers/{answerId}'
     ]
   },
-  { name: 'scheduledOps' }
+  { name: 'scheduledOps' },
+  { name: 'sesNotifications' }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {

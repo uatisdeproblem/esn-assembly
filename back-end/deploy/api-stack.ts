@@ -13,6 +13,7 @@ import * as S3Deployment from 'aws-cdk-lib/aws-s3-deployment';
 import { Subscription, SubscriptionProtocol, Topic } from 'aws-cdk-lib/aws-sns';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction as LambdaFunctionTarget } from 'aws-cdk-lib/aws-events-targets';
+import { SnsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 export interface ApiProps extends cdk.StackProps {
   project: string;
@@ -105,11 +106,15 @@ export class ApiStack extends cdk.Stack {
 
     // @idea insert here project-custom constructs if needed
 
-    new Subscription(this, 'SESSubscriptionToHandleSESBounces', {
-      topic: Topic.fromTopicArn(this, 'SESTopicToHandleSESBounces', props.ses.notificationTopicArn),
-      protocol: SubscriptionProtocol.EMAIL,
-      endpoint: props.firstAdminEmail
-    });
+    if (lambdaFunctions['sesNotifications']) {
+      const topic = Topic.fromTopicArn(this, 'SESTopicToHandleSESBounces', props.ses.notificationTopicArn);
+      new Subscription(this, 'SESSubscriptionToHandleSESBounces', {
+        topic,
+        protocol: SubscriptionProtocol.LAMBDA,
+        endpoint: lambdaFunctions['sesNotifications'].functionArn
+      });
+      lambdaFunctions['sesNotifications'].addEventSource(new SnsEventSource(topic));
+    }
 
     if (lambdaFunctions['scheduledOps']) {
       const rule = new Rule(this, 'EventRuleScheduledOps', {

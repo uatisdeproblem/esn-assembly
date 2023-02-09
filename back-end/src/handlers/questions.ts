@@ -4,6 +4,8 @@
 
 import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
 
+import { isEmailInBlockList } from './sesNotifications';
+
 import { Topic } from '../models/topic.model';
 import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
@@ -212,7 +214,8 @@ class Questions extends ResourceController {
         question: question.summary,
         url: QUESTION_BASE_URL.concat(topic.topicId)
       };
-      await ses.sendTemplatedEmail({ toAddresses: [subject.email], template, templateData }, SES_CONFIG);
+      if (!(await isEmailInBlockList(question.creator.email)))
+        await ses.sendTemplatedEmail({ toAddresses: [subject.email], template, templateData }, SES_CONFIG);
     }
   }
 }
