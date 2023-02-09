@@ -21,8 +21,8 @@ export enum UserRoles {
  */
 export const ADMIN_ROLES = [
   UserRoles.INTERNATIONAL_GA_CT,
-  UserRoles.INTERNATIONAL_BOARD,
-  UserRoles.INTERNATIONAL_SECRETARIAT
+  //UserRoles.INTERNATIONAL_BOARD,
+  //UserRoles.INTERNATIONAL_SECRETARIAT
 ];
 
 /**
