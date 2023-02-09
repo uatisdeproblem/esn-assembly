@@ -1,7 +1,7 @@
 <p class="view" [innerHTML]="sanitizedHtml" *ngIf="!editMode"></p>
 <angular-editor
   *ngIf="editMode"
-  [(ngModel)]="content"
+  [(ngModel)]="text"
   [config]="editorConfig"
-  (blur)="contentChange.emit(content)"
+  (input)="contentChange.emit($event.target.innerHTML)"
 ></angular-editor>
