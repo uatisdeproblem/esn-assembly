@@ -89,13 +89,15 @@ export class Subject extends Resource {
    */
   getURL(): string {
     const BASE_URL = 'https://accounts.esn.org/';
+    // we need to strip the dots to build a valid ID to parse the page on Galaxy
+    const cleanedId = this.id.replace(/\./gm, '');
     switch (this.type) {
       case SubjectTypes.USER:
-        return BASE_URL.concat('user/', this.id);
+        return BASE_URL.concat('user/', cleanedId);
       case SubjectTypes.COUNTRY:
-        return BASE_URL.concat('country/', this.id);
+        return BASE_URL.concat('country/', cleanedId);
       case SubjectTypes.SECTION:
-        return BASE_URL.concat('section/', this.id);
+        return BASE_URL.concat('section/', cleanedId);
     }
   }
 
