@@ -1,7 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, IonContent, IonInfiniteScroll, IonSearchbar } from '@ionic/angular';
-import { Browser } from '@capacitor/browser';
 import { Attachment } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
@@ -78,7 +77,7 @@ export class TopicPage {
     try {
       await this.loading.show();
       const url = await this._attachments.download(attachment);
-      await Browser.open({ url });
+      await this.app.openURL(url);
     } catch (error) {
       this.message.error('COMMON.OPERATION_FAILED');
     } finally {

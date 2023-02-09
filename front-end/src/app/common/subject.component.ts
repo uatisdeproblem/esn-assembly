@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { Browser } from '@capacitor/browser';
 
 import { AppService } from '@app/app.service';
 
@@ -30,6 +29,6 @@ export class SubjectComponent {
 
   async openOnGalaxy(): Promise<void> {
     const url = this.subject.getURL();
-    await Browser.open({ url });
+    await this.app.openURL(url);
   }
 }

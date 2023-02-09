@@ -153,7 +153,7 @@ export class AppService {
    * Show some app's info.
    */
   async info(): Promise<void> {
-    const openPrivacyPolicy = (): Promise<void> => Browser.open({ url: this.t._('IDEA_VARIABLES.PRIVACY_POLICY_URL') });
+    const openPrivacyPolicy = (): Promise<void> => this.openURL(this.t._('IDEA_VARIABLES.PRIVACY_POLICY_URL'));
 
     const header = this.t._('COMMON.APP_NAME');
     const message = this.t._('COMMON.VERSION', { v: env.idea.app.version });
@@ -196,5 +196,13 @@ export class AppService {
    */
   getIcon(): string {
     return APP_ICON_PATH;
+  }
+
+  /**
+   * Open the URL in the browser.
+   */
+  async openURL(url: string): Promise<void> {
+    const windowName = this.platform.is('ios') ? '_parent' : '_blank';
+    await Browser.open({ url, windowName });
   }
 }

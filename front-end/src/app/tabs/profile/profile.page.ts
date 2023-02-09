@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Browser } from '@capacitor/browser';
 
 import { AppService } from '@app/app.service';
 
@@ -13,6 +12,6 @@ export class ProfilePage {
 
   async openGalaxyAccount(): Promise<void> {
     const url = 'https://accounts.esn.org/user/'.concat(this.app.user.userId);
-    await Browser.open({ url });
+    await this.app.openURL(url);
   }
 }
