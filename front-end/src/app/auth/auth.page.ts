@@ -12,6 +12,8 @@ import { environment as env } from '@env';
   styleUrls: ['auth.page.scss']
 })
 export class AuthPage implements OnInit {
+  version = env.idea.app.version;
+
   constructor(private storage: IDEAStorageService, private route: ActivatedRoute, public app: AppService) {}
   async ngOnInit(): Promise<void> {
     const apiToken = this.route.snapshot.paramMap.get('token');
