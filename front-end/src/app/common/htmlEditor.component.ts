@@ -26,6 +26,7 @@ export class HTMLEditorComponent implements OnChanges {
     editable: true,
     spellcheck: false,
     sanitize: true,
+    rawPaste: true,
     minHeight: '300px',
     toolbarHiddenButtons: [
       [
