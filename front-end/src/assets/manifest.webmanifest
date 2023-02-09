@@ -1,0 +1,9 @@
+{
+  "background_color": "#222428",
+  "description": "ESN General Assembly Q&A",
+  "display": "fullscreen",
+  "icons": [{ "src": "icons/icon-store.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "maskable" }],
+  "name": "ESN General Assembly Q&A",
+  "short_name": "ESN GA Q&A",
+  "start_url": "../index.html"
+}
