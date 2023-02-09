@@ -1,12 +1,10 @@
-<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
-  <ion-toolbar color="ideaToolbar">
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
     <ion-buttons slot="start">
       <ion-img [src]="app.getIcon()"></ion-img>
     </ion-buttons>
     <ion-title>{{ 'TABS.ARCHIVE' | translate }}</ion-title>
   </ion-toolbar>
-</ion-header>
-<ion-content>
   <ion-toolbar class="filtersBar" color="ideaToolbar">
     <ion-buttons slot="end">
       <ion-item lines="none" color="ideaToolbar">
@@ -35,6 +33,8 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+</ion-header>
+<ion-content>
   <ion-list class="aList">
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="!topics">
       <ion-label>{{ 'ARCHIVE.CHOOSE_FILTERS_AND_SEARCH' | translate }}</ion-label>

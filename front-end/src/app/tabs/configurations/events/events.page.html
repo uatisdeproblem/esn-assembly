@@ -1,12 +1,10 @@
-<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
-  <ion-toolbar color="ideaToolbar">
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
     <ion-buttons slot="start">
       <ion-img [src]="app.getIcon()"></ion-img>
     </ion-buttons>
     <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
   </ion-toolbar>
-</ion-header>
-<ion-content>
   <ion-toolbar color="ideaToolbar">
     <ion-buttons slot="start">
       <ion-button (click)="app.closePage()">
@@ -18,6 +16,8 @@
       <ion-button fill="solid" color="ESNcyan" (click)="addEvent()">{{ 'COMMON.ADD' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
+</ion-header>
+<ion-content>
   <ion-list class="aList maxWidthContainer">
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="events && !events.length">
       <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>

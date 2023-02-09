@@ -1,12 +1,10 @@
-<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
-  <ion-toolbar color="ideaToolbar">
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
     <ion-buttons slot="start">
       <ion-img [src]="app.getIcon()"></ion-img>
     </ion-buttons>
     <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
   </ion-toolbar>
-</ion-header>
-<ion-content>
   <ion-toolbar class="filtersBar" color="ideaToolbar">
     <ion-searchbar
       #searchbar
@@ -57,6 +55,8 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+</ion-header>
+<ion-content>
   <ion-list class="aList">
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="topics && !topics.length">
       <ion-label>{{ 'TOPICS.NO_ACTIVE_TOPICS' | translate }}</ion-label>
