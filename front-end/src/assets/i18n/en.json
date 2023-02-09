@@ -161,8 +161,8 @@
     "DELETE_ANSWER": "Delete answer"
   },
   "ARCHIVE": {
-    "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters and search through the action bar above.",
-    "NO_ELEMENT_FOUND_WITH_FILTERS": "No topics found with the filters selected"
+    "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters in the action bar above to search through archived topics.",
+    "NO_ELEMENT_FOUND_WITH_FILTERS": "No archived topics found with the filters selected"
   },
   "CONFIGURATIONS": {
     "ENTITIES": "Entities",

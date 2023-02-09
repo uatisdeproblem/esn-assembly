@@ -37,10 +37,10 @@
 <ion-content>
   <ion-list class="aList">
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="!topics">
-      <ion-label>{{ 'ARCHIVE.CHOOSE_FILTERS_AND_SEARCH' | translate }}</ion-label>
+      <ion-label class="ion-text-wrap">{{ 'ARCHIVE.CHOOSE_FILTERS_AND_SEARCH' | translate }}</ion-label>
     </ion-item>
     <ion-item lines="full" class="ion-text-center noElements" *ngIf="topics && !topics.length">
-      <ion-label>{{ 'ARCHIVE.NO_ELEMENT_FOUND_WITH_FILTERS' | translate }}</ion-label>
+      <ion-label class="ion-text-wrap">{{ 'ARCHIVE.NO_ELEMENT_FOUND_WITH_FILTERS' | translate }}</ion-label>
     </ion-item>
     <ng-container *ngIf="app.isInMobileMode()">
       <app-topic *ngFor="let topic of topics" [topic]="topic" (select)="openTopic(topic)"></app-topic>
