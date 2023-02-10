@@ -60,7 +60,7 @@
     </ion-list-header>
     <ion-item>
       <ion-label>{{ 'TOPICS.SET_DEADLINE' | translate }}</ion-label>
-      <ion-checkbox [(ngModel)]="hasDeadline" (ionChange)="shouldResetDeadline()"></ion-checkbox>
+      <ion-checkbox [(ngModel)]="hasDeadline" [disabled]="!editMode" (ionChange)="shouldResetDeadline()"></ion-checkbox>
     </ion-item>
     <idea-date-time
       *ngIf="hasDeadline"
@@ -68,6 +68,7 @@
       [useISOFormat]="true"
       [timePicker]="true"
       [label]="'TOPICS.DEADLINE' | translate"
+      [disabled]="!editMode"
       [class.fieldHasError]="hasFieldAnError('willCloseAt')"
     ></idea-date-time>
     <ion-list-header>
