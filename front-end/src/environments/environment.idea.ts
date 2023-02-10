@@ -9,7 +9,8 @@ export const environment = {
       url: 'https://esn-ga.link',
       mediaUrl: 'https://media.esn-ga.link',
       title: 'ESN General Assembly Q&A',
-      maxFileUploadSizeMB: 20
+      maxFileUploadSizeMB: 20,
+      supportEmail: 'ga-secretary@esn.org'
     },
     api: {
       url: 'api.esn-ga.link',
