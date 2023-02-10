@@ -29,6 +29,10 @@
       <ion-icon name="person-outline" slot="start"></ion-icon>
       <ion-label>{{ 'PROFILE.MANAGE_ACCOUNT_ON_GALAXY' | translate }}</ion-label>
     </ion-item>
+    <ion-item button (click)="sendFeedback()">
+      <ion-icon name="help-buoy-outline" slot="start"></ion-icon>
+      <ion-label>{{ 'PROFILE.FEEDBACK_OR_HELP' | translate }}</ion-label>
+    </ion-item>
     <ion-item button (click)="app.logout()">
       <ion-icon name="log-out-outline" slot="start"></ion-icon>
       <ion-label>{{ 'COMMON.LOGOUT' | translate }}</ion-label>

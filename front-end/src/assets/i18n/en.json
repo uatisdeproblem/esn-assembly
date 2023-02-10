@@ -209,7 +209,9 @@
     "EMAIL_FOR_NOTIFICATIONS": "Email address for notifications"
   },
   "PROFILE": {
-    "MANAGE_ACCOUNT_ON_GALAXY": "Manage account on ESN Galaxy"
+    "MANAGE_ACCOUNT_ON_GALAXY": "Manage account on ESN Galaxy",
+    "FEEDBACK_OR_HELP": "Send feedback or ask for help",
+    "FEEDBACK_EMAIL_SUBJECT": "ESN GA Q&A - Feedback"
   },
   "USER_ROLES": {
     "INTERNATIONAL_BOARD": "International Board",
