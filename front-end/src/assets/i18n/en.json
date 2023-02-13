@@ -209,7 +209,7 @@
     "EMAIL_FOR_NOTIFICATIONS": "Email address for notifications"
   },
   "PROFILE": {
-    "MANAGE_ON_ESN_ACCOUNT": "Manage on ESN Accounts",
+    "MANAGE_ON_ESN_ACCOUNTS": "Manage on ESN Accounts",
     "FEEDBACK_OR_HELP": "Send feedback or ask for help",
     "FEEDBACK_EMAIL_SUBJECT": "ESN GA Q&A - Feedback"
   },
