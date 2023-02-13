@@ -17,7 +17,7 @@ export class AuthPage implements OnInit {
   constructor(private storage: IDEAStorageService, private route: ActivatedRoute, public app: AppService) {}
   async ngOnInit(): Promise<void> {
     const apiToken = this.route.snapshot.paramMap.get('token');
-    // complete the flow from ESN Galaxy
+    // complete the flow from ESN Accounts
     if (apiToken) {
       const user = parseJWT(apiToken);
       const tokenExpiresAt = user.exp * 1000;
@@ -30,7 +30,7 @@ export class AuthPage implements OnInit {
     }
   }
 
-  startLoginFlowWithESNGalaxy(): void {
+  startLoginFlowWithESNAccounts(): void {
     const apiLoginURL = `https://${env.idea.api.url}/${env.idea.api.stage}/login`;
     const localhost = location.hostname.startsWith('localhost') ? '?localhost=8100' : '';
     window.location.assign(`https://accounts.esn.org/cas/login?service=${apiLoginURL}${localhost}`);

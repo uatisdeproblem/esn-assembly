@@ -15,7 +15,7 @@ export class ProfilePage {
 
   constructor(private t: IDEATranslationsService, public app: AppService) {}
 
-  async openGalaxyAccount(): Promise<void> {
+  async openESNAccount(): Promise<void> {
     const url = 'https://accounts.esn.org/user/'.concat(this.app.user.userId);
     await this.app.openURL(url);
   }

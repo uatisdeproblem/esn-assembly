@@ -27,7 +27,7 @@ export class SubjectComponent {
 
   constructor(public app: AppService) {}
 
-  async openOnGalaxy(): Promise<void> {
+  async openOnESNAccounts(): Promise<void> {
     const url = this.subject.getURL();
     await this.app.openURL(url);
   }

@@ -63,7 +63,7 @@ export class Topic extends Resource {
    */
   attachments: Attachment[];
   /**
-   * To be able to ask questions, a user must have at least a role (Galaxy) included in this list.
+   * To be able to ask questions, a user must have at least a role (ESN Accounts) included in this list.
    * An empty string means that any user (regardless the role) can ask questions.
    */
   rolesAbleToAskQuestions: UserRoles[];

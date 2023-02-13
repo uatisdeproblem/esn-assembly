@@ -20,17 +20,17 @@ export enum UserRoles {
  * The list of roles that, if owned, would grant administative privileges in the platform.
  */
 export const ADMIN_ROLES = [
-  UserRoles.INTERNATIONAL_GA_CT,
+  UserRoles.INTERNATIONAL_GA_CT
   //UserRoles.INTERNATIONAL_BOARD,
   //UserRoles.INTERNATIONAL_SECRETARIAT
 ];
 
 /**
- * The map between the platform's roles with the (known) interesting roles on Galaxy.
+ * The map between the platform's roles with the (known) interesting roles on ESN Accounts.
  * Roles that ends with "*" are intended to be: "any role with that prefix".
  * Note: all roles are lower-cased (since they will be handled with a case-insensitive logic).
  */
-export const GALAXY_ROLES_MAP: { [userRole: string]: string[] } = {
+export const ESN_ACCOUNTS_ROLES_MAP: { [userRole: string]: string[] } = {
   INTERNATIONAL_BOARD: ['international.regularBoardMember'], // @todo
   INTERNATIONAL_SECRETARIAT: ['international.secretariat'], // @todo
   INTERNATIONAL_LEVEL: ['international.*'],
@@ -45,7 +45,7 @@ export const GALAXY_ROLES_MAP: { [userRole: string]: string[] } = {
 
 export class User extends Resource {
   /**
-   * Username in Galaxy.
+   * Username in ESN Accounts.
    */
   userId: string;
   /**
@@ -61,11 +61,11 @@ export class User extends Resource {
    */
   lastName: string;
   /**
-   * Section code in Galaxy.
+   * Section code in ESN Accounts.
    */
   roles: string[];
   /**
-   * Section code in Galaxy.
+   * Section code in ESN Accounts.
    */
   sectionCode: string;
   /**
@@ -74,7 +74,7 @@ export class User extends Resource {
   section: string;
   /**
    * ESN Country.
-   * @todo there's a known error from Galaxy: here is returned the Section and not the Country.
+   * @todo there's a known error from ESN Accounts: here is returned the Section and not the Country.
    */
   country: string;
   /**
@@ -86,13 +86,13 @@ export class User extends Resource {
    * Whether the user has one of the allowed roles.
    */
   static isAllowedBasedOnRoles = (user: User, allowedRoles: UserRoles[]): boolean => {
-    const allowedGalaxyRoles: string[] = [];
-    for (const role of allowedRoles) allowedGalaxyRoles.push(...GALAXY_ROLES_MAP[role]);
+    const allowedESNAccountsRoles: string[] = [];
+    for (const role of allowedRoles) allowedESNAccountsRoles.push(...ESN_ACCOUNTS_ROLES_MAP[role]);
 
     return user.roles
       .map(userRole => userRole.toLowerCase())
       .some(userRole =>
-        allowedGalaxyRoles.some(allowedRole =>
+        allowedESNAccountsRoles.some(allowedRole =>
           allowedRole.endsWith('*')
             ? userRole.startsWith(allowedRole.slice(0, allowedRole.length - 1))
             : allowedRole === userRole
@@ -122,7 +122,7 @@ export class User extends Resource {
 
   /**
    * Get a string representing the ESN Section and Country of the subject.
-   * @todo to solve a known error from Galaxy: the Country isn't returned correctly.
+   * @todo to solve a known error from ESN Accounts: the Country isn't returned correctly.
    */
   getSectionCountry(): string {
     if (this.country === this.section) return this.section;

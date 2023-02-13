@@ -20,7 +20,7 @@ let JWT_SECRET: string;
 export const handler = async (event: APIGatewayProxyEventV2WithRequestContext<AuthResult>): Promise<AuthResult> => {
   const authorization = event?.headers?.authorization;
   const result: AuthResult = { isAuthorized: false };
-  const user = await verifyTokenAndGetGalaxyUser(authorization);
+  const user = await verifyTokenAndGetESNAccountsUser(authorization);
 
   if (user) {
     result.context = { principalId: user.userId, user };
@@ -38,7 +38,7 @@ const getJwtSecretFromSecretsManager = async (): Promise<string> => {
   if (!JWT_SECRET) JWT_SECRET = await secretsManager.getStringById(SECRETS_PATH);
   return JWT_SECRET;
 };
-const verifyTokenAndGetGalaxyUser = async (token: string): Promise<User> => {
+const verifyTokenAndGetESNAccountsUser = async (token: string): Promise<User> => {
   const secret = await getJwtSecretFromSecretsManager();
   try {
     const result = verify(token, secret) as JwtPayload;

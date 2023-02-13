@@ -7,7 +7,9 @@
         <ion-card-title>{{ 'COMMON.APP_NAME_SHORT' | translate }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-button (click)="startLoginFlowWithESNGalaxy()">{{ 'AUTH.LOGIN_WITH_ESN_GALAXY' | translate }}</ion-button>
+        <ion-button (click)="startLoginFlowWithESNAccounts()">
+          {{ 'AUTH.LOGIN_WITH_ESN_ACCOUNTS' | translate }}
+        </ion-button>
         <p class="version">v{{ version }}</p>
       </ion-card-content>
     </ion-card>

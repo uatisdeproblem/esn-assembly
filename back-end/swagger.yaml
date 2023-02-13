@@ -37,13 +37,13 @@ tags:
 paths:
   /login:
     get:
-      summary: Manage the login accepted request from Galaxy and prepare a token to authenticate the user
+      summary: Manage the login accepted request from ESN Accounts and prepare a token to authenticate the user
       description: Acquire the CAS ticket, validate it, create the user (if necessary) and return a token.
       tags: [Login]
       parameters:
         - name: ticket
           in: query
-          description: The CAS ticket of successful login with Galaxy
+          description: The CAS ticket of successful login with ESN Accounts
           required: true
           schema:
             type: string

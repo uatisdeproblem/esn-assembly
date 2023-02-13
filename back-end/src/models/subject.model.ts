@@ -7,7 +7,7 @@ import { User } from './user.model';
  */
 export class Subject extends Resource {
   /**
-   * The ESN Galaxy ID of the subject.
+   * The ESN Accounts ID of the subject.
    */
   id: string;
   /**
@@ -85,11 +85,11 @@ export class Subject extends Resource {
   }
 
   /**
-   * Get the subject's URL in ESN Galaxy.
+   * Get the subject's URL in ESN Accounts.
    */
   getURL(): string {
     const BASE_URL = 'https://accounts.esn.org/';
-    // we need to strip the dots to build a valid ID to parse the page on Galaxy
+    // we need to strip the dots to build a valid ID to parse the page on ESN Accounts
     const cleanedId = this.id.replace(/\./gm, '');
     switch (this.type) {
       case SubjectTypes.USER:
@@ -103,7 +103,7 @@ export class Subject extends Resource {
 
   /**
    * Get a string representing the ESN Section and Country of the subject.
-   * @todo to solve a known error from Galaxy: the Country isn't returned correctly.
+   * @todo to solve a known error from ESN Accounts: the Country isn't returned correctly.
    */
   getSectionCountry(): string {
     if (this.country === this.section) return this.section;

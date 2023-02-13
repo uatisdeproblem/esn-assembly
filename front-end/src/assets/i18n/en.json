@@ -83,7 +83,7 @@
     "EN": "English"
   },
   "AUTH": {
-    "LOGIN_WITH_ESN_GALAXY": "Login with ESN Galaxy"
+    "LOGIN_WITH_ESN_ACCOUNTS": "Login with ESN Accounts"
   },
   "TABS": {
     "TOPICS": "Topics",
@@ -131,7 +131,7 @@
     "NO_CONTENT": "No content",
     "MAKE_A_QUESTION": "Ask a question",
     "ARCHIVED": "Archived",
-    "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "Galaxy roles allowed to ask questions",
+    "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "ESN Accounts roles allowed to ask questions",
     "NO_ROLES_RESTRICTIONS": "Any user can ask question",
     "DEADLINE": "Deadline",
     "SET_DEADLINE": "Set deadline",
@@ -195,7 +195,7 @@
     "NO_ATTACHMENTS": "No attachments"
   },
   "SUBJECTS": {
-    "ID": "ESN Galaxy ID/username",
+    "ID": "ESN Accounts ID/username",
     "TYPE": "Type",
     "TYPES": {
       "USER": "User",
@@ -209,7 +209,7 @@
     "EMAIL_FOR_NOTIFICATIONS": "Email address for notifications"
   },
   "PROFILE": {
-    "MANAGE_ACCOUNT_ON_GALAXY": "Manage account on ESN Galaxy",
+    "MANAGE_ON_ESN_ACCOUNT": "Manage on ESN Accounts",
     "FEEDBACK_OR_HELP": "Send feedback or ask for help",
     "FEEDBACK_EMAIL_SUBJECT": "ESN GA Q&A - Feedback"
   },
