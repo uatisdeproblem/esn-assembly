@@ -1,6 +1,7 @@
 import { Resource } from 'idea-toolbox';
 
 import { User } from './user.model';
+import { cleanESNAccountsIdForURL } from './utils';
 
 /**
  * The subject of a topic.
@@ -89,8 +90,7 @@ export class Subject extends Resource {
    */
   getURL(): string {
     const BASE_URL = 'https://accounts.esn.org/';
-    // we need to strip the dots to build a valid ID to parse the page on ESN Accounts
-    const cleanedId = this.id.replace(/[._]/gm, '');
+    const cleanedId = cleanESNAccountsIdForURL(this.id);
     switch (this.type) {
       case SubjectTypes.USER:
         return BASE_URL.concat('user/', cleanedId);

@@ -4,6 +4,7 @@ import { IDEATranslationsService } from '@idea-ionic/common';
 import { AppService } from '@app/app.service';
 
 import { environment as env } from '@env';
+import { cleanESNAccountsIdForURL } from '@models/utils';
 
 @Component({
   selector: 'profile',
@@ -16,7 +17,7 @@ export class ProfilePage {
   constructor(private t: IDEATranslationsService, public app: AppService) {}
 
   async openESNAccount(): Promise<void> {
-    const url = 'https://accounts.esn.org/user/'.concat(this.app.user.userId);
+    const url = 'https://accounts.esn.org/user/'.concat(cleanESNAccountsIdForURL(this.app.user.userId));
     await this.app.openURL(url);
   }
 
