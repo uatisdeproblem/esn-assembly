@@ -16,7 +16,7 @@ import { User } from '../models/user.model';
 const CAS_URL = 'https://accounts.esn.org/cas';
 const JWT_EXPIRE_TIME = '1 day';
 
-const APP_URL = process.env.STAGE === 'prod' ? 'https://esn-ga.link' : 'https://dev.esn-ga.link';
+const APP_URL = process.env.STAGE === 'prod' ? 'https://qa.esn.org' : 'https://dev.esn-ga.link';
 
 const SECRETS_PATH = 'esn-ga/auth';
 const secretsManager = new SecretsManager();

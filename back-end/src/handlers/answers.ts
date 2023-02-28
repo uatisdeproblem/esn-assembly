@@ -23,7 +23,8 @@ const DDB_TABLES = {
 };
 const ddb = new DynamoDB();
 
-const QUESTION_BASE_URL = `https://${process.env.STAGE === 'prod' ? '' : 'dev.'}esn-ga.link/t/topics/`;
+const DOMAIN_URL = process.env.STAGE === 'prod' ? 'qa.esn.org' : 'dev.esn-ga.link';
+const QUESTION_BASE_URL = `https://${DOMAIN_URL}/t/topics/`;
 const SES_CONFIG = {
   sourceName: 'ESN General Assembly Q&A',
   source: process.env.SES_SOURCE_ADDRESS,

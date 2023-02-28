@@ -6,7 +6,7 @@ export const environment = {
     project: 'esn-ga',
     app: {
       version: '1.0.1',
-      url: 'https://esn-ga.link',
+      url: 'https://qa.esn.org',
       mediaUrl: 'https://media.esn-ga.link',
       title: 'ESN General Assembly Q&A',
       maxFileUploadSizeMB: 20,
