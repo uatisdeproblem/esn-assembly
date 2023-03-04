@@ -192,7 +192,7 @@
     "HIDE_ERROR": "Hide the error",
     "REMOVE_ATTACHMENT": "Remove the attachment",
     "TAP_TO_ADD_ATTACHMENT": "Tap to attach a document...",
-    "TAP_TO_ADD_ATTACHMENT_I": "The preferred format is images or PDF documents. Max size of 10MB per attachment.",
+    "TAP_TO_ADD_ATTACHMENT_I": "The preferred format is images or PDF documents. Max size of 50MB per attachment.",
     "UPLOADING": "Uploading...",
     "FILE_IS_TOO_BIG": "The file is too big",
     "NO_ATTACHMENTS": "No attachments"
