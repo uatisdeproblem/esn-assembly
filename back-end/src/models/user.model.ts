@@ -34,7 +34,7 @@ export const ESN_ACCOUNTS_ROLES_MAP: { [userRole: string]: string[] } = {
   INTERNATIONAL_BOARD: ['international.regularBoardMember'], // @todo
   INTERNATIONAL_SECRETARIAT: ['international.secretariat'], // @todo
   INTERNATIONAL_LEVEL: ['international.*'],
-  INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradministrator'],
+  INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradmin'],
   INTERNATIONAL_AB: ['international.ab*'], // @todo
   INTERNATIONAL_AC: ['international.ac*'], // @todo
   NATIONAL_BOARD: ['national.regularBoardMember'],
