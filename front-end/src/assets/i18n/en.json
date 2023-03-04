@@ -140,7 +140,10 @@
     "RELATED_TOPICS": "Related topics",
     "NO_RELATED_TOPICS": "No related topics",
     "RELATED_TO": "Related to",
-    "CANT_DELETE_IF_LINKED_ERROR": "Unlink all related topics first"
+    "CANT_DELETE_IF_LINKED_ERROR": "Unlink all related topics first",
+    "IS_DRAFT": "It's a draft",
+    "IS_DRAFT_I": "It won't be visible to non-administrators",
+    "DRAFT": "Draft"
   },
   "QUESTIONS": {
     "BY": "By",

@@ -59,8 +59,13 @@
       </ion-label>
     </ion-list-header>
     <ion-item>
+      <ion-checkbox
+        slot="start"
+        [(ngModel)]="hasDeadline"
+        [disabled]="!editMode"
+        (ionChange)="shouldResetDeadline()"
+      ></ion-checkbox>
       <ion-label>{{ 'TOPICS.SET_DEADLINE' | translate }}</ion-label>
-      <ion-checkbox [(ngModel)]="hasDeadline" [disabled]="!editMode" (ionChange)="shouldResetDeadline()"></ion-checkbox>
     </ion-item>
     <idea-date-time
       *ngIf="hasDeadline"
@@ -170,6 +175,13 @@
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.OTHER_OPTIONS' | translate }}</h2></ion-label>
     </ion-list-header>
+    <ion-item>
+      <ion-checkbox slot="start" [(ngModel)]="topic.isDraft" [disabled]="!editMode"></ion-checkbox>
+      <ion-label class="ion-text-wrap">
+        {{ 'TOPICS.IS_DRAFT' | translate }}
+        <p>{{ 'TOPICS.IS_DRAFT_I' | translate }}</p>
+      </ion-label>
+    </ion-item>
     <idea-checker
       [data]="relatedTopicsChecks"
       [label]="'TOPICS.RELATED_TOPICS' | translate"

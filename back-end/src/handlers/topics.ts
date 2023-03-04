@@ -56,6 +56,8 @@ class Topics extends ResourceController {
     let topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics });
     topics = topics.map(x => new Topic(x));
 
+    if (!this.galaxyUser.isAdministrator()) topics = topics.filter(x => !x.isDraft);
+
     if (this.queryParams.archived !== undefined) {
       const archived = this.queryParams.archived !== 'false';
       topics = topics.filter(x => (archived ? x.archivedAt : !x.archivedAt));

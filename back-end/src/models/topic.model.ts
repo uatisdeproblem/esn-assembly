@@ -47,6 +47,10 @@ export class Topic extends Resource {
    */
   updatedAt?: epochISOString;
   /**
+   * Whether the topic is only drafted, and therefore should not be seen by non-administrators.
+   */
+  isDraft: boolean;
+  /**
    * The timestamp when the topic will close. Note: it's a sparse index for queries.
    */
   willCloseAt?: epochISOString;
@@ -79,6 +83,7 @@ export class Topic extends Resource {
     this.numOfQuestions = this.clean(x.numOfQuestions, Number, 0);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
+    this.isDraft = this.clean(x.isDraft, Boolean, true);
     if (x.willCloseAt) this.willCloseAt = this.clean(x.willCloseAt, d => new Date(d).toISOString());
     else delete this.willCloseAt;
     if (x.closedAt) this.closedAt = this.clean(x.closedAt, d => new Date(d).toISOString());

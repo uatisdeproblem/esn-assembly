@@ -26,12 +26,11 @@
             <ion-card-title>{{ topic.name }}</ion-card-title>
             <p>
               <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
-              <ion-badge slot="end" [color]="topic.closedAt ? 'danger' : 'success'">
+              <ion-badge *ngIf="topic.isDraft" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
+              <ion-badge *ngIf="!topic.isDraft" [color]="topic.closedAt ? 'danger' : 'success'">
                 {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
               </ion-badge>
-              <ion-badge slot="end" color="warning" *ngIf="topic.archivedAt">
-                {{ 'TOPICS.ARCHIVED' | translate }}
-              </ion-badge>
+              <ion-badge color="warning" *ngIf="topic.archivedAt">{{ 'TOPICS.ARCHIVED' | translate }}</ion-badge>
             </p>
           </ion-card-header>
           <ion-card-content>

@@ -17,9 +17,12 @@
         (ionError)="app.fallbackAvatar($event?.target, subject.type !== SubjectTypes.USER)"
       ></ion-img>
     </ion-avatar>
-    <ion-badge slot="end" *ngIf="!topic.archivedAt" [color]="topic.closedAt ? 'danger' : 'success'">
-      {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
-    </ion-badge>
+    <ng-container *ngIf="!topic.archivedAt">
+      <ion-badge slot="end" *ngIf="topic.isDraft" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
+      <ion-badge slot="end" *ngIf="!topic.isDraft" [color]="topic.closedAt ? 'danger' : 'success'">
+        {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+      </ion-badge>
+    </ng-container>
   </ion-item>
   <!-- skeleton -->
   <ion-item *ngIf="!topic">
@@ -59,9 +62,12 @@
     </ion-col>
     <ion-col [sizeLg]="1">{{ topic.numOfQuestions }}</ion-col>
     <ion-col [sizeLg]="1">
-      <ion-badge fill="outline" *ngIf="!topic.archivedAt" [color]="topic.closedAt ? 'danger' : 'success'">
-        {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
-      </ion-badge>
+      <ng-container *ngIf="!topic.archivedAt">
+        <ion-badge *ngIf="topic.isDraft" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
+        <ion-badge *ngIf="!topic.isDraft" [color]="topic.closedAt ? 'danger' : 'success'">
+          {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+        </ion-badge>
+      </ng-container>
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="1">
       {{ topic.updatedAt ?? topic.createdAt | dateLocale : 'mediumDate' }}
