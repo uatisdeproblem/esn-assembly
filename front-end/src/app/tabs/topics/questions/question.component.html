@@ -30,7 +30,7 @@
         [creator]="answer.creator"
         [isSender]="true"
       ></app-message-bubble>
-      <p class="ion-text-right" *ngIf="!topic.isClosed() && getLastAnswer()?.canUserEdit(app.user)">
+      <p class="ion-text-right" *ngIf="!topic.archivedAt && getLastAnswer()?.canUserEdit(app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteLastAnswer()">
           {{ 'QUESTIONS.DELETE_ANSWER' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
         </ion-button>
