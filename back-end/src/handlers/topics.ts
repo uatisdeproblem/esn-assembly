@@ -138,6 +138,7 @@ class Topics extends ResourceController {
   }
 
   protected async getResource(): Promise<Topic> {
+    if (this.topic.isDraft && !this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
     return this.topic;
   }
 
