@@ -19,11 +19,16 @@ export enum UserRoles {
 /**
  * The list of roles that, if owned, would grant administative privileges in the platform.
  */
-export const ADMIN_ROLES = [
-  UserRoles.INTERNATIONAL_GA_CT
+export const ADMIN_ROLES: UserRoles[] = [
+  //UserRoles.INTERNATIONAL_GA_CT
   //UserRoles.INTERNATIONAL_BOARD,
   //UserRoles.INTERNATIONAL_SECRETARIAT
 ];
+/**
+ * @todo since roles on Galaxy are not updated nor reflecting the current ESN structure,
+ * we temporarily opted for a username-based approach, to avoid granting unwanted permissions.
+ */
+export const ADMIN_USERNAMES = ['mc', 'kajakaczkiello', 'gtelesca'];
 
 /**
  * The map between the platform's roles with the (known) interesting roles on ESN Accounts.
@@ -117,7 +122,7 @@ export class User extends Resource {
    * Whether the user has administrative privileges in the platform.
    */
   isAdministrator(): boolean {
-    return User.isAllowedBasedOnRoles(this, ADMIN_ROLES);
+    return User.isAllowedBasedOnRoles(this, ADMIN_ROLES) || ADMIN_USERNAMES.includes(this.userId);
   }
 
   /**
