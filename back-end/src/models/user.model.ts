@@ -36,12 +36,12 @@ export const ADMIN_USERNAMES = ['mc', 'kajakaczkiello', 'gtelesca'];
  * Note: all roles are lower-cased (since they will be handled with a case-insensitive logic).
  */
 export const ESN_ACCOUNTS_ROLES_MAP: { [userRole: string]: string[] } = {
-  INTERNATIONAL_BOARD: ['international.regularBoardMember'], // @todo
+  INTERNATIONAL_BOARD: ['international.regularBoardMember', 'international.vicepresident'], // @todo
   INTERNATIONAL_SECRETARIAT: ['international.secretariat'], // @todo
   INTERNATIONAL_LEVEL: ['international.*'],
   INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradmin'],
-  INTERNATIONAL_AB: ['international.ab*'], // @todo
-  INTERNATIONAL_AC: ['international.ac*'], // @todo
+  INTERNATIONAL_AB: ['international.ab.*', 'international.ab.secretary'], // @todo
+  INTERNATIONAL_AC: ['international.ac.*'], // @todo
   NATIONAL_BOARD: ['national.regularBoardMember'],
   NATIONAL_LEVEL: ['national.*'],
   LOCAL_BOARD: ['local.regularboardmember'],
