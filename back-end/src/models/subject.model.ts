@@ -8,7 +8,7 @@ import { cleanESNAccountsIdForURL } from './utils';
  */
 export class Subject extends Resource {
   /**
-   * The ESN Accounts ID of the subject.
+   * The ESN Accounts ID of the subject (lowercase).
    */
   id: string;
   /**
@@ -53,7 +53,7 @@ export class Subject extends Resource {
 
   load(x: any): void {
     super.load(x);
-    this.id = this.clean(x.id, String);
+    this.id = this.clean(x.id, String)?.toLowerCase();
     this.type = this.clean(x.type, String);
     this.name = this.clean(x.name, String);
     if (this.type === SubjectTypes.USER) {

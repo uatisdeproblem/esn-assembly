@@ -50,7 +50,7 @@ export const ESN_ACCOUNTS_ROLES_MAP: { [userRole: string]: string[] } = {
 
 export class User extends Resource {
   /**
-   * Username in ESN Accounts.
+   * Username in ESN Accounts (lowercase).
    */
   userId: string;
   /**
@@ -107,7 +107,7 @@ export class User extends Resource {
 
   load(x: any): void {
     super.load(x);
-    this.userId = this.clean(x.userId, String);
+    this.userId = this.clean(x.userId, String)?.toLowerCase();
     this.email = this.clean(x.email, String);
     this.firstName = this.clean(x.firstName, String);
     this.lastName = this.clean(x.lastName, String);
