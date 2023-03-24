@@ -4,7 +4,7 @@
 
 import { DynamoDB, GenericController, RCError } from 'idea-aws';
 
-import { FAVORITE_TIMEZONE, getDateStringInFavoriteTimezone } from '../models/favoriteTimezone.const';
+import { dateStringIsPast, FAVORITE_TIMEZONE } from '../models/favoriteTimezone.const';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -27,10 +27,8 @@ class ScheduledOps extends GenericController {
     }
   }
   private async closeTopicsWithPastDeadline(): Promise<void> {
-    const now = getDateStringInFavoriteTimezone(new Date(), FAVORITE_TIMEZONE);
-
     const topics = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-willCloseAt-index' });
-    const topicsToClose = topics.filter(t => getDateStringInFavoriteTimezone(t.willCloseAt, FAVORITE_TIMEZONE) <= now);
+    const topicsToClose = topics.filter(t => dateStringIsPast(t.willCloseAt, FAVORITE_TIMEZONE));
 
     for (const topic of topicsToClose) {
       try {

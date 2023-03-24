@@ -9,7 +9,7 @@
 </ion-header>
 <ion-content [class.viewMode]="!editMode">
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
-    <p class="ion-text-right" *ngIf="!editMode && !topic.archivedAt">
+    <p class="ion-text-right" *ngIf="!editMode && !topic.isArchived()">
       <ion-button [color]="topic.closedAt ? 'success': 'danger'" (click)="manageTopicStatus(!!topic.closedAt)">
         {{ (topic.closedAt ? 'COMMON.OPEN' : 'COMMON.CLOSE') | translate }}
       </ion-button>
@@ -54,27 +54,47 @@
 
     <ion-list-header>
       <ion-label>
-        <h2>{{ 'TOPICS.DEADLINE' | translate }}</h2>
-        <p>{{ 'TOPICS.DEADLINE_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+        <h2>{{ 'TOPICS.DEADLINES' | translate }}</h2>
+        <p>{{ 'TOPICS.DEADLINES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
       </ion-label>
     </ion-list-header>
     <ion-item>
       <ion-checkbox
         slot="start"
-        [(ngModel)]="hasDeadline"
+        [(ngModel)]="hasDeadlineForQuestions"
         [disabled]="!editMode"
-        (ionChange)="shouldResetDeadline()"
+        (ionChange)="shouldResetDeadlineForQuestions()"
       ></ion-checkbox>
-      <ion-label>{{ 'TOPICS.SET_DEADLINE' | translate }}</ion-label>
+      <ion-label>{{ 'TOPICS.SET_DEADLINE_QUESTIONS' | translate }}</ion-label>
     </ion-item>
     <idea-date-time
-      *ngIf="hasDeadline"
+      *ngIf="hasDeadlineForQuestions"
       [(date)]="topic.willCloseAt"
       [useISOFormat]="true"
-      [timePicker]="true"
-      [label]="'TOPICS.DEADLINE' | translate"
+      [manualTimePicker]="true"
+      [label]="'TOPICS.DEADLINE_QUESTIONS' | translate"
       [disabled]="!editMode"
+      [hideClearButton]="true"
       [class.fieldHasError]="hasFieldAnError('willCloseAt')"
+    ></idea-date-time>
+    <ion-item>
+      <ion-checkbox
+        slot="start"
+        [(ngModel)]="hasDeadlineForAnswers"
+        [disabled]="!editMode"
+        (ionChange)="shouldResetDeadlineForAnswers()"
+      ></ion-checkbox>
+      <ion-label>{{ 'TOPICS.SET_DEADLINE_ANSWERS' | translate }}</ion-label>
+    </ion-item>
+    <idea-date-time
+      *ngIf="hasDeadlineForAnswers"
+      [(date)]="topic.acceptAnswersUntil"
+      [useISOFormat]="true"
+      [manualTimePicker]="true"
+      [label]="'TOPICS.DEADLINE_ANSWERS' | translate"
+      [disabled]="!editMode"
+      [hideClearButton]="true"
+      [class.fieldHasError]="hasFieldAnError('acceptAnswersUntil')"
     ></idea-date-time>
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.CONTENT' | translate }}</h2></ion-label>
@@ -199,8 +219,8 @@
 
     <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
       <ion-col>
-        <ion-button color="warning" (click)="archiveTopic(!topic.archivedAt)">
-          {{ (topic.archivedAt ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
+        <ion-button color="warning" (click)="archiveTopic(!topic.isArchived())">
+          {{ (topic.isArchived() ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
         </ion-button>
       </ion-col>
       <ion-col class="ion-text-right">

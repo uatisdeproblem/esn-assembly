@@ -16,3 +16,13 @@ export const getDateStringInFavoriteTimezone = (date: Date | epochISODateString,
   });
   return formatter.format(new Date(date));
 };
+
+export const dateStringIsFuture = (dateString: epochISODateString, timezone: string): boolean => {
+  const now = getDateStringInFavoriteTimezone(new Date(), timezone);
+  return !dateString || now < getDateStringInFavoriteTimezone(dateString, timezone);
+};
+
+export const dateStringIsPast = (dateString: epochISODateString, timezone: string): boolean => {
+  const now = getDateStringInFavoriteTimezone(new Date(), timezone);
+  return !dateString || now > getDateStringInFavoriteTimezone(dateString, timezone);
+};

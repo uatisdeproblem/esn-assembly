@@ -2,7 +2,7 @@ import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 
 import { TopicCategoryAttached } from './category.model';
 import { TopicEventAttached } from './event.model';
-import { FAVORITE_TIMEZONE, getDateStringInFavoriteTimezone } from './favoriteTimezone.const';
+import { FAVORITE_TIMEZONE, dateStringIsFuture, dateStringIsPast } from './favoriteTimezone.const';
 import { Subject } from './subject.model';
 import { User, UserRoles } from './user.model';
 
@@ -55,11 +55,16 @@ export class Topic extends Resource {
    */
   willCloseAt?: epochISOString;
   /**
-   * The timestamp when the topic was closed.
+   * The timestamp when the topic was closed. A topic which is closed cannot accept new questions.
    */
   closedAt?: epochISOString;
   /**
-   * The timestamp when the topic was archived.
+   * The timestamp until answers can still be posted (if allowed).
+   * If not set, answers can be created until the topic is archived.
+   */
+  acceptAnswersUntil?: epochISOString;
+  /**
+   * The timestamp when the topic was archived. A topic archived is also closed.
    */
   archivedAt?: epochISOString;
   /**
@@ -86,6 +91,9 @@ export class Topic extends Resource {
     this.isDraft = this.clean(x.isDraft, Boolean, true);
     if (x.willCloseAt) this.willCloseAt = this.clean(x.willCloseAt, d => new Date(d).toISOString());
     else delete this.willCloseAt;
+    if (x.acceptAnswersUntil)
+      this.acceptAnswersUntil = this.clean(x.acceptAnswersUntil, d => new Date(d).toISOString());
+    else delete this.acceptAnswersUntil;
     if (x.closedAt) this.closedAt = this.clean(x.closedAt, d => new Date(d).toISOString());
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.attachments = this.cleanArray(x.attachments, a => new Attachment(a));
@@ -109,6 +117,13 @@ export class Topic extends Resource {
     if (this.iE(this.category?.categoryId)) e.push('category');
     if (this.willCloseAt && (this.iE(this.willCloseAt, 'date') || this.willCloseAt < new Date().toISOString()))
       e.push('willCloseAt');
+    if (
+      this.acceptAnswersUntil &&
+      (this.iE(this.acceptAnswersUntil, 'date') ||
+        (this.willCloseAt && this.acceptAnswersUntil < this.willCloseAt) ||
+        this.acceptAnswersUntil < new Date().toISOString())
+    )
+      e.push('acceptAnswersUntil');
     if (this.iE(this.subjects)) e.push('subjects');
     this.subjects.forEach((s, index): void => s.validate().forEach(ea => e.push(`subjects[${index}].${ea}`)));
     return e;
@@ -118,6 +133,7 @@ export class Topic extends Resource {
    * Whether the user is allowed to ask questions on the topic.
    */
   canUserAskQuestions(user: User): boolean {
+    if (this.isClosed()) return false;
     if (!this.rolesAbleToAskQuestions.length) return true;
     return User.isAllowedBasedOnRoles(user, this.rolesAbleToAskQuestions);
   }
@@ -125,18 +141,24 @@ export class Topic extends Resource {
    * Whether the user is allowed to answer questions on the topic.
    */
   canUserAnswerQuestions(user: User, excludeAdmin = false): boolean {
-    return (user.isAdministrator() && !excludeAdmin) || this.subjects.some(s => s.id === user.userId);
+    const timeCheck = !this.acceptAnswersUntil || dateStringIsFuture(this.acceptAnswersUntil, FAVORITE_TIMEZONE);
+    const adminCheck = user.isAdministrator() && !excludeAdmin;
+    const subjectCheck = this.subjects.some(s => s.id === user.userId);
+    return !this.isArchived() && timeCheck && (adminCheck || subjectCheck);
   }
 
   /**
-   * Whether the topic is closed.
+   * Whether the topic is closed (extra check since this operation could be automated).
    */
   isClosed(): boolean {
-    const now = getDateStringInFavoriteTimezone(new Date(), FAVORITE_TIMEZONE);
-    return (
-      !!this.closedAt ||
-      (this.willCloseAt && getDateStringInFavoriteTimezone(this.willCloseAt, FAVORITE_TIMEZONE) < now)
-    );
+    if (this.isArchived()) return true;
+    return !!this.closedAt || (this.willCloseAt && dateStringIsPast(this.willCloseAt, FAVORITE_TIMEZONE));
+  }
+  /**
+   * Whether the topic is archived.
+   */
+  isArchived(): boolean {
+    return !!this.archivedAt;
   }
 }
 

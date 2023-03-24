@@ -60,7 +60,7 @@ class Topics extends ResourceController {
 
     if (this.queryParams.archived !== undefined) {
       const archived = this.queryParams.archived !== 'false';
-      topics = topics.filter(x => (archived ? x.archivedAt : !x.archivedAt));
+      topics = topics.filter(x => (archived ? x.isArchived() : !x.isArchived()));
     }
     if (this.queryParams.categoryId) topics = topics.filter(x => x.category.categoryId === this.queryParams.categoryId);
     if (this.queryParams.eventId) topics = topics.filter(x => x.event.eventId === this.queryParams.eventId);

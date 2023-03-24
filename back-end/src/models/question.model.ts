@@ -1,6 +1,7 @@
 import { epochISOString, Resource } from 'idea-toolbox';
 
 import { Subject } from './subject.model';
+import { Topic } from './topic.model';
 import { User } from './user.model';
 
 /**
@@ -80,7 +81,8 @@ export class Question extends Resource {
   /**
    * Whether the user is allowed to edit the question.
    */
-  canUserEdit(user: User, excludeAdmin = false): boolean {
+  canUserEdit(topic: Topic, user: User, excludeAdmin = false): boolean {
+    if (topic.isClosed()) return false;
     return (user.isAdministrator() && !excludeAdmin) || user.userId === this.creator.id;
   }
 }

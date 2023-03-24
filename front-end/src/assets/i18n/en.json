@@ -133,9 +133,12 @@
     "ARCHIVED": "Archived",
     "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "ESN Accounts roles allowed to ask questions",
     "NO_ROLES_RESTRICTIONS": "Any user can ask question",
-    "DEADLINE": "Deadline",
-    "SET_DEADLINE": "Set deadline",
-    "DEADLINE_IN_FAVORITE_TIMEZONE": "The deadline must be in the timezone {{timezone}}",
+    "DEADLINES": "Deadlines",
+    "DEADLINES_IN_FAVORITE_TIMEZONE": "The deadlines must be in the timezone {{timezone}}",
+    "DEADLINE_QUESTIONS": "Deadline for questions",
+    "SET_DEADLINE_QUESTIONS": "Set deadline for questions",
+    "DEADLINE_ANSWERS": "Deadline for answers",
+    "SET_DEADLINE_ANSWERS": "Set deadline for answers",
     "OTHER_OPTIONS": "Other options",
     "RELATED_TOPICS": "Related topics",
     "NO_RELATED_TOPICS": "No related topics",
@@ -143,7 +146,10 @@
     "CANT_DELETE_IF_LINKED_ERROR": "Unlink all related topics first",
     "IS_DRAFT": "It's a draft",
     "IS_DRAFT_I": "It won't be visible to non-administrators",
-    "DRAFT": "Draft"
+    "DRAFT": "Draft",
+    "ANSWERS": "Answers",
+    "QUESTIONS_UNTIL": "Questions until",
+    "ANSWERS_UNTIL": "Answers until"
   },
   "QUESTIONS": {
     "BY": "By",

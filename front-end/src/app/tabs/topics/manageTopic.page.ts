@@ -33,7 +33,8 @@ export class ManageTopicPage implements OnInit {
   categories: TopicCategory[];
   events: TopicEvent[];
 
-  hasDeadline = false;
+  hasDeadlineForQuestions = false;
+  hasDeadlineForAnswers = false;
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   SubjectTypes = SubjectTypes;
@@ -74,7 +75,8 @@ export class ManageTopicPage implements OnInit {
       await this.loading.show();
       if (topicId !== 'new') {
         this.topic = await this._topics.getById(topicId);
-        if (this.topic.willCloseAt) this.hasDeadline = true;
+        if (this.topic.willCloseAt) this.hasDeadlineForQuestions = true;
+        if (this.topic.acceptAnswersUntil) this.hasDeadlineForAnswers = true;
         this.relatedTopics = await this._topics.getRelated(this.topic);
         this.relatedTopicsChecks = this.activeTopics
           .filter(x => x.topicId !== this.topic.topicId)
@@ -110,8 +112,11 @@ export class ManageTopicPage implements OnInit {
     return c1 && c2 ? c1.categoryId === c2.categoryId : c1 === c2;
   }
 
-  shouldResetDeadline(): void {
-    if (!this.hasDeadline) this.topic.willCloseAt = null;
+  shouldResetDeadlineForQuestions(): void {
+    if (!this.hasDeadlineForQuestions) this.topic.willCloseAt = null;
+  }
+  shouldResetDeadlineForAnswers(): void {
+    if (!this.hasDeadlineForAnswers) this.topic.acceptAnswersUntil = null;
   }
 
   addSubject(): void {

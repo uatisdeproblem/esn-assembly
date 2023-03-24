@@ -30,16 +30,32 @@
               <ion-badge *ngIf="!topic.isDraft" [color]="topic.closedAt ? 'danger' : 'success'">
                 {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
               </ion-badge>
-              <ion-badge color="warning" *ngIf="topic.archivedAt">{{ 'TOPICS.ARCHIVED' | translate }}</ion-badge>
+              <ion-badge color="warning" *ngIf="topic.isArchived()">{{ 'TOPICS.ARCHIVED' | translate }}</ion-badge>
             </p>
           </ion-card-header>
           <ion-card-content>
             <ion-list class="aList" lines="none">
               <app-subject color="white" *ngFor="let subject of topic.subjects" [subject]="subject"></app-subject>
-              <ion-item class="ion-margin-top ion-text-right deadline" *ngIf="topic.willCloseAt">
-                <ion-label>{{ topic.willCloseAt | date: 'MMM d, y (H:mm z)' : FAVORITE_TIMEZONE }}</ion-label>
-                <ion-badge slot="end" color="medium">{{ 'TOPICS.DEADLINE' | translate }}</ion-badge>
-              </ion-item>
+              <ion-row class="ion-margin-top" *ngIf="!topic.isArchived()">
+                <ion-col *ngIf="topic.willCloseAt">
+                  <ion-item class="ion-text-right deadline">
+                    <ion-label>
+                      <p>{{ 'TOPICS.QUESTIONS_UNTIL' | translate }}</p>
+                      {{ topic.willCloseAt | date: 'MMM d, y (H:mm z)' : FAVORITE_TIMEZONE }}
+                    </ion-label>
+                    <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
+                  </ion-item>
+                </ion-col>
+                <ion-col *ngIf="topic.acceptAnswersUntil && !dateStringIsPast(topic.acceptAnswersUntil)">
+                  <ion-item class="ion-text-right deadline">
+                    <ion-label>
+                      <p>{{ 'TOPICS.ANSWERS_UNTIL' | translate }}</p>
+                      {{ topic.acceptAnswersUntil | date: 'MMM d, y (H:mm z)' : FAVORITE_TIMEZONE }}
+                    </ion-label>
+                    <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
               <app-html-editor *ngIf="topic.content" [content]="topic.content" [editMode]="false"></app-html-editor>
               <ion-item
                 lines="inset"

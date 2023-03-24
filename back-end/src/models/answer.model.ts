@@ -1,6 +1,8 @@
 import { epochISOString, Resource } from 'idea-toolbox';
 
+import { FAVORITE_TIMEZONE, dateStringIsFuture } from './favoriteTimezone.const';
 import { Subject } from './subject.model';
+import { Topic } from './topic.model';
 import { User } from './user.model';
 
 /**
@@ -61,7 +63,10 @@ export class Answer extends Resource {
   /**
    * Whether the user is allowed to edit the answer.
    */
-  canUserEdit(user: User, excludeAdmin = false): boolean {
-    return (user.isAdministrator() && !excludeAdmin) || user.userId === this.creator.id;
+  canUserEdit(topic: Topic, user: User, excludeAdmin = false): boolean {
+    const timeCheck = !topic.acceptAnswersUntil || dateStringIsFuture(topic.acceptAnswersUntil, FAVORITE_TIMEZONE);
+    const adminCheck = user.isAdministrator() && !excludeAdmin;
+    const creatorCheck = user.userId === this.creator.id;
+    return !topic.isArchived() && timeCheck && (adminCheck || creatorCheck);
   }
 }

@@ -17,9 +17,14 @@ ion-list.aList {
     margin-bottom: 0;
   }
   ion-item.deadline {
-    font-size: 0.9em;
-    text-transform: uppercase;
-    font-weight: 500;
+    ion-label {
+      font-size: 0.9em;
+      font-weight: 500;
+      p {
+        font-size: 0.8em;
+        font-weight: 500;
+      }
+    }
   }
 }
 

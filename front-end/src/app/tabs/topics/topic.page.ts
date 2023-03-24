@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, IonContent, IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
-import { Attachment } from 'idea-toolbox';
+import { Attachment, epochISOString } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
@@ -12,7 +12,7 @@ import { QuestionsService } from './questions/questions.service';
 import { Topic } from '@models/topic.model';
 import { Question } from '@models/question.model';
 import { Subject } from '@models/subject.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
+import { dateStringIsPast, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'topic',
@@ -164,5 +164,9 @@ export class TopicPage {
 
   openTopic(topic: Topic): void {
     this.app.goToInTabs(['topics', topic.topicId]);
+  }
+
+  dateStringIsPast(dateString: epochISOString): boolean {
+    return dateStringIsPast(dateString, FAVORITE_TIMEZONE);
   }
 }

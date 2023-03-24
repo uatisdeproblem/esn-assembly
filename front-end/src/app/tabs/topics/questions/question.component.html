@@ -4,8 +4,8 @@
     <ion-card-title>{{ question.summary }}</ion-card-title>
   </ion-card-header>
   <ion-card-content>
-    <ion-row *ngIf="!topic.archivedAt">
-      <ion-col *ngIf="!topic.isClosed() && answers && !answers.length && question.canUserEdit(app.user)">
+    <ion-row *ngIf="!topic.isArchived()">
+      <ion-col *ngIf="answers && !answers.length && question.canUserEdit(topic, app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteQuestion()">
           {{ 'QUESTIONS.DELETE_QUESTION' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
         </ion-button>
@@ -30,7 +30,7 @@
         [creator]="answer.creator"
         [isSender]="true"
       ></app-message-bubble>
-      <p class="ion-text-right" *ngIf="!topic.archivedAt && getLastAnswer()?.canUserEdit(app.user)">
+      <p class="ion-text-right" *ngIf="getLastAnswer()?.canUserEdit(topic, app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteLastAnswer()">
           {{ 'QUESTIONS.DELETE_ANSWER' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
         </ion-button>
@@ -43,7 +43,7 @@
       <ion-button
         expand="block"
         class="ion-margin-top"
-        *ngIf="!topic.archivedAt && topic.canUserAnswerQuestions(app.user) && !newAnswer"
+        *ngIf="topic.canUserAnswerQuestions(app.user) && !newAnswer"
         (click)="writeAnswer()"
       >
         {{ 'QUESTIONS.ANSWER' | translate }} <ion-icon name="pencil" slot="end"></ion-icon>

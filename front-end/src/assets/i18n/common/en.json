@@ -22,6 +22,14 @@
       "PROVINCE": "Province",
       "PROVINCE_HINT": "Province, district, area"
     },
+    "APP_STATUS": {
+      "UPDATE": "Update",
+      "NEW_VERSION": "New version available: {{newVersion}}",
+      "MUST_UPDATE": "Update required",
+      "MAINTENANCE": "The app is in maintenance mode",
+      "GOT_IT": "Got it",
+      "EVERYTHING_IS_OK": "It's all good!"
+    },
     "CALENDAR": {
       "CLOSE_WITHOUT_SAVING": "Close without saving",
       "MONTH": "Month",
@@ -36,22 +44,22 @@
       "CONFIRM_SELECTION": "Confirm your selection",
       "DESELECT_ALL": "Deselect all",
       "DONE": "Done",
+      "LIMIT_OF_NUM": "(of {{num}})",
       "NONE": "None",
       "NO_ELEMENTS_FOUND": "No elements found",
       "NUM_ELEMENTS_SELECTED": "{{num}} elements selected",
-      "SEARCH": "Search",
-      "SELECT_ALL": "Select all",
       "RESET": "Reset",
-      "LIMIT_OF_NUM": "(of {{num}})"
+      "SEARCH": "Search",
+      "SELECT_ALL": "Select all"
     },
     "CONTACTS": {
+      "CALL": "Call",
       "EMAIL": "Email",
       "EMAIL_HINT": "Email address",
       "NAME": "Name",
       "NAME_HINT": "Full name of the contact",
       "PHONE": "Phone",
       "PHONE_HINT": "Phone/cellphone number",
-      "CALL": "Call",
       "SEND_EMAIL": "Send email"
     },
     "CUSTOM_FIELDS": {
@@ -66,6 +74,7 @@
       "CHOOSE_A_KEY": "Choose a name for the field",
       "CLOSE_WITHOUT_SAVING": "Close without saving",
       "DEFAULT": "Default value",
+      "DEFAULT_CHOICE": "Default choice",
       "DEFAULT_HINT": "The value to assume by default",
       "DESCRIPTION": "Description",
       "DESCRIPTION_HINT": "Description of how the field should be filled out",
@@ -91,6 +100,7 @@
       "NAME": "Name",
       "NAME_HINT": "A name to recognize the field and understand its purpose",
       "NEW_FIELD": "New field",
+      "NO_DEFAULT_CHOICE": "No pre-selected choice",
       "NO_ELEMENTS": "No elements",
       "OBLIGATORY": "Obligatory",
       "OPTIONS": "Possible choices",
@@ -101,24 +111,22 @@
       "SECTION_DESCRIPTION_HINT": "Briefly describe the purpose of the section",
       "SECTION_FIELDS": "Section fields",
       "SECTION_NAME_HINT": "The name to identify the section",
-      "TYPE": "Type",
-      "DEFAULT_CHOICE": "Default choice",
-      "NO_DEFAULT_CHOICE": "No pre-selected choice"
+      "TYPE": "Type"
     },
     "DURATION": { "HH": "hh", "HOURS": "Hours", "MINUTES": "Minutes", "MM": "mm", "SECONDS": "Seconds", "SS": "ss" },
     "ECHO": {
-      "INVALID_ACTION": "Invalid action",
-      "YOU_CAN_CLOSE_THE_PAGE": "You can close this page now.",
       "ACCOUNT_CONFIRMED": "Account confirmed: you can now sign-in.",
       "EMAIL_CHANGED": "Email address successfully updated. You now have to sign-in again.",
       "EXTERNAL_CALENDARS_SOURCE_INTEGRATION_ERROR": "Error while linking the external account; try again",
       "EXTERNAL_CALENDARS_SOURCE_INTEGRATION_SUCCESS": "The external account is now linked. Go back to the calendars page to complete the configuration",
       "GITHUB_SOURCE_INTEGRATION_ERROR": "Error during the integration of GitHub; try again.",
       "GITHUB_SOURCE_INTEGRATION_SUCCESS": "GitHub has been connected. You can now complete the configuration.",
+      "INVALID_ACTION": "Invalid action",
       "REQUEST_FAILED": "The request failed; try again.",
       "TEAM_JOINED": "You successfully joined the team.",
       "TRELLO_SOURCE_INTEGRATION_ERROR": "Error during the integration of Trello; try again.",
-      "TRELLO_SOURCE_INTEGRATION_SUCCESS": "Copy and paste the following token in the previous page to complete the configuration: {{token}}"
+      "TRELLO_SOURCE_INTEGRATION_SUCCESS": "Copy and paste the following token in the previous page to complete the configuration: {{token}}",
+      "YOU_CAN_CLOSE_THE_PAGE": "You can close this page now."
     },
     "EMAIL": {
       "ATTACHMENTS": "Attachments",
@@ -137,16 +145,16 @@
       "VARIABLES_AVAILABLE_I": "These are all the variables you can use in subject and content. When sending an email they will be substitute by their values."
     },
     "FTTT": {
-      "FROM": "From",
-      "TO": "To",
       "AM": "AM",
-      "PM": "PM",
+      "FROM": "From",
       "MINUTES_PREFERENCE": "Minutes preference",
-      "PERIOD": "Period"
+      "PERIOD": "Period",
+      "PM": "PM",
+      "TO": "To"
     },
     "LABELER": {
-      "EXPLANATION_OBLIGATORY": "Only the translation in the default language is mandatory.",
       "EXPLANATION": "If any translation is missing, the one in the default language is used instead.",
+      "EXPLANATION_OBLIGATORY": "Only the translation in the default language is mandatory.",
       "FILL_IN_DEFAULT_LANGUAGE": "You must fill in the label at least in the default language",
       "MANAGE_LABEL": "Manage label",
       "VARIABLES_AVAILABLE": "Variables available",
@@ -175,10 +183,13 @@
     },
     "OFFLINE": {
       "ADVANCED_ACTIONS": "Advanced actions",
+      "CANCEL_REQUEST": "Cancel the request",
       "DELETION_IS_IRREVERSIBLE": "The deletion is irreversible",
       "DONT_EXIT_APP_DISCLAIMER": "Please, don't exit the app while synchronising",
       "DOWNLOAD": "Download",
+      "DOWNLOAD_LOG": "Download a log of the failed request",
       "DOWNLOAD_RESOURCES_EXPLANATION": "List of the resources available offline",
+      "ERROR_CODE": "Error code",
       "ERROR_DURING_LAST_SYNC": "There was an error during the last synchronisation; please try again.",
       "FEATURES_REDUCED_CONTENTS_NOT_UP_TO_DATE": "Functionality is reduced and contents may be not up to date",
       "FORCE_FULL_SYNC": "Full synchronisation",
@@ -193,9 +204,6 @@
       "REQUEST_FAILED_EXPLANATION_I": "Upload failed for this resource; please try again.",
       "REQUEST_FAILED_EXPLANATION_II": "If the error persist, cancel the request to proceed.",
       "REQUEST_FAILED_EXPLANATION_III": "You can request a log of the error for further analysis.",
-      "ERROR_CODE": "Error code",
-      "CANCEL_REQUEST": "Cancel the request",
-      "DOWNLOAD_LOG": "Download a log of the failed request",
       "SYNC_IN_PROGRESS": "Synchronisation in progress",
       "SYNC_NOW": "Sync",
       "UPLOAD": "Upload",
@@ -203,60 +211,55 @@
       "YOU_ARE_OFFLINE": "You are offline"
     },
     "PDF_TEMPLATE": {
-      "EDIT_TEMPLATE": "Edit template",
-      "BREADCRUMB_I": "Here above you can see on which area of the template you are working.",
-      "BREADCRUMB_II": "You can navigate inner areas of the template by touching them.",
-      "NAVIGATE_BACK": "Navigate back",
-      "SECTION": "Section",
       "ADD_A_SECTION": "Add a new section to the template",
-      "REMOVE_SECTION": "Remove the section from the template",
-      "SECTIONS": "Sections",
-      "EDIT_SECTIONS": "Edit the sections",
-      "INSERT_FIELDS_IN_NORMAL_SECTION": "You can add fields in the template by tapping an empty column in a row.",
-      "PAGE_BREAK": "Page break",
-      "PAGE_BREAK_I": "Go to a new page after this row",
       "BLANK_ROW": "Blank row",
       "BLANK_ROW_I": "View an empty row, to create space between contents",
+      "BREADCRUMB_I": "Here above you can see on which area of the template you are working.",
+      "BREADCRUMB_II": "You can navigate inner areas of the template by touching them.",
+      "CHOOSE_WHERE_TO_MOVE_FIELD": "Choose where to move the field",
+      "COMPLEX_FIELD": "Complex field",
+      "EDIT_SECTIONS": "Edit the sections",
+      "EDIT_TEMPLATE": "Edit template",
       "HEADER": "Header",
       "HEADER_I": "Header row, to separate two areas of the template",
-      "INNER_SECTION_TITLE": "Title of the inner section",
-      "INNER_SECTION_TITLE_I": "The title of the inner section is shown only if the section has some data to display; leave it empty in case you never want to display it.",
-      "INNER_SECTION_TITLE_EMPTY_NOT_SHOWN": "The title is currently empty so it won't be displayed",
       "INNER_SECTION": "Inner section",
       "INNER_SECTION_I": "Child section of the current one; used to manage fields of an inner context",
+      "INNER_SECTION_TITLE": "Title of the inner section",
+      "INNER_SECTION_TITLE_EMPTY_NOT_SHOWN": "The title is currently empty so it won't be displayed",
+      "INNER_SECTION_TITLE_I": "The title of the inner section is shown only if the section has some data to display; leave it empty in case you never want to display it.",
+      "INSERT_FIELDS_IN_NORMAL_SECTION": "You can add fields in the template by tapping an empty column in a row.",
+      "NAVIGATE_BACK": "Navigate back",
+      "NEW_HEADER": "New header",
+      "NORMAL_ROW": "Normal row",
+      "NO_EMPTY_SLOT_WHERE_TO_MOVE_FIELD": "There's no an empty slot where the field can be moved. Add a new row.",
+      "NO_SECTION_DEFINED_YET_HERE": "No section defined here; you can add one through the action buttons above.",
+      "ONE_OR_MORE_SECTIONS_HAVE_ERRORS": "One or more sections have errors; please check before to continue.",
+      "PAGE_BREAK": "Page break",
+      "PAGE_BREAK_I": "Go to a new page after this row",
+      "REMOVE_SECTION": "Remove the section from the template",
       "REPEATED_INNER_SECTION": "Repeated inner section",
       "REPEATED_INNER_SECTION_I": "Child section of the current one; used to manage fields of an inner context. Based on the data available, it could be repeated more times when printed.",
-      "NO_SECTION_DEFINED_YET_HERE": "No section defined here; you can add one through the action buttons above.",
-      "NORMAL_ROW": "Normal row",
-      "WHAT_DO_YOU_WANT_TO_INSERT": "What do you want to insert?",
-      "NEW_HEADER": "New header",
-      "YOU_CAN_INSERT_SPECIAL_SECTIONS": "Based on your position in the template, you will be able to add different kind of sections.",
+      "SECTION": "Section",
+      "SECTIONS": "Sections",
       "SIMPLE_FIELD": "Simple field",
-      "COMPLEX_FIELD": "Complex field",
-      "WHAT_DO_YOU_WANT_TO_DO_WITH_FIELD": "What do you want to do with the field?",
-      "NO_EMPTY_SLOT_WHERE_TO_MOVE_FIELD": "There's no an empty slot where the field can be moved. Add a new row.",
-      "CHOOSE_WHERE_TO_MOVE_FIELD": "Choose where to move the field",
       "SIZE": "Size",
-      "ONE_OR_MORE_SECTIONS_HAVE_ERRORS": "One or more sections have errors; please check before to continue."
+      "WHAT_DO_YOU_WANT_TO_DO_WITH_FIELD": "What do you want to do with the field?",
+      "WHAT_DO_YOU_WANT_TO_INSERT": "What do you want to insert?",
+      "YOU_CAN_INSERT_SPECIAL_SECTIONS": "Based on your position in the template, you will be able to add different kind of sections."
     },
     "SELECT": {
       "CLEAR_SELECTION": "Clear selection",
       "CLOSE_WITHOUT_SELECTING": "Close without selecting anything",
+      "HIDE_DETAILS": "Hide details",
       "NO_ELEMENTS_FOUND": "No elements found",
       "NO_ELEMENTS_FOUND_START_TYPING_TO_ADD_ONE": "No elements found; start typing to add a new one.",
       "SEARCH": "Search",
       "SELECT_": "Select {{suggestion}}",
-      "TAP_TO_FILTER": "Tap to filter",
       "SHOW_DETAILS": "Show details",
-      "HIDE_DETAILS": "Hide details"
+      "TAP_TO_FILTER": "Tap to filter"
     },
     "SENTIMENT": {
-      "RESULT": {
-        "POSITIVE": "Positive",
-        "NEGATIVE": "Negative",
-        "NEUTRAL": "Neutral",
-        "MIXED": "Mixed"
-      },
+      "RESULT": { "MIXED": "Mixed", "NEGATIVE": "Negative", "NEUTRAL": "Neutral", "POSITIVE": "Positive" },
       "RESULT_HINT": "We detected a generally {{sentiment}} sentiment from the text"
     },
     "SIGNATURE": {
@@ -268,8 +271,8 @@
       "SIGNATORY": "Signatory",
       "SIGNATURE": "Signature",
       "SIGNATURE_EXPLANATION": "Draw the signature here below",
-      "VERIFY_SIGNATORY_AND_SIGNATURE": "Verify signatory and signature",
-      "SIGNATURE_IS_TOO_COMPLEX": "The signature is too complex; please sign again"
+      "SIGNATURE_IS_TOO_COMPLEX": "The signature is too complex; please sign again",
+      "VERIFY_SIGNATORY_AND_SIGNATURE": "Verify signatory and signature"
     }
   }
 }
