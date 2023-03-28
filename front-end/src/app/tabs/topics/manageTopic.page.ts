@@ -78,13 +78,7 @@ export class ManageTopicPage implements OnInit {
       await this.loading.show();
       if (topicId !== 'new') {
         this.topic = await this._topics.getById(topicId);
-        if (this.topic.willCloseAt) this.hasDeadlineForQuestions = true;
-        if (this.topic.acceptAnswersUntil) this.hasDeadlineForAnswers = true;
-        if (this.topic.publishedSince) {
-          if (dateStringIsFuture(this.topic.publishedSince, FAVORITE_TIMEZONE))
-            this.publishingOption = PublishingOptions.SCHEDULE;
-          else this.publishingOption = PublishingOptions.PUBLISH;
-        } else this.publishingOption = PublishingOptions.DRAFT;
+        this.setUIHelpersForComplexFields();
         this.relatedTopics = await this._topics.getRelated(this.topic);
         this.relatedTopicsChecks = this.activeTopics
           .filter(x => x.topicId !== this.topic.topicId)
@@ -272,7 +266,17 @@ export class ManageTopicPage implements OnInit {
       this.topic = this.entityBeforeChange;
       this.errors = new Set<string>();
       this.editMode = UXMode.VIEW;
+      this.setUIHelpersForComplexFields();
     }
+  }
+  private setUIHelpersForComplexFields(): void {
+    this.hasDeadlineForQuestions = !!this.topic.willCloseAt;
+    this.hasDeadlineForAnswers = !!this.topic.acceptAnswersUntil;
+    if (this.topic.publishedSince) {
+      if (dateStringIsFuture(this.topic.publishedSince, FAVORITE_TIMEZONE))
+        this.publishingOption = PublishingOptions.SCHEDULE;
+      else this.publishingOption = PublishingOptions.PUBLISH;
+    } else this.publishingOption = PublishingOptions.DRAFT;
   }
 }
 
