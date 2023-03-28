@@ -62,7 +62,7 @@ class TopicCategories extends ResourceController {
   }
 
   protected async postResources(): Promise<TopicCategory> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     this.topicCategory = new TopicCategory(this.body);
     this.topicCategory.categoryId = await ddb.IUNID(PROJECT);
@@ -75,7 +75,7 @@ class TopicCategories extends ResourceController {
   }
 
   protected async putResource(): Promise<TopicCategory> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const oldCategory = new TopicCategory(this.topicCategory);
     this.topicCategory.safeLoad(this.body, oldCategory);
@@ -94,7 +94,7 @@ class TopicCategories extends ResourceController {
     }
   }
   private async manageArchive(archive: boolean): Promise<TopicCategory> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     if (archive) this.topicCategory.archivedAt = new Date().toISOString();
     else delete this.topicCategory.archivedAt;
@@ -104,7 +104,7 @@ class TopicCategories extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
     const topicsWithCategory = topics.filter(x => x.category.categoryId === this.topicCategory.categoryId);

@@ -18,6 +18,7 @@ import { parameters, stages, Stage } from './environments';
 const apiResources: ResourceController[] = [
   { name: 'auth', isAuthFunction: true },
   { name: 'login', paths: ['/login'] },
+  { name: 'configurations', paths: ['/configurations'] },
   { name: 'categories', paths: ['/categories', '/categories/{categoryId}'] },
   { name: 'events', paths: ['/events', '/events/{eventId}'] },
   { name: 'topics', paths: ['/topics', '/topics/{topicId}'] },
@@ -35,6 +36,9 @@ const apiResources: ResourceController[] = [
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
+  configurations: {
+    PK: { name: 'PK', type: DDB.AttributeType.STRING }
+  },
   categories: {
     PK: { name: 'categoryId', type: DDB.AttributeType.STRING }
   },

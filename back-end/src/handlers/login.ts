@@ -5,9 +5,10 @@
 import { default as Axios } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { sign } from 'jsonwebtoken';
-import { RCError, ResourceController, SecretsManager } from 'idea-aws';
+import { DynamoDB, RCError, ResourceController, SecretsManager } from 'idea-aws';
 
 import { User } from '../models/user.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -17,6 +18,10 @@ const CAS_URL = 'https://accounts.esn.org/cas';
 const JWT_EXPIRE_TIME = '1 day';
 
 const APP_URL = process.env.STAGE === 'prod' ? 'https://qa.esn.org' : 'https://dev.esn-ga.link';
+
+const PROJECT = process.env.PROJECT;
+const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
+const ddb = new DynamoDB();
 
 const SECRETS_PATH = 'esn-ga/auth';
 const secretsManager = new SecretsManager();
@@ -58,6 +63,10 @@ class Login extends ResourceController {
       const attributes = data['cas:attributes'][0];
       const userId = data['cas:user'][0];
 
+      const { administratorsIds } = new Configurations(
+        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+      );
+
       const user = new User({
         userId,
         email: attributes['cas:mail'][0],
@@ -67,7 +76,8 @@ class Login extends ResourceController {
         roles: attributes['cas:roles'],
         section: attributes['cas:section'][0],
         country: attributes['cas:country'][0],
-        avatarURL: attributes['cas:picture'][0]
+        avatarURL: attributes['cas:picture'][0],
+        isAdministrator: administratorsIds.includes(userId)
       });
       this.logger.info('ESN Accounts login', user);
 

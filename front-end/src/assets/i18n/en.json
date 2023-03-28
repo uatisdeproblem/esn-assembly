@@ -176,7 +176,10 @@
   "CONFIGURATIONS": {
     "ENTITIES": "Entities",
     "CATEGORIES": "Categories",
-    "EVENTS": "Events"
+    "EVENTS": "Events",
+    "ADMINISTRATORS": "Administrators",
+    "ADMINISTRATORS_I": "Add administrators by their ESN Accounts username",
+    "ADD_ADMINISTRATOR": "Add administrator"
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",

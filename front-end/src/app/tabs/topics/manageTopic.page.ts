@@ -58,7 +58,7 @@ export class ManageTopicPage implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    if (!this.app.user.isAdministrator()) return this.app.closePage('COMMON.UNAUTHORIZED');
+    if (!this.app.user.isAdministrator) return this.app.closePage('COMMON.UNAUTHORIZED');
 
     [this.categories, this.events, this.activeTopics] = await Promise.all([
       this._categories.getList(),

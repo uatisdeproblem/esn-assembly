@@ -62,7 +62,7 @@ class TopicEvents extends ResourceController {
   }
 
   protected async postResources(): Promise<TopicEvent> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     this.topicEvent = new TopicEvent(this.body);
     this.topicEvent.eventId = await ddb.IUNID(PROJECT);
@@ -75,7 +75,7 @@ class TopicEvents extends ResourceController {
   }
 
   protected async putResource(): Promise<TopicEvent> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const oldEvent = new TopicEvent(this.topicEvent);
     this.topicEvent.safeLoad(this.body, oldEvent);
@@ -94,7 +94,7 @@ class TopicEvents extends ResourceController {
     }
   }
   private async manageArchive(archive: boolean): Promise<TopicEvent> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     if (archive) this.topicEvent.archivedAt = new Date().toISOString();
     else delete this.topicEvent.archivedAt;
@@ -104,7 +104,7 @@ class TopicEvents extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
     const topicsWithEvent = topics.filter(x => x.event.eventId === this.topicEvent.eventId);

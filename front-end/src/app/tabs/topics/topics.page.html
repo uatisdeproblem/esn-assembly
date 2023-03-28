@@ -50,7 +50,7 @@
           </ion-select-option>
         </ion-select>
       </ion-item>
-      <ion-button fill="solid" color="ESNcyan" *ngIf="app.user.isAdministrator()" (click)="addTopic()">
+      <ion-button fill="solid" color="ESNcyan" *ngIf="app.user.isAdministrator" (click)="addTopic()">
         {{ 'COMMON.ADD' | translate }}
       </ion-button>
     </ion-buttons>

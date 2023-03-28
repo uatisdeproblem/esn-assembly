@@ -4,13 +4,18 @@
 
 import { APIGatewayProxyEventV2WithRequestContext } from 'aws-lambda';
 import { JwtPayload, verify } from 'jsonwebtoken';
-import { SecretsManager } from 'idea-aws';
+import { DynamoDB, SecretsManager } from 'idea-aws';
 
 import { User } from '../models/user.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
+
+const PROJECT = process.env.PROJECT;
+const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
+const ddb = new DynamoDB();
 
 const SECRETS_PATH = 'esn-ga/auth';
 const secretsManager = new SecretsManager();
@@ -23,6 +28,7 @@ export const handler = async (event: APIGatewayProxyEventV2WithRequestContext<Au
   const user = await verifyTokenAndGetESNAccountsUser(authorization);
 
   if (user) {
+    if (user.isAdministrator) user.isAdministrator = await verifyIfUserIsStillAnAdministratorById(user.userId);
     result.context = { principalId: user.userId, user };
     result.isAuthorized = true;
   }
@@ -46,6 +52,12 @@ const verifyTokenAndGetESNAccountsUser = async (token: string): Promise<User> =>
   } catch (error) {
     return null;
   }
+};
+const verifyIfUserIsStillAnAdministratorById = async (userId: string): Promise<boolean> => {
+  const { administratorsIds } = new Configurations(
+    await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+  );
+  return administratorsIds.includes(userId);
 };
 
 /**

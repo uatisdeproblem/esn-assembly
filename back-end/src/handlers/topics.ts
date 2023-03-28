@@ -56,7 +56,7 @@ class Topics extends ResourceController {
     let topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics });
     topics = topics.map(x => new Topic(x));
 
-    if (!this.galaxyUser.isAdministrator()) topics = topics.filter(x => !x.isDraft);
+    if (!this.galaxyUser.isAdministrator) topics = topics.filter(x => !x.isDraft);
 
     if (this.queryParams.archived !== undefined) {
       const archived = this.queryParams.archived !== 'false';
@@ -98,7 +98,7 @@ class Topics extends ResourceController {
   }
 
   protected async postResources(): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     this.topic = new Topic(this.body);
     this.topic.topicId = await ddb.IUNID(PROJECT);
@@ -117,7 +117,7 @@ class Topics extends ResourceController {
     }
   }
   private async getSignedURLToUploadAttachment(): Promise<SignedURL> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const attachmentId = await ddb.IUNID(PROJECT.concat('-attachment'));
 
@@ -138,12 +138,12 @@ class Topics extends ResourceController {
   }
 
   protected async getResource(): Promise<Topic> {
-    if (this.topic.isDraft && !this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (this.topic.isDraft && !this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
     return this.topic;
   }
 
   protected async putResource(): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const oldTopic = new Topic(this.topic);
     this.topic.safeLoad(this.body, oldTopic);
@@ -166,7 +166,7 @@ class Topics extends ResourceController {
     }
   }
   private async manageStatus(open: boolean): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     if (open) delete this.topic.closedAt;
     else this.topic.closedAt = new Date().toISOString();
@@ -175,7 +175,7 @@ class Topics extends ResourceController {
     return this.topic;
   }
   private async manageArchive(archive: boolean): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     if (archive) {
       this.topic.archivedAt = new Date().toISOString();
@@ -187,7 +187,7 @@ class Topics extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator()) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const topics: RelatedTopic[] = await ddb.query({
       TableName: DDB_TABLES.relatedTopics,

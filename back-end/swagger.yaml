@@ -23,6 +23,8 @@ externalDocs:
 tags:
   - name: Login
     description: Access the platform
+  - name: Configurations
+    description: The platfrom's configurations
   - name: Categories
     description: The platform's categories
   - name: Events
@@ -50,6 +52,33 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
+  /configurations:
+    get:
+      summary: Get the platform's configurations
+      description: Requires to be Administrator
+      tags: [Configurations]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/Configurations'
+    put:
+      summary: Edit the platform's configurations
+      description: Requires to be Administrator
+      tags: [Configurations]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Configurations'
+      responses:
+        200:
+          $ref: '#/components/responses/Configurations'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /categories:
     get:
       summary: Get the categories
@@ -802,6 +831,9 @@ paths:
 
 components:
   schemas:
+    Configurations:
+      type: object
+      additionalProperties: {}
     Category:
       type: object
       additionalProperties: {}
@@ -819,6 +851,13 @@ components:
       additionalProperties: {}
 
   responses:
+    Configurations:
+      description: The platform' configurations
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Configurations'
     Category:
       description: A category
       content:

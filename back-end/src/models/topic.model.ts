@@ -142,7 +142,7 @@ export class Topic extends Resource {
    */
   canUserAnswerQuestions(user: User, excludeAdmin = false): boolean {
     const timeCheck = !this.acceptAnswersUntil || dateStringIsFuture(this.acceptAnswersUntil, FAVORITE_TIMEZONE);
-    const adminCheck = user.isAdministrator() && !excludeAdmin;
+    const adminCheck = user.isAdministrator && !excludeAdmin;
     const subjectCheck = this.subjects.some(s => s.id === user.userId);
     return !this.isArchived() && timeCheck && (adminCheck || subjectCheck);
   }

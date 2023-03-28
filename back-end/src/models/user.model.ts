@@ -17,27 +17,13 @@ export enum UserRoles {
 }
 
 /**
- * The list of roles that, if owned, would grant administative privileges in the platform.
- */
-export const ADMIN_ROLES: UserRoles[] = [
-  //UserRoles.INTERNATIONAL_GA_CT
-  //UserRoles.INTERNATIONAL_BOARD,
-  //UserRoles.INTERNATIONAL_SECRETARIAT
-];
-/**
- * @todo since roles on Galaxy are not updated nor reflecting the current ESN structure,
- * we temporarily opted for a username-based approach, to avoid granting unwanted permissions.
- */
-export const ADMIN_USERNAMES = ['mc', 'kajakaczkiello', 'gtelesca'];
-
-/**
  * The map between the platform's roles with the (known) interesting roles on ESN Accounts.
  * Roles that ends with "*" are intended to be: "any role with that prefix".
  * Note: all roles are lower-cased (since they will be handled with a case-insensitive logic).
  */
 export const ESN_ACCOUNTS_ROLES_MAP: { [userRole: string]: string[] } = {
   INTERNATIONAL_BOARD: ['international.regularBoardMember', 'international.vicepresident'], // @todo
-  INTERNATIONAL_SECRETARIAT: ['international.secretariat'], // @todo
+  INTERNATIONAL_SECRETARIAT: ['international.officeStaff'],
   INTERNATIONAL_LEVEL: ['international.*'],
   INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradmin'],
   INTERNATIONAL_AB: ['international.ab.*', 'international.ab.secretary'], // @todo
@@ -86,6 +72,11 @@ export class User extends Resource {
    * The URL to the user's avatar.
    */
   avatarURL: string;
+  /**
+   * Whether the user is administrator, based on the platform's configurations.
+   * A change in this permission will require a new sign-in to take full place.
+   */
+  isAdministrator: boolean;
 
   /**
    * Whether the user has one of the allowed roles.
@@ -116,13 +107,7 @@ export class User extends Resource {
     this.section = this.clean(x.section, String);
     this.country = this.clean(x.country, String);
     this.avatarURL = this.clean(x.avatarURL, String);
-  }
-
-  /**
-   * Whether the user has administrative privileges in the platform.
-   */
-  isAdministrator(): boolean {
-    return User.isAllowedBasedOnRoles(this, ADMIN_ROLES) || ADMIN_USERNAMES.includes(this.userId);
+    this.isAdministrator = this.clean(x.isAdministrator, Boolean);
   }
 
   /**
