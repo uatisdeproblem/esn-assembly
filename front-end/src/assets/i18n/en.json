@@ -148,10 +148,10 @@
     "ANSWERS": "Answers",
     "QUESTIONS_UNTIL": "Questions until",
     "ANSWERS_UNTIL": "Answers until",
-    "PUBLISHING_OPTIONS": "Publishing options",
+    "PUBLISHING_OPTIONS": "Topic visibility",
     "PUBLISHING_OPTIONS_": {
       "DRAFT": "Keep as draft (only admins can see)",
-      "PUBLISH": "Publish now",
+      "PUBLISH": "Visibile",
       "SCHEDULE": "Schedule publishing"
     },
     "PUBLISH_ON": "Publish on"
