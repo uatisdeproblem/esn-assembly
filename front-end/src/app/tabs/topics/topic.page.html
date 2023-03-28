@@ -35,7 +35,12 @@
           </ion-card-header>
           <ion-card-content>
             <ion-list class="aList" lines="none">
-              <app-subject color="white" *ngFor="let subject of topic.subjects" [subject]="subject"></app-subject>
+              <app-subject
+                color="white"
+                *ngFor="let subject of topic.subjects"
+                [subject]="subject"
+                [class.single]="topic.subjects?.length === 1"
+              ></app-subject>
               <ion-row class="ion-margin-top" *ngIf="!topic.isArchived()">
                 <ion-col *ngIf="topic.willCloseAt">
                   <ion-item class="ion-text-right deadline">

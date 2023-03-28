@@ -1,3 +1,7 @@
 ion-item {
   --border-radius: 4px;
+  ion-avatar {
+    width: var(--app-subject-avatar-size, 50px);
+    height: var(--app-subject-avatar-size, 50px);
+  }
 }

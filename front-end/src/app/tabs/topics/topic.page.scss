@@ -16,6 +16,9 @@ ion-list.aList {
   ion-list-header ion-label h2 {
     margin-bottom: 0;
   }
+  app-subject.single {
+    --app-subject-avatar-size: 100px;
+  }
   ion-item.deadline {
     ion-label {
       font-size: 0.9em;
