@@ -8,6 +8,9 @@ ion-item {
   ion-chip[disabled] {
     opacity: 1 !important;
   }
+  ion-chip.small ion-icon {
+    font-size: 1em;
+  }
 }
 ion-item.current {
   border-left: 8px solid var(--ion-color-primary);
