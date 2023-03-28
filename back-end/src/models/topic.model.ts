@@ -123,9 +123,7 @@ export class Topic extends Resource {
       e.push('willCloseAt');
     if (
       this.acceptAnswersUntil &&
-      (this.iE(this.acceptAnswersUntil, 'date') ||
-        (this.willCloseAt && this.acceptAnswersUntil < this.willCloseAt) ||
-        this.acceptAnswersUntil < new Date().toISOString())
+      (this.iE(this.acceptAnswersUntil, 'date') || (this.willCloseAt && this.acceptAnswersUntil < this.willCloseAt))
     )
       e.push('acceptAnswersUntil');
     if (this.iE(this.subjects)) e.push('subjects');
