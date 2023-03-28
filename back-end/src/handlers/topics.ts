@@ -56,7 +56,7 @@ class Topics extends ResourceController {
     let topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics });
     topics = topics.map(x => new Topic(x));
 
-    if (!this.galaxyUser.isAdministrator) topics = topics.filter(x => !x.isDraft);
+    if (!this.galaxyUser.isAdministrator) topics = topics.filter(x => !x.isDraft());
 
     if (this.queryParams.archived !== undefined) {
       const archived = this.queryParams.archived !== 'false';
@@ -138,7 +138,7 @@ class Topics extends ResourceController {
   }
 
   protected async getResource(): Promise<Topic> {
-    if (this.topic.isDraft && !this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (this.topic.isDraft() && !this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
     return this.topic;
   }
 

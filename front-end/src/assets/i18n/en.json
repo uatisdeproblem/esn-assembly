@@ -134,7 +134,7 @@
     "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "ESN Accounts roles allowed to ask questions",
     "NO_ROLES_RESTRICTIONS": "Any user can ask question",
     "DEADLINES": "Deadlines",
-    "DEADLINES_IN_FAVORITE_TIMEZONE": "The deadlines must be in the timezone {{timezone}}",
+    "DATES_IN_FAVORITE_TIMEZONE": "Dates are considered in the timezone {{timezone}}",
     "DEADLINE_QUESTIONS": "Deadline for questions",
     "SET_DEADLINE_QUESTIONS": "Set deadline for questions",
     "DEADLINE_ANSWERS": "Deadline for answers",
@@ -144,12 +144,17 @@
     "NO_RELATED_TOPICS": "No related topics",
     "RELATED_TO": "Related to",
     "CANT_DELETE_IF_LINKED_ERROR": "Unlink all related topics first",
-    "IS_DRAFT": "It's a draft",
-    "IS_DRAFT_I": "It won't be visible to non-administrators",
     "DRAFT": "Draft",
     "ANSWERS": "Answers",
     "QUESTIONS_UNTIL": "Questions until",
-    "ANSWERS_UNTIL": "Answers until"
+    "ANSWERS_UNTIL": "Answers until",
+    "PUBLISHING_OPTIONS": "Publishing options",
+    "PUBLISHING_OPTIONS_": {
+      "DRAFT": "Keep as draft (only admins can see)",
+      "PUBLISH": "Publish now",
+      "SCHEDULE": "Schedule publishing"
+    },
+    "PUBLISH_ON": "Publish on"
   },
   "QUESTIONS": {
     "BY": "By",

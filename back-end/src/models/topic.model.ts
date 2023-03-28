@@ -47,9 +47,11 @@ export class Topic extends Resource {
    */
   updatedAt?: epochISOString;
   /**
-   * Whether the topic is only drafted, and therefore should not be seen by non-administrators.
+   * The timestamp since when the topic is considered published.
+   * If not set, it's a draft; drafts are displayed only to administrators.
+   * If set in the future, it means the publishing has been scheduled.
    */
-  isDraft: boolean;
+  publishedSince?: string;
   /**
    * The timestamp when the topic will close. Note: it's a sparse index for queries.
    */
@@ -88,7 +90,8 @@ export class Topic extends Resource {
     this.numOfQuestions = this.clean(x.numOfQuestions, Number, 0);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
-    this.isDraft = this.clean(x.isDraft, Boolean, true);
+    if (x.publishedSince) this.publishedSince = this.clean(x.publishedSince, d => new Date(d).toISOString());
+    else delete this.publishedSince;
     if (x.willCloseAt) this.willCloseAt = this.clean(x.willCloseAt, d => new Date(d).toISOString());
     else delete this.willCloseAt;
     if (x.acceptAnswersUntil)
@@ -115,6 +118,7 @@ export class Topic extends Resource {
     if (this.iE(this.name)) e.push('name');
     if (this.iE(this.event?.eventId)) e.push('event');
     if (this.iE(this.category?.categoryId)) e.push('category');
+    if (this.publishedSince && this.iE(this.publishedSince, 'date')) e.push('publishedSince');
     if (this.willCloseAt && (this.iE(this.willCloseAt, 'date') || this.willCloseAt < new Date().toISOString()))
       e.push('willCloseAt');
     if (
@@ -145,6 +149,13 @@ export class Topic extends Resource {
     const adminCheck = user.isAdministrator && !excludeAdmin;
     const subjectCheck = this.subjects.some(s => s.id === user.userId);
     return !this.isArchived() && timeCheck && (adminCheck || subjectCheck);
+  }
+
+  /**
+   * Whether the topic is a draft (hence visible only to administrators); otherwise, it's considered published.
+   */
+  isDraft(): boolean {
+    return !this.publishedSince || dateStringIsFuture(this.publishedSince, FAVORITE_TIMEZONE);
   }
 
   /**

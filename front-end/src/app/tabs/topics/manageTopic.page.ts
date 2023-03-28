@@ -15,7 +15,7 @@ import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
 import { TopicEvent, TopicEventAttached } from '@models/event.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { UserRoles } from '@models/user.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
+import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'manage-topic',
@@ -44,6 +44,9 @@ export class ManageTopicPage implements OnInit {
   relatedTopicsChecks: Check[];
 
   rolesAbleToAskQuestionsChecks: Check[];
+
+  publishingOption = PublishingOptions.DRAFT;
+  PublishingOptions = PublishingOptions;
 
   constructor(
     private location: Location,
@@ -77,6 +80,11 @@ export class ManageTopicPage implements OnInit {
         this.topic = await this._topics.getById(topicId);
         if (this.topic.willCloseAt) this.hasDeadlineForQuestions = true;
         if (this.topic.acceptAnswersUntil) this.hasDeadlineForAnswers = true;
+        if (this.topic.publishedSince) {
+          if (dateStringIsFuture(this.topic.publishedSince, FAVORITE_TIMEZONE))
+            this.publishingOption = PublishingOptions.SCHEDULE;
+          else this.publishingOption = PublishingOptions.PUBLISH;
+        } else this.publishingOption = PublishingOptions.DRAFT;
         this.relatedTopics = await this._topics.getRelated(this.topic);
         this.relatedTopicsChecks = this.activeTopics
           .filter(x => x.topicId !== this.topic.topicId)
@@ -110,6 +118,11 @@ export class ManageTopicPage implements OnInit {
   }
   compareWithCategory(c1: TopicCategoryAttached, c2: TopicCategoryAttached): boolean {
     return c1 && c2 ? c1.categoryId === c2.categoryId : c1 === c2;
+  }
+
+  handleChangeOfPublishingOption(): void {
+    if (this.publishingOption === PublishingOptions.DRAFT) delete this.topic.publishedSince;
+    if (this.publishingOption === PublishingOptions.PUBLISH) this.topic.publishedSince = new Date().toISOString();
   }
 
   shouldResetDeadlineForQuestions(): void {
@@ -267,4 +280,10 @@ export enum UXMode {
   VIEW,
   INSERT,
   EDIT
+}
+
+export enum PublishingOptions {
+  DRAFT = 'DRAFT',
+  PUBLISH = 'PUBLISH',
+  SCHEDULE = 'SCHEDULE'
 }

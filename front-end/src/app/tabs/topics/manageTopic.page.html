@@ -54,8 +54,31 @@
 
     <ion-list-header>
       <ion-label>
+        <h2>{{ 'TOPICS.PUBLISHING_OPTIONS' | translate }}</h2>
+        <p>{{ 'TOPICS.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+      </ion-label>
+    </ion-list-header>
+    <ion-radio-group [(ngModel)]="publishingOption" (ionBlur)="handleChangeOfPublishingOption()">
+      <ion-item *ngFor="let option of PublishingOptions | keyvalue">
+        <ion-radio slot="start" [value]="option.value" [disabled]="!editMode"></ion-radio>
+        <ion-label>{{ ('TOPICS.PUBLISHING_OPTIONS_.' + option.value) | translate }}</ion-label>
+      </ion-item>
+    </ion-radio-group>
+    <idea-date-time
+      *ngIf="publishingOption === PublishingOptions.SCHEDULE"
+      [(date)]="topic.publishedSince"
+      [useISOFormat]="true"
+      [manualTimePicker]="true"
+      [label]="'TOPICS.PUBLISH_ON' | translate"
+      [disabled]="!editMode"
+      [hideClearButton]="true"
+      [class.fieldHasError]="hasFieldAnError('publishedSince')"
+    ></idea-date-time>
+
+    <ion-list-header>
+      <ion-label>
         <h2>{{ 'TOPICS.DEADLINES' | translate }}</h2>
-        <p>{{ 'TOPICS.DEADLINES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+        <p>{{ 'TOPICS.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
       </ion-label>
     </ion-list-header>
     <ion-item>
@@ -195,13 +218,6 @@
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.OTHER_OPTIONS' | translate }}</h2></ion-label>
     </ion-list-header>
-    <ion-item>
-      <ion-checkbox slot="start" [(ngModel)]="topic.isDraft" [disabled]="!editMode"></ion-checkbox>
-      <ion-label class="ion-text-wrap">
-        {{ 'TOPICS.IS_DRAFT' | translate }}
-        <p>{{ 'TOPICS.IS_DRAFT_I' | translate }}</p>
-      </ion-label>
-    </ion-item>
     <idea-checker
       [data]="relatedTopicsChecks"
       [label]="'TOPICS.RELATED_TOPICS' | translate"

@@ -18,8 +18,8 @@
       ></ion-img>
     </ion-avatar>
     <ng-container *ngIf="!topic.isArchived()">
-      <ion-badge slot="end" *ngIf="topic.isDraft" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
-      <ion-badge slot="end" *ngIf="!topic.isDraft" [color]="topic.closedAt ? 'danger' : 'success'">
+      <ion-badge slot="end" *ngIf="topic.isDraft()" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
+      <ion-badge slot="end" *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">
         {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
       </ion-badge>
     </ng-container>
@@ -63,8 +63,8 @@
     <ion-col [sizeLg]="1">{{ topic.numOfQuestions }}</ion-col>
     <ion-col [sizeLg]="1">
       <ng-container *ngIf="!topic.isArchived()">
-        <ion-badge *ngIf="topic.isDraft" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
-        <ion-badge *ngIf="!topic.isDraft" [color]="topic.closedAt ? 'danger' : 'success'">
+        <ion-badge *ngIf="topic.isDraft()" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
+        <ion-badge *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">
           {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
         </ion-badge>
       </ng-container>

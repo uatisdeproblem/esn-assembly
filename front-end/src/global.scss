@@ -182,3 +182,10 @@ ion-badge.unreadDot {
   border-color: var(--ion-color-light) !important;
   color: var(--ion-text-color) !important;
 }
+
+// to remove after updating IDEA-Ionic-Extra > 6.11.1
+ion-radio[slot='start'] + ion-label {
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--ion-text-color);
+  --placeholder-opacity: 0 !important;
+}
