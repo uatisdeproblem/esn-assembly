@@ -46,7 +46,8 @@
                   <ion-item class="ion-text-right deadline">
                     <ion-label>
                       <p>{{ 'TOPICS.QUESTIONS_UNTIL' | translate }}</p>
-                      {{ topic.willCloseAt | date: 'MMM d, y (H:mm z)' : FAVORITE_TIMEZONE }}
+                      {{ topic.willCloseAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+                      <p>{{ FAVORITE_TIMEZONE }}</p>
                     </ion-label>
                     <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
                   </ion-item>
@@ -55,7 +56,8 @@
                   <ion-item class="ion-text-right deadline">
                     <ion-label>
                       <p>{{ 'TOPICS.ANSWERS_UNTIL' | translate }}</p>
-                      {{ topic.acceptAnswersUntil | date: 'MMM d, y (H:mm z)' : FAVORITE_TIMEZONE }}
+                      {{ topic.acceptAnswersUntil | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+                      <p>{{ FAVORITE_TIMEZONE }}</p>
                     </ion-label>
                     <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
                   </ion-item>

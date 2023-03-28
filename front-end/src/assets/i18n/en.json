@@ -134,7 +134,7 @@
     "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "ESN Accounts roles allowed to ask questions",
     "NO_ROLES_RESTRICTIONS": "Any user can ask question",
     "DEADLINES": "Deadlines",
-    "DATES_IN_FAVORITE_TIMEZONE": "Dates are considered in the timezone {{timezone}}",
+    "DATES_IN_FAVORITE_TIMEZONE": "Dates must be set in the timezone {{timezone}}",
     "DEADLINE_QUESTIONS": "Deadline for questions",
     "SET_DEADLINE_QUESTIONS": "Set deadline for questions",
     "DEADLINE_ANSWERS": "Deadline for answers",
