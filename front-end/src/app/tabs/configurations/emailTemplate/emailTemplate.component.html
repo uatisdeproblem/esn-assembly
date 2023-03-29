@@ -35,13 +35,13 @@
       <ion-textarea [rows]="4" [(ngModel)]="content"></ion-textarea>
     </ion-item>
     <ion-row class="ion-margin-top">
-      <ion-col [size]="6">
-        <ion-button size="small" color="danger" (click)="askAndResetTemplate()">
+      <ion-col class="ion-text-center" [size]="12" [sizeSm]="6">
+        <ion-button size="small" expand="block" color="danger" (click)="askAndResetTemplate()">
           {{ 'EMAIL_TEMPLATE.RESET' | translate }}
           <ion-icon icon="trash" slot="end"></ion-icon>
         </ion-button>
       </ion-col>
-      <ion-col class="ion-text-right" [size]="6">
+      <ion-col class="ion-text-center" [size]="12" [sizeSm]="6">
         <input
           id="htmlFileInput"
           type="file"
@@ -49,19 +49,19 @@
           style="display: none"
           (change)="loadTemplateFromFile($event?.target)"
         />
-        <ion-button size="small" (click)="browseHTMLFile()">
+        <ion-button size="small" expand="block" (click)="browseHTMLFile()">
           {{ 'EMAIL_TEMPLATE.CONTENT_FROM_FILE' | translate }}
           <ion-icon icon="folder" slot="end"></ion-icon>
         </ion-button>
       </ion-col>
-      <ion-col [size]="6">
-        <ion-button size="small" color="medium" (click)="downloadTemplate()">
+      <ion-col class="ion-text-center" [size]="12" [sizeSm]="6">
+        <ion-button size="small" expand="block" color="medium" (click)="downloadTemplate()">
           {{ 'EMAIL_TEMPLATE.DOWNLOAD_TEMPLATE' | translate }}
           <ion-icon icon="cloud-download" slot="end"></ion-icon>
         </ion-button>
       </ion-col>
-      <ion-col class="ion-text-right" [size]="6">
-        <ion-button size="small" color="secondary" (click)="askAndSendTestEmailWithCurrentTemplate()">
+      <ion-col class="ion-text-center" [size]="12" [sizeSm]="6">
+        <ion-button size="small" expand="block" color="secondary" (click)="askAndSendTestEmailWithCurrentTemplate()">
           {{ 'EMAIL_TEMPLATE.TEST_TEMPLATE' | translate }}
           <ion-icon icon="send" slot="end"></ion-icon>
         </ion-button>
