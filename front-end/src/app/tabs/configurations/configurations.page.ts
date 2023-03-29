@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AlertController, ModalController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
-import { EmailTemplateComponent } from '@app/common/emailTemplate.component';
+import { EmailTemplateComponent } from './emailTemplate/emailTemplate.component';
 
 import { AppService } from '@app/app.service';
 import { ConfigurationsService, EmailTemplates } from './configurations.service';

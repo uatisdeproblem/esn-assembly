@@ -12,10 +12,11 @@ import { User } from '../models/user.model';
 ///
 
 const PROJECT = process.env.PROJECT;
+const STAGE = process.env.STAGE;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
-const BASE_URL = process.env.STAGE === 'prod' ? 'https://qa.esn.org' : 'https://dev.esn-ga.link';
+const BASE_URL = STAGE === 'prod' ? 'https://qa.esn.org' : 'https://dev.esn-ga.link';
 const SES_CONFIG = {
   sourceName: 'ESN General Assembly Q&A',
   source: process.env.SES_SOURCE_ADDRESS,
@@ -97,7 +98,7 @@ class ConfigurationsRC extends ResourceController {
   }
   private async getEmailTemplate(emailTemplate: string): Promise<{ subject: string; content: string }> {
     try {
-      const template = await ses.getTemplate(emailTemplate);
+      const template = await ses.getTemplate(`${emailTemplate}-${STAGE}`);
       return { subject: template.SubjectPart, content: template.HtmlPart };
     } catch (error) {
       throw new RCError('Template not found');
@@ -107,11 +108,11 @@ class ConfigurationsRC extends ResourceController {
     if (!subject) throw new RCError('Missing subject');
     if (!content) throw new RCError('Missing content');
 
-    await ses.setTemplate(emailTemplate, subject, content, true);
+    await ses.setTemplate(`${emailTemplate}-${STAGE}`, subject, content, true);
   }
   private async testEmailTemplate(emailTemplate: string): Promise<void> {
     const toAddresses = [this.galaxyUser.email];
-    const template = emailTemplate;
+    const template = `${emailTemplate}-${STAGE}`;
     const templateData = {
       user: `${this.galaxyUser.firstName} ${this.galaxyUser.lastName}`,
       topic: TEST_EMAIL_EXAMPLE_TOPIC,
@@ -134,12 +135,12 @@ class ConfigurationsRC extends ResourceController {
     }
   }
   private async resetEmailTemplate(emailTemplate: string): Promise<void> {
-    const subject = emailTemplate;
+    const subject = `${emailTemplate}-${STAGE}`;
     const content = await s3.getObject({
       bucket: S3_BUCKET_MEDIA,
       key: S3_ASSETS_FOLDER.concat('/', emailTemplate, '.hbs'),
       type: GetObjectTypes.TEXT
     });
-    await ses.setTemplate(emailTemplate, subject, content, true);
+    await ses.setTemplate(`${emailTemplate}-${STAGE}`, subject, content, true);
   }
 }

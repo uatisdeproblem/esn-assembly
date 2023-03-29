@@ -259,10 +259,10 @@
     "TEMPLATE_RESET": "Reset (use default template)",
     "EMAIL_SENT": "Email sent",
     "BAD_TEMPLATE": "The template seems to have some problems. Please check its correctness.",
-    "TEST_TEMPLATE": "Test current template",
-    "TEST_TEMPLATE_I": "A test email with the current template will be sent to your email address.",
+    "TEST_TEMPLATE": "Test active template",
+    "TEST_TEMPLATE_I": "A test email with the template currently active will be sent to your email address.",
     "RESET": "Reset to default",
-    "DOWNLOAD_TEMPLATE": "Download current template",
+    "DOWNLOAD_TEMPLATE": "Download active template",
     "VARIABLES": {
       "USER": "The full name of the user target of the notification",
       "TOPIC": "The title of the topic",

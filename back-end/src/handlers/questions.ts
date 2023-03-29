@@ -16,6 +16,7 @@ import { User } from '../models/user.model';
 ///
 
 const PROJECT = process.env.PROJECT;
+const STAGE = process.env.STAGE;
 const DDB_TABLES = {
   questions: process.env.DDB_TABLE_questions,
   questionsUpvotes: process.env.DDB_TABLE_questionsUpvotes,
@@ -24,7 +25,7 @@ const DDB_TABLES = {
 };
 const ddb = new DynamoDB();
 
-const DOMAIN_URL = process.env.STAGE === 'prod' ? 'qa.esn.org' : 'dev.esn-ga.link';
+const DOMAIN_URL = STAGE === 'prod' ? 'qa.esn.org' : 'dev.esn-ga.link';
 const QUESTION_BASE_URL = `https://${DOMAIN_URL}/t/topics/`;
 const SES_CONFIG = {
   sourceName: 'ESN General Assembly Q&A',
@@ -204,7 +205,7 @@ class Questions extends ResourceController {
 
   private async sendNotificationToTopicSubjects(topic: Topic, question: Question): Promise<void> {
     const subjectsToNotify = topic.subjects.filter(x => !!x.email);
-    const template = 'notify-new-question';
+    const template = `notify-new-question-${STAGE}`;
     for (const subject of subjectsToNotify) {
       const templateData = {
         user: subject.name,

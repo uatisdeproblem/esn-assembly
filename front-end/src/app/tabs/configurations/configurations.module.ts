@@ -7,7 +7,7 @@ import { IDEATranslationsModule } from '@idea-ionic/common';
 import { ConfigurationsRoutingModule } from './configurations.routing.module';
 import { ConfigurationsPage } from './configurations.page';
 
-import { EmailTemplateModule } from 'src/app/common/emailTemplate.module';
+import { EmailTemplateModule } from './emailTemplate/emailTemplate.module';
 
 @NgModule({
   imports: [

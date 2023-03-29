@@ -3,8 +3,8 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { isEmpty } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
-import { ConfigurationsService, EmailTemplates } from '@app/tabs/configurations/configurations.service';
-import { AppService } from '../app.service';
+import { ConfigurationsService, EmailTemplates } from '../configurations.service';
+import { AppService } from '@app/app.service';
 
 @Component({
   selector: 'app-email-template',
@@ -39,7 +39,9 @@ export class EmailTemplateComponent implements OnInit {
     private app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    await this.loadTemplate();
+    const { subject, content } = await this.getTemplate();
+    this.subject = subject;
+    this.content = content;
   }
 
   hasFieldAnError(field: string): boolean {
@@ -96,15 +98,14 @@ export class EmailTemplateComponent implements OnInit {
     alert.present();
   }
 
-  downloadTemplate(): void {
-    this.app.downloadDataAsFile(this.content, 'text/html', this.template.concat('.html'));
+  async downloadTemplate(): Promise<void> {
+    const { content } = await this.getTemplate();
+    this.app.downloadDataAsFile(content, 'text/html', this.template.concat('.html'));
   }
-  async loadTemplate(): Promise<void> {
+  async getTemplate(): Promise<{ subject: string; content: string }> {
     try {
       await this.loading.show();
-      const { subject, content } = await this._configurations.getEmailTemplate(this.template);
-      this.subject = subject;
-      this.content = content;
+      return await this._configurations.getEmailTemplate(this.template);
     } catch (error) {
       this.message.error('COMMON.SOMETHING_WENT_WRONG');
     } finally {
