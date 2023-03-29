@@ -164,7 +164,7 @@ class Answers extends ResourceController {
   private async sendNotificationToQuestionMaker(topic: Topic, question: Question): Promise<void> {
     const template = 'notify-new-answer';
     const templateData = {
-      userName: question.creator.name,
+      user: question.creator.name,
       topic: topic.name,
       question: question.summary,
       url: QUESTION_BASE_URL.concat(topic.topicId)

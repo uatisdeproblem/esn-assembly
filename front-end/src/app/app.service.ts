@@ -205,4 +205,19 @@ export class AppService {
     const windowName = this.platform.is('ios') ? '_parent' : '_blank';
     await Browser.open({ url, windowName });
   }
+
+  /**
+   * Open a new window in the browser to download some data as a file.
+   */
+  downloadDataAsFile(data: any, type: string, fileName: string): void {
+    const uri = `data:${type};charset=utf-8,${encodeURIComponent(data)}`;
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = uri;
+    downloadLink.download = fileName;
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
 }

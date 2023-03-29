@@ -180,11 +180,18 @@
   },
   "CONFIGURATIONS": {
     "ENTITIES": "Entities",
+    "ENTITIES_I": "Manage the general entities of the platform",
     "CATEGORIES": "Categories",
     "EVENTS": "Events",
     "ADMINISTRATORS": "Administrators",
     "ADMINISTRATORS_I": "Add administrators by their ESN Accounts username",
-    "ADD_ADMINISTRATOR": "Add administrator"
+    "ADD_ADMINISTRATOR": "Add administrator",
+    "EMAIL_TEMPLATES": "Email templates",
+    "EMAIL_TEMPLATES_I": "Set the templates for the following notification emails",
+    "EMAIL_TEMPLATES_TYPES": {
+      "QUESTIONS": "New questions in a topic",
+      "ANSWERS": "New answers to a question"
+    }
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",
@@ -241,5 +248,26 @@
     "NATIONAL_LEVEL": "National level (any role)",
     "LOCAL_BOARD": "Local Boards",
     "LOCAL_LEVEL": "Local level (any role)"
+  },
+  "EMAIL_TEMPLATE": {
+    "HTML": "Template for emails",
+    "HTML_I": "Set an HTML template for the email to send.",
+    "VARIABLES_ALLOWED": "The template can contain the following variables:",
+    "SUBJECT": "Subject",
+    "CONTENT": "Content",
+    "CONTENT_FROM_FILE": "Load from HTML file",
+    "TEMPLATE_RESET": "Reset (use default template)",
+    "EMAIL_SENT": "Email sent",
+    "BAD_TEMPLATE": "The template seems to have some problems. Please check its correctness.",
+    "TEST_TEMPLATE": "Test current template",
+    "TEST_TEMPLATE_I": "A test email with the current template will be sent to your email address.",
+    "RESET": "Reset to default",
+    "DOWNLOAD_TEMPLATE": "Download current template",
+    "VARIABLES": {
+      "USER": "The full name of the user target of the notification",
+      "TOPIC": "The title of the topic",
+      "QUESTION": "The summary of the question",
+      "URL": "The link to the question"
+    }
   }
 }

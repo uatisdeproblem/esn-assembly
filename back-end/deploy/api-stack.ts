@@ -313,16 +313,9 @@ export class ApiStack extends cdk.Stack {
     apiDomain: string;
   }): void {
     const region = cdk.Stack.of(this).region;
-    const account = cdk.Stack.of(this).account;
 
     const accessSES = new IAM.Policy(this, 'ManageSES', {
-      statements: [
-        new IAM.PolicyStatement({
-          effect: IAM.Effect.ALLOW,
-          actions: ['ses:*'],
-          resources: [`arn:aws:ses:${region}:${account}:identity/*`, `arn:aws:ses:${region}:${account}:template/*`]
-        })
-      ]
+      statements: [new IAM.PolicyStatement({ effect: IAM.Effect.ALLOW, actions: ['ses:*'], resources: ['*'] })]
     });
     params.lambdaFunctions.forEach(lambdaFn => {
       if (lambdaFn.role) lambdaFn.role.attachInlinePolicy(accessSES);

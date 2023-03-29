@@ -9,13 +9,28 @@
 <ion-content>
   <ion-list class="aList maxWidthContainer">
     <ion-list-header>
-      <ion-label><h2>{{ 'CONFIGURATIONS.ENTITIES' | translate }}</h2></ion-label>
+      <ion-label>
+        <h2>{{ 'CONFIGURATIONS.ENTITIES' | translate }}</h2>
+        <p>{{ 'CONFIGURATIONS.ENTITIES_I' | translate }}</p></ion-label
+      >
     </ion-list-header>
     <ion-item button detail (click)="app.goToInTabs(['configurations', 'events'])">
       <ion-label>{{ 'CONFIGURATIONS.EVENTS' | translate }}</ion-label>
     </ion-item>
     <ion-item button detail (click)="app.goToInTabs(['configurations', 'categories'])">
       <ion-label>{{ 'CONFIGURATIONS.CATEGORIES' | translate }}</ion-label>
+    </ion-item>
+    <ion-list-header class="ion-padding-top">
+      <ion-label>
+        <h2>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES' | translate }}</h2>
+        <p>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_I' | translate }}</p>
+      </ion-label>
+    </ion-list-header>
+    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.QUESTIONS)">
+      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.QUESTIONS' | translate }}</ion-label>
+    </ion-item>
+    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.ANSWERS)">
+      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.ANSWERS' | translate }}</ion-label>
     </ion-item>
     <ion-list-header class="ion-padding-top">
       <ion-label>

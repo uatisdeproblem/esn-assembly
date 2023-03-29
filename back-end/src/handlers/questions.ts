@@ -207,7 +207,7 @@ class Questions extends ResourceController {
     const template = 'notify-new-question';
     for (const subject of subjectsToNotify) {
       const templateData = {
-        userName: subject.name,
+        user: subject.name,
         topic: topic.name,
         question: question.summary,
         url: QUESTION_BASE_URL.concat(topic.topicId)

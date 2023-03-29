@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
+import { EmailTemplateComponent } from '@app/common/emailTemplate.component';
+
 import { AppService } from '@app/app.service';
-import { ConfigurationsService } from './configurations.service';
+import { ConfigurationsService, EmailTemplates } from './configurations.service';
 
 import { Configurations } from '@models/configurations.model';
 import { cleanESNAccountsIdForURL } from '@models/utils';
@@ -16,7 +18,10 @@ import { cleanESNAccountsIdForURL } from '@models/utils';
 export class ConfigurationsPage implements OnInit {
   configurations: Configurations;
 
+  EmailTemplates = EmailTemplates;
+
   constructor(
+    private modalCtrl: ModalController,
     private alertCtrl: AlertController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
@@ -77,5 +82,11 @@ export class ConfigurationsPage implements OnInit {
   async openAdministratorProfileById(userId: string): Promise<void> {
     const url = 'https://accounts.esn.org/user/'.concat(cleanESNAccountsIdForURL(userId));
     await this.app.openURL(url);
+  }
+
+  async openTemplateEmailModal(template: EmailTemplates): Promise<void> {
+    const componentProps = { template };
+    const modal = await this.modalCtrl.create({ component: EmailTemplateComponent, componentProps });
+    await modal.present();
   }
 }

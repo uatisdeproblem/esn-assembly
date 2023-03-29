@@ -79,6 +79,40 @@ paths:
           $ref: '#/components/responses/Configurations'
         400:
           $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Set specific configurations
+      tags: [Configurations]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum:
+                    - GET_EMAIL_TEMPLATE_QUESTIONS
+                    - GET_EMAIL_TEMPLATE_ANSWERS
+                    - SET_EMAIL_TEMPLATE_QUESTIONS
+                    - SET_EMAIL_TEMPLATE_ANSWERS
+                    - RESET_EMAIL_TEMPLATE_QUESTIONS
+                    - RESET_EMAIL_TEMPLATE_ANSWERS
+                    - TEST_EMAIL_TEMPLATE_QUESTIONS
+                    - TEST_EMAIL_TEMPLATE_ANSWERS
+                subject:
+                  type: string
+                  description: (SET_EMAIL_TEMPLATE_QUESTIONS, SET_EMAIL_TEMPLATE_ANSWERS)
+                content:
+                  type: string
+                  description: (SET_EMAIL_TEMPLATE_QUESTIONS, SET_EMAIL_TEMPLATE_ANSWERS)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /categories:
     get:
       summary: Get the categories
