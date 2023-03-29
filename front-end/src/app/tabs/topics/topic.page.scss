@@ -32,6 +32,12 @@ ion-list.aList {
       }
     }
   }
+  ion-item.attachment {
+    font-size: 1.1em;
+    ion-icon[slot='start'] {
+      margin-right: 16px;
+    }
+  }
 }
 
 app-html-editor {

@@ -5,7 +5,7 @@
       (ionError)="app.fallbackAvatar($event?.target, subject.type !== SubjectTypes.USER)"
     ></ion-img>
   </ion-avatar>
-  <ion-label>
+  <ion-label class="ion-text-wrap">
     {{ subject.name }}
     <p *ngIf="subject.getSectionCountry()">{{ subject.getSectionCountry() }}</p>
   </ion-label>

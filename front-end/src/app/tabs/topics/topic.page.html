@@ -66,18 +66,19 @@
               <app-html-editor *ngIf="topic.content" [content]="topic.content" [editMode]="false"></app-html-editor>
               <ion-item
                 lines="inset"
-                class="ion-margin-top"
-                *ngFor="let attachment of topic.attachments"
+                class="attachment"
+                *ngFor="let attachment of topic.attachments; let first = first"
+                [class.ion-margin-top]="first"
                 button
                 (click)="downloadAttachment(attachment)"
               >
                 <ion-icon name="attach" slot="start"></ion-icon>
-                <ion-label>{{ attachment.name }}.{{ attachment.format }}</ion-label>
+                <ion-label class="ion-text-wrap">{{ attachment.name }}.{{ attachment.format }}</ion-label>
               </ion-item>
               <ion-item
                 lines="inset"
-                class="ion-margin-top"
-                *ngFor="let related of relatedTopics"
+                *ngFor="let related of relatedTopics; let first = first"
+                [class.ion-margin-top]="first"
                 button
                 (click)="openTopic(related)"
               >

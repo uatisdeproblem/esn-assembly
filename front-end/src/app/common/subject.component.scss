@@ -4,4 +4,7 @@ ion-item {
     width: var(--app-subject-avatar-size, 50px);
     height: var(--app-subject-avatar-size, 50px);
   }
+  ion-label p {
+    color: var(--ion-color-step-500);
+  }
 }
