@@ -16,7 +16,7 @@ import { User } from '@models/user.model';
 /**
  * The base URLs where the thumbnails are located.
  */
-const THUMBNAILS_BASE_URL = env.idea.app.mediaUrl.concat('/thumbnails/images/', env.idea.api.stage, '/');
+const THUMBNAILS_BASE_URL = env.idea.app.mediaUrl.concat('/images/', env.idea.api.stage, '/');
 /**
  * A local fallback URL for the users avatars.
  */
@@ -119,7 +119,7 @@ export class AppService {
   /**
    * Get the URL to an image by its URI.
    */
-  private getImageURLByURI(imageURI: string): string {
+  getImageURLByURI(imageURI: string): string {
     return THUMBNAILS_BASE_URL.concat(imageURI, '.png');
   }
   /**

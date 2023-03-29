@@ -9,6 +9,7 @@ import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
 import { TopicCategoryService } from '../configurations/categories/categories.service';
 import { TopicEventsService } from '../configurations/events/events.service';
+import { MediaService } from '@app/common/media.service';
 
 import { Topic } from '@models/topic.model';
 import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
@@ -58,6 +59,7 @@ export class ManageTopicPage implements OnInit {
     private _topics: TopicsService,
     private _categories: TopicCategoryService,
     private _events: TopicEventsService,
+    private _media: MediaService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
@@ -278,6 +280,26 @@ export class ManageTopicPage implements OnInit {
       else this.publishingOption = PublishingOptions.PUBLISH;
     } else this.publishingOption = PublishingOptions.DRAFT;
   }
+
+  browseImagesForElementId(elementId: string): void {
+    document.getElementById(elementId).click();
+  }
+  async uploadImageForSubject(subject: Subject, { target }): Promise<void> {
+    const file = target.files[0];
+    if (!file) return;
+
+    try {
+      await this.loading.show();
+      const imageURI = await this._media.uploadImage(file);
+      await sleepForNumSeconds(5);
+      subject.avatarURL = this.app.getImageURLByURI(imageURI);
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      if (target) target.value = '';
+      this.loading.hide();
+    }
+  }
 }
 
 export enum UXMode {
@@ -291,3 +313,6 @@ export enum PublishingOptions {
   PUBLISH = 'PUBLISH',
   SCHEDULE = 'SCHEDULE'
 }
+
+const sleepForNumSeconds = (numSeconds = 1): Promise<void> =>
+  new Promise(resolve => setTimeout((): void => resolve(null), 1000 * numSeconds));

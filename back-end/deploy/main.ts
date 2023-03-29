@@ -19,6 +19,7 @@ const apiResources: ResourceController[] = [
   { name: 'auth', isAuthFunction: true },
   { name: 'login', paths: ['/login'] },
   { name: 'configurations', paths: ['/configurations'] },
+  { name: 'media', paths: ['/media'] },
   { name: 'categories', paths: ['/categories', '/categories/{categoryId}'] },
   { name: 'events', paths: ['/events', '/events/{eventId}'] },
   { name: 'topics', paths: ['/topics', '/topics/{topicId}'] },

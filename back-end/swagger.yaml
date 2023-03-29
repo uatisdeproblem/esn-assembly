@@ -113,6 +113,16 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /media:
+    post:
+      summary: Get a signed URL to upload a new image
+      description: Requires to be Administrator
+      tags: [Configurations]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
   /categories:
     get:
       summary: Get the categories

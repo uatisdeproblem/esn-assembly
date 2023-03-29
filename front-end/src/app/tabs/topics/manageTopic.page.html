@@ -179,6 +179,22 @@
             <ion-item [class.fieldHasError]="hasFieldAnError('subjects[' + index + '].avatarURL')">
               <ion-label position="stacked">{{ 'SUBJECTS.AVATAR_URL' | translate }}</ion-label>
               <ion-input [(ngModel)]="subject.avatarURL" [disabled]="!editMode"></ion-input>
+              <input
+                type="file"
+                accept="image/*"
+                style="display: none"
+                [id]="'upload-image-' + index"
+                (change)="uploadImageForSubject(subject, $event)"
+              />
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="medium"
+                class="ion-margin-top"
+                (click)="browseImagesForElementId('upload-image-' + index)"
+              >
+                <ion-icon icon="cloud-upload-outline" slot="icon-only"></ion-icon>
+              </ion-button>
             </ion-item>
           </ion-col>
           <ion-col [size]="6">
