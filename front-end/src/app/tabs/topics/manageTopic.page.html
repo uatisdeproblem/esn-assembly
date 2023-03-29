@@ -9,11 +9,6 @@
 </ion-header>
 <ion-content [class.viewMode]="!editMode">
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
-    <p class="ion-text-right" *ngIf="!editMode && !topic.isArchived()">
-      <ion-button [color]="topic.closedAt ? 'success': 'danger'" (click)="manageTopicStatus(!!topic.closedAt)">
-        {{ (topic.closedAt ? 'COMMON.OPEN' : 'COMMON.CLOSE') | translate }}
-      </ion-button>
-    </p>
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.ATTRIBUTES' | translate }}</h2> </ion-label>
     </ion-list-header>
@@ -249,6 +244,11 @@
       (change)="setRolesAbleToAskQuestionsFromChecks()"
     ></idea-checker>
 
+    <p class="ion-text-center" *ngIf="!editMode && !topic.isArchived()">
+      <ion-button [color]="topic.closedAt ? 'ESNgreen': 'ESNpink'" (click)="manageTopicStatus(!!topic.closedAt)">
+        {{ (topic.closedAt ? 'TOPICS.REOPEN_TOPIC' : 'TOPICS.CLOSE_TOPIC') | translate }}
+      </ion-button>
+    </p>
     <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
       <ion-col>
         <ion-button color="warning" (click)="archiveTopic(!topic.isArchived())">

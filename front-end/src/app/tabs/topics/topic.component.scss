@@ -30,6 +30,7 @@ ion-row.headerRow {
 }
 ion-row.row {
   font-size: 0.9em;
+  border-bottom: 0.8px solid var(--ion-color-white-tint);
   b {
     font-weight: 500;
   }

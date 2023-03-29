@@ -154,7 +154,9 @@
       "PUBLISH": "Visibile",
       "SCHEDULE": "Schedule publishing"
     },
-    "PUBLISH_ON": "Publish on"
+    "PUBLISH_ON": "Publish on",
+    "CLOSE_TOPIC": "Close topic",
+    "REOPEN_TOPIC": "Reopen topic"
   },
   "QUESTIONS": {
     "BY": "By",

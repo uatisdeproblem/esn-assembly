@@ -7,11 +7,6 @@
     </ion-buttons>
     <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
   </ion-toolbar>
-  <ion-toolbar color="ideaToolbar" *ngIf="app.user.isAdministrator">
-    <ion-buttons slot="end">
-      <ion-button fill="solid" color="ESNcyan" (click)="manageTopic()">{{ 'COMMON.MANAGE' | translate }}</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
 </ion-header>
 <ion-content>
   <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
@@ -176,3 +171,8 @@
     </ion-row>
   </ion-grid>
 </ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+  <ion-fab-button color="ESNcyan" size="small" [title]="'COMMON.MANAGE' | translate" (click)="manageTopic()">
+    <ion-icon icon="build"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
