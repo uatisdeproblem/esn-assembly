@@ -22,13 +22,18 @@ export enum UserRoles {
  * Note: all roles are lower-cased (since they will be handled with a case-insensitive logic).
  */
 export const ESN_ACCOUNTS_ROLES_MAP: { [userRole: string]: string[] } = {
-  INTERNATIONAL_BOARD: ['international.regularBoardMember', 'international.vicepresident'], // @todo
-  INTERNATIONAL_SECRETARIAT: ['international.officeStaff'],
-  INTERNATIONAL_LEVEL: ['international.*'],
+  INTERNATIONAL_BOARD: [
+    'International.president',
+    'international.vicepresident',
+    'International.treasurer',
+    'international.webprojectadministrator'
+  ], // @todo
+  INTERNATIONAL_SECRETARIAT: ['international.officestaff'],
   INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradmin'],
-  INTERNATIONAL_AB: ['international.ab.*', 'international.ab.secretary'], // @todo
+  INTERNATIONAL_AB: ['international.ab.*', 'international.ab.main_arbitrator', 'international.ab.secretary'], // @todo
   INTERNATIONAL_AC: ['international.ac.*'], // @todo
-  NATIONAL_BOARD: ['national.regularBoardMember'],
+  INTERNATIONAL_LEVEL: ['international.*'],
+  NATIONAL_BOARD: ['national.regularboardmember'],
   NATIONAL_LEVEL: ['national.*'],
   LOCAL_BOARD: ['local.regularboardmember'],
   LOCAL_LEVEL: ['local.*']
