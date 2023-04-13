@@ -32,6 +32,7 @@ const apiResources: ResourceController[] = [
       '/topics/{topicId}/questions/{questionId}/answers/{answerId}'
     ]
   },
+  { name: 'badges', paths: ['/badges', '/badges/{badge}'] },
   { name: 'scheduledOps' },
   { name: 'sesNotifications' }
 ];
@@ -79,6 +80,10 @@ const tables: { [tableName: string]: DDBTable } = {
   questionsUpvotes: {
     PK: { name: 'questionId', type: DDB.AttributeType.STRING },
     SK: { name: 'userId', type: DDB.AttributeType.STRING }
+  },
+  usersBadges: {
+    PK: { name: 'userId', type: DDB.AttributeType.STRING },
+    SK: { name: 'badge', type: DDB.AttributeType.STRING }
   }
 };
 

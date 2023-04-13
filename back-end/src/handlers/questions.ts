@@ -3,13 +3,16 @@
 ///
 
 import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
+import { toISODate } from 'idea-toolbox';
 
 import { isEmailInBlockList } from './sesNotifications';
+import { addBadgeToUser } from './badges';
 
 import { Topic } from '../models/topic.model';
 import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
 import { User } from '../models/user.model';
+import { Badges } from '../models/userBadge.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -109,6 +112,11 @@ class Questions extends ResourceController {
 
     await this.sendNotificationToTopicSubjects(this.topic, this.question);
 
+    await addBadgeToUser(ddb, this.galaxyUser, Badges.FIRST_QUESTION);
+    if ((await this.getNumQuestionsMadeByUser()) >= 5)
+      await addBadgeToUser(ddb, this.galaxyUser, Badges.QUESTIONS_MASTER);
+    if (toISODate(new Date()) === '2023-04-14') await addBadgeToUser(ddb, this.galaxyUser, Badges.PEER_PRESSURE_MINHO);
+
     return this.question;
   }
 
@@ -146,6 +154,9 @@ class Questions extends ResourceController {
 
     this.question.numOfUpvotes = await this.getLiveNumUpvotes();
     await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
+
+    await addBadgeToUser(ddb, this.galaxyUser, Badges.NEWCOMER);
+
     return this.question;
   }
   private async getLiveNumUpvotes(): Promise<number> {
@@ -215,6 +226,21 @@ class Questions extends ResourceController {
       };
       if (!(await isEmailInBlockList(question.creator.email)))
         await ses.sendTemplatedEmail({ toAddresses: [subject.email], template, templateData }, SES_CONFIG);
+    }
+  }
+
+  // @todo to improve performance
+  private async getNumQuestionsMadeByUser(): Promise<number> {
+    try {
+      const questions = await ddb.scan({
+        TableName: DDB_TABLES.questions,
+        ProjectionExpression: 'creator',
+        FilterExpression: 'creator.id = :userId',
+        ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }
+      });
+      return questions.length;
+    } catch (error) {
+      return 0;
     }
   }
 }

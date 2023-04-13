@@ -1,0 +1,24 @@
+<ion-card color="white">
+  <ion-card-header>
+    <ion-card-subtitle *ngIf="!userBadge.firstSeenAt">
+      <ion-item color="primary">
+        <ion-label class="ion-text-wrap ion-text-center">{{ 'PROFILE.YOU_EARNED_A_BADGE' | translate }}</ion-label>
+      </ion-item>
+    </ion-card-subtitle>
+    <ion-card-title class="ion-text-center">{{ 'PROFILE.BADGES.' + userBadge.badge | translate }}</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p class="ion-text-center">{{ 'PROFILE.BADGES_I.' + userBadge.badge | translate }}</p>
+    <ion-img [src]="_badges.getBadgeImage(userBadge)"></ion-img>
+    <p class="ion-text-center ion-padding-bottom">
+      <ion-badge color="light">
+        {{ 'PROFILE.BADGE_EARNED' | translate }}: {{ userBadge.earnedAt | dateLocale : 'd MMM yyyy' }}
+      </ion-badge>
+    </p>
+    <p class="ion-text-center">
+      <ion-button fill="clear" color="medium" (click)="close()">
+        {{ 'COMMON.CLOSE' | translate }}
+      </ion-button>
+    </p>
+  </ion-card-content>
+</ion-card>

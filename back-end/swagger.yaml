@@ -35,6 +35,8 @@ tags:
     description: The questions on a topic
   - name: Answers
     description: The answers to the questions
+  - name: Badges
+    description: The badges earned by the users following actions on the platform
 
 paths:
   /login:
@@ -872,6 +874,31 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /badges:
+    get:
+      summary: Get the user's earned badges
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/Badges'
+  /badges/{badge}:
+    get:
+      summary: Get the badge earned (if so) by the user (and mark as seen)
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: badge
+          in: path
+          description: Badge
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Badge'
 
 components:
   schemas:
@@ -891,6 +918,9 @@ components:
       type: object
       additionalProperties: {}
     Answer:
+      type: object
+      additionalProperties: {}
+    Badge:
       type: object
       additionalProperties: {}
 
@@ -977,6 +1007,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Answer'
+    Badge:
+      description: A badge
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Badge'
+    Badges:
+      description: The badges
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Badge'
     BadParameters:
       description: Bad input parameters
       content:

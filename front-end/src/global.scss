@@ -189,3 +189,10 @@ ion-radio[slot='start'] + ion-label {
   -webkit-text-fill-color: var(--ion-text-color);
   --placeholder-opacity: 0 !important;
 }
+
+.largePopover {
+  --width: 700px;
+  @media only screen and (max-width: 767px) {
+    --width: 400px;
+  }
+}

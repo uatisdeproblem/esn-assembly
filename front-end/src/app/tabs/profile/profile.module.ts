@@ -7,8 +7,10 @@ import { IDEATranslationsModule } from '@idea-ionic/common';
 import { ProfileRoutingModule } from './profile.routing.module';
 import { ProfilePage } from './profile.page';
 
+import { UserBadgeModule } from './badges/userBadge.module';
+
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, ProfileRoutingModule],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, ProfileRoutingModule, UserBadgeModule],
   declarations: [ProfilePage]
 })
 export class ProfileModule {}
