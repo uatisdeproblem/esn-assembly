@@ -25,6 +25,15 @@
       <ion-button slot="end" class="ion-margin-top" fill="clear" color="medium" *ngIf="badges" (click)="badges = null">
         <ion-icon icon="arrow-undo" slot="icon-only"></ion-icon>
       </ion-button>
+      <ion-button
+        slot="end"
+        class="ion-margin-top"
+        fill="clear"
+        *ngIf="badges"
+        (click)="openESNAccountOfUserId(userId)"
+      >
+        <ion-icon slot="icon-only" icon="open-outline"></ion-icon>
+      </ion-button>
     </ion-item>
     <ion-grid class="ion-margin-top badgesGrid" *ngIf="badges">
       <ion-row class="ion-justify-content-center ion-align-items-center">
