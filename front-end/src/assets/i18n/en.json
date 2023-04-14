@@ -193,7 +193,11 @@
     "EMAIL_TEMPLATES_TYPES": {
       "QUESTIONS": "New questions in a topic",
       "ANSWERS": "New answers to a question"
-    }
+    },
+    "GIVE_BADGES": "Give badges",
+    "GIVE_BADGES_I": "Badges are usually earned through automatic actions, but here you can force them.",
+    "GIVE_A_BADGE": "Give a badge",
+    "USER_ID": "User ID (ESN Accounts)"
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",
@@ -246,13 +250,21 @@
       "FIRST_QUESTION": "First question",
       "PEER_PRESSURE_MINHO": "Peer pressure",
       "QUESTIONS_MASTER": "Question Master",
-      "NEWCOMER": "Newcomer"
+      "NEWCOMER": "Newcomer",
+      "KNOW_IT_ALL": "Know-It-All Streak",
+      "LOVE_GIVER": "The Love Giver",
+      "POKEMON_HUNTER": "Pokemon Hunter",
+      "RISING_STAR": "Rising Star"
     },
     "BADGES_I": {
       "FIRST_QUESTION": "Congrats for starting your way into the Q&A app!",
       "PEER_PRESSURE_MINHO": "Pedro asks, you deliver. Just in time before GA Minho's deadline.",
       "QUESTIONS_MASTER": "This is the way! Asking lots of healthy questions help the Network grow stronger.",
-      "NEWCOMER": "You're finally acclimating to the tool. We are happy about it!"
+      "NEWCOMER": "You're finally acclimating to the tool. We are happy about it!",
+      "KNOW_IT_ALL": "Soooo many questions, but you saw it through. Amazing job!",
+      "LOVE_GIVER": "You're a true supporter! Continue smashing that upvote button!",
+      "POKEMON_HUNTER": "You did catch'em all! Every candidates knows you now.",
+      "RISING_STAR": "You're the bright future of our Network. Congrats, candidate!"
     }
   },
   "USER_ROLES": {

@@ -20,6 +20,15 @@
     <ion-item button detail (click)="app.goToInTabs(['configurations', 'categories'])">
       <ion-label>{{ 'CONFIGURATIONS.CATEGORIES' | translate }}</ion-label>
     </ion-item>
+    <ion-list-header>
+      <ion-label>
+        <h2>{{ 'CONFIGURATIONS.GIVE_BADGES' | translate }}</h2>
+        <p>{{ 'CONFIGURATIONS.GIVE_BADGES_I' | translate }}</p></ion-label
+      >
+    </ion-list-header>
+    <p class="ion-text-center">
+      <ion-button (click)="openBadgesModal()">{{ 'CONFIGURATIONS.GIVE_A_BADGE' | translate }}</ion-button>
+    </p>
     <ion-list-header class="ion-padding-top">
       <ion-label>
         <h2>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES' | translate }}</h2>

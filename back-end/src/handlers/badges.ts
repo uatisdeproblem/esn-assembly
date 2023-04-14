@@ -29,9 +29,19 @@ class BadgesRC extends ResourceController {
     this.galaxyUser = new User(event.requestContext.authorizer.lambda.user);
   }
 
-  protected async checkAuthBeforeRequest(): Promise<void> {
-    if (!this.resourceId) return;
+  protected async getResources(): Promise<UserBadge[]> {
+    const userId =
+      this.queryParams.userId && this.galaxyUser.isAdministrator ? this.queryParams.userId : this.galaxyUser.userId;
+    let usersBadges: UserBadge[] = await ddb.query({
+      TableName: DDB_TABLES.usersBadges,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: { ':userId': userId }
+    });
+    usersBadges = usersBadges.map(x => new UserBadge(x));
+    return usersBadges.sort((a, b): number => b.earnedAt.localeCompare(a.earnedAt));
+  }
 
+  protected async getResource(): Promise<UserBadge> {
     try {
       this.userBadge = new UserBadge(
         await ddb.get({
@@ -42,19 +52,7 @@ class BadgesRC extends ResourceController {
     } catch (err) {
       throw new RCError('Badge not found');
     }
-  }
 
-  protected async getResources(): Promise<UserBadge[]> {
-    let usersBadges: UserBadge[] = await ddb.query({
-      TableName: DDB_TABLES.usersBadges,
-      KeyConditionExpression: 'userId = :userId',
-      ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }
-    });
-    usersBadges = usersBadges.map(x => new UserBadge(x));
-    return usersBadges.sort((a, b): number => b.earnedAt.localeCompare(a.earnedAt));
-  }
-
-  protected async getResource(): Promise<UserBadge> {
     if (!this.userBadge.firstSeenAt) {
       this.userBadge.firstSeenAt = new Date().toISOString();
       await ddb.update({
@@ -66,11 +64,34 @@ class BadgesRC extends ResourceController {
     }
     return this.userBadge;
   }
+
+  protected async postResource(): Promise<void> {
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+
+    const { userId } = this.queryParams;
+    const badge = this.resourceId as Badges;
+
+    if (!userId) throw new RCError('No target user');
+    if (!badge || !Object.values(Badges).includes(badge)) throw new RCError('Invalid badge');
+
+    await addBadgeToUser(ddb, userId, badge);
+  }
+
+  protected async deleteResource(): Promise<void> {
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+
+    const { userId } = this.queryParams;
+    const badge = this.resourceId as Badges;
+
+    if (!userId) throw new RCError('No target user');
+
+    await ddb.delete({ TableName: DDB_TABLES.usersBadges, Key: { userId, badge } });
+  }
 }
 
-export const addBadgeToUser = async (ddb: DynamoDB, user: User, badge: Badges): Promise<void> => {
+export const addBadgeToUser = async (ddb: DynamoDB, userId: string, badge: Badges): Promise<void> => {
   try {
-    const userBadge = new UserBadge({ userId: user.userId, badge });
+    const userBadge = new UserBadge({ userId, badge });
     await ddb.put({
       TableName: DDB_TABLES.usersBadges,
       Item: userBadge,

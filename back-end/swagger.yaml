@@ -899,6 +899,54 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/Badge'
+    post:
+      summary: Add the badge to a user
+      description: Requires to be Administrator
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: badge
+          in: path
+          description: Badge
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: Target User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Badge'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Remove the badge from a user
+      description: Requires to be Administrator
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: badge
+          in: path
+          description: Badge
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: Target User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:

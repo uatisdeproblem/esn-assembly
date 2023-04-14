@@ -4,11 +4,15 @@
 
 import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
+
+import { addBadgeToUser } from './badges';
+
 import { TopicCategoryAttached } from '../models/category.model';
 import { TopicEventAttached } from '../models/event.model';
-
 import { RelatedTopic, Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
+import { Badges } from '../models/userBadge.model';
+import { SubjectTypes } from '../models/subject.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -103,7 +107,12 @@ class Topics extends ResourceController {
     this.topic = new Topic(this.body);
     this.topic.topicId = await ddb.IUNID(PROJECT);
 
-    return await this.putSafeResource({ noOverwrite: true });
+    await this.putSafeResource({ noOverwrite: true });
+
+    const userSubjects = this.topic.subjects.filter(s => s.type === SubjectTypes.USER);
+    for (const user of userSubjects) await addBadgeToUser(ddb, user.id, Badges.RISING_STAR);
+
+    return this.topic;
   }
 
   protected async patchResources(): Promise<SignedURL> {

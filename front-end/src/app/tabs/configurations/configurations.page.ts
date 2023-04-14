@@ -3,6 +3,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { EmailTemplateComponent } from './emailTemplate/emailTemplate.component';
+import { GiveBadgesComponent } from './badges/giveBadges.component';
 
 import { AppService } from '@app/app.service';
 import { ConfigurationsService, EmailTemplates } from './configurations.service';
@@ -87,6 +88,11 @@ export class ConfigurationsPage implements OnInit {
   async openTemplateEmailModal(template: EmailTemplates): Promise<void> {
     const componentProps = { template };
     const modal = await this.modalCtrl.create({ component: EmailTemplateComponent, componentProps });
+    await modal.present();
+  }
+
+  async openBadgesModal(): Promise<void> {
+    const modal = await this.modalCtrl.create({ component: GiveBadgesComponent });
     await modal.present();
   }
 }

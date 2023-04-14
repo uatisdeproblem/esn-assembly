@@ -79,7 +79,15 @@ const tables: { [tableName: string]: DDBTable } = {
   },
   questionsUpvotes: {
     PK: { name: 'questionId', type: DDB.AttributeType.STRING },
-    SK: { name: 'userId', type: DDB.AttributeType.STRING }
+    SK: { name: 'userId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'inverted-index',
+        partitionKey: { name: 'userId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'questionId', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.ALL
+      }
+    ]
   },
   usersBadges: {
     PK: { name: 'userId', type: DDB.AttributeType.STRING },

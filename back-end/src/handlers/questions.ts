@@ -112,10 +112,11 @@ class Questions extends ResourceController {
 
     await this.sendNotificationToTopicSubjects(this.topic, this.question);
 
-    await addBadgeToUser(ddb, this.galaxyUser, Badges.FIRST_QUESTION);
+    await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.FIRST_QUESTION);
     if ((await this.getNumQuestionsMadeByUser()) >= 10)
-      await addBadgeToUser(ddb, this.galaxyUser, Badges.QUESTIONS_MASTER);
-    if (toISODate(new Date()) === '2023-04-14') await addBadgeToUser(ddb, this.galaxyUser, Badges.PEER_PRESSURE_MINHO);
+      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.QUESTIONS_MASTER);
+    if (toISODate(new Date()) === '2023-04-14')
+      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.PEER_PRESSURE_MINHO);
 
     return this.question;
   }
@@ -155,7 +156,11 @@ class Questions extends ResourceController {
     this.question.numOfUpvotes = await this.getLiveNumUpvotes();
     await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
 
-    await addBadgeToUser(ddb, this.galaxyUser, Badges.NEWCOMER);
+    if (!cancel) {
+      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.NEWCOMER);
+      if ((await this.getNumQuestionsUpvotedByUser()) >= 10)
+        await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.LOVE_GIVER);
+    }
 
     return this.question;
   }
@@ -239,6 +244,19 @@ class Questions extends ResourceController {
         ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }
       });
       return questions.length;
+    } catch (error) {
+      return 0;
+    }
+  }
+  private async getNumQuestionsUpvotedByUser(): Promise<number> {
+    try {
+      const upvotes = await ddb.query({
+        TableName: DDB_TABLES.questionsUpvotes,
+        IndexName: 'inverted-index',
+        KeyConditionExpression: 'userId = :userId',
+        ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }
+      });
+      return upvotes.length;
     } catch (error) {
       return 0;
     }

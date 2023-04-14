@@ -8,6 +8,7 @@ import { ConfigurationsRoutingModule } from './configurations.routing.module';
 import { ConfigurationsPage } from './configurations.page';
 
 import { EmailTemplateModule } from './emailTemplate/emailTemplate.module';
+import { GiveBadgesModule } from './badges/giveBadges.module';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { EmailTemplateModule } from './emailTemplate/emailTemplate.module';
     IonicModule,
     IDEATranslationsModule,
     ConfigurationsRoutingModule,
-    EmailTemplateModule
+    EmailTemplateModule,
+    GiveBadgesModule
   ],
   declarations: [ConfigurationsPage]
 })
