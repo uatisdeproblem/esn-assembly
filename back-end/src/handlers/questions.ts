@@ -113,7 +113,7 @@ class Questions extends ResourceController {
     await this.sendNotificationToTopicSubjects(this.topic, this.question);
 
     await addBadgeToUser(ddb, this.galaxyUser, Badges.FIRST_QUESTION);
-    if ((await this.getNumQuestionsMadeByUser()) >= 5)
+    if ((await this.getNumQuestionsMadeByUser()) >= 10)
       await addBadgeToUser(ddb, this.galaxyUser, Badges.QUESTIONS_MASTER);
     if (toISODate(new Date()) === '2023-04-14') await addBadgeToUser(ddb, this.galaxyUser, Badges.PEER_PRESSURE_MINHO);
 
