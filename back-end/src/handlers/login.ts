@@ -87,7 +87,7 @@ class Login extends ResourceController {
 
       // redirect to the front-end with the fresh new token (instead of resolving)
       const appURL = this.queryParams.localhost ? `http://localhost:${this.queryParams.localhost}` : APP_URL;
-      this.callback(null, { statusCode: 302, headers: { Location: `${appURL}/auth/${token}` } });
+      this.callback(null, { statusCode: 302, headers: { Location: `${appURL}/auth?token=${token}` } });
     } catch (err) {
       this.logger.error('VALIDATE CAS TICKET', err);
       throw new RCError('Login failed');
