@@ -100,7 +100,7 @@ class Questions extends ResourceController {
   }
 
   protected async postResources(): Promise<Question> {
-    if (!this.topic.canUserAskQuestions(this.galaxyUser)) throw new Error('Role not allowed to ask questions');
+    if (!this.topic.canUserAskQuestions(this.galaxyUser)) throw new Error('Not allowed to ask questions');
 
     this.question = new Question(this.body);
     this.question.topicId = this.topic.topicId;
