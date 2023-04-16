@@ -92,7 +92,7 @@ class Answers extends ResourceController {
       ExpressionAttributeValues: { ':questionId': this.question.questionId }
     });
     answers = answers.map(x => new Answer(x));
-    return answers.sort((a, b): number => b.createdAt.localeCompare(b.createdAt));
+    return answers.sort((a, b): number => a.createdAt.localeCompare(b.createdAt));
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Answer> {
