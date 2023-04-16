@@ -28,7 +28,7 @@ export class HTMLEditorComponent implements OnInit, OnChanges {
     editable: true,
     spellcheck: false,
     sanitize: true,
-    rawPaste: false, // @todo temporarily disabled to allow candidates to copy/past their answers; let's see how it goes
+    rawPaste: false,
     minHeight: '300px',
     toolbarHiddenButtons: [
       [
