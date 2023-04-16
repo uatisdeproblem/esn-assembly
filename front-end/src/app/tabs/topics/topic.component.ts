@@ -4,6 +4,7 @@ import { AppService } from '@app/app.service';
 
 import { Topic } from '@models/topic.model';
 import { SubjectTypes } from '@models/subject.model';
+import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'app-topic',
@@ -29,6 +30,7 @@ export class TopicComponent {
   @Output() select = new EventEmitter<void>();
 
   SubjectTypes = SubjectTypes;
+  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   constructor(public app: AppService) {}
 }

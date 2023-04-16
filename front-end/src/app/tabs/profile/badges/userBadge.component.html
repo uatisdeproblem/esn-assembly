@@ -12,7 +12,8 @@
     <ion-img [src]="_badges.getBadgeImage(userBadge)"></ion-img>
     <p class="ion-text-center ion-padding-bottom">
       <ion-badge color="light">
-        {{ 'PROFILE.BADGE_EARNED' | translate }}: {{ userBadge.earnedAt | dateLocale : 'd MMM yyyy' }}
+        {{ 'PROFILE.BADGE_EARNED' | translate }}:
+        {{ userBadge.earnedAt | date : 'd MMM yyyy' : FAVORITE_TIMEZONE }}
       </ion-badge>
     </p>
     <p class="ion-text-center">

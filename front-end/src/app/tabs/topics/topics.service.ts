@@ -70,12 +70,6 @@ export class TopicsService {
       case TopicsSortBy.CREATED_DATE_DESC:
         filteredList = filteredList.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
         break;
-      case TopicsSortBy.UPDATED_DATE_ASC:
-        filteredList = filteredList.sort((a, b): number => a.updatedAt.localeCompare(b.updatedAt));
-        break;
-      case TopicsSortBy.CREATED_DATE_DESC:
-        filteredList = filteredList.sort((a, b): number => b.updatedAt.localeCompare(a.updatedAt));
-        break;
       case TopicsSortBy.NUM_OF_QUESTIONS_ASC:
         filteredList = filteredList.sort((a, b): number => a.numOfQuestions - b.numOfQuestions);
         break;
@@ -129,12 +123,6 @@ export class TopicsService {
         break;
       case TopicsSortBy.CREATED_DATE_DESC:
         filteredList = filteredList.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
-        break;
-      case TopicsSortBy.UPDATED_DATE_ASC:
-        filteredList = filteredList.sort((a, b): number => a.updatedAt.localeCompare(b.updatedAt));
-        break;
-      case TopicsSortBy.CREATED_DATE_DESC:
-        filteredList = filteredList.sort((a, b): number => b.updatedAt.localeCompare(a.updatedAt));
         break;
       case TopicsSortBy.NUM_OF_QUESTIONS_ASC:
         filteredList = filteredList.sort((a, b): number => a.numOfQuestions - b.numOfQuestions);
@@ -235,8 +223,6 @@ export class TopicsService {
 export enum TopicsSortBy {
   CREATED_DATE_ASC = 'CREATED_DATE_ASC',
   CREATED_DATE_DESC = 'CREATED_DATE_DESC',
-  UPDATED_DATE_ASC = 'UPDATED_DATE_ASC',
-  UPDATED_DATE_DESC = 'UPDATED_DATE_DESC',
   NUM_OF_QUESTIONS_ASC = 'NUM_OF_QUESTIONS_ASC',
   NUM_OF_QUESTIONS_DESC = 'NUM_OF_QUESTIONS_DESC'
 }

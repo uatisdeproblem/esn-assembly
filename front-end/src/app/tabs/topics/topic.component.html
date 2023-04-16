@@ -41,7 +41,7 @@
     <ion-col [sizeLg]="2">{{ 'TOPICS.SUBJECTS' | translate }}</ion-col>
     <ion-col [sizeLg]="1">{{ 'TOPICS.NUM_OF_QUESTIONS' | translate }}</ion-col>
     <ion-col [sizeLg]="1">{{ 'TOPICS.STATUS' | translate }}</ion-col>
-    <ion-col class="ion-hide-xl-down" [sizeLg]="1">{{ 'TOPICS.UPDATED_AT' | translate }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="1">{{ 'TOPICS.CREATED_AT' | translate }}</ion-col>
   </ion-row>
   <ion-row class="ion-align-items-center row tappable" *ngIf="!header && topic" (click)="select.emit()">
     <ion-col [sizeLg]="5" [sizeXl]="3">
@@ -70,7 +70,7 @@
       </ng-container>
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="1">
-      {{ topic.updatedAt ?? topic.createdAt | dateLocale : 'mediumDate' }}
+      {{ topic.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
     </ion-col>
   </ion-row>
   <!-- skeleton -->

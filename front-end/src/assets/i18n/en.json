@@ -116,8 +116,6 @@
     "SORT_BY_OPTIONS": {
       "CREATED_DATE_ASC": "Creation date ⬆",
       "CREATED_DATE_DESC": "Creation date ⬇",
-      "UPDATED_DATE_ASC": "Edit date ⬆",
-      "UPDATED_DATE_DESC": "Edit date ⬇",
       "NUM_OF_QUESTIONS_ASC": "# of questions ⬆",
       "NUM_OF_QUESTIONS_DESC": "# of questions ⬇"
     },

@@ -13,7 +13,7 @@
       <b>{{ question.creator.name }}</b>
       <br />
       {{ 'QUESTIONS.ON' | translate | lowercase }}
-      {{ question.updatedAt ?? question.createdAt | dateLocale : 'mediumDate' }}
+      {{ question.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
     </p>
   </ion-label>
   <ion-chip color="medium" [class.small]="app.isInMobileMode()" disabled>
