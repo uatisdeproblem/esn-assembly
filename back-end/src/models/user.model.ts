@@ -23,15 +23,16 @@ export enum UserRoles {
  */
 export const ESN_ACCOUNTS_ROLES_MAP: { [userRole: string]: string[] } = {
   INTERNATIONAL_BOARD: [
-    'International.president',
+    'international.president',
     'international.vicepresident',
-    'International.treasurer',
-    'international.webprojectadministrator'
-  ], // @todo
+    'international.treasurer',
+    'international.webprojectadministrator',
+    'international.externalrelations'
+  ],
   INTERNATIONAL_SECRETARIAT: ['international.officestaff'],
   INTERNATIONAL_GA_CT: ['international.cnrsecretary', 'international.agmchair', 'international.cnradmin'],
-  INTERNATIONAL_AB: ['international.ab.*', 'international.ab.main_arbitrator', 'international.ab.secretary'], // @todo
-  INTERNATIONAL_AC: ['international.ac.*'], // @todo
+  INTERNATIONAL_AB: ['international.ab.*'],
+  INTERNATIONAL_AC: ['international.ac.*'],
   INTERNATIONAL_LEVEL: ['international.*'],
   NATIONAL_BOARD: ['national.regularboardmember'],
   NATIONAL_LEVEL: ['national.*'],
