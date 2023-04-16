@@ -33,6 +33,7 @@ export class QuestionComponent implements OnChanges {
 
   answers: Answer[];
   userUpvoted: boolean;
+  userClapped: { [answerId: string]: boolean } = {};
 
   newAnswer: Answer;
   errors = new Set<string>();
@@ -48,9 +49,10 @@ export class QuestionComponent implements OnChanges {
   ) {}
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     if (changes.question?.currentValue)
-      [this.answers, this.userUpvoted] = await Promise.all([
+      [this.answers, this.userUpvoted, this.userClapped] = await Promise.all([
         this._answers.getListOfQuestion(this.question, { force: true }),
-        this._questions.userHasUpvoted(this.topic, this.question)
+        this._questions.userHasUpvoted(this.topic, this.question),
+        this._questions.userClaps(this.topic, this.question)
       ]);
   }
 
@@ -61,6 +63,16 @@ export class QuestionComponent implements OnChanges {
       else this.question.load(await this._questions.upvoteCancel(this.topic, this.question));
     } catch (error) {
       this.userUpvoted = !upvote;
+      this.message.error('COMMON.OPERATION_FAILED');
+    }
+  }
+  async clapAnswer(clap: boolean, answer: Answer): Promise<void> {
+    try {
+      this.userClapped[answer.answerId] = clap;
+      if (clap) this.question.load(await this._answers.clap(this.question, answer));
+      else this.question.load(await this._answers.clapCancel(this.question, answer));
+    } catch (error) {
+      this.userClapped[answer.answerId] = !clap;
       this.message.error('COMMON.OPERATION_FAILED');
     }
   }

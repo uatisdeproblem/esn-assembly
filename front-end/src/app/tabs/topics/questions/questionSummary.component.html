@@ -16,14 +16,20 @@
       {{ question.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
     </p>
   </ion-label>
-  <ion-chip color="medium" [class.small]="app.isInMobileMode()" disabled>
-    <ion-icon name="chatbubbles"></ion-icon>
-    <ion-label>{{ question.numOfAnswers }}</ion-label>
-  </ion-chip>
-  <ion-chip color="success" [class.small]="app.isInMobileMode()" disabled>
-    <ion-icon name="thumbs-up"></ion-icon>
-    <ion-label>{{ question.numOfUpvotes }}</ion-label>
-  </ion-chip>
+  <div slot="end" class="ion-text-center questionStats" [class.mobile]="app.isInMobileMode()">
+    <ion-chip color="medium" disabled>
+      <ion-icon name="chatbubbles"></ion-icon>
+      <ion-label>{{ question.numOfAnswers }}</ion-label>
+    </ion-chip>
+    <ion-chip color="success" disabled>
+      <ion-icon name="thumbs-up"></ion-icon>
+      <ion-label>{{ question.numOfUpvotes }}</ion-label>
+    </ion-chip>
+    <ion-chip color="ESNpink" disabled>
+      <ion-icon icon="assets/icons/clap.svg"></ion-icon>
+      <ion-label>{{ question.numOfClaps }}</ion-label>
+    </ion-chip>
+  </div>
 </ion-item>
 <!-- skeleton -->
 <ion-item *ngIf="!question">

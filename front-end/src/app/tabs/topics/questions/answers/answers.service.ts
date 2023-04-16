@@ -95,4 +95,27 @@ export class AnswersService {
     const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId];
     await this.api.deleteResource(path);
   }
+
+  /*
+   * Clap an answer.
+   */
+  async clap(question: Question, answer: Answer): Promise<Question> {
+    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId];
+    return new Question(await this.api.patchResource(path, { body: { action: 'CLAP' } }));
+  }
+  /**
+   * Cancel the clap to an answer.
+   */
+  async clapCancel(question: Question, answer: Answer): Promise<Question> {
+    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId];
+    return new Question(await this.api.patchResource(path, { body: { action: 'CLAP_CANCEL' } }));
+  }
+  /**
+   * Whether the current user clapped an answer.
+   */
+  async userHasClapped(question: Question, answer: Answer): Promise<boolean> {
+    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId];
+    const { clapped } = await this.api.patchResource(path, { body: { action: 'IS_CLAPPED' } });
+    return clapped;
+  }
 }

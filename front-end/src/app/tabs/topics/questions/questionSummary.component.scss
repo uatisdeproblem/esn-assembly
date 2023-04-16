@@ -5,11 +5,19 @@ ion-item {
       font-weight: 500;
     }
   }
-  ion-chip[disabled] {
-    opacity: 1 !important;
+  .questionStats {
+    ion-chip {
+      margin: 0 2px;
+    }
+    ion-chip[disabled] {
+      opacity: 1 !important;
+    }
   }
-  ion-chip.small ion-icon {
-    font-size: 1em;
+  .questionStats.mobile {
+    max-width: 120px;
+    ion-chip ion-icon {
+      font-size: 0.9em;
+    }
   }
 }
 ion-item.current {

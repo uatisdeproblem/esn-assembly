@@ -109,6 +109,16 @@ export class QuestionsService {
     const { upvoted } = await this.api.patchResource(path, { body: { action: 'IS_UPVOTED' } });
     return upvoted;
   }
+  /**
+   * Get the answers (to the question) for which the user clapped.
+   */
+  async userClaps(topic: Topic, question: Question): Promise<{ [answerId: string]: boolean }> {
+    const path = ['topics', topic.topicId, 'questions', question.questionId];
+    const answersIds: string[] = await this.api.patchResource(path, { body: { action: 'USER_CLAPS' } });
+    const clapMap = {};
+    answersIds.forEach(a => (clapMap[a] = true));
+    return clapMap;
+  }
 
   /**
    * Delete a question.

@@ -89,6 +89,24 @@ const tables: { [tableName: string]: DDBTable } = {
       }
     ]
   },
+  answersClaps: {
+    PK: { name: 'answerId', type: DDB.AttributeType.STRING },
+    SK: { name: 'userId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'inverted-index',
+        partitionKey: { name: 'userId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'answerId', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.ALL
+      },
+      {
+        indexName: 'questionId-userId-index',
+        partitionKey: { name: 'questionId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'userId', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.ALL
+      }
+    ]
+  },
   usersBadges: {
     PK: { name: 'userId', type: DDB.AttributeType.STRING },
     SK: { name: 'badge', type: DDB.AttributeType.STRING }

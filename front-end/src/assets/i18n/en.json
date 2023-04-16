@@ -172,7 +172,9 @@
     "DELETE_QUESTION": "Delete question",
     "ANSWER": "Answer",
     "IS_YOUR_ANSWER_READY": "Is your answer ready?",
-    "DELETE_ANSWER": "Delete answer"
+    "DELETE_ANSWER": "Delete answer",
+    "CLAP_ANSWER": "Clap answer",
+    "CANCEL_CLAP_ANSWER": "Cancel clap"
   },
   "ARCHIVE": {
     "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters in the action bar above to search through archived topics.",

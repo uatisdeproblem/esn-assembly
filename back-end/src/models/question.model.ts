@@ -45,6 +45,10 @@ export class Question extends Resource {
    * The number of upvotes for the question.
    */
   numOfUpvotes: number;
+  /**
+   * The number of claps for the question's answers.
+   */
+  numOfClaps: number;
 
   load(x: any): void {
     super.load(x);
@@ -57,6 +61,7 @@ export class Question extends Resource {
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     this.numOfAnswers = this.clean(x.numOfAnswers, Number, 0);
     this.numOfUpvotes = this.clean(x.numOfUpvotes, Number, 0);
+    this.numOfClaps = this.clean(x.numOfClaps, Number, 0);
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -68,6 +73,7 @@ export class Question extends Resource {
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     this.numOfAnswers = safeData.numOfAnswers;
     this.numOfUpvotes = safeData.numOfUpvotes;
+    this.numOfClaps = safeData.numOfClaps;
   }
 
   validate(): string[] {

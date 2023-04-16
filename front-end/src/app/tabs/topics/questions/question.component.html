@@ -29,8 +29,22 @@
         [text]="answer.text"
         [creator]="answer.creator"
         [isSender]="question.creator.id !== answer.creator.id"
-      ></app-message-bubble>
-      <p class="ion-text-right" *ngIf="getLastAnswer()?.canUserEdit(topic, app.user)">
+      >
+        <p
+          class="ion-text-right ion-padding-end"
+          *ngIf="question.creator.id !== answer.creator.id && answer.creator.id !== app.user.userId"
+        >
+          <ion-button
+            fill="clear"
+            [color]="userClapped[answer.answerId] ? 'medium' : 'ESNpink'"
+            (click)="clapAnswer(!userClapped[answer.answerId], answer)"
+          >
+            {{ (userClapped[answer.answerId] ? 'QUESTIONS.CANCEL_CLAP_ANSWER' : 'QUESTIONS.CLAP_ANSWER') | translate }}
+            <ion-icon slot="end" icon="/assets/icons/clap.svg"></ion-icon>
+          </ion-button>
+        </p>
+      </app-message-bubble>
+      <p class="ion-text-center" *ngIf="getLastAnswer()?.canUserEdit(topic, app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteLastAnswer()">
           {{ 'QUESTIONS.DELETE_ANSWER' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
         </ion-button>

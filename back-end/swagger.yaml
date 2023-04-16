@@ -698,7 +698,7 @@ paths:
               properties:
                 action:
                   type: string
-                  enum: [UPVOTE, UPVOTE_CANCEL, IS_UPVOTED]
+                  enum: [UPVOTE, UPVOTE_CANCEL, IS_UPVOTED, USER_CLAPS]
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
@@ -842,6 +842,45 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/Answer'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on an answer
+      tags: [Answers]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: string
+        - name: answerId
+          in: path
+          description: Answer ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [CLAP, CLAP_CANCEL, IS_CLAPPED]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
     delete:

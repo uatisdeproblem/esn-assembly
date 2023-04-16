@@ -2,6 +2,7 @@
   <app-subject color="transparent" lines="none" [subject]="creator"></app-subject>
   <p [innerHtml]="sanitizedHtml"></p>
 </div>
+<ng-content></ng-content>
 <!--skeleton-->
 <div class="bubble" *ngIf="!text" [class.bubbleSender]="isSender">
   <ion-skeleton-text animated></ion-skeleton-text>

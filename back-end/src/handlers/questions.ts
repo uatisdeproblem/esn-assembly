@@ -3,7 +3,6 @@
 ///
 
 import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
-import { toISODate } from 'idea-toolbox';
 
 import { isEmailInBlockList } from './sesNotifications';
 import { addBadgeToUser } from './badges';
@@ -24,7 +23,8 @@ const DDB_TABLES = {
   questions: process.env.DDB_TABLE_questions,
   questionsUpvotes: process.env.DDB_TABLE_questionsUpvotes,
   topics: process.env.DDB_TABLE_topics,
-  answers: process.env.DDB_TABLE_answers
+  answers: process.env.DDB_TABLE_answers,
+  answersClaps: process.env.DDB_TABLE_answersClaps
 };
 const ddb = new DynamoDB();
 
@@ -115,8 +115,6 @@ class Questions extends ResourceController {
     await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.FIRST_QUESTION);
     if ((await this.getNumQuestionsMadeByUser()) >= 10)
       await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.QUESTIONS_MASTER);
-    if (toISODate(new Date()) === '2023-04-14')
-      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.PEER_PRESSURE_MINHO);
 
     return this.question;
   }
@@ -136,7 +134,7 @@ class Questions extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
-  protected async patchResource(): Promise<Question | { upvoted: boolean }> {
+  protected async patchResource(): Promise<Question | { upvoted: boolean } | string[]> {
     switch (this.body.action) {
       case 'UPVOTE':
         return await this.upvote();
@@ -144,6 +142,8 @@ class Questions extends ResourceController {
         return await this.upvote(true);
       case 'IS_UPVOTED':
         return { upvoted: await this.isUpvoted() };
+      case 'USER_CLAPS':
+        return await this.getAnswersIdsClappedByUser();
       default:
         throw new RCError('Unsupported action');
     }
@@ -158,7 +158,7 @@ class Questions extends ResourceController {
 
     if (!cancel) {
       await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.NEWCOMER);
-      if ((await this.getNumQuestionsUpvotedByUser()) >= 10)
+      if ((await this.getNumQuestionsUpvotedByUser()) >= 15)
         await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.LOVE_GIVER);
     }
 
@@ -181,6 +181,15 @@ class Questions extends ResourceController {
     } catch (error) {
       return false;
     }
+  }
+  private async getAnswersIdsClappedByUser(): Promise<string[]> {
+    const answersClapped = await ddb.query({
+      TableName: DDB_TABLES.answersClaps,
+      IndexName: 'questionId-userId-index',
+      KeyConditionExpression: 'questionId = :questionId AND userId = :userId',
+      ExpressionAttributeValues: { ':questionId': this.question.questionId, ':userId': this.galaxyUser.userId }
+    });
+    return answersClapped.map(x => x.answerId);
   }
 
   protected async deleteResource(): Promise<void> {
