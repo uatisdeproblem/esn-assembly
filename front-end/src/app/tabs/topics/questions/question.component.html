@@ -28,7 +28,7 @@
         *ngFor="let answer of answers"
         [text]="answer.text"
         [creator]="answer.creator"
-        [isSender]="true"
+        [isSender]="question.creator.id !== answer.creator.id"
       ></app-message-bubble>
       <p class="ion-text-right" *ngIf="getLastAnswer()?.canUserEdit(topic, app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteLastAnswer()">
