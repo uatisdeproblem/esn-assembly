@@ -167,7 +167,7 @@ class Answers extends ResourceController {
     await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
 
     if (!cancel && (await this.getNumAnswersClappedByUser()) >= 15)
-      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.LOVE_GIVER);
+      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.CHEERGIVER);
 
     return this.question;
   }

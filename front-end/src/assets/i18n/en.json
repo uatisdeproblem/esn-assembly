@@ -254,7 +254,8 @@
       "KNOW_IT_ALL": "Know-It-All Streak",
       "LOVE_GIVER": "The Love Giver",
       "POKEMON_HUNTER": "Pokemon Hunter",
-      "RISING_STAR": "Rising Star"
+      "RISING_STAR": "Rising Star",
+      "CHEERGIVER": "Cheergiver"
     },
     "BADGES_I": {
       "FIRST_QUESTION": "Congrats for starting your way into the Q&A app!",
@@ -264,7 +265,8 @@
       "KNOW_IT_ALL": "Soooo many questions, but you saw it through. Amazing job!",
       "LOVE_GIVER": "You're a true supporter! Continue smashing that upvote button!",
       "POKEMON_HUNTER": "You did catch'em all! Every candidates knows you now.",
-      "RISING_STAR": "You're the bright future of our Network. Congrats, candidate!"
+      "RISING_STAR": "You're the bright future of our Network. Congrats, candidate!",
+      "CHEERGIVER": "The appreciation round is your arena! As loud as you can be."
     }
   },
   "USER_ROLES": {
