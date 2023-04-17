@@ -8,6 +8,9 @@ ion-item {
   .questionStats {
     ion-chip {
       margin: 0 2px;
+      ion-label {
+        font-weight: 600;
+      }
     }
     ion-chip[disabled] {
       opacity: 1 !important;
