@@ -1,7 +1,8 @@
-<p class="view" [innerHTML]="sanitizedHtml" *ngIf="!editMode"></p>
+<div class="view internalPSpacing" [innerHTML]="sanitizedHtml" *ngIf="!editMode"></div>
 <angular-editor
   *ngIf="editMode"
   [(ngModel)]="text"
   [config]="editorConfig"
   (input)="contentChange.emit($event.target.innerHTML)"
+  (paste)="cleanHTMLCode($event)"
 ></angular-editor>

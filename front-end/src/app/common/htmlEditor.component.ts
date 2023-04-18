@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { DomSanitizer } from '@angular/platform-browser';
 import { SecurityContext } from '@angular/core';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { docsSoap } from 'docs-soap';
 
 @Component({
   selector: 'app-html-editor',
@@ -62,5 +63,12 @@ export class HTMLEditorComponent implements OnInit, OnChanges {
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.editMode) this.sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, this.content);
+  }
+
+  cleanHTMLCode(event: any): void {
+    event.preventDefault();
+    const pastedText = event.clipboardData.getData('text/html');
+    this.text = docsSoap(pastedText);
+    this.contentChange.emit(this.text);
   }
 }

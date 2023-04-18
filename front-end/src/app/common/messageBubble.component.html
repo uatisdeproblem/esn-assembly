@@ -1,6 +1,6 @@
 <div class="bubble" *ngIf="text" [class.bubbleSender]="isSender">
   <app-subject color="transparent" lines="none" [subject]="creator"></app-subject>
-  <p [innerHtml]="sanitizedHtml"></p>
+  <div class="internalPSpacing" [innerHtml]="sanitizedHtml"></div>
 </div>
 <ng-content></ng-content>
 <!--skeleton-->

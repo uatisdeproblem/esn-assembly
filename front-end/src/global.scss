@@ -182,6 +182,10 @@ ion-badge.unreadDot {
   border-color: var(--ion-color-light) !important;
   color: var(--ion-text-color) !important;
 }
+div.internalPSpacing p {
+  // needs to be global to work (angular editor)
+  margin: 4px 0;
+}
 
 // to remove after updating IDEA-Ionic-Extra > 6.11.1
 ion-radio[slot='start'] + ion-label {
