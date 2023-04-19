@@ -4,5 +4,5 @@
   [(ngModel)]="text"
   [config]="editorConfig"
   (input)="contentChange.emit($event.target.innerHTML)"
-  (paste)="cleanHTMLCode($event)"
+  (paste)="cleanHTMLCode()"
 ></angular-editor>

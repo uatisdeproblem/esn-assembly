@@ -65,10 +65,10 @@ export class HTMLEditorComponent implements OnInit, OnChanges {
     if (changes.editMode) this.sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, this.content);
   }
 
-  cleanHTMLCode(event: any): void {
-    event.preventDefault();
-    const pastedText = event.clipboardData.getData('text/html');
-    this.text = docsSoap(pastedText);
-    this.contentChange.emit(this.text);
+  cleanHTMLCode(): void {
+    setTimeout((): void => {
+      this.text = docsSoap(this.text);
+      this.contentChange.emit(this.text);
+    }, 100);
   }
 }
