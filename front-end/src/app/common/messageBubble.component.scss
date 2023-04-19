@@ -7,13 +7,13 @@ div.bubble {
   height: auto;
   background-color: var(--bubble-bg-color);
   border: var(--ion-border-color);
-  border-radius: 30px;
+  border-radius: 22px;
   padding: 16px;
   div {
     padding: 8px 16px;
   }
 }
-div:before {
+div.bubble:before {
   content: ' ';
   position: absolute;
   width: 0;
