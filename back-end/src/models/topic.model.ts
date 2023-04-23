@@ -186,3 +186,16 @@ export interface RelatedTopic {
 export enum RelatedTopicRelations {
   LINK = 'LINK'
 }
+
+/**
+ * A summary, exportable version for a topic (and its questions and answers).
+ */
+export interface TopicQuestionsExportable {
+  Topic: string;
+  Category: string;
+  Subjects: string;
+  Summary: string;
+  Question: string;
+  Creator: string;
+  Answers: string;
+}

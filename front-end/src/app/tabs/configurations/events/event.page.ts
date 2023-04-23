@@ -132,6 +132,18 @@ export class EventPage {
       this.editMode = UXMode.VIEW;
     }
   }
+
+  async downloadSummarySpreadsheet(): Promise<void> {
+    try {
+      await this.loading.show();
+      const url = await this._events.downloadSummarySpreadsheet(this.event);
+      this.app.openURL(url);
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      this.loading.hide();
+    }
+  }
 }
 
 export enum UXMode {

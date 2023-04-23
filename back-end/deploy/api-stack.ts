@@ -43,7 +43,7 @@ export interface DDBTable {
 const defaultLambdaFnProps: NodejsFunctionProps = {
   runtime: Lambda.Runtime.NODEJS_14_X,
   architecture: Lambda.Architecture.ARM_64,
-  timeout: Duration.seconds(10),
+  timeout: Duration.seconds(30),
   memorySize: 1024,
   bundling: { minify: true, sourceMap: true },
   environment: { NODE_OPTIONS: '--enable-source-maps' },

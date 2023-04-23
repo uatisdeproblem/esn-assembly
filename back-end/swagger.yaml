@@ -287,6 +287,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: summarySpreadsheet
+          in: query
+          description: Get the URL to a summary spreadsheet containing questions and answers to this event's topics
+          schema:
+            type: boolean
       responses:
         200:
           $ref: '#/components/responses/Event'

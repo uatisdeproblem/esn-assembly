@@ -14,6 +14,8 @@
     "idea-aws": "^3.16.2",
     "idea-toolbox": "^6.7.0",
     "jsonwebtoken": "^9.0.0",
+    "string-strip-html": "^13.2.3",
+    "xlsx": "^0.18.5",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
