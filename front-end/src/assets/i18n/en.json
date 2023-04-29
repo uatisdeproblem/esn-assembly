@@ -257,7 +257,18 @@
       "LOVE_GIVER": "The Love Giver",
       "POKEMON_HUNTER": "Pokemon Hunter",
       "RISING_STAR": "Rising Star",
-      "CHEERGIVER": "Cheergiver"
+      "CHEERGIVER": "Cheergiver",
+      "CHAIRING_WIZARD": "Chairing Wizard",
+      "SHOW_MAKER": "Show maker",
+      "MIC_CATCHER": "Mic catcher",
+      "JOKER": "Joker",
+      "ENERGY_DRIVER": "Energy Driver",
+      "FABULOUS_SCRIBE": "Fabulous Scribe",
+      "ONLOOKER": "Onlooker",
+      "PLENARIES_RUNNER": "Plenaries Runner",
+      "SPECTATOR": "Spectator",
+      "MEDUSA": "Medusa",
+      "RAPID_ROCKET_SPEAKER": "Rapid rocket speaker"
     },
     "BADGES_I": {
       "FIRST_QUESTION": "Congrats for starting your way into the Q&A app!",
@@ -268,7 +279,18 @@
       "LOVE_GIVER": "You're a true supporter! Continue smashing that upvote button!",
       "POKEMON_HUNTER": "You did catch'em all! Every candidates knows you now.",
       "RISING_STAR": "You're the bright future of our Network. Congrats, candidate!",
-      "CHEERGIVER": "The appreciation round is your arena! As loud as you can be."
+      "CHEERGIVER": "The appreciation round is your arena! As loud as you can be.",
+      "CHAIRING_WIZARD": "You know how it feels to be on the other side of the desk. Be sure to stand up from time to time!",
+      "SHOW_MAKER": "If there's some fuss, you're around. Drama is your bread and butter.",
+      "MIC_CATCHER": "The boogeyperson of the Speakers List and the GA Administrator's worst nightmare.",
+      "JOKER": "The sovereign of the spam chats. The memes master. The jokes authority.",
+      "ENERGY_DRIVER": "You are like a magnet: people float around your endless energy: on fire!",
+      "FABULOUS_SCRIBE": "Your pen work is helping the Network be better. You should be proud!",
+      "ONLOOKER": "Nothing escapes your sight! Thanks for sharing your superpower with us.",
+      "PLENARIES_RUNNER": "Such legwork: how many calories did you burn? Thank you!",
+      "SPECTATOR": "Maybe you're not in the centre of the action, but damn, such a spectator. Enjoy, my friend!",
+      "MEDUSA": "A unique badge for a unique person. Stay amazing as you are!",
+      "RAPID_ROCKET_SPEAKER": "Faster than the speed of sound. Eminem is that you?"
     }
   },
   "USER_ROLES": {

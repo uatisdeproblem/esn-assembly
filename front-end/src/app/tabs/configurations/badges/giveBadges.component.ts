@@ -29,6 +29,7 @@ export class GiveBadgesComponent {
 
   async getUserBadges(userId: string): Promise<void> {
     if (!userId) return;
+    userId = userId.toLowerCase();
     this.badges = null;
     try {
       await this.loading.show();
@@ -41,6 +42,7 @@ export class GiveBadgesComponent {
   }
 
   async removeBadgeFromUser(userId: string, userBadge: UserBadge): Promise<void> {
+    userId = userId.toLowerCase();
     const doRemove = async (): Promise<void> => {
       try {
         await this.loading.show();
@@ -61,6 +63,7 @@ export class GiveBadgesComponent {
   }
 
   async addBadgeToUser(userId: string): Promise<void> {
+    userId = userId.toLowerCase();
     const header = this.t._('CONFIGURATIONS.GIVE_A_BADGE');
     const subHeader = userId;
     const inputs: any[] = Object.values(Badges).map(badge => ({
