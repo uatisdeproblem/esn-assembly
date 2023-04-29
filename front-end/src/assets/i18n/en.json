@@ -267,7 +267,7 @@
       "ONLOOKER": "Onlooker",
       "PLENARIES_RUNNER": "Plenaries Runner",
       "SPECTATOR": "Spectator",
-      "MEDUSA": "Medusa",
+      "MEDUSA_ONE": "Medusa",
       "RAPID_ROCKET_SPEAKER": "Rapid rocket speaker"
     },
     "BADGES_I": {
@@ -289,7 +289,7 @@
       "ONLOOKER": "Nothing escapes your sight! Thanks for sharing your superpower with us.",
       "PLENARIES_RUNNER": "Such legwork: how many calories did you burn? Thank you!",
       "SPECTATOR": "Maybe you're not in the centre of the action, but damn, such a spectator. Enjoy, my friend!",
-      "MEDUSA": "A unique badge for a unique person. Stay amazing as you are!",
+      "MEDUSA_ONE": "A unique badge for a unique person. Stay amazing as you are!",
       "RAPID_ROCKET_SPEAKER": "Faster than the speed of sound. Eminem is that you?"
     }
   },
