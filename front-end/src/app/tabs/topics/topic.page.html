@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
     <ion-buttons slot="start">
-      <ion-button (click)="app.closePage()">
+      <ion-button (click)="currentQuestion ? selectQuestion(null) : app.closePage()">
         <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -122,7 +122,7 @@
         </ion-list>
       </ion-col>
       <ion-col [size]="12" [sizeLg]="6" *ngIf="currentQuestion">
-        <p>
+        <p *ngIf="!app.isInMobileMode()">
           <ion-button color="medium" fill="clear" (click)="selectQuestion(null)">
             <ion-icon slot="start" name="close"></ion-icon> {{ 'COMMON.CLOSE' | translate }}
           </ion-button>
