@@ -50,6 +50,9 @@
           </ion-select-option>
         </ion-select>
       </ion-item>
+      <ion-button fill="solid" color="ESNpink" (click)="app.goToInTabs(['topics', 'archive'])">
+        {{ 'ARCHIVE.ARCHIVE' | translate }}
+      </ion-button>
       <ion-button fill="solid" color="ESNcyan" *ngIf="app.user.isAdministrator" (click)="addTopic()">
         {{ 'COMMON.ADD' | translate }}
       </ion-button>

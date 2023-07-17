@@ -3,10 +3,10 @@ import { Component } from '@angular/core';
 import { AppService } from '@app/app.service';
 
 @Component({
-  selector: 'app-tabs',
-  templateUrl: 'tabs.component.html',
-  styleUrls: ['tabs.component.scss']
+  selector: 'dashboard',
+  templateUrl: 'dashboard.page.html',
+  styleUrls: ['dashboard.page.scss']
 })
-export class TabsComponent {
+export class DashboardPage {
   constructor(public app: AppService) {}
 }

@@ -86,8 +86,8 @@
     "LOGIN_WITH_ESN_ACCOUNTS": "Login with ESN Accounts"
   },
   "TABS": {
-    "TOPICS": "Topics",
-    "ARCHIVE": "Archive",
+    "DASHBOARD": "Dashboard",
+    "TOPICS": "Q&A",
     "PROFILE": "Profile",
     "CONFIGURATIONS": "Configurations"
   },
@@ -177,6 +177,8 @@
     "CANCEL_CLAP_ANSWER": "Cancel clap"
   },
   "ARCHIVE": {
+    "ARCHIVE": "Archive",
+    "QA_ARCHIVE": "Q&A archive",
     "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters in the action bar above to search through archived topics.",
     "NO_ELEMENT_FOUND_WITH_FILTERS": "No archived topics found with the filters selected"
   },

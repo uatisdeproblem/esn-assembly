@@ -8,14 +8,14 @@ const routes: Routes = [
     path: '',
     component: TabsComponent,
     children: [
-      { path: '', redirectTo: 'topics', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadChildren: (): Promise<any> => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
+      },
       {
         path: 'topics',
         loadChildren: (): Promise<any> => import('./topics/topics.module').then(m => m.TopicsModule)
-      },
-      {
-        path: 'archive',
-        loadChildren: (): Promise<any> => import('./archive/archive.module').then(m => m.ArchiveModule)
       },
       {
         path: 'profile',

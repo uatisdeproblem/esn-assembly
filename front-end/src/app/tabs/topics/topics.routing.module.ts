@@ -7,6 +7,10 @@ import { ManageTopicPage } from './manageTopic.page';
 
 const routes: Routes = [
   { path: '', component: TopicsPage },
+  {
+    path: 'archive',
+    loadChildren: (): Promise<any> => import('./archive/archive.module').then(m => m.ArchiveModule)
+  },
   { path: ':topicId', component: TopicPage },
   { path: ':topicId/manage', component: ManageTopicPage }
 ];
