@@ -1,0 +1,6 @@
+ion-list.aList {
+  padding-top: 0;
+  ion-item::part(detail-icon) {
+    margin-left: 12px;
+  }
+}

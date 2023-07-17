@@ -5,10 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { DashboardRoutingModule } from './dashboard.routing.module';
-import { DashboardPage } from './dashboard.page';
+import { CommunicationsComponent, DashboardPage } from './dashboard.page';
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, DashboardRoutingModule],
-  declarations: [DashboardPage]
+  declarations: [DashboardPage, CommunicationsComponent]
 })
 export class DashboardModule {}
