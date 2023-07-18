@@ -54,7 +54,7 @@
         <ion-icon icon="archive-outline" slot="icon-only" *ngIf="app.isInMobileMode()"></ion-icon>
         <ion-text *ngIf="!app.isInMobileMode()">{{ 'ARCHIVE.ARCHIVE' | translate }}</ion-text>
       </ion-button>
-      <ion-button fill="solid" color="ESNcyan" *ngIf="app.user.isAdministrator" (click)="addTopic()">
+      <ion-button fill="solid" color="ESNgreen" *ngIf="app.user.isAdministrator" (click)="addTopic()">
         <ion-icon icon="add" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
