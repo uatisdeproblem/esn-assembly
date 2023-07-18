@@ -5,77 +5,68 @@
     </ion-buttons>
     <ion-title>{{ 'TABS.DASHBOARD' | translate }}</ion-title>
   </ion-toolbar>
+  <ion-toolbar color="ideaToolbar">
+    <ion-segment [(ngModel)]="segment">
+      <ion-segment-button [value]="MobileSegments.NEWS">
+        <ion-label>{{ 'DASHBOARD.NEWS' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="MobileSegments.DEADLINES">
+        <ion-label>{{ 'DASHBOARD.NEXT_DEADLINES' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="MobileSegments.LINKS">
+        <ion-label>{{ 'DASHBOARD.USEFUL_LINKS' | translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 <ion-content>
   <ion-grid [class.ion-no-padding]="app.isInMobileMode()">
     <ion-row>
-      <ion-col [size]="12" [sizeLg]="7">
-        <ion-list class="aList">
+      <ion-col [size]="12" [sizeLg]="6">
+        <ion-list class="aList" *ngIf="!app.isInMobileMode() || segment === MobileSegments.NEWS">
           <ion-list-header>
-            <ion-label><h1>Latest communications</h1></ion-label>
+            <ion-label>
+              <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEWS' | translate }}</h1>
+              <p>{{ 'DASHBOARD.NEWS_I' | translate }}</p>
+            </ion-label>
           </ion-list-header>
-          <ion-item button (click)="openCommunication($event)">
-            <ion-icon slot="start" name="bookmark" color="ESNpink" size="small" style="margin-right: 16px"></ion-icon>
-            <ion-label>
-              Ex. GA August 2023 - Timeline
-              <p>Timeline and contents of the Extraordinary GA.</p>
-            </ion-label>
-            <ion-note slot="end">Jul 17</ion-note>
+          <ion-item class="noElements" *ngIf="communications && !communications.length">
+            <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
           </ion-item>
-          <ion-item button>
-            <ion-icon
-              slot="start"
-              name="ellipse"
-              color="ESNcyan"
-              size="small"
-              style="width: 12px; margin-right: 16px; margin-left: 4px"
-            ></ion-icon>
-            <ion-label>
-              GA Autumn 2023 - Registrations
-              <p>Registrations are open.</p>
-            </ion-label>
-            <ion-note slot="end">Jul 14</ion-note>
-          </ion-item>
-          <ion-item button>
-            <ion-icon slot="start" name="" color="ESNpink" size="small" style="margin-right: 16px"></ion-icon>
-            <ion-label>
-              NOs call June 2023
-              <p>Please fill-in the topic proposal</p>
-            </ion-label>
-            <ion-note slot="end">Jun 10</ion-note>
-          </ion-item>
+          <app-communication *ngIf="!communications"></app-communication>
+          <app-communication
+            *ngFor="let communication of communications"
+            [communication]="communication"
+          ></app-communication>
         </ion-list>
       </ion-col>
-      <ion-col [class.ion-padding-start]="!app.isInMobileMode()" [size]="12" [sizeLg]="5">
-        <ion-list class="aList">
+      <ion-col [class.ion-padding-start]="!app.isInMobileMode()" [size]="12" [sizeLg]="6">
+        <ion-list class="aList" *ngIf="!app.isInMobileMode() || segment === MobileSegments.DEADLINES">
           <ion-list-header>
-            <ion-label><h1>Next deadlines</h1></ion-label>
+            <ion-label>
+              <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEXT_DEADLINES' | translate }}</h1>
+              <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+            </ion-label>
+            <ion-button (click)="openAllDeadlines()">{{ 'DASHBOARD.SEE_ALL_DEADLINES' | translate }}</ion-button>
           </ion-list-header>
-          <ion-item>
-            <ion-badge slot="start" color="danger" style="width: 80px">Today</ion-badge>
-            <ion-label>Travel Fund applications</ion-label>
+          <ion-item class="noElements" *ngIf="nextDeadlines && !nextDeadlines.length">
+            <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
           </ion-item>
-          <ion-item>
-            <ion-badge slot="start" color="warning" style="width: 80px">Tomorrow</ion-badge>
-            <ion-label>GA Autumn registrations</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-badge slot="start" color="medium" style="width: 80px">Jun 15</ion-badge>
-            <ion-label>Topics proposal</ion-label>
-          </ion-item>
+          <app-deadline *ngIf="!nextDeadlines"></app-deadline>
+          <app-deadline *ngFor="let deadline of nextDeadlines" [deadline]="deadline"></app-deadline>
         </ion-list>
-        <ion-list class="aList">
+        <ion-list class="aList" *ngIf="!app.isInMobileMode() || segment === MobileSegments.LINKS">
           <ion-list-header>
-            <ion-label><h1>Useful links</h1></ion-label>
+            <ion-label>
+              <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.USEFUL_LINKS' | translate }}</h1>
+              <p>{{ 'DASHBOARD.USEFUL_LINKS_I' | translate }}</p>
+            </ion-label>
           </ion-list-header>
-          <ion-item button>
-            <ion-icon slot="start" icon="open-outline" color="primary" size="small"></ion-icon>
-            <ion-label>GA Autumn 2023 documents</ion-label>
+          <ion-item class="noElements" *ngIf="usefulLinks && !usefulLinks.length">
+            <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
           </ion-item>
-          <ion-item button>
-            <ion-icon slot="start" icon="open-outline" color="primary" size="small"></ion-icon>
-            <ion-label>Travel Fund form</ion-label>
-          </ion-item>
+          <app-useful-link *ngIf="!usefulLinks"></app-useful-link>
+          <app-useful-link *ngFor="let link of  usefulLinks" [link]="link"></app-useful-link>
         </ion-list>
       </ion-col>
     </ion-row>

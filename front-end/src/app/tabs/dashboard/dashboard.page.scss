@@ -1,6 +1,12 @@
+ion-segment-button {
+  text-transform: none;
+}
+
+ion-grid {
+  max-width: 1200px;
+}
+
 ion-list.aList {
   padding-top: 0;
-  ion-item::part(detail-icon) {
-    margin-left: 12px;
-  }
+  padding-bottom: 20px;
 }

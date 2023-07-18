@@ -5,10 +5,25 @@ import { FormsModule } from '@angular/forms';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { DashboardRoutingModule } from './dashboard.routing.module';
-import { CommunicationsComponent, DashboardPage } from './dashboard.page';
+import { DashboardPage } from './dashboard.page';
+
+import { CommunicationComponent } from './communications/communication.component';
+import { DeadlineComponent } from './deadlines/deadline.component';
+import { DeadlinesComponent } from './deadlines/deadlines.component';
+import { UsefulLinkComponent } from './usefulLinks/usefulLink.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, DashboardRoutingModule],
-  declarations: [DashboardPage, CommunicationsComponent]
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    IDEATranslationsModule,
+    DashboardRoutingModule,
+    CommunicationComponent,
+    DeadlineComponent,
+    DeadlinesComponent,
+    UsefulLinkComponent
+  ],
+  declarations: [DashboardPage]
 })
 export class DashboardModule {}

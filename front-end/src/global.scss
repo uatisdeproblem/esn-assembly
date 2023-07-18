@@ -200,3 +200,9 @@ ion-radio[slot='start'] + ion-label {
     --width: 400px;
   }
 }
+
+ion-modal {
+  @media only screen and (min-width: 768px) {
+    --border-radius: 8px;
+  }
+}

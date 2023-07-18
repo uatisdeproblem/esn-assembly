@@ -176,6 +176,20 @@
     "CLAP_ANSWER": "Clap answer",
     "CANCEL_CLAP_ANSWER": "Cancel clap"
   },
+  "DASHBOARD": {
+    "NEWS": "News",
+    "NEWS_I": "Bullettin board of the ESN General Assembly",
+    "NEXT_DEADLINES": "Next deadlines",
+    "SEE_ALL_DEADLINES": "See all",
+    "USEFUL_LINKS": "Useful links",
+    "USEFUL_LINKS_I": "Access more information through these sources"
+  },
+  "DEADLINES": {
+    "DEADLINES": "Deadlines",
+    "TODAY": "Today",
+    "TOMORROW": "Tomorrow",
+    "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time"
+  },
   "ARCHIVE": {
     "ARCHIVE": "Archive",
     "QA_ARCHIVE": "Q&A archive",
