@@ -3,10 +3,13 @@ import { ModalController } from '@ionic/angular';
 import { addDays, isBefore } from 'date-fns';
 import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
 
+import { CommunicationDetailComponent } from './communications/communicationDetail.component';
+import { ManageCommunicationComponent } from './communications/manageCommunication.component';
 import { DeadlinesComponent } from './deadlines/deadlines.component';
 import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.component';
 
 import { AppService } from '@app/app.service';
+import { CommunicationsService } from './communications/communications.service';
 import { DeadlinesService } from './deadlines/deadlines.service';
 import { UsefulLinksService } from './usefulLinks/usefulLinks.service';
 
@@ -26,30 +29,7 @@ const NEXT_DEADLINES_NUM_DAYS = 30;
   styleUrls: ['dashboard.page.scss']
 })
 export class DashboardPage implements OnInit {
-  communications: Communication[] = [
-    new Communication({
-      name: 'Ex. GA August 2023 - Timeline',
-      brief: 'Timeline and contents of the Extraordinary GA',
-      date: '2023-07-18',
-      imageURL: 'https://ionicframework.com/docs/img/demos/card-media.png',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    }),
-    new Communication({
-      name: 'GA Autumn 2023 - Registrations',
-      brief: 'Registrations are open',
-      date: '2023-07-17',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    }),
-    new Communication({
-      name: 'GA Spring 2023 - Report and minutes',
-      date: '2023-06-20',
-      imageURL: 'https://i.ibb.co/h7CF4xt/gaminho.png',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    })
-  ];
+  communications: Communication[];
   deadlines: Deadline[];
   nextDeadlines: Deadline[];
   usefulLinks: UsefulLink[];
@@ -66,13 +46,46 @@ export class DashboardPage implements OnInit {
     private modalCtrl: ModalController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
+    private _communications: CommunicationsService,
     private _deadlines: DeadlinesService,
     private _usefulLinks: UsefulLinksService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    [this.deadlines, this.usefulLinks] = await Promise.all([this._deadlines.getList(), this._usefulLinks.getList()]);
+    [this.communications, this.deadlines, this.usefulLinks] = await Promise.all([
+      this._communications.getList(),
+      this._deadlines.getList(),
+      this._usefulLinks.getList()
+    ]);
     this.nextDeadlines = this.getNextDeadlines();
+  }
+
+  //
+  // COMMUNICATIONS
+  //
+
+  async openCommunication(communication: Communication): Promise<void> {
+    if (this.editMode) return;
+    const modal = await this.modalCtrl.create({
+      component: CommunicationDetailComponent,
+      componentProps: { communication }
+    });
+    await modal.present();
+  }
+  async manageCommunication(communication: Communication): Promise<void> {
+    if (!this.editMode) return;
+    const modal = await this.modalCtrl.create({
+      component: ManageCommunicationComponent,
+      componentProps: { communication },
+      backdropDismiss: false
+    });
+    modal.onDidDismiss().then(async (): Promise<void> => {
+      this.communications = await this._communications.getList({ force: true });
+    });
+    await modal.present();
+  }
+  async addCommunication(): Promise<void> {
+    await this.manageCommunication(new Communication());
   }
 
   //

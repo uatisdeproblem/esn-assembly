@@ -8,6 +8,8 @@ import { DashboardRoutingModule } from './dashboard.routing.module';
 import { DashboardPage } from './dashboard.page';
 
 import { CommunicationComponent } from './communications/communication.component';
+import { CommunicationDetailComponent } from './communications/communicationDetail.component';
+import { ManageCommunicationComponent } from './communications/manageCommunication.component';
 import { DeadlineComponent } from './deadlines/deadline.component';
 import { DeadlinesComponent } from './deadlines/deadlines.component';
 import { UsefulLinkComponent } from './usefulLinks/usefulLink.component';
@@ -21,6 +23,8 @@ import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.compon
     IDEATranslationsModule,
     DashboardRoutingModule,
     CommunicationComponent,
+    CommunicationDetailComponent,
+    ManageCommunicationComponent,
     DeadlineComponent,
     DeadlinesComponent,
     UsefulLinkComponent,

@@ -75,8 +75,8 @@ class Deadlines extends ResourceController {
   protected async putResource(): Promise<Deadline> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
-    const oldLink = new Deadline(this.deadline);
-    this.deadline.safeLoad(this.body, oldLink);
+    const oldDeadline = new Deadline(this.deadline);
+    this.deadline.safeLoad(this.body, oldDeadline);
 
     return await this.putSafeResource({ noOverwrite: false });
   }

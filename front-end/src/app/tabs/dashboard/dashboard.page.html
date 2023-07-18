@@ -29,6 +29,9 @@
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEWS' | translate }}</h1>
               <p>{{ 'DASHBOARD.NEWS_I' | translate }}</p>
             </ion-label>
+            <ion-button color="ESNgreen" *ngIf="editMode" (click)="addCommunication()">
+              {{ 'COMMON.ADD' | translate }}
+            </ion-button>
           </ion-list-header>
           <ion-item class="noElements" *ngIf="communications && !communications.length">
             <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
@@ -37,7 +40,17 @@
           <app-communication
             *ngFor="let communication of communications"
             [communication]="communication"
-          ></app-communication>
+            [button]="!editMode"
+            (select)="openCommunication(communication)"
+          >
+            <ng-container *ngIf="editMode">
+              <p class="ion-text-right">
+                <ion-button slot="end" fill="clear" color="ESNgreen" (click)="manageCommunication(communication)">
+                  <ion-icon icon="pencil" slot="icon-only"></ion-icon>
+                </ion-button>
+              </p>
+            </ng-container>
+          </app-communication>
         </ion-list>
       </ion-col>
       <ion-col [class.ion-padding-start]="!app.isInMobileMode()" [size]="12" [sizeLg]="6">

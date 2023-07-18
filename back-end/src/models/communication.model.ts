@@ -39,7 +39,7 @@ export class Communication extends Resource {
     this.name = this.clean(x.name, String);
     this.brief = this.clean(x.brief, String);
     this.content = this.clean(x.content, String);
-    this.date = this.clean(x.date, d => new Date(d).toISOString());
+    this.date = this.clean(x.date, d => new Date(d).toISOString(), new Date().toISOString());
     if (x.imageURL) this.imageURL = this.clean(x.imageURL, String);
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
   }
@@ -56,5 +56,12 @@ export class Communication extends Resource {
     if (this.iE(this.content)) e.push('content');
     if (this.iE(this.date, 'date')) e.push('date');
     return e;
+  }
+
+  /**
+   * Whether the communication is archived.
+   */
+  isArchived(): boolean {
+    return !!this.archivedAt;
   }
 }

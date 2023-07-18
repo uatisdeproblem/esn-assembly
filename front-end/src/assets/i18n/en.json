@@ -185,6 +185,13 @@
     "USEFUL_LINKS": "Useful links",
     "USEFUL_LINKS_I": "Access more information through these sources."
   },
+  "COMMUNICATIONS": {
+    "MANAGE_COMMUNICATION": "Manage communication",
+    "NAME": "Title",
+    "BRIEF": "A brief description (for previews)",
+    "IMAGE_URL": "Image URL",
+    "CONTENT": "The full-content of the communication"
+  },
   "DEADLINES": {
     "DEADLINES": "Deadlines",
     "TODAY": "Today",

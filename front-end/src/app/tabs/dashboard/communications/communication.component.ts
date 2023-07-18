@@ -1,20 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
-
-import { CommunicationDetailComponent } from './communicationDetail.component';
-
-import { AppService } from '@app/app.service';
 
 import { Communication } from '@models/communication.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule, CommunicationDetailComponent],
+  imports: [CommonModule, IonicModule, IDEATranslationsModule],
   selector: 'app-communication',
   template: `
-    <ion-card [color]="color" *ngIf="!communication" [class.mobile]="app.isInMobileMode()">
+    <ion-card [color]="color" *ngIf="!communication">
       <ion-skeleton-text animated style="height: 180px"></ion-skeleton-text>
       <ion-card-header>
         <ion-card-subtitle>
@@ -24,13 +20,14 @@ import { Communication } from '@models/communication.model';
         <ion-card-subtitle><ion-skeleton-text animated style="width: 80%"></ion-skeleton-text></ion-card-subtitle>
       </ion-card-header>
     </ion-card>
-    <ion-card [color]="color" button [class.mobile]="app.isInMobileMode()" (click)="openCommunication(communication)">
+    <ion-card *ngIf="communication" [color]="color" [button]="button" (click)="select.emit()">
       <ion-img *ngIf="communication.imageURL" [src]="communication.imageURL"></ion-img>
       <ion-card-header>
         <ion-card-subtitle>{{ communication.date | dateLocale }}</ion-card-subtitle>
         <ion-card-title>{{ communication.name }}</ion-card-title>
         <ion-card-subtitle *ngIf="communication.brief">{{ communication.brief }}</ion-card-subtitle>
       </ion-card-header>
+      <ion-card-content><ng-content></ng-content></ion-card-content>
     </ion-card>
   `,
   styles: [
@@ -46,6 +43,9 @@ import { Communication } from '@models/communication.model';
       ion-card-subtitle:first-of-type {
         color: var(--ion-color-step-500);
       }
+      ion-card-subtitle:nth-of-type(2) {
+        margin-top: 12px;
+      }
     `
   ]
 })
@@ -58,14 +58,14 @@ export class CommunicationComponent {
    * The color for the component.
    */
   @Input() color = 'white';
+  /**
+   * Whether the component should act like a button.
+   */
+  @Input() button = false;
+  /**
+   * Trigger when selected.
+   */
+  @Output() select = new EventEmitter<void>();
 
-  constructor(private modalCtrl: ModalController, public app: AppService) {}
-
-  async openCommunication(communication: Communication): Promise<void> {
-    const modal = await this.modalCtrl.create({
-      component: CommunicationDetailComponent,
-      componentProps: { communication }
-    });
-    await modal.present();
-  }
+  constructor() {}
 }

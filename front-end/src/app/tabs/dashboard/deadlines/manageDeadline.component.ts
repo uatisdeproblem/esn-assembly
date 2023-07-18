@@ -17,7 +17,7 @@ import { Deadline } from '@models/deadline.model';
 @Component({
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, IDEADateTimeModule],
-  selector: 'app-manage-useful-deadline',
+  selector: 'app-manage-deadline',
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar color="medium">
