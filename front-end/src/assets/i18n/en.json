@@ -1,8 +1,6 @@
 {
   "COMMON": {
     "APP_NAME": "General Assembly app",
-    "APP_NAME_SHORT": "App",
-    "APP_DESCRIPTION": "ESN General Assembly",
     "VERSION": "Version {{v}}",
     "ARE_YOU_SURE": "Are you sure?",
     "ACTION_IS_IRREVERSIBLE": "The action is irreversible",
@@ -83,6 +81,8 @@
     "EN": "English"
   },
   "AUTH": {
+    "TITLE": "General Assembly app",
+    "SUBTITLE": "Erasmus Student Network",
     "LOGIN_WITH_ESN_ACCOUNTS": "Login with ESN Accounts"
   },
   "TABS": {
