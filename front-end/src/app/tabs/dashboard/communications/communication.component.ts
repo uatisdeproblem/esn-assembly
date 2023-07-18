@@ -41,6 +41,7 @@ import { Communication } from '@models/communication.model';
       ion-img {
         object-fit: cover;
         height: 180px;
+        border-bottom: 1px solid var(--ion-color-light);
       }
       ion-card-subtitle:first-of-type {
         color: var(--ion-color-step-500);

@@ -28,6 +28,7 @@ import { Communication } from '@models/communication.model';
           <ion-card-title>{{ communication.name }}</ion-card-title>
           <ion-card-subtitle>{{ communication.brief }}</ion-card-subtitle>
         </ion-card-header>
+        <ion-img *ngIf="communication.imageURL" [src]="communication.imageURL"></ion-img>
         <app-html-editor [content]="communication.content" [editMode]="false"></app-html-editor>
       </ion-card>
     </ion-content>
@@ -43,6 +44,13 @@ import { Communication } from '@models/communication.model';
       ion-card-header ion-card-subtitle {
         color: var(--ion-color-step-500);
       }
+      ion-img {
+        object-fit: cover;
+        height: 180px;
+      }
+      ion-img::part(image) {
+        border-radius: 8px;
+      }
     `,
     `
       ion-toolbar ion-buttons[slot='start'] ion-button {
@@ -51,7 +59,7 @@ import { Communication } from '@models/communication.model';
     `,
     `
       app-html-editor {
-        --app-html-editor-margin: 2px;
+        --app-html-editor-margin: 10px 2px;
         --app-html-editor-padding: 20px 16px;
         --app-html-editor-background-color: var(--ion-color-light);
         --app-html-editor-box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px;
