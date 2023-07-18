@@ -17,7 +17,7 @@ import { UsefulLink } from '@models/usefulLink.model';
     </ion-item>
     <ion-item [color]="color" *ngIf="link" button (click)="openLink()">
       <ion-icon slot="start" icon="open-outline" color="primary" size="small"></ion-icon>
-      <ion-label>{{ link.name }}</ion-label>
+      <ion-label class="ion-text-wrap">{{ link.name }}</ion-label>
     </ion-item>
   `,
   styles: [

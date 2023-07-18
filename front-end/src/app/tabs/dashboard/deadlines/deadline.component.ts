@@ -18,7 +18,7 @@ import { Deadline } from '@models/deadline.model';
     </ion-item>
     <ion-item [color]="color" *ngIf="deadline">
       <ion-badge slot="start" [color]="getDeadlineColor()">{{ getDeadlineLabel() }}</ion-badge>
-      <ion-label>{{ deadline.name }}</ion-label>
+      <ion-label class="ion-text-wrap">{{ deadline.name }}</ion-label>
       <ion-note slot="end">{{ deadline.at | dateLocale : 'HH:mm' }}</ion-note>
     </ion-item>
   `,
