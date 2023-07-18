@@ -178,17 +178,18 @@
   },
   "DASHBOARD": {
     "NEWS": "News",
-    "NEWS_I": "Bullettin board of the ESN General Assembly",
+    "NEWS_I": "Bullettin board from the GA Chairing Team.",
     "NEXT_DEADLINES": "Next deadlines",
+    "NEXT_DEADLINES_I": "Deadlines in the upcoming {{days}} days.",
     "SEE_ALL_DEADLINES": "See all",
     "USEFUL_LINKS": "Useful links",
-    "USEFUL_LINKS_I": "Access more information through these sources"
+    "USEFUL_LINKS_I": "Access more information through these sources."
   },
   "DEADLINES": {
     "DEADLINES": "Deadlines",
     "TODAY": "Today",
     "TOMORROW": "Tomorrow",
-    "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time"
+    "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time."
   },
   "ARCHIVE": {
     "ARCHIVE": "Archive",

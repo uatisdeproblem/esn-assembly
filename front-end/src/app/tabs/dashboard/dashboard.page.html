@@ -45,6 +45,7 @@
           <ion-list-header>
             <ion-label>
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEXT_DEADLINES' | translate }}</h1>
+              <p>{{ 'DASHBOARD.NEXT_DEADLINES_I' | translate: { days: NEXT_DEADLINES_NUM_DAYS } }}</p>
               <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
             </ion-label>
             <ion-button (click)="openAllDeadlines()">{{ 'DASHBOARD.SEE_ALL_DEADLINES' | translate }}</ion-button>

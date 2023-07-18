@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import { addDays, isBefore } from 'date-fns';
 
 import { DeadlinesComponent } from './deadlines/deadlines.component';
 
@@ -9,6 +10,11 @@ import { Communication } from '@models/communication.model';
 import { Deadline } from '@models/deadline.model';
 import { UsefulLink } from '@models/usefulLink.model';
 import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
+
+/**
+ * The number of days to consider a deadline "upcoming"/next.
+ */
+const NEXT_DEADLINES_NUM_DAYS = 30;
 
 @Component({
   selector: 'dashboard',
@@ -40,11 +46,6 @@ export class DashboardPage {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
     })
   ];
-  nextDeadlines: Deadline[] = [
-    new Deadline({ name: 'Travel Fund applications', at: new Date() }),
-    new Deadline({ name: 'Registrations close', at: new Date('2023-07-19') }),
-    new Deadline({ name: 'Topics proposal', at: new Date('2023-08-10') })
-  ];
   deadlines: Deadline[] = [
     new Deadline({ name: 'Travel Fund applications', at: new Date() }),
     new Deadline({ name: 'Registrations close', at: new Date('2023-07-19') }),
@@ -52,6 +53,10 @@ export class DashboardPage {
     new Deadline({ name: 'Test 123', at: new Date('2023-08-14') }),
     new Deadline({ name: 'Important date', at: new Date('2023-08-22') })
   ];
+  nextDeadlines: Deadline[] = this.deadlines.filter(x =>
+    isBefore(new Date(x.at), addDays(new Date(), NEXT_DEADLINES_NUM_DAYS))
+  );
+
   usefulLinks: UsefulLink[] = [
     new UsefulLink({
       name: 'GA Autumn 2023 documents',
@@ -64,6 +69,7 @@ export class DashboardPage {
   MobileSegments = MobileSegments;
 
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
+  NEXT_DEADLINES_NUM_DAYS = NEXT_DEADLINES_NUM_DAYS;
 
   constructor(private modalCtrl: ModalController, public app: AppService) {}
 
