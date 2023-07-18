@@ -189,7 +189,10 @@
     "DEADLINES": "Deadlines",
     "TODAY": "Today",
     "TOMORROW": "Tomorrow",
-    "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time."
+    "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time.",
+    "MANAGE_DEADLINE": "Manage deadline",
+    "NAME": "A description for the deadline",
+    "DATE": "The date and time of the deadline"
   },
   "USEFUL_LINKS": {
     "MANAGE_LINK": "Manage useful link",

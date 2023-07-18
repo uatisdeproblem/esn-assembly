@@ -7,6 +7,7 @@ import { DeadlinesComponent } from './deadlines/deadlines.component';
 import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.component';
 
 import { AppService } from '@app/app.service';
+import { DeadlinesService } from './deadlines/deadlines.service';
 import { UsefulLinksService } from './usefulLinks/usefulLinks.service';
 
 import { Communication } from '@models/communication.model';
@@ -49,16 +50,8 @@ export class DashboardPage implements OnInit {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
     })
   ];
-  deadlines: Deadline[] = [
-    new Deadline({ name: 'Travel Fund applications', at: new Date() }),
-    new Deadline({ name: 'Registrations close', at: new Date('2023-07-19') }),
-    new Deadline({ name: 'Topics proposal', at: new Date('2023-08-10') }),
-    new Deadline({ name: 'Test 123', at: new Date('2023-08-14') }),
-    new Deadline({ name: 'Important date', at: new Date('2023-08-22') })
-  ];
-  nextDeadlines: Deadline[] = this.deadlines.filter(x =>
-    isBefore(new Date(x.at), addDays(new Date(), NEXT_DEADLINES_NUM_DAYS))
-  );
+  deadlines: Deadline[];
+  nextDeadlines: Deadline[];
   usefulLinks: UsefulLink[];
 
   segment = MobileSegments.NEWS;
@@ -73,19 +66,33 @@ export class DashboardPage implements OnInit {
     private modalCtrl: ModalController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
+    private _deadlines: DeadlinesService,
     private _usefulLinks: UsefulLinksService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    this.usefulLinks = await this._usefulLinks.getList();
+    [this.deadlines, this.usefulLinks] = await Promise.all([this._deadlines.getList(), this._usefulLinks.getList()]);
+    this.nextDeadlines = this.getNextDeadlines();
   }
+
+  //
+  // DEADLINES
+  //
 
   async openAllDeadlines(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: DeadlinesComponent,
-      componentProps: { deadlines: this.deadlines }
+      componentProps: { deadlines: this.deadlines, editMode: this.editMode }
     });
+    if (this.editMode)
+      modal.onDidDismiss().then(async (): Promise<void> => {
+        this.deadlines = await this._deadlines.getList({ force: true });
+        this.nextDeadlines = this.getNextDeadlines();
+      });
     await modal.present();
+  }
+  private getNextDeadlines(): Deadline[] {
+    return this.deadlines.filter(x => isBefore(new Date(x.at), addDays(new Date(), NEXT_DEADLINES_NUM_DAYS)));
   }
 
   //

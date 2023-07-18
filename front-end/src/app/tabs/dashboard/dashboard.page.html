@@ -48,7 +48,12 @@
               <p>{{ 'DASHBOARD.NEXT_DEADLINES_I' | translate: { days: NEXT_DEADLINES_NUM_DAYS } }}</p>
               <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
             </ion-label>
-            <ion-button (click)="openAllDeadlines()">{{ 'DASHBOARD.SEE_ALL_DEADLINES' | translate }}</ion-button>
+            <ion-button *ngIf="!editMode" (click)="openAllDeadlines()">
+              {{ 'DASHBOARD.SEE_ALL_DEADLINES' | translate }}
+            </ion-button>
+            <ion-button color="ESNgreen" *ngIf="editMode" (click)="openAllDeadlines()">
+              {{ 'COMMON.MANAGE' | translate }}
+            </ion-button>
           </ion-list-header>
           <ion-item class="noElements" *ngIf="nextDeadlines && !nextDeadlines.length">
             <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>

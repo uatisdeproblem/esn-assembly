@@ -39,6 +39,8 @@ tags:
     description: The badges earned by the users following actions on the platform
   - name: UsefulLinks
     description: The useful links available to the users to explore more contents
+  - name: Deadlines
+    description: The deadlines the users should be aware of
 
 paths:
   /login:
@@ -1107,6 +1109,90 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /deadlines:
+    get:
+      summary: Get the (future) deadlines
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/Deadlines'
+    post:
+      summary: Insert a new deadline
+      description: Requires to be Administrator
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Deadline'
+      responses:
+        200:
+          $ref: '#/components/responses/Deadlines'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /deadlines/{deadlineId}:
+    get:
+      summary: Get a deadline
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: deadlineId
+          in: path
+          description: Deadline ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Deadline'
+    put:
+      summary: Edit a deadline
+      description: Requires to be Administrator
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: deadlineId
+          in: path
+          description: Deadline ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Deadline'
+      responses:
+        200:
+          $ref: '#/components/responses/Deadline'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a deadline
+      description: Requires to be Administrator
+      tags: [Deadline]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: deadlineId
+          in: path
+          description: Deadline ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -1132,6 +1218,9 @@ components:
       type: object
       additionalProperties: {}
     UsefulLink:
+      type: object
+      additionalProperties: {}
+    Deadline:
       type: object
       additionalProperties: {}
 
@@ -1248,6 +1337,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/UsefulLink'
+    Deadline:
+      description: A deadline
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Deadline'
+    Deadlines:
+      description: The deadlines
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Deadline'
     BadParameters:
       description: Bad input parameters
       content:

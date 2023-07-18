@@ -3,20 +3,21 @@ import { FormsModule } from '@angular/forms';
 import { Component, Input } from '@angular/core';
 import { AlertController, IonicModule, ModalController } from '@ionic/angular';
 import {
+  IDEADateTimeModule,
   IDEALoadingService,
   IDEAMessageService,
   IDEATranslationsModule,
   IDEATranslationsService
 } from '@idea-ionic/common';
 
-import { UsefulLinksService } from './usefulLinks.service';
+import { DeadlinesService } from './deadlines.service';
 
-import { UsefulLink } from '@models/usefulLink.model';
+import { Deadline } from '@models/deadline.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule],
-  selector: 'app-manage-useful-link',
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, IDEADateTimeModule],
+  selector: 'app-manage-useful-deadline',
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar color="medium">
@@ -25,7 +26,7 @@ import { UsefulLink } from '@models/usefulLink.model';
             <ion-icon slot="icon-only" icon="close-circle"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>{{ 'USEFUL_LINKS.MANAGE_LINK' | translate }}</ion-title>
+        <ion-title>{{ 'DEADLINES.MANAGE_DEADLINE' | translate }}</ion-title>
         <ion-buttons slot="end">
           <ion-button [title]="'COMMON.SAVE' | translate" (click)="save()">
             <ion-icon slot="icon-only" icon="checkmark-circle"></ion-icon>
@@ -37,16 +38,19 @@ import { UsefulLink } from '@models/usefulLink.model';
       <ion-list class="aList" lines="full">
         <ion-item [class.fieldHasError]="hasFieldAnError('name')">
           <ion-label position="stacked">
-            {{ 'USEFUL_LINKS.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
+            {{ 'DEADLINES.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
           </ion-label>
-          <ion-input [(ngModel)]="link.name"></ion-input>
+          <ion-input [(ngModel)]="deadline.name"></ion-input>
         </ion-item>
-        <ion-item [class.fieldHasError]="hasFieldAnError('url')">
-          <ion-label position="stacked">
-            {{ 'USEFUL_LINKS.URL' | translate }} <ion-text class="obligatoryDot"></ion-text>
-          </ion-label>
-          <ion-input [(ngModel)]="link.url"></ion-input>
-        </ion-item>
+        <idea-date-time
+          [(date)]="deadline.at"
+          [useISOFormat]="true"
+          [manualTimePicker]="true"
+          [label]="'DEADLINES.DATE' | translate"
+          [obligatory]="true"
+          [hideClearButton]="true"
+          [class.fieldHasError]="hasFieldAnError('at')"
+        ></idea-date-time>
         <ion-row class="ion-padding-top">
           <ion-col class="ion-text-right ion-padding-end">
             <ion-button color="danger" (click)="askAndDelete()">{{ 'COMMON.DELETE' | translate }}</ion-button>
@@ -56,11 +60,11 @@ import { UsefulLink } from '@models/usefulLink.model';
     </ion-content>
   `
 })
-export class ManageUsefulLinkComponent {
+export class ManageDeadlineComponent {
   /**
-   * The useful link to manage.
+   * The deadline to manage.
    */
-  @Input() link: UsefulLink;
+  @Input() deadline: Deadline;
 
   errors = new Set<string>();
 
@@ -70,7 +74,7 @@ export class ManageUsefulLinkComponent {
     private t: IDEATranslationsService,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
-    private _usefulLinks: UsefulLinksService
+    private _deadlines: DeadlinesService
   ) {}
 
   hasFieldAnError(field: string): boolean {
@@ -78,15 +82,15 @@ export class ManageUsefulLinkComponent {
   }
 
   async save(): Promise<void> {
-    this.errors = new Set(this.link.validate());
+    this.errors = new Set(this.deadline.validate());
     if (this.errors.size) return this.message.error('COMMON.FORM_HAS_ERROR_TO_CHECK');
 
     try {
       await this.loading.show();
-      let result: UsefulLink;
-      if (!this.link.linkId) result = await this._usefulLinks.insert(this.link);
-      else result = await this._usefulLinks.update(this.link);
-      this.link.load(result);
+      let result: Deadline;
+      if (!this.deadline.deadlineId) result = await this._deadlines.insert(this.deadline);
+      else result = await this._deadlines.update(this.deadline);
+      this.deadline.load(result);
       this.message.success('COMMON.OPERATION_COMPLETED');
       this.close();
     } catch (err) {
@@ -103,7 +107,7 @@ export class ManageUsefulLinkComponent {
     const doDelete = async (): Promise<void> => {
       try {
         await this.loading.show();
-        await this._usefulLinks.delete(this.link);
+        await this._deadlines.delete(this.deadline);
         this.message.success('COMMON.OPERATION_COMPLETED');
         this.close();
       } catch (error) {

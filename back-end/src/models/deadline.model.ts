@@ -32,7 +32,7 @@ export class Deadline extends Resource {
   validate(): string[] {
     const e = super.validate();
     if (this.iE(this.name)) e.push('name');
-    if (this.iE(this.at, 'date')) e.push('at');
+    if (this.iE(this.at, 'date') || this.at < new Date().toISOString()) e.push('at');
     return e;
   }
 }

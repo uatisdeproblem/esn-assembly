@@ -20,12 +20,16 @@ import { Deadline } from '@models/deadline.model';
       <ion-badge slot="start" [color]="getDeadlineColor()">{{ getDeadlineLabel() }}</ion-badge>
       <ion-label class="ion-text-wrap">{{ deadline.name }}</ion-label>
       <ion-note slot="end">{{ deadline.at | dateLocale : 'HH:mm' }}</ion-note>
+      <ng-content></ng-content>
     </ion-item>
   `,
   styles: [
     `
       ion-item ion-badge[slot='start'] {
         width: 100px;
+      }
+      ion-item ion-note[slot='end'] {
+        padding: 16px 4px;
       }
     `
   ]
