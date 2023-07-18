@@ -53,7 +53,7 @@ import { Communication } from '@models/communication.model';
         </ion-item>
         <ion-item [class.fieldHasError]="hasFieldAnError('imageURL')">
           <ion-label position="stacked">{{ 'COMMUNICATIONS.IMAGE_URL' | translate }}</ion-label>
-          <ion-input [(ngModel)]="communication.avatarURL"></ion-input>
+          <ion-input [(ngModel)]="communication.imageURL"></ion-input>
           <input type="file" accept="image/*" style="display: none" id="upload-image" (change)="uploadImage($event)" />
           <ion-button
             slot="end"
