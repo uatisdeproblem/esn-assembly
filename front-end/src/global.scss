@@ -48,6 +48,10 @@
   padding-bottom: 80px;
 }
 
+ion-content {
+  --background: var(--ion-color-white-shade);
+}
+
 ion-list.aList {
   background: transparent;
   ion-list-header {
@@ -133,7 +137,9 @@ ion-button:not([fill='clear'], [fill='outline']) {
   --box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 ion-toolbar ion-buttons ion-button,
-ion-list-header ion-button {
+ion-list-header ion-button,
+ion-button[fill='clear'] {
+  font-weight: 600;
   --box-shadow: none !important;
 }
 ion-toolbar ion-buttons ion-button[fill='solid'] {
@@ -185,13 +191,6 @@ ion-badge.unreadDot {
 div.internalPSpacing p {
   // needs to be global to work (angular editor)
   margin: 4px 0;
-}
-
-// to remove after updating IDEA-Ionic-Extra > 6.11.1
-ion-radio[slot='start'] + ion-label {
-  opacity: 1 !important;
-  -webkit-text-fill-color: var(--ion-text-color);
-  --placeholder-opacity: 0 !important;
 }
 
 .largePopover {

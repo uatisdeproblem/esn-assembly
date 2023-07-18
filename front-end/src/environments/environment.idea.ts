@@ -9,6 +9,7 @@ export const environment = {
       url: 'https://qa.esn.org',
       mediaUrl: 'https://media.esn-ga.link',
       title: 'ESN General Assembly app',
+      bundle: 'com.matteocarbone.esnga',
       maxFileUploadSizeMB: 50,
       supportEmail: 'ga-secretary@esn.org'
     },
