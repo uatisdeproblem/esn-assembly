@@ -18,7 +18,7 @@ const ddb = new DynamoDB();
 
 const BASE_URL = STAGE === 'prod' ? 'https://qa.esn.org' : 'https://dev.esn-ga.link';
 const SES_CONFIG = {
-  sourceName: 'ESN General Assembly Q&A',
+  sourceName: 'ESN General Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION

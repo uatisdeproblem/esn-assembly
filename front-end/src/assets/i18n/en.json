@@ -1,7 +1,7 @@
 {
   "COMMON": {
-    "APP_NAME": "General Assembly Q&A",
-    "APP_NAME_SHORT": "Q&A",
+    "APP_NAME": "General Assembly app",
+    "APP_NAME_SHORT": "App",
     "APP_DESCRIPTION": "ESN General Assembly",
     "VERSION": "Version {{v}}",
     "ARE_YOU_SURE": "Are you sure?",
