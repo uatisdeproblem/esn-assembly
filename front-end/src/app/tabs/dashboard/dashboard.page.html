@@ -62,14 +62,51 @@
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.USEFUL_LINKS' | translate }}</h1>
               <p>{{ 'DASHBOARD.USEFUL_LINKS_I' | translate }}</p>
             </ion-label>
+            <ion-button color="ESNgreen" *ngIf="editMode" (click)="addUsefulLink()">
+              {{ 'COMMON.ADD' | translate }}
+            </ion-button>
           </ion-list-header>
           <ion-item class="noElements" *ngIf="usefulLinks && !usefulLinks.length">
             <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
           </ion-item>
           <app-useful-link *ngIf="!usefulLinks"></app-useful-link>
-          <app-useful-link *ngFor="let link of  usefulLinks" [link]="link"></app-useful-link>
+          <app-useful-link
+            *ngFor="let link of usefulLinks; let first = first; let last = last; let index = index"
+            [link]="link"
+            [button]="!editMode"
+            (select)="openUsefulLink(link)"
+          >
+            <ng-container *ngIf="editMode">
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="ESNgreen"
+                [disabled]="first"
+                (click)="swapSortUsefulLinks(link, usefulLinks[index-1], $event)"
+              >
+                <ion-icon icon="arrow-up" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="ESNgreen"
+                [disabled]="last"
+                (click)="swapSortUsefulLinks(link, usefulLinks[index+1], $event)"
+              >
+                <ion-icon icon="arrow-down" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button slot="end" fill="clear" color="ESNgreen" (click)="editUsefulLink(link)">
+                <ion-icon icon="pencil" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ng-container>
+          </app-useful-link>
         </ion-list>
       </ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+  <ion-fab-button color="ESNgreen" size="small" [title]="'COMMON.MANAGE' | translate" (click)="editMode = !editMode">
+    <ion-icon [icon]="editMode ?'checkmark' : 'build'"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

@@ -11,6 +11,7 @@ import { CommunicationComponent } from './communications/communication.component
 import { DeadlineComponent } from './deadlines/deadline.component';
 import { DeadlinesComponent } from './deadlines/deadlines.component';
 import { UsefulLinkComponent } from './usefulLinks/usefulLink.component';
+import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.component';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { UsefulLinkComponent } from './usefulLinks/usefulLink.component';
     CommunicationComponent,
     DeadlineComponent,
     DeadlinesComponent,
-    UsefulLinkComponent
+    UsefulLinkComponent,
+    ManageUsefulLinkComponent
   ],
   declarations: [DashboardPage]
 })

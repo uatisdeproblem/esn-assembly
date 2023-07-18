@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { addDays, isBefore } from 'date-fns';
+import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
 
 import { DeadlinesComponent } from './deadlines/deadlines.component';
+import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.component';
 
 import { AppService } from '@app/app.service';
+import { UsefulLinksService } from './usefulLinks/usefulLinks.service';
 
 import { Communication } from '@models/communication.model';
 import { Deadline } from '@models/deadline.model';
@@ -21,7 +24,7 @@ const NEXT_DEADLINES_NUM_DAYS = 30;
   templateUrl: 'dashboard.page.html',
   styleUrls: ['dashboard.page.scss']
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit {
   communications: Communication[] = [
     new Communication({
       name: 'Ex. GA August 2023 - Timeline',
@@ -56,14 +59,7 @@ export class DashboardPage {
   nextDeadlines: Deadline[] = this.deadlines.filter(x =>
     isBefore(new Date(x.at), addDays(new Date(), NEXT_DEADLINES_NUM_DAYS))
   );
-
-  usefulLinks: UsefulLink[] = [
-    new UsefulLink({
-      name: 'GA Autumn 2023 documents',
-      url: 'https://wiki.esn.org/display/EV/Extraordinary+GA+August+2023+Documents'
-    }),
-    new UsefulLink({ name: 'Travel Fund form', url: 'https://forms.esn.org/travel-fund' })
-  ];
+  usefulLinks: UsefulLink[];
 
   segment = MobileSegments.NEWS;
   MobileSegments = MobileSegments;
@@ -71,7 +67,18 @@ export class DashboardPage {
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
   NEXT_DEADLINES_NUM_DAYS = NEXT_DEADLINES_NUM_DAYS;
 
-  constructor(private modalCtrl: ModalController, public app: AppService) {}
+  editMode = false;
+
+  constructor(
+    private modalCtrl: ModalController,
+    private loading: IDEALoadingService,
+    private message: IDEAMessageService,
+    private _usefulLinks: UsefulLinksService,
+    public app: AppService
+  ) {}
+  async ngOnInit(): Promise<void> {
+    this.usefulLinks = await this._usefulLinks.getList();
+  }
 
   async openAllDeadlines(): Promise<void> {
     const modal = await this.modalCtrl.create({
@@ -79,6 +86,41 @@ export class DashboardPage {
       componentProps: { deadlines: this.deadlines }
     });
     await modal.present();
+  }
+
+  //
+  // USEFUL LINKS
+  //
+
+  async openUsefulLink(usefulLink: UsefulLink): Promise<void> {
+    if (this.editMode) return;
+    await this.app.openURL(usefulLink.url);
+  }
+  async swapSortUsefulLinks(usefulLinkA: UsefulLink, usefulLinkB: UsefulLink, event?: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    try {
+      await this.loading.show();
+      await this._usefulLinks.swapSort(usefulLinkA, usefulLinkB);
+      this.usefulLinks = await this._usefulLinks.getList();
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      this.loading.hide();
+    }
+  }
+  async editUsefulLink(usefulLink: UsefulLink): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ManageUsefulLinkComponent,
+      componentProps: { link: usefulLink },
+      backdropDismiss: false
+    });
+    modal.onDidDismiss().then(async (): Promise<void> => {
+      this.usefulLinks = await this._usefulLinks.getList({ force: true });
+    });
+    await modal.present();
+  }
+  async addUsefulLink(): Promise<void> {
+    await this.editUsefulLink(new UsefulLink());
   }
 }
 

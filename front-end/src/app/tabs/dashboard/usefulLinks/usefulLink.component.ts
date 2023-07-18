@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
-
-import { AppService } from '@app/app.service';
 
 import { UsefulLink } from '@models/usefulLink.model';
 
@@ -15,9 +13,10 @@ import { UsefulLink } from '@models/usefulLink.model';
     <ion-item [color]="color" *ngIf="!link">
       <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
     </ion-item>
-    <ion-item [color]="color" *ngIf="link" button (click)="openLink()">
-      <ion-icon slot="start" icon="open-outline" color="primary" size="small"></ion-icon>
+    <ion-item [color]="color" *ngIf="link" [button]="button" (click)="select.emit()">
+      <ion-icon slot="start" icon="link" color="primary" size="small"></ion-icon>
       <ion-label class="ion-text-wrap">{{ link.name }}</ion-label>
+      <ng-content></ng-content>
     </ion-item>
   `,
   styles: [
@@ -37,10 +36,14 @@ export class UsefulLinkComponent {
    * The color for the component.
    */
   @Input() color = 'white';
+  /**
+   * Whether the component should act like a button.
+   */
+  @Input() button = false;
+  /**
+   * Trigger when selected.
+   */
+  @Output() select = new EventEmitter<void>();
 
-  constructor(public app: AppService) {}
-
-  async openLink(): Promise<void> {
-    await this.app.openURL(this.link.url);
-  }
+  constructor() {}
 }

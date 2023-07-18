@@ -191,6 +191,11 @@
     "TOMORROW": "Tomorrow",
     "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time."
   },
+  "USEFUL_LINKS": {
+    "MANAGE_LINK": "Manage useful link",
+    "NAME": "Name",
+    "URL": "URL"
+  },
   "ARCHIVE": {
     "ARCHIVE": "Archive",
     "QA_ARCHIVE": "Q&A archive",

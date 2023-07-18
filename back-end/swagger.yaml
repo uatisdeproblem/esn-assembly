@@ -37,6 +37,8 @@ tags:
     description: The answers to the questions
   - name: Badges
     description: The badges earned by the users following actions on the platform
+  - name: UsefulLinks
+    description: The useful links available to the users to explore more contents
 
 paths:
   /login:
@@ -991,6 +993,120 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /usefulLinks:
+    get:
+      summary: Get the useful links
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLinks'
+    post:
+      summary: Insert a new useful link
+      description: Requires to be Administrator
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsefulLink'
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLink'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /usefulLinks/{linkId}:
+    get:
+      summary: Get a useful link
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLink'
+    put:
+      summary: Edit a useful link
+      description: Requires to be Administrator
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsefulLink'
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLink'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a useful link
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [SWAP_SORT]
+                otherLinkId:
+                  type: string
+                  description: (SWAP_SORT)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a useful link
+      description: Requires to be Administrator
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -1013,6 +1129,9 @@ components:
       type: object
       additionalProperties: {}
     Badge:
+      type: object
+      additionalProperties: {}
+    UsefulLink:
       type: object
       additionalProperties: {}
 
@@ -1114,6 +1233,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Badge'
+    UsefulLink:
+      description: A useful link
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/UsefulLink'
+    UsefulLinks:
+      description: The useful links
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UsefulLink'
     BadParameters:
       description: Bad input parameters
       content:

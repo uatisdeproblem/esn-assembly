@@ -16,17 +16,23 @@ export class UsefulLink extends Resource {
    * The URL of the link.
    */
   url: string;
+  /**
+   * The sort index to order the link in lists.
+   */
+  sort: number;
 
   load(x: any): void {
     super.load(x);
     this.linkId = this.clean(x.linkId, String);
     this.name = this.clean(x.name, String);
     this.url = this.clean(x.url, String);
+    this.sort = this.clean(x.sort, Number, Date.now());
   }
 
   safeLoad(newData: any, safeData: any): void {
     super.safeLoad(newData, safeData);
     this.linkId = safeData.linkId;
+    this.sort = safeData.sort;
   }
 
   validate(): string[] {
