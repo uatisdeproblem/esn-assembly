@@ -13,6 +13,7 @@ import {
 import { DeadlinesService } from './deadlines.service';
 
 import { Deadline } from '@models/deadline.model';
+import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   standalone: true,
@@ -51,7 +52,14 @@ import { Deadline } from '@models/deadline.model';
           [hideClearButton]="true"
           [class.fieldHasError]="hasFieldAnError('at')"
         ></idea-date-time>
-        <ion-row class="ion-padding-top">
+        <ion-item-divider>
+          <ion-label class="ion-text-wrap ion-padding-start">
+            <p>
+              <i>{{ 'DEADLINES.DATES_I' | translate : { timezone: FAVORITE_TIMEZONE } }}</i>
+            </p>
+          </ion-label>
+        </ion-item-divider>
+        <ion-row class="ion-padding-top" *ngIf="deadline.deadlineId">
           <ion-col class="ion-text-right ion-padding-end">
             <ion-button color="danger" (click)="askAndDelete()">{{ 'COMMON.DELETE' | translate }}</ion-button>
           </ion-col>
@@ -67,6 +75,8 @@ export class ManageDeadlineComponent {
   @Input() deadline: Deadline;
 
   errors = new Set<string>();
+
+  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   constructor(
     private modalCtrl: ModalController,

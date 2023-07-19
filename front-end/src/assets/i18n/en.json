@@ -199,7 +199,8 @@
     "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time.",
     "MANAGE_DEADLINE": "Manage deadline",
     "NAME": "A description for the deadline",
-    "DATE": "The date and time of the deadline"
+    "DATE": "The date and time of the deadline",
+    "DATES_I": "Note: the deadline must be set in the timezone {{timezone}}."
   },
   "USEFUL_LINKS": {
     "MANAGE_LINK": "Manage useful link",

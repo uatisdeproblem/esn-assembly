@@ -47,7 +47,7 @@ import { UsefulLink } from '@models/usefulLink.model';
           </ion-label>
           <ion-input [(ngModel)]="link.url"></ion-input>
         </ion-item>
-        <ion-row class="ion-padding-top">
+        <ion-row class="ion-padding-top" *ngIf="link.linkId">
           <ion-col class="ion-text-right ion-padding-end">
             <ion-button color="danger" (click)="askAndDelete()">{{ 'COMMON.DELETE' | translate }}</ion-button>
           </ion-col>
