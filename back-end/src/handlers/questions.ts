@@ -12,6 +12,7 @@ import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
+import { Subject } from '../models/subject.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -21,7 +22,6 @@ const PROJECT = process.env.PROJECT;
 const STAGE = process.env.STAGE;
 const DDB_TABLES = {
   questions: process.env.DDB_TABLE_questions,
-  questionsUpvotes: process.env.DDB_TABLE_questionsUpvotes,
   topics: process.env.DDB_TABLE_topics,
   answers: process.env.DDB_TABLE_answers,
   answersClaps: process.env.DDB_TABLE_answersClaps
@@ -105,6 +105,8 @@ class Questions extends ResourceController {
     this.question = new Question(this.body);
     this.question.topicId = this.topic.topicId;
     this.question.questionId = await ddb.IUNID(PROJECT);
+    this.question.creator = Subject.fromUser(this.galaxyUser);
+    this.question.createdAt = new Date().toISOString();
 
     await this.putSafeResource({ noOverwrite: true });
 
@@ -130,58 +132,20 @@ class Questions extends ResourceController {
 
     const oldQuestion = new Question(this.question);
     this.question.safeLoad(this.body, oldQuestion);
+    this.question.updatedAt = new Date().toISOString();
 
     return await this.putSafeResource({ noOverwrite: false });
   }
 
   protected async patchResource(): Promise<Question | { upvoted: boolean } | string[]> {
     switch (this.body.action) {
-      case 'UPVOTE':
-        return await this.upvote();
-      case 'UPVOTE_CANCEL':
-        return await this.upvote(true);
-      case 'IS_UPVOTED':
-        return { upvoted: await this.isUpvoted() };
       case 'USER_CLAPS':
         return await this.getAnswersIdsClappedByUser();
       default:
         throw new RCError('Unsupported action');
     }
   }
-  private async upvote(cancel = false): Promise<Question> {
-    const upvoteItem = { questionId: this.question.questionId, userId: this.galaxyUser.userId };
-    if (cancel) await ddb.delete({ TableName: DDB_TABLES.questionsUpvotes, Key: upvoteItem });
-    else await ddb.put({ TableName: DDB_TABLES.questionsUpvotes, Item: upvoteItem });
 
-    this.question.numOfUpvotes = await this.getLiveNumUpvotes();
-    await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
-
-    if (!cancel) {
-      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.NEWCOMER);
-      if ((await this.getNumQuestionsUpvotedByUser()) >= 15)
-        await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.LOVE_GIVER);
-    }
-
-    return this.question;
-  }
-  private async getLiveNumUpvotes(): Promise<number> {
-    const upvotes = await ddb.query({
-      TableName: DDB_TABLES.questionsUpvotes,
-      KeyConditionExpression: 'questionId = :questionId',
-      ExpressionAttributeValues: { ':questionId': this.question.questionId },
-      ConsistentRead: true
-    });
-    return upvotes.length;
-  }
-  private async isUpvoted(): Promise<boolean> {
-    try {
-      const upvoteItem = { questionId: this.question.questionId, userId: this.galaxyUser.userId };
-      await ddb.get({ TableName: DDB_TABLES.questionsUpvotes, Key: upvoteItem });
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
   private async getAnswersIdsClappedByUser(): Promise<string[]> {
     const answersClapped = await ddb.query({
       TableName: DDB_TABLES.answersClaps,
@@ -253,19 +217,6 @@ class Questions extends ResourceController {
         ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }
       });
       return questions.length;
-    } catch (error) {
-      return 0;
-    }
-  }
-  private async getNumQuestionsUpvotedByUser(): Promise<number> {
-    try {
-      const upvotes = await ddb.query({
-        TableName: DDB_TABLES.questionsUpvotes,
-        IndexName: 'inverted-index',
-        KeyConditionExpression: 'userId = :userId',
-        ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }
-      });
-      return upvotes.length;
     } catch (error) {
       return 0;
     }

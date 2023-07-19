@@ -198,6 +198,9 @@ div.internalPSpacing p {
   margin: 4px 0;
 }
 
+.mediumPopover {
+  --width: 350px;
+}
 .largePopover {
   --width: 700px;
   @media only screen and (max-width: 767px) {

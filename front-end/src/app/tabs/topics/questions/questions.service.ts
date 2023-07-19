@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
+import { AppService } from '@app/app.service';
+
 import { Topic } from '@models/topic.model';
 import { Question } from '@models/question.model';
+import { Subject } from '@models/subject.model';
 
 @Injectable({ providedIn: 'root' })
 export class QuestionsService {
@@ -13,7 +16,7 @@ export class QuestionsService {
    */
   MAX_PAGE_SIZE = 24;
 
-  constructor(private api: IDEAApiService) {}
+  constructor(private api: IDEAApiService, private app: AppService) {}
 
   /**
    * Load the questions in a topic from the back-end.
@@ -90,24 +93,32 @@ export class QuestionsService {
   /**
    * Upvote a question.
    */
-  async upvote(topic: Topic, question: Question): Promise<Question> {
-    const path = ['topics', topic.topicId, 'questions', question.questionId];
-    return new Question(await this.api.patchResource(path, { body: { action: 'UPVOTE' } }));
+  async upvote(topic: Topic, question: Question): Promise<void> {
+    const path = ['topics', topic.topicId, 'questions', question.questionId, 'upvotes'];
+    await this.api.postResource(path);
   }
   /**
    * Cancel the upvote to a question.
    */
-  async upvoteCancel(topic: Topic, question: Question): Promise<Question> {
-    const path = ['topics', topic.topicId, 'questions', question.questionId];
-    return new Question(await this.api.patchResource(path, { body: { action: 'UPVOTE_CANCEL' } }));
+  async upvoteCancel(topic: Topic, question: Question): Promise<void> {
+    const path = ['topics', topic.topicId, 'questions', question.questionId, 'upvotes'];
+    await this.api.deleteResource(path);
   }
   /**
    * Whether the current user upvoted the question.
    */
   async userHasUpvoted(topic: Topic, question: Question): Promise<boolean> {
-    const path = ['topics', topic.topicId, 'questions', question.questionId];
-    const { upvoted } = await this.api.patchResource(path, { body: { action: 'IS_UPVOTED' } });
+    const path = ['topics', topic.topicId, 'questions', question.questionId, 'upvotes', this.app.user.userId];
+    const { upvoted } = await this.api.getResource(path);
     return upvoted;
+  }
+  /**
+   * Get the users who upvoted the question (latest first).
+   */
+  async getUpvoters(topic: Topic, question: Question): Promise<Subject[]> {
+    const path = ['topics', topic.topicId, 'questions', question.questionId, 'upvotes'];
+    const subjects: Subject[] = await this.api.getResource(path);
+    return subjects.map(x => new Subject(x));
   }
   /**
    * Get the answers (to the question) for which the user clapped.

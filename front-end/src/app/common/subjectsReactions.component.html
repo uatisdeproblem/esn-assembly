@@ -1,0 +1,28 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" color="medium" (click)="close()">
+        <ion-icon icon="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end" *ngIf="reaction">
+      <ion-text [color]="reaction === 'upvote' ? 'ESNgreen' : 'ESNpink'">{{ subjects?.length }}</ion-text>
+      <ion-icon
+        class="ion-padding-end"
+        [icon]="reaction === 'upvote' ? 'thumbs-up' : '/assets/icons/clap.svg'"
+        [color]="reaction === 'upvote' ? 'ESNgreen' : 'ESNpink'"
+      ></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content color="light">
+  <ion-list class="aList">
+    <p class="ion-text-center" *ngIf="showSpinner">
+      <ion-spinner></ion-spinner>
+    </p>
+    <app-subject *ngFor="let subject of subjects" [subject]="subject" size="small"></app-subject>
+    <ion-item class="noElements" *ngIf="!showSpinner && !subjects?.length">
+      <ion-label>{{ 'SUBJECTS.NO_ONE_REACTED_YET' | translate }}</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

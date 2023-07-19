@@ -4,7 +4,7 @@ import { User } from './user.model';
 import { cleanESNAccountsIdForURL } from './utils';
 
 /**
- * The subject of a topic.
+ * A user subject to a topic, a questio, an answer, etc..
  */
 export class Subject extends Resource {
   /**

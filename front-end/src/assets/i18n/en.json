@@ -75,7 +75,8 @@
     "SAVE_CHANGES": "Save changes",
     "NOT_FOUND": "Not found",
     "NOT_SELECTED": "Not selected",
-    "MANAGE": "Manage"
+    "MANAGE": "Manage",
+    "UNKNOWN": "Unknown"
   },
   "LANGUAGES": {
     "EN": "English"
@@ -173,8 +174,10 @@
     "ANSWER": "Answer",
     "IS_YOUR_ANSWER_READY": "Is your answer ready?",
     "DELETE_ANSWER": "Delete answer",
-    "CLAP_ANSWER": "Clap answer",
-    "CANCEL_CLAP_ANSWER": "Cancel clap"
+    "CLAP_ANSWER": "Applause answer",
+    "CANCEL_CLAP_ANSWER": "Cancel applause",
+    "SEE_UPVOTERS": "Who upvoted",
+    "SEE_CLAPPERS": "Who applauded"
   },
   "DASHBOARD": {
     "NEWS": "News",
@@ -271,7 +274,8 @@
     "AVATAR_URL": "Avatar URL",
     "SECTION": "ESN Section",
     "COUNTRY": "ESN Country",
-    "EMAIL_FOR_NOTIFICATIONS": "Email address for notifications"
+    "EMAIL_FOR_NOTIFICATIONS": "Email address for notifications",
+    "NO_ONE_REACTED_YET": "No one yet"
   },
   "PROFILE": {
     "MANAGE_ON_ESN_ACCOUNTS": "Profile on ESN Accounts",

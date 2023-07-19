@@ -8,3 +8,12 @@ ion-item {
     color: var(--ion-color-step-500);
   }
 }
+ion-item.small {
+  ion-avatar {
+    width: var(--app-subject-avatar-size-small, 24px);
+    height: var(--app-subject-avatar-size-small, 24px);
+  }
+  ion-label {
+    font-size: 0.9em;
+  }
+}
