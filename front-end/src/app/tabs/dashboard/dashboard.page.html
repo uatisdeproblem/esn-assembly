@@ -27,7 +27,7 @@
           <ion-list-header>
             <ion-label>
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEWS' | translate }}</h1>
-              <p>{{ 'DASHBOARD.NEWS_I' | translate }}</p>
+              <p *ngIf="!editMode">{{ 'DASHBOARD.NEWS_I' | translate }}</p>
             </ion-label>
             <ion-button color="ESNgreen" *ngIf="editMode" (click)="addCommunication()">
               {{ 'COMMON.ADD' | translate }}
@@ -58,8 +58,10 @@
           <ion-list-header>
             <ion-label>
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEXT_DEADLINES' | translate }}</h1>
-              <p>{{ 'DASHBOARD.NEXT_DEADLINES_I' | translate: { days: NEXT_DEADLINES_NUM_DAYS } }}</p>
-              <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+              <ng-container *ngIf="!editMode">
+                <p>{{ 'DASHBOARD.NEXT_DEADLINES_I' | translate: { days: NEXT_DEADLINES_NUM_DAYS } }}</p>
+                <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+              </ng-container>
             </ion-label>
             <ion-button *ngIf="!editMode" (click)="openAllDeadlines()">
               {{ 'DASHBOARD.SEE_ALL_DEADLINES' | translate }}
@@ -78,7 +80,7 @@
           <ion-list-header>
             <ion-label>
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.USEFUL_LINKS' | translate }}</h1>
-              <p>{{ 'DASHBOARD.USEFUL_LINKS_I' | translate }}</p>
+              <p *ngIf="!editMode">{{ 'DASHBOARD.USEFUL_LINKS_I' | translate }}</p>
             </ion-label>
             <ion-button color="ESNgreen" *ngIf="editMode" (click)="addUsefulLink()">
               {{ 'COMMON.ADD' | translate }}

@@ -30,7 +30,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
         <ion-list-header>
           <ion-label>
             <h1>{{ 'DEADLINES.DEADLINES' | translate }}</h1>
-            <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate : { timezone: FAVORITE_TIMEZONE } }}</p>
+            <p *ngIf="!editMode">{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate : { timezone: FAVORITE_TIMEZONE } }}</p>
           </ion-label>
           <ion-button color="ESNgreen" *ngIf="editMode" (click)="addDeadline()">
             {{ 'COMMON.ADD' | translate }}
