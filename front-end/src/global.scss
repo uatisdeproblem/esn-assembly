@@ -101,6 +101,11 @@ ion-list.aList {
       font-weight: 500;
     }
   }
+  ion-item {
+    --highlight-color-focused: var(--ion-color-primary);
+    --highlight-color-valid: var(--ion-color-primary);
+    --highlight-color-invalid: var(--ion-color-primary);
+  }
   ion-row.row,
   ion-item {
     // all the three definitions are important
@@ -139,7 +144,7 @@ ion-button:not([fill='clear'], [fill='outline']) {
 ion-toolbar ion-buttons ion-button,
 ion-list-header ion-button,
 ion-button[fill='clear'] {
-  font-weight: 600;
+  font-weight: 500;
   --box-shadow: none !important;
 }
 ion-toolbar ion-buttons ion-button[fill='solid'] {
@@ -204,4 +209,13 @@ ion-modal {
   @media only screen and (min-width: 768px) {
     --border-radius: 8px;
   }
+}
+
+// to remove after updating IDEA Ionic Extra > v6.13.0
+ion-text.obligatoryDot::after {
+  content: '*';
+  font-size: 1.1em;
+  color: var(--ion-color-danger);
+  -webkit-text-fill-color: var(--ion-color-danger); // needed for viewMode
+  vertical-align: text-top;
 }
