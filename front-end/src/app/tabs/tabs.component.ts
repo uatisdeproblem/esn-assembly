@@ -8,11 +8,5 @@ import { AppService } from '@app/app.service';
   styleUrls: ['tabs.component.scss']
 })
 export class TabsComponent {
-  tabs: { id: string; icon: string; titleKey: string }[] = [
-    { id: 'topics', icon: 'home', titleKey: 'TABS.TOPICS' },
-    { id: 'archive', icon: 'archive', titleKey: 'TABS.ARCHIVE' },
-    { id: 'configurations', icon: 'settings', titleKey: 'TABS.CONFIGURATIONS' }
-  ];
-
   constructor(public app: AppService) {}
 }

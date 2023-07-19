@@ -1,3 +1,3 @@
-# ESN General Assembly Q&A
+# ESN General Assembly app
 
 _Ex-candidates blog._

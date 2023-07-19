@@ -1,7 +1,7 @@
 openapi: 3.0.3
 
 info:
-  title: ESN GA Candidates app
+  title: ESN General Assembly app
   version: 1.1.9
   contact:
     name: Matteo Carbone
@@ -37,6 +37,12 @@ tags:
     description: The answers to the questions
   - name: Badges
     description: The badges earned by the users following actions on the platform
+  - name: UsefulLinks
+    description: The useful links available to the users to explore more contents
+  - name: Deadlines
+    description: The deadlines the users should be aware of
+  - name: Communications
+    description: The communications towards the users
 
 paths:
   /login:
@@ -370,6 +376,12 @@ paths:
       tags: [Topics]
       security:
         - AuthFunction: []
+      parameters:
+        - name: archived
+          in: query
+          description: Whether to get archived topics instead of active ones
+          schema:
+            type: boolean
       responses:
         200:
           $ref: '#/components/responses/Topics'
@@ -991,6 +1003,321 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /usefulLinks:
+    get:
+      summary: Get the useful links
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLinks'
+    post:
+      summary: Insert a new useful link
+      description: Requires to be Administrator
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsefulLink'
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLink'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /usefulLinks/{linkId}:
+    get:
+      summary: Get a useful link
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLink'
+    put:
+      summary: Edit a useful link
+      description: Requires to be Administrator
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsefulLink'
+      responses:
+        200:
+          $ref: '#/components/responses/UsefulLink'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a useful link
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [SWAP_SORT]
+                otherLinkId:
+                  type: string
+                  description: (SWAP_SORT)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a useful link
+      description: Requires to be Administrator
+      tags: [UsefulLinks]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: linkId
+          in: path
+          description: Link ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /deadlines:
+    get:
+      summary: Get the (future) deadlines
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      responses:
+        200:
+          $ref: '#/components/responses/Deadlines'
+    post:
+      summary: Insert a new deadline
+      description: Requires to be Administrator
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Deadline'
+      responses:
+        200:
+          $ref: '#/components/responses/Deadlines'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /deadlines/{deadlineId}:
+    get:
+      summary: Get a deadline
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: deadlineId
+          in: path
+          description: Deadline ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Deadline'
+    put:
+      summary: Edit a deadline
+      description: Requires to be Administrator
+      tags: [Deadlines]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: deadlineId
+          in: path
+          description: Deadline ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Deadline'
+      responses:
+        200:
+          $ref: '#/components/responses/Deadline'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a deadline
+      description: Requires to be Administrator
+      tags: [Deadline]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: deadlineId
+          in: path
+          description: Deadline ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /communications:
+    get:
+      summary: Get the communications
+      tags: [Communications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: archived
+          in: query
+          description: Whether to get archived communications instead of active ones
+          schema:
+            type: boolean
+      responses:
+        200:
+          $ref: '#/components/responses/Communications'
+    post:
+      summary: Insert a new communication
+      description: Requires to be Administrator
+      tags: [Communications]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Communication'
+      responses:
+        200:
+          $ref: '#/components/responses/Communications'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /communications/{communicationId}:
+    get:
+      summary: Get a communication
+      tags: [Communications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: communicationId
+          in: path
+          description: Communication ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Communication'
+    put:
+      summary: Edit a communication
+      description: Requires to be Administrator
+      tags: [Communications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: communicationId
+          in: path
+          description: Communication ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Communication'
+      responses:
+        200:
+          $ref: '#/components/responses/Communication'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a communication
+      tags: [Communications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: communicationId
+          in: path
+          description: Communication ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [ARCHIVE, UNARCHIVE]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a communication
+      description: Requires to be Administrator
+      tags: [Communications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: communicationId
+          in: path
+          description: Communication ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -1013,6 +1340,15 @@ components:
       type: object
       additionalProperties: {}
     Badge:
+      type: object
+      additionalProperties: {}
+    UsefulLink:
+      type: object
+      additionalProperties: {}
+    Deadline:
+      type: object
+      additionalProperties: {}
+    Communication:
       type: object
       additionalProperties: {}
 
@@ -1114,6 +1450,51 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Badge'
+    UsefulLink:
+      description: A useful link
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/UsefulLink'
+    UsefulLinks:
+      description: The useful links
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UsefulLink'
+    Deadline:
+      description: A deadline
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Deadline'
+    Deadlines:
+      description: The deadlines
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Deadline'
+    Communication:
+      description: A communication
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Communication'
+    Communications:
+      description: The communications
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Communication'
     BadParameters:
       description: Bad input parameters
       content:

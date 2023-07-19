@@ -1,8 +1,6 @@
 {
   "COMMON": {
-    "APP_NAME": "General Assembly Q&A",
-    "APP_NAME_SHORT": "Q&A",
-    "APP_DESCRIPTION": "ESN General Assembly",
+    "APP_NAME": "General Assembly app",
     "VERSION": "Version {{v}}",
     "ARE_YOU_SURE": "Are you sure?",
     "ACTION_IS_IRREVERSIBLE": "The action is irreversible",
@@ -83,11 +81,13 @@
     "EN": "English"
   },
   "AUTH": {
+    "TITLE": "General Assembly app",
+    "SUBTITLE": "Erasmus Student Network",
     "LOGIN_WITH_ESN_ACCOUNTS": "Login with ESN Accounts"
   },
   "TABS": {
-    "TOPICS": "Topics",
-    "ARCHIVE": "Archive",
+    "DASHBOARD": "Dashboard",
+    "TOPICS": "Q&A",
     "PROFILE": "Profile",
     "CONFIGURATIONS": "Configurations"
   },
@@ -176,7 +176,40 @@
     "CLAP_ANSWER": "Clap answer",
     "CANCEL_CLAP_ANSWER": "Cancel clap"
   },
+  "DASHBOARD": {
+    "NEWS": "News",
+    "NEWS_I": "Bullettin board from the GA Chairing Team.",
+    "NEXT_DEADLINES": "Next deadlines",
+    "NEXT_DEADLINES_I": "Deadlines in the upcoming {{days}} days.",
+    "SEE_ALL_DEADLINES": "See all",
+    "USEFUL_LINKS": "Useful links",
+    "USEFUL_LINKS_I": "Access more information through these sources."
+  },
+  "COMMUNICATIONS": {
+    "MANAGE_COMMUNICATION": "Manage communication",
+    "NAME": "Title",
+    "BRIEF": "A brief description (for previews)",
+    "IMAGE_URL": "Image URL",
+    "CONTENT": "The full-content of the communication"
+  },
+  "DEADLINES": {
+    "DEADLINES": "Deadlines",
+    "TODAY": "Today",
+    "TOMORROW": "Tomorrow",
+    "DEADLINES_TIMEZONE": "All deadlines are in {{timezone}} time.",
+    "MANAGE_DEADLINE": "Manage deadline",
+    "NAME": "A description for the deadline",
+    "DATE": "The date and time of the deadline",
+    "DATES_I": "Note: the deadline must be set in the timezone {{timezone}}."
+  },
+  "USEFUL_LINKS": {
+    "MANAGE_LINK": "Manage useful link",
+    "NAME": "Name",
+    "URL": "URL"
+  },
   "ARCHIVE": {
+    "ARCHIVE": "Archive",
+    "QA_ARCHIVE": "Q&A archive",
     "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters in the action bar above to search through archived topics.",
     "NO_ELEMENT_FOUND_WITH_FILTERS": "No archived topics found with the filters selected"
   },

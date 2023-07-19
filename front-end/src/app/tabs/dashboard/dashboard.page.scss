@@ -1,0 +1,16 @@
+ion-segment-button {
+  text-transform: none;
+}
+
+ion-grid {
+  max-width: 1200px;
+}
+
+ion-list.aList {
+  padding-top: 0;
+  padding-bottom: 20px;
+}
+
+app-useful-link ion-button[slot='end'] {
+  margin-left: 8px;
+}

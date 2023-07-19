@@ -7,7 +7,7 @@ import { IDEATranslationsModule } from '@idea-ionic/common';
 import { ArchiveRoutingModule } from './archive.routing.module';
 import { ArchivePage } from './archive.page';
 
-import { TopicModule } from '../topics/topic.module';
+import { TopicModule } from '@tabs/topics/topic.module';
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, ArchiveRoutingModule, TopicModule],

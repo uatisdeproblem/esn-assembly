@@ -48,6 +48,10 @@
   padding-bottom: 80px;
 }
 
+ion-content {
+  --background: var(--ion-color-white-shade);
+}
+
 ion-list.aList {
   background: transparent;
   ion-list-header {
@@ -97,6 +101,11 @@ ion-list.aList {
       font-weight: 500;
     }
   }
+  ion-item {
+    --highlight-color-focused: var(--ion-color-primary);
+    --highlight-color-valid: var(--ion-color-primary);
+    --highlight-color-invalid: var(--ion-color-primary);
+  }
   ion-row.row,
   ion-item {
     // all the three definitions are important
@@ -133,7 +142,9 @@ ion-button:not([fill='clear'], [fill='outline']) {
   --box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 ion-toolbar ion-buttons ion-button,
-ion-list-header ion-button {
+ion-list-header ion-button,
+ion-button[fill='clear'] {
+  font-weight: 500;
   --box-shadow: none !important;
 }
 ion-toolbar ion-buttons ion-button[fill='solid'] {
@@ -187,16 +198,27 @@ div.internalPSpacing p {
   margin: 4px 0;
 }
 
-// to remove after updating IDEA-Ionic-Extra > 6.11.1
-ion-radio[slot='start'] + ion-label {
-  opacity: 1 !important;
-  -webkit-text-fill-color: var(--ion-text-color);
-  --placeholder-opacity: 0 !important;
-}
-
 .largePopover {
   --width: 700px;
   @media only screen and (max-width: 767px) {
     --width: 400px;
   }
+}
+
+ion-modal {
+  @media only screen and (min-width: 768px) {
+    --border-radius: 8px;
+  }
+  ion-header ion-toolbar ion-title {
+    font-size: 1.1em;
+  }
+}
+
+// to remove after updating IDEA Ionic Extra > v6.13.0
+ion-text.obligatoryDot::after {
+  content: '*';
+  font-size: 1.1em;
+  color: var(--ion-color-danger);
+  -webkit-text-fill-color: var(--ion-color-danger); // needed for viewMode
+  vertical-align: text-top;
 }

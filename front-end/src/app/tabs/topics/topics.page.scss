@@ -4,6 +4,9 @@ ion-toolbar.filtersBar {
   ion-select {
     font-size: 0.9em;
   }
+  ion-button {
+    text-transform: none;
+  }
 }
 
 ion-grid {

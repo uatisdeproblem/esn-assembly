@@ -1,0 +1,132 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-img [src]="app.getIcon()"></ion-img>
+    </ion-buttons>
+    <ion-title>{{ 'TABS.DASHBOARD' | translate }}</ion-title>
+  </ion-toolbar>
+  <ion-toolbar color="ideaToolbar">
+    <ion-segment [(ngModel)]="segment">
+      <ion-segment-button [value]="MobileSegments.NEWS">
+        <ion-label>{{ 'DASHBOARD.NEWS' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="MobileSegments.DEADLINES">
+        <ion-label>{{ 'DASHBOARD.NEXT_DEADLINES' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="MobileSegments.LINKS">
+        <ion-label>{{ 'DASHBOARD.USEFUL_LINKS' | translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-grid [class.ion-no-padding]="app.isInMobileMode()">
+    <ion-row>
+      <ion-col [size]="12" [sizeLg]="6">
+        <ion-list class="aList" *ngIf="!app.isInMobileMode() || segment === MobileSegments.NEWS">
+          <ion-list-header>
+            <ion-label>
+              <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEWS' | translate }}</h1>
+              <p *ngIf="!editMode">{{ 'DASHBOARD.NEWS_I' | translate }}</p>
+            </ion-label>
+            <ion-button color="ESNgreen" *ngIf="editMode" (click)="addCommunication()">
+              {{ 'COMMON.ADD' | translate }}
+            </ion-button>
+          </ion-list-header>
+          <ion-item class="noElements" *ngIf="communications && !communications.length">
+            <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
+          </ion-item>
+          <app-communication *ngIf="!communications"></app-communication>
+          <app-communication
+            *ngFor="let communication of communications"
+            [communication]="communication"
+            [button]="!editMode"
+            (select)="openCommunication(communication)"
+          >
+            <ng-container *ngIf="editMode">
+              <p class="ion-text-right">
+                <ion-button slot="end" fill="clear" color="ESNgreen" (click)="manageCommunication(communication)">
+                  <ion-icon icon="pencil" slot="icon-only"></ion-icon>
+                </ion-button>
+              </p>
+            </ng-container>
+          </app-communication>
+        </ion-list>
+      </ion-col>
+      <ion-col [class.ion-padding-start]="!app.isInMobileMode()" [size]="12" [sizeLg]="6">
+        <ion-list class="aList" *ngIf="!app.isInMobileMode() || segment === MobileSegments.DEADLINES">
+          <ion-list-header>
+            <ion-label>
+              <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEXT_DEADLINES' | translate }}</h1>
+              <ng-container *ngIf="!editMode">
+                <p>{{ 'DASHBOARD.NEXT_DEADLINES_I' | translate: { days: NEXT_DEADLINES_NUM_DAYS } }}</p>
+                <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+              </ng-container>
+            </ion-label>
+            <ion-button *ngIf="!editMode" (click)="openAllDeadlines()">
+              {{ 'DASHBOARD.SEE_ALL_DEADLINES' | translate }}
+            </ion-button>
+            <ion-button color="ESNgreen" *ngIf="editMode" (click)="openAllDeadlines()">
+              {{ 'COMMON.MANAGE' | translate }}
+            </ion-button>
+          </ion-list-header>
+          <ion-item class="noElements" *ngIf="nextDeadlines && !nextDeadlines.length">
+            <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
+          </ion-item>
+          <app-deadline *ngIf="!nextDeadlines"></app-deadline>
+          <app-deadline *ngFor="let deadline of nextDeadlines" [deadline]="deadline"></app-deadline>
+        </ion-list>
+        <ion-list class="aList" *ngIf="!app.isInMobileMode() || segment === MobileSegments.LINKS">
+          <ion-list-header>
+            <ion-label>
+              <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.USEFUL_LINKS' | translate }}</h1>
+              <p *ngIf="!editMode">{{ 'DASHBOARD.USEFUL_LINKS_I' | translate }}</p>
+            </ion-label>
+            <ion-button color="ESNgreen" *ngIf="editMode" (click)="addUsefulLink()">
+              {{ 'COMMON.ADD' | translate }}
+            </ion-button>
+          </ion-list-header>
+          <ion-item class="noElements" *ngIf="usefulLinks && !usefulLinks.length">
+            <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
+          </ion-item>
+          <app-useful-link *ngIf="!usefulLinks"></app-useful-link>
+          <app-useful-link
+            *ngFor="let link of usefulLinks; let first = first; let last = last; let index = index"
+            [link]="link"
+            [button]="!editMode"
+            (select)="openUsefulLink(link)"
+          >
+            <ng-container *ngIf="editMode">
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="ESNgreen"
+                [disabled]="first"
+                (click)="swapSortUsefulLinks(link, usefulLinks[index-1], $event)"
+              >
+                <ion-icon icon="arrow-up" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="ESNgreen"
+                [disabled]="last"
+                (click)="swapSortUsefulLinks(link, usefulLinks[index+1], $event)"
+              >
+                <ion-icon icon="arrow-down" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button slot="end" fill="clear" color="ESNgreen" (click)="editUsefulLink(link)">
+                <ion-icon icon="pencil" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ng-container>
+          </app-useful-link>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+  <ion-fab-button color="ESNgreen" size="small" [title]="'COMMON.MANAGE' | translate" (click)="editMode = !editMode">
+    <ion-icon [icon]="editMode ?'checkmark' : 'build'"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

@@ -3,9 +3,9 @@ import { IonInfiniteScroll } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
-import { TopicsService, TopicsSortBy } from '../topics/topics.service';
-import { TopicCategoryService } from '../configurations/categories/categories.service';
-import { TopicEventsService } from '../configurations/events/events.service';
+import { TopicsService, TopicsSortBy } from '@tabs/topics/topics.service';
+import { TopicCategoryService } from '@tabs/configurations/categories/categories.service';
+import { TopicEventsService } from '@tabs/configurations/events/events.service';
 
 import { TopicCategory } from '@models/category.model';
 import { TopicEvent } from '@models/event.model';
