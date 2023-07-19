@@ -11,6 +11,9 @@
         </ion-button>
       </ion-col>
       <ion-col class="ion-text-right">
+        <ion-button fill="clear" color="medium" (click)="seeQuestionUpvoters($event)">
+          {{ 'QUESTIONS.SEE_UPVOTERS' | translate }} <ion-icon slot="end" icon="eye"></ion-icon>
+        </ion-button>
         <ion-button fill="clear" [color]="userUpvoted ? 'medium' : 'ESNgreen'" (click)="upvoteQuestion(!userUpvoted)">
           {{ (userUpvoted ? 'QUESTIONS.CANCEL_UPVOTE_QUESTION' : 'QUESTIONS.UPVOTE_QUESTION') | translate }}
           <ion-icon slot="end" icon="thumbs-up"></ion-icon>
@@ -34,6 +37,9 @@
           class="ion-text-right ion-padding-end"
           *ngIf="question.creator.id !== answer.creator.id && answer.creator.id !== app.user.userId"
         >
+          <ion-button fill="clear" color="medium" (click)="seeAnswerClappers(answer, $event)">
+            {{ 'QUESTIONS.SEE_CLAPPERS' | translate }} <ion-icon slot="end" icon="eye"></ion-icon>
+          </ion-button>
           <ion-button
             fill="clear"
             [color]="userClapped[answer.answerId] ? 'medium' : 'ESNpink'"
@@ -44,7 +50,7 @@
           </ion-button>
         </p>
       </app-message-bubble>
-      <p class="ion-text-center" *ngIf="getLastAnswer()?.canUserEdit(topic, app.user)">
+      <p class="ion-text-center ion-padding-top" *ngIf="getLastAnswer()?.canUserEdit(topic, app.user)">
         <ion-button color="danger" fill="clear" (click)="deleteLastAnswer()">
           {{ 'QUESTIONS.DELETE_ANSWER' | translate }} <ion-icon name="trash-outline" slot="end"></ion-icon>
         </ion-button>

@@ -1,4 +1,10 @@
-<ion-item button [color]="color" [lines]="lines" (click)="openOnESNAccounts()">
+<ion-item
+  [button]="subject?.id"
+  [color]="color"
+  [lines]="lines"
+  [class.small]="size === 'small'"
+  (click)="openOnESNAccounts()"
+>
   <ion-avatar slot="start">
     <ion-img
       [src]="subject.avatarURL ?? app.getAvatarFallbackURL(subject.type !== SubjectTypes.USER)"
@@ -6,7 +12,7 @@
     ></ion-img>
   </ion-avatar>
   <ion-label class="ion-text-wrap">
-    {{ subject.name }}
-    <p *ngIf="subject.getSectionCountry()">{{ subject.getSectionCountry() }}</p>
+    {{ subject.name ?? ('COMMON.UNKNOWN' | translate) }}
+    <p *ngIf="size !== 'small' && subject.getSectionCountry()">{{ subject.getSectionCountry() }}</p>
   </ion-label>
 </ion-item>

@@ -5,6 +5,7 @@ import { AppService } from '@app/app.service';
 
 import { Topic } from '@models/topic.model';
 import { Question } from '@models/question.model';
+import { Subject } from '@models/subject.model';
 
 @Injectable({ providedIn: 'root' })
 export class QuestionsService {
@@ -110,6 +111,14 @@ export class QuestionsService {
     const path = ['topics', topic.topicId, 'questions', question.questionId, 'upvotes', this.app.user.userId];
     const { upvoted } = await this.api.getResource(path);
     return upvoted;
+  }
+  /**
+   * Get the users who upvoted the question (latest first).
+   */
+  async getUpvoters(topic: Topic, question: Question): Promise<Subject[]> {
+    const path = ['topics', topic.topicId, 'questions', question.questionId, 'upvotes'];
+    const subjects: Subject[] = await this.api.getResource(path);
+    return subjects.map(x => new Subject(x));
   }
   /**
    * Get the answers (to the question) for which the user clapped.

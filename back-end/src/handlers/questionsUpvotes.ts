@@ -67,7 +67,6 @@ class Questions extends ResourceController {
       ExpressionAttributeValues: { ':questionId': this.question.questionId }
     });
     questionUpvotes = questionUpvotes
-      .filter(x => !!x.creator) // older data don't have this field
       .map(x => new QuestionUpvote(x))
       .sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
     return questionUpvotes.map(x => x.creator);
@@ -77,7 +76,7 @@ class Questions extends ResourceController {
     const upvoteItem = new QuestionUpvote({
       questionId: this.question.questionId,
       userId: this.galaxyUser.userId,
-      subject: Subject.fromUser(this.galaxyUser)
+      creator: Subject.fromUser(this.galaxyUser)
     });
 
     await ddb.put({ TableName: DDB_TABLES.questionsUpvotes, Item: upvoteItem });

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, PopoverController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
+
+import { SubjectsReactionsComponent } from 'src/app/common/subjectsReactions.component';
 
 import { AppService } from '@app/app.service';
 import { QuestionsService } from './questions.service';
@@ -40,6 +42,7 @@ export class QuestionComponent implements OnChanges {
 
   constructor(
     private alertCtrl: AlertController,
+    private popoverCtrl: PopoverController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
@@ -188,5 +191,29 @@ export class QuestionComponent implements OnChanges {
     ];
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
+  }
+
+  async seeQuestionUpvoters(event: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    const subjectsPromise = this._questions.getUpvoters(this.topic, this.question);
+    const popover = await this.popoverCtrl.create({
+      component: SubjectsReactionsComponent,
+      componentProps: { subjectsPromise, reaction: 'upvote' },
+      cssClass: 'mediumPopover',
+      event
+    });
+    await popover.present();
+  }
+
+  async seeAnswerClappers(answer: Answer, event: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    const subjectsPromise = this._answers.getClappers(this.question, answer);
+    const popover = await this.popoverCtrl.create({
+      component: SubjectsReactionsComponent,
+      componentProps: { subjectsPromise, reaction: 'clap' },
+      cssClass: 'mediumPopover',
+      event
+    });
+    await popover.present();
   }
 }

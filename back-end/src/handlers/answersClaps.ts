@@ -81,7 +81,6 @@ class AnswersClaps extends ResourceController {
       ExpressionAttributeValues: { ':answerId': this.answer.answerId }
     });
     answersClaps = answersClaps
-      .filter(x => !!x.creator) // older data don't have this field
       .map(x => new AnswerClap(x))
       .sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
     return answersClaps.map(x => x.creator);
@@ -92,7 +91,7 @@ class AnswersClaps extends ResourceController {
       answerId: this.answer.answerId,
       userId: this.galaxyUser.userId,
       questionId: this.question.questionId,
-      subject: Subject.fromUser(this.galaxyUser)
+      creator: Subject.fromUser(this.galaxyUser)
     });
 
     await ddb.put({ TableName: DDB_TABLES.answersClaps, Item: answerClap });

@@ -5,10 +5,11 @@ import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { SubjectComponent } from './subject.component';
+import { SubjectsReactionsComponent } from './subjectsReactions.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule],
-  declarations: [SubjectComponent],
-  exports: [SubjectComponent]
+  declarations: [SubjectComponent, SubjectsReactionsComponent],
+  exports: [SubjectComponent, SubjectsReactionsComponent]
 })
 export class SubjectModule {}

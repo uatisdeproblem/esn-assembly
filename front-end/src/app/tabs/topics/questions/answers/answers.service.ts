@@ -5,6 +5,7 @@ import { AppService } from '@app/app.service';
 
 import { Question } from '@models/question.model';
 import { Answer } from '@models/answer.model';
+import { Subject } from '@models/subject.model';
 
 @Injectable({ providedIn: 'root' })
 export class AnswersService {
@@ -128,5 +129,13 @@ export class AnswersService {
     ];
     const { clapped } = await this.api.getResource(path);
     return clapped;
+  }
+  /**
+   * Get the users who clapped the answer (latest first).
+   */
+  async getClappers(question: Question, answer: Answer): Promise<Subject[]> {
+    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId, 'claps'];
+    const subjects: Subject[] = await this.api.getResource(path);
+    return subjects.map(x => new Subject(x));
   }
 }
