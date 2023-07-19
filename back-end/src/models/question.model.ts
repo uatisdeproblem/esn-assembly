@@ -92,3 +92,35 @@ export class Question extends Resource {
     return (user.isAdministrator && !excludeAdmin) || user.userId === this.creator.id;
   }
 }
+
+/**
+ * The act of upvoting a question.
+ */
+export class QuestionUpvote extends Resource {
+  /**
+   * The ID of the question.
+   */
+  questionId: string;
+  /**
+   * The ID of the user who upvoted.
+   */
+  userId: string;
+  /**
+   * The data of the user who upvoted.
+   * Note: older data may not have this field.
+   */
+  creator: Subject;
+  /**
+   * The timestamp of creation of the upvote.
+   * Note: older data may not have this field.
+   */
+  createdAt: epochISOString;
+
+  load(x: any): void {
+    super.load(x);
+    this.questionId = this.clean(x.questionId, String);
+    this.userId = this.clean(x.userId, String);
+    this.creator = new Subject(x.creator);
+    this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
+  }
+}

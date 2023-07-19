@@ -5,13 +5,12 @@
 import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
 
 import { isEmailInBlockList } from './sesNotifications';
-import { addBadgeToUser } from './badges';
 
 import { Topic } from '../models/topic.model';
 import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
 import { User } from '../models/user.model';
-import { Badges } from '../models/userBadge.model';
+import { Subject } from '../models/subject.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -22,8 +21,7 @@ const STAGE = process.env.STAGE;
 const DDB_TABLES = {
   questions: process.env.DDB_TABLE_questions,
   topics: process.env.DDB_TABLE_topics,
-  answers: process.env.DDB_TABLE_answers,
-  answersClaps: process.env.DDB_TABLE_answersClaps
+  answers: process.env.DDB_TABLE_answers
 };
 const ddb = new DynamoDB();
 
@@ -116,6 +114,8 @@ class Answers extends ResourceController {
     this.answer = new Answer(this.body);
     this.answer.questionId = this.question.questionId;
     this.answer.answerId = await ddb.IUNID(PROJECT);
+    this.answer.creator = Subject.fromUser(this.galaxyUser);
+    this.answer.createdAt = new Date().toISOString();
 
     await this.putSafeResource({ noOverwrite: true });
 
@@ -135,65 +135,9 @@ class Answers extends ResourceController {
 
     const oldAnswer = new Answer(this.answer);
     this.answer.safeLoad(this.body, oldAnswer);
+    this.answer.updatedAt = new Date().toISOString();
 
     return await this.putSafeResource({ noOverwrite: false });
-  }
-
-  protected async patchResource(): Promise<Question | { clapped: boolean }> {
-    switch (this.body.action) {
-      case 'CLAP':
-        return await this.clap();
-      case 'CLAP_CANCEL':
-        return await this.clap(true);
-      case 'IS_CLAPPED':
-        return { clapped: await this.isClapped() };
-      default:
-        throw new RCError('Unsupported action');
-    }
-  }
-  private async clap(cancel = false): Promise<Question> {
-    if (cancel)
-      await ddb.delete({
-        TableName: DDB_TABLES.answersClaps,
-        Key: { answerId: this.answer.answerId, userId: this.galaxyUser.userId }
-      });
-    else
-      await ddb.put({
-        TableName: DDB_TABLES.answersClaps,
-        Item: { answerId: this.answer.answerId, userId: this.galaxyUser.userId, questionId: this.question.questionId }
-      });
-
-    this.question.numOfClaps = await this.getLiveNumClaps();
-    await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
-
-    if (!cancel && (await this.getNumAnswersClappedByUser()) >= 15)
-      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.CHEERGIVER);
-
-    return this.question;
-  }
-  private async getLiveNumClaps(): Promise<number> {
-    try {
-      const claps = await ddb.query({
-        TableName: DDB_TABLES.answersClaps,
-        IndexName: 'questionId-userId-index',
-        KeyConditionExpression: 'questionId = :questionId',
-        ExpressionAttributeValues: { ':questionId': this.question.questionId }
-      });
-      return claps.length;
-    } catch (error) {
-      return 0;
-    }
-  }
-  private async isClapped(): Promise<boolean> {
-    try {
-      await ddb.get({
-        TableName: DDB_TABLES.answersClaps,
-        Key: { answerId: this.answer.answerId, userId: this.galaxyUser.userId }
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
   }
 
   protected async deleteResource(): Promise<void> {
@@ -232,19 +176,5 @@ class Answers extends ResourceController {
     };
     if (!(await isEmailInBlockList(question.creator.email)))
       await ses.sendTemplatedEmail({ toAddresses: [question.creator.email], template, templateData }, SES_CONFIG);
-  }
-
-  private async getNumAnswersClappedByUser(): Promise<number> {
-    try {
-      const claps = await ddb.query({
-        TableName: DDB_TABLES.answersClaps,
-        IndexName: 'inverted-index',
-        KeyConditionExpression: 'userId = :userId',
-        ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }
-      });
-      return claps.length;
-    } catch (error) {
-      return 0;
-    }
   }
 }

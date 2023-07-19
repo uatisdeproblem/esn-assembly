@@ -59,8 +59,13 @@ export class QuestionComponent implements OnChanges {
   async upvoteQuestion(upvote: boolean): Promise<void> {
     try {
       this.userUpvoted = upvote;
-      if (upvote) this.question.load(await this._questions.upvote(this.topic, this.question));
-      else this.question.load(await this._questions.upvoteCancel(this.topic, this.question));
+      if (upvote) {
+        await this._questions.upvote(this.topic, this.question);
+        this.question.numOfUpvotes++;
+      } else {
+        await this._questions.upvoteCancel(this.topic, this.question);
+        this.question.numOfUpvotes--;
+      }
     } catch (error) {
       this.userUpvoted = !upvote;
       this.message.error('COMMON.OPERATION_FAILED');
@@ -69,8 +74,13 @@ export class QuestionComponent implements OnChanges {
   async clapAnswer(clap: boolean, answer: Answer): Promise<void> {
     try {
       this.userClapped[answer.answerId] = clap;
-      if (clap) this.question.load(await this._answers.clap(this.question, answer));
-      else this.question.load(await this._answers.clapCancel(this.question, answer));
+      if (clap) {
+        await this._answers.clap(this.question, answer);
+        this.question.numOfClaps++;
+      } else {
+        await this._answers.clapCancel(this.question, answer);
+        this.question.numOfClaps--;
+      }
     } catch (error) {
       this.userClapped[answer.answerId] = !clap;
       this.message.error('COMMON.OPERATION_FAILED');

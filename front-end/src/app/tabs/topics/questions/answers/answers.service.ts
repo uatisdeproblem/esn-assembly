@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
+import { AppService } from '@app/app.service';
+
 import { Question } from '@models/question.model';
 import { Answer } from '@models/answer.model';
 
@@ -13,7 +15,7 @@ export class AnswersService {
    */
   MAX_PAGE_SIZE = 24;
 
-  constructor(private api: IDEAApiService) {}
+  constructor(private api: IDEAApiService, private app: AppService) {}
 
   /**
    * Load the answers to a question from the back-end.
@@ -99,23 +101,32 @@ export class AnswersService {
   /*
    * Clap an answer.
    */
-  async clap(question: Question, answer: Answer): Promise<Question> {
-    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId];
-    return new Question(await this.api.patchResource(path, { body: { action: 'CLAP' } }));
+  async clap(question: Question, answer: Answer): Promise<void> {
+    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId, 'claps'];
+    await this.api.postResource(path);
   }
   /**
    * Cancel the clap to an answer.
    */
-  async clapCancel(question: Question, answer: Answer): Promise<Question> {
-    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId];
-    return new Question(await this.api.patchResource(path, { body: { action: 'CLAP_CANCEL' } }));
+  async clapCancel(question: Question, answer: Answer): Promise<void> {
+    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId, 'claps'];
+    await this.api.deleteResource(path);
   }
   /**
    * Whether the current user clapped an answer.
    */
   async userHasClapped(question: Question, answer: Answer): Promise<boolean> {
-    const path = ['topics', question.topicId, 'questions', question.questionId, 'answers', answer.answerId];
-    const { clapped } = await this.api.patchResource(path, { body: { action: 'IS_CLAPPED' } });
+    const path = [
+      'topics',
+      question.topicId,
+      'questions',
+      question.questionId,
+      'answers',
+      answer.answerId,
+      'claps',
+      this.app.user.userId
+    ];
+    const { clapped } = await this.api.getResource(path);
     return clapped;
   }
 }

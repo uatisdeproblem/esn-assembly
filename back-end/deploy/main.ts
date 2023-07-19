@@ -26,10 +26,24 @@ const apiResources: ResourceController[] = [
   { name: 'relatedTopics', paths: ['/topics/{topicId}/related', '/topics/{topicId}/related/{relatedId}'] },
   { name: 'questions', paths: ['/topics/{topicId}/questions', '/topics/{topicId}/questions/{questionId}'] },
   {
+    name: 'questionsUpvotes',
+    paths: [
+      '/topics/{topicId}/questions/{questionId}/upvotes',
+      '/topics/{topicId}/questions/{questionId}/upvotes/{userId}'
+    ]
+  },
+  {
     name: 'answers',
     paths: [
       '/topics/{topicId}/questions/{questionId}/answers',
       '/topics/{topicId}/questions/{questionId}/answers/{answerId}'
+    ]
+  },
+  {
+    name: 'answersClaps',
+    paths: [
+      '/topics/{topicId}/questions/{questionId}/answers/{answerId}/claps',
+      '/topics/{topicId}/questions/{questionId}/answers/{answerId}/claps/{userId}'
     ]
   },
   { name: 'badges', paths: ['/badges', '/badges/{badge}'] },

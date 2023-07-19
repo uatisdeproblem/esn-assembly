@@ -70,3 +70,40 @@ export class Answer extends Resource {
     return !topic.isArchived() && timeCheck && (adminCheck || creatorCheck);
   }
 }
+
+/**
+ * The act of clapping for an answer.
+ */
+export class AnswerClap extends Resource {
+  /**
+   * The ID of the question to which the answer is related.
+   */
+  questionId: string;
+  /**
+   * The ID of the answer clapped.
+   */
+  answerId: string;
+  /**
+   * The ID of the user who clapped.
+   */
+  userId: string;
+  /**
+   * The data of the user who clapped.
+   * Note: older data may not have this field.
+   */
+  creator: Subject;
+  /**
+   * The timestamp of creation of the clap.
+   * Note: older data may not have this field.
+   */
+  createdAt: epochISOString;
+
+  load(x: any): void {
+    super.load(x);
+    this.questionId = this.clean(x.questionId, String);
+    this.answerId = this.clean(x.answerId, String);
+    this.userId = this.clean(x.userId, String);
+    this.creator = new Subject(x.creator);
+    this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
+  }
+}
