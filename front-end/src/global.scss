@@ -209,6 +209,9 @@ ion-modal {
   @media only screen and (min-width: 768px) {
     --border-radius: 8px;
   }
+  ion-header ion-toolbar ion-title {
+    font-size: 1.1em;
+  }
 }
 
 // to remove after updating IDEA Ionic Extra > v6.13.0
