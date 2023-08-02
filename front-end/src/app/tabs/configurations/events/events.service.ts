@@ -8,6 +8,11 @@ export class TopicEventsService {
   private events: TopicEvent[];
 
   /**
+   * Whether in the cache we loaded all the events or only the NOT archived ones.
+   */
+  all: boolean;
+
+  /**
    * The number of events to consider for the pagination, when active.
    */
   MAX_PAGE_SIZE = 24;
@@ -17,8 +22,11 @@ export class TopicEventsService {
   /**
    * Load the events from the back-end.
    */
-  private async loadList(): Promise<void> {
-    const events: TopicEvent[] = await this.api.getResource('events');
+  private async loadList(all = false): Promise<void> {
+    this.all = all;
+    const params: any = {};
+    if (all) params.all = true;
+    const events: TopicEvent[] = await this.api.getResource('events', { params });
     this.events = events.map(x => new TopicEvent(x));
   }
   /**
@@ -28,12 +36,13 @@ export class TopicEventsService {
   async getList(
     options: {
       force?: boolean;
+      all?: boolean;
       search?: string;
       withPagination?: boolean;
       startPaginationAfterId?: string;
     } = {}
   ): Promise<TopicEvent[]> {
-    if (!this.events || options.force) await this.loadList();
+    if (!this.events || options.force || options.all !== this.all) await this.loadList(options.all);
     if (!this.events) return null;
 
     options.search = options.search ? String(options.search).toLowerCase() : '';

@@ -37,7 +37,10 @@ export class ArchivePage implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
+    [this.categories, this.events] = await Promise.all([
+      this._categories.getList({ all: true }),
+      this._events.getList({ all: true })
+    ]);
   }
 
   async search(): Promise<void> {

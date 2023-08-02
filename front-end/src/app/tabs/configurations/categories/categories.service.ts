@@ -8,6 +8,11 @@ export class TopicCategoryService {
   private categories: TopicCategory[];
 
   /**
+   * Whether in the cache we loaded all the categories or only the NOT archived ones.
+   */
+  all: boolean;
+
+  /**
    * The number of categories to consider for the pagination, when active.
    */
   MAX_PAGE_SIZE = 24;
@@ -17,8 +22,11 @@ export class TopicCategoryService {
   /**
    * Load the categories from the back-end.
    */
-  private async loadList(): Promise<void> {
-    const categories: TopicCategory[] = await this.api.getResource('categories');
+  private async loadList(all = false): Promise<void> {
+    this.all = all;
+    const params: any = {};
+    if (all) params.all = true;
+    const categories: TopicCategory[] = await this.api.getResource('categories', { params });
     this.categories = categories.map(x => new TopicCategory(x));
   }
   /**
@@ -28,12 +36,13 @@ export class TopicCategoryService {
   async getList(
     options: {
       force?: boolean;
+      all?: boolean;
       search?: string;
       withPagination?: boolean;
       startPaginationAfterId?: string;
     } = {}
   ): Promise<TopicCategory[]> {
-    if (!this.categories || options.force) await this.loadList();
+    if (!this.categories || options.force || options.all !== this.all) await this.loadList(options.all);
     if (!this.categories) return null;
 
     options.search = options.search ? String(options.search).toLowerCase() : '';
