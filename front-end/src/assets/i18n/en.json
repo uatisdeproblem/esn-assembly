@@ -211,7 +211,8 @@
   "USEFUL_LINKS": {
     "MANAGE_LINK": "Manage useful link",
     "NAME": "Name",
-    "URL": "URL"
+    "URL": "URL",
+    "GENERAL": "General"
   },
   "ARCHIVE": {
     "ARCHIVE": "Archive",

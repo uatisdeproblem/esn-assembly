@@ -18,7 +18,9 @@ import { UsefulLink } from '@models/usefulLink.model';
       <ion-label class="ion-text-wrap">
         {{ link.name }}
         <p>
-          <ion-text color="medium" style="font-weight: 600">{{ link.event?.name }}</ion-text>
+          <ion-text color="medium" style="font-weight: 600">
+            {{ link.event?.name ?? ('USEFUL_LINKS.GENERAL' | translate) }}
+          </ion-text>
         </p>
       </ion-label>
       <ng-content></ng-content>
