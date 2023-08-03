@@ -45,17 +45,6 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
           </ion-label>
           <ion-input [(ngModel)]="deadline.name"></ion-input>
         </ion-item>
-        <app-events-picker
-          [class.fieldHasError]="hasFieldAnError('event')"
-          [editMode]="true"
-          [(event)]="deadline.event"
-        ></app-events-picker>
-        <ion-item [class.fieldHasError]="hasFieldAnError('target')">
-          <ion-label position="stacked">
-            {{ 'DEADLINES.TARGET' | translate }}
-          </ion-label>
-          <ion-input [(ngModel)]="deadline.target"></ion-input>
-        </ion-item>
         <ion-item [class.fieldHasError]="hasFieldAnError('action')">
           <ion-label position="stacked">
             {{ 'DEADLINES.ACTION' | translate }}
@@ -71,6 +60,17 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
             <ion-select-option *ngFor="let color of COLORS" [value]="color">{{ color }}</ion-select-option>
           </ion-select>
         </ion-item>
+        <ion-item [class.fieldHasError]="hasFieldAnError('target')">
+          <ion-label position="stacked">
+            {{ 'DEADLINES.TARGET' | translate }}
+          </ion-label>
+          <ion-input [(ngModel)]="deadline.target"></ion-input>
+        </ion-item>
+        <app-events-picker
+          [class.fieldHasError]="hasFieldAnError('event')"
+          [editMode]="true"
+          [(event)]="deadline.event"
+        ></app-events-picker>
         <idea-date-time
           [(date)]="deadline.at"
           [useISOFormat]="true"
