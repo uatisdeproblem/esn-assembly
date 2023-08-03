@@ -9,13 +9,15 @@ import {
   IDEATranslationsService
 } from '@idea-ionic/common';
 
+import { EventsPickerComponent } from 'src/app/common/eventsPicker.component';
+
 import { UsefulLinksService } from './usefulLinks.service';
 
 import { UsefulLink } from '@models/usefulLink.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, EventsPickerComponent],
   selector: 'app-manage-useful-link',
   template: `
     <ion-header class="ion-no-border">
@@ -47,6 +49,11 @@ import { UsefulLink } from '@models/usefulLink.model';
           </ion-label>
           <ion-input [(ngModel)]="link.url"></ion-input>
         </ion-item>
+        <app-events-picker
+          [class.fieldHasError]="hasFieldAnError('event')"
+          [editMode]="true"
+          [(event)]="link.event"
+        ></app-events-picker>
         <ion-row class="ion-padding-top" *ngIf="link.linkId">
           <ion-col class="ion-text-right ion-padding-end">
             <ion-button color="danger" (click)="askAndDelete()">{{ 'COMMON.DELETE' | translate }}</ion-button>

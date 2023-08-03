@@ -15,14 +15,23 @@ import { UsefulLink } from '@models/usefulLink.model';
     </ion-item>
     <ion-item [color]="color" *ngIf="link" [button]="button" (click)="select.emit()">
       <ion-icon slot="start" icon="link" color="primary" size="small"></ion-icon>
-      <ion-label class="ion-text-wrap">{{ link.name }}</ion-label>
+      <ion-label class="ion-text-wrap">
+        {{ link.name }}
+        <p>
+          <ion-text color="medium" style="font-weight: 600">{{ link.event?.name }}</ion-text>
+        </p>
+      </ion-label>
       <ng-content></ng-content>
     </ion-item>
   `,
   styles: [
     `
-      ion-item ion-badge[slot='start'] {
-        width: 100px;
+      ion-item ion-label {
+        margin: 12px 0 8px 0;
+        line-height: 1.1em;
+      }
+      ion-item ion-label p {
+        font-size: 0.8em;
       }
     `
   ]

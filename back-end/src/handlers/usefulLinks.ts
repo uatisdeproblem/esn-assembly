@@ -6,13 +6,14 @@ import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { UsefulLink } from '../models/usefulLink.model';
+import { GAEventAttached } from '../models/event.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
 const PROJECT = process.env.PROJECT;
-const DDB_TABLES = { usefulLinks: process.env.DDB_TABLE_usefulLinks };
+const DDB_TABLES = { usefulLinks: process.env.DDB_TABLE_usefulLinks, events: process.env.DDB_TABLE_events };
 const ddb = new DynamoDB();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new UsefulLinks(ev, cb).handleRequest();
@@ -51,6 +52,16 @@ class UsefulLinks extends ResourceController {
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<UsefulLink> {
     const errors = this.usefulLink.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+
+    if (this.usefulLink.event?.eventId) {
+      try {
+        this.usefulLink.event = new GAEventAttached(
+          await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.usefulLink.event.eventId } })
+        );
+      } catch (error) {
+        throw new RCError('Event not found');
+      }
+    }
 
     const putParams: any = { TableName: DDB_TABLES.usefulLinks, Item: this.usefulLink };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(linkId)';
