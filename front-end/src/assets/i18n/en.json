@@ -203,7 +203,10 @@
     "MANAGE_DEADLINE": "Manage deadline",
     "NAME": "A description for the deadline",
     "DATE": "The date and time of the deadline",
-    "DATES_I": "Note: the deadline must be set in the timezone {{timezone}}."
+    "DATES_I": "Note: the deadline must be set in the timezone {{timezone}}.",
+    "TARGET": "The target group/people of the deadline",
+    "ACTION": "The kind of action related to the deadline",
+    "ACTION_COLOR": "A color to visually represent the action"
   },
   "USEFUL_LINKS": {
     "MANAGE_LINK": "Manage useful link",

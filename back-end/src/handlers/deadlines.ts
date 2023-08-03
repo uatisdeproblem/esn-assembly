@@ -6,13 +6,14 @@ import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { Deadline } from '../models/deadline.model';
+import { GAEventAttached } from '../models/event.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
 const PROJECT = process.env.PROJECT;
-const DDB_TABLES = { deadlines: process.env.DDB_TABLE_deadlines };
+const DDB_TABLES = { deadlines: process.env.DDB_TABLE_deadlines, events: process.env.DDB_TABLE_events };
 const ddb = new DynamoDB();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new Deadlines(ev, cb).handleRequest();
@@ -51,6 +52,16 @@ class Deadlines extends ResourceController {
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Deadline> {
     const errors = this.deadline.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+
+    if (this.deadline.event?.eventId) {
+      try {
+        this.deadline.event = new GAEventAttached(
+          await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.deadline.event.eventId } })
+        );
+      } catch (error) {
+        throw new RCError('Event not found');
+      }
+    }
 
     const putParams: any = { TableName: DDB_TABLES.deadlines, Item: this.deadline };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(deadlineId)';

@@ -10,6 +10,8 @@ import {
   IDEATranslationsService
 } from '@idea-ionic/common';
 
+import { EventsPickerComponent } from 'src/app/common/eventsPicker.component';
+
 import { DeadlinesService } from './deadlines.service';
 
 import { Deadline } from '@models/deadline.model';
@@ -17,7 +19,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, IDEADateTimeModule],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, IDEADateTimeModule, EventsPickerComponent],
   selector: 'app-manage-deadline',
   template: `
     <ion-header class="ion-no-border">
@@ -42,6 +44,32 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
             {{ 'DEADLINES.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
           </ion-label>
           <ion-input [(ngModel)]="deadline.name"></ion-input>
+        </ion-item>
+        <app-events-picker
+          [class.fieldHasError]="hasFieldAnError('event')"
+          [editMode]="true"
+          [(event)]="deadline.event"
+        ></app-events-picker>
+        <ion-item [class.fieldHasError]="hasFieldAnError('target')">
+          <ion-label position="stacked">
+            {{ 'DEADLINES.TARGET' | translate }}
+          </ion-label>
+          <ion-input [(ngModel)]="deadline.target"></ion-input>
+        </ion-item>
+        <ion-item [class.fieldHasError]="hasFieldAnError('action')">
+          <ion-label position="stacked">
+            {{ 'DEADLINES.ACTION' | translate }}
+          </ion-label>
+          <ion-input [(ngModel)]="deadline.action"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="deadline.action" [class.fieldHasError]="hasFieldAnError('actionColor')">
+          <ion-label position="stacked">
+            {{ 'DEADLINES.ACTION_COLOR' | translate }}
+          </ion-label>
+          <ion-select interface="popover" [(ngModel)]="deadline.actionColor">
+            <ion-select-option value=""></ion-select-option>
+            <ion-select-option *ngFor="let color of COLORS" [value]="color">{{ color }}</ion-select-option>
+          </ion-select>
         </ion-item>
         <idea-date-time
           [(date)]="deadline.at"
@@ -77,6 +105,22 @@ export class ManageDeadlineComponent {
   errors = new Set<string>();
 
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
+  COLORS = [
+    'primary',
+    'secondary',
+    'tertiary',
+    'white',
+    'dark',
+    'light',
+    'medium',
+    'success',
+    'danger',
+    'ESNgreen',
+    'ESNcyan',
+    'ESNpink',
+    'ESNdarkBlue',
+    'ESNorange'
+  ];
 
   constructor(
     private modalCtrl: ModalController,
