@@ -1,5 +1,7 @@
 import { epochISOString, Resource } from 'idea-toolbox';
 
+import { GAEventAttached } from './event.model';
+
 /**
  * A communication intended as news.
  */
@@ -25,9 +27,13 @@ export class Communication extends Resource {
    */
   date: epochISOString;
   /**
-   * The URL to the communication's image.
+   * The URL to the communication's image (if any).
    */
-  imageURL?: string;
+  imageURL: string | null;
+  /**
+   * The event to which the communication refers to (if any).
+   */
+  event: GAEventAttached | null;
   /**
    * The timestamp when the communication was archived (if so).
    */
@@ -40,7 +46,8 @@ export class Communication extends Resource {
     this.brief = this.clean(x.brief, String);
     this.content = this.clean(x.content, String);
     this.date = this.clean(x.date, d => new Date(d).toISOString(), new Date().toISOString());
-    if (x.imageURL) this.imageURL = this.clean(x.imageURL, String);
+    this.imageURL = this.clean(x.imageURL, String);
+    this.event = x.event?.eventId ? new GAEventAttached(x.event) : null;
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
   }
 

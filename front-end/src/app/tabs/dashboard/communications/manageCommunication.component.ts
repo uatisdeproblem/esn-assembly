@@ -9,6 +9,7 @@ import {
   IDEATranslationsService
 } from '@idea-ionic/common';
 
+import { EventsPickerComponent } from 'src/app/common/eventsPicker.component';
 import { HTMLEditorModule } from '@app/common/htmlEditor.module';
 
 import { AppService } from '@app/app.service';
@@ -19,7 +20,7 @@ import { Communication } from '@models/communication.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, HTMLEditorModule],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, HTMLEditorModule, EventsPickerComponent],
   selector: 'app-manage-communication',
   template: `
     <ion-header class="ion-no-border">
@@ -65,6 +66,11 @@ import { Communication } from '@models/communication.model';
             <ion-icon icon="cloud-upload-outline" slot="icon-only"></ion-icon>
           </ion-button>
         </ion-item>
+        <app-events-picker
+          [class.fieldHasError]="hasFieldAnError('event')"
+          [editMode]="true"
+          [(event)]="communication.event"
+        ></app-events-picker>
         <ion-list-header [class.fieldHasError]="hasFieldAnError('content')">
           <ion-label>
             <h2>{{ 'COMMUNICATIONS.CONTENT' | translate }} <ion-text class="obligatoryDot"></ion-text></h2>

@@ -24,8 +24,14 @@ import { Communication } from '@models/communication.model';
       <ion-img *ngIf="communication.imageURL" [src]="communication.imageURL"></ion-img>
       <ion-card-header>
         <ion-card-subtitle>{{ communication.date | dateLocale }}</ion-card-subtitle>
-        <ion-card-title>{{ communication.name }}</ion-card-title>
-        <ion-card-subtitle *ngIf="communication.brief">{{ communication.brief }}</ion-card-subtitle>
+        <ion-card-title>
+          <ion-text color="medium" style="font-weight: 600">
+            {{ communication.event?.name }}
+          </ion-text>
+          <ion-text *ngIf="communication.event"> - </ion-text>
+          {{ communication.name }}
+        </ion-card-title>
+        <ion-card-subtitle>{{ communication.brief }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content><ng-content></ng-content></ion-card-content>
     </ion-card>
@@ -44,7 +50,8 @@ import { Communication } from '@models/communication.model';
         color: var(--ion-color-step-500);
       }
       ion-card-subtitle:nth-of-type(2) {
-        margin-top: 12px;
+        margin-top: 4px;
+        font-weight: 400;
       }
     `
   ]

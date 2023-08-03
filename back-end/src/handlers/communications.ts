@@ -6,13 +6,14 @@ import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { Communication } from '../models/communication.model';
+import { GAEventAttached } from '../models/event.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
 const PROJECT = process.env.PROJECT;
-const DDB_TABLES = { communications: process.env.DDB_TABLE_communications };
+const DDB_TABLES = { communications: process.env.DDB_TABLE_communications, events: process.env.DDB_TABLE_events };
 const ddb = new DynamoDB();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new Communications(ev, cb).handleRequest();
@@ -55,6 +56,16 @@ class Communications extends ResourceController {
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Communication> {
     const errors = this.communication.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+
+    if (this.communication.event?.eventId) {
+      try {
+        this.communication.event = new GAEventAttached(
+          await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.communication.event.eventId } })
+        );
+      } catch (error) {
+        throw new RCError('Event not found');
+      }
+    }
 
     const putParams: any = { TableName: DDB_TABLES.communications, Item: this.communication };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(communicationId)';
