@@ -4,10 +4,10 @@ import { IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
 import { AppService } from '@app/app.service';
 import { TopicsService, TopicsSortBy } from './topics.service';
 import { TopicCategoryService } from '../configurations/categories/categories.service';
-import { TopicEventsService } from '../configurations/events/events.service';
+import { GAEventsService } from '../configurations/events/events.service';
 
 import { TopicCategory } from '@models/category.model';
-import { TopicEvent } from '@models/event.model';
+import { GAEvent } from '@models/event.model';
 import { Topic } from '@models/topic.model';
 
 @Component({
@@ -23,7 +23,7 @@ export class TopicsPage implements OnInit {
   categories: TopicCategory[];
   filterByCategory: string = null;
 
-  events: TopicEvent[];
+  events: GAEvent[];
   filterByEvent: string = null;
 
   filterByStatus: boolean;
@@ -34,7 +34,7 @@ export class TopicsPage implements OnInit {
   constructor(
     private _topics: TopicsService,
     private _categories: TopicCategoryService,
-    private _events: TopicEventsService,
+    private _events: GAEventsService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {

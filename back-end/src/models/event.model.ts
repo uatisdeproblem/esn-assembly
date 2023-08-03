@@ -1,9 +1,10 @@
 import { epochISOString, Resource } from 'idea-toolbox';
 
 /**
- * An event for which a topic is discussed.
+ * An event for which a topic is discussed or an entity is linked to.
+ * Note: it's  NOT named `Event` to avoid overlapping with standard classes.
  */
-export class TopicEvent extends Resource {
+export class GAEvent extends Resource {
   /**
    * The ID of the event.
    */
@@ -40,7 +41,7 @@ export class TopicEvent extends Resource {
 /**
  * A brief representation of an Event.
  */
-export class TopicEventAttached extends Resource {
+export class GAEventAttached extends Resource {
   /**
    * The ID of the event.
    */

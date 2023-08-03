@@ -1,7 +1,7 @@
 import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 
 import { TopicCategoryAttached } from './category.model';
-import { TopicEventAttached } from './event.model';
+import { GAEventAttached } from './event.model';
 import { FAVORITE_TIMEZONE, dateStringIsFuture, dateStringIsPast } from './favoriteTimezone.const';
 import { Subject } from './subject.model';
 import { User, UserRoles } from './user.model';
@@ -25,7 +25,7 @@ export class Topic extends Resource {
   /**
    * The event for which the topic is discussed.
    */
-  event: TopicEventAttached;
+  event: GAEventAttached;
   /**
    * The category that classifies the topic.
    */
@@ -84,7 +84,7 @@ export class Topic extends Resource {
     this.topicId = this.clean(x.topicId, String);
     this.name = this.clean(x.name, String);
     this.content = this.clean(x.content, String);
-    this.event = new TopicEventAttached(x.event);
+    this.event = new GAEventAttached(x.event);
     this.category = new TopicCategoryAttached(x.category);
     this.subjects = this.cleanArray(x.subjects, s => new Subject(s));
     this.numOfQuestions = this.clean(x.numOfQuestions, Number, 0);

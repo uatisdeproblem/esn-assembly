@@ -8,7 +8,7 @@ import { SignedURL } from 'idea-toolbox';
 import { addBadgeToUser } from './badges';
 
 import { TopicCategoryAttached } from '../models/category.model';
-import { TopicEventAttached } from '../models/event.model';
+import { GAEventAttached } from '../models/event.model';
 import { RelatedTopic, Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
@@ -85,7 +85,7 @@ class Topics extends ResourceController {
     }
 
     try {
-      this.topic.event = new TopicEventAttached(
+      this.topic.event = new GAEventAttached(
         await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.topic.event.eventId } })
       );
     } catch (error) {

@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { IonInfiniteScroll } from '@ionic/angular';
 
 import { AppService } from '@app/app.service';
-import { TopicEventsService } from './events.service';
+import { GAEventsService } from './events.service';
 
-import { TopicEvent } from '@models/event.model';
+import { GAEvent } from '@models/event.model';
 
 @Component({
   selector: 'events',
@@ -12,9 +12,9 @@ import { TopicEvent } from '@models/event.model';
   styleUrls: ['events.page.scss']
 })
 export class EventsPage {
-  events: TopicEvent[];
+  events: GAEvent[];
 
-  constructor(private _events: TopicEventsService, public app: AppService) {}
+  constructor(private _events: GAEventsService, public app: AppService) {}
   async ionViewDidEnter(): Promise<void> {
     this.events = await this._events.getList({ force: true, withPagination: true });
   }
@@ -31,7 +31,7 @@ export class EventsPage {
   addEvent(): void {
     this.app.goToInTabs(['configurations', 'events', 'new']);
   }
-  openEvent(event: TopicEvent): void {
+  openEvent(event: GAEvent): void {
     this.app.goToInTabs(['configurations', 'events', event.eventId]);
   }
 }

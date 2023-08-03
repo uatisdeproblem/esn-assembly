@@ -3,9 +3,9 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
 import { AppService } from '@app/app.service';
-import { TopicEventsService } from './events.service';
+import { GAEventsService } from './events.service';
 
-import { TopicEvent } from '@models/event.model';
+import { GAEvent } from '@models/event.model';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 import { AlertController } from '@ionic/angular';
 
@@ -15,12 +15,12 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['event.page.scss']
 })
 export class EventPage {
-  event: TopicEvent;
+  event: GAEvent;
 
   editMode = UXMode.VIEW;
   UXMode = UXMode;
   errors = new Set<string>();
-  entityBeforeChange: TopicEvent;
+  entityBeforeChange: GAEvent;
 
   constructor(
     private location: Location,
@@ -29,7 +29,7 @@ export class EventPage {
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
-    private _events: TopicEventsService,
+    private _events: GAEventsService,
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
@@ -40,7 +40,7 @@ export class EventPage {
         this.event = await this._events.getById(eventId);
         this.editMode = UXMode.VIEW;
       } else {
-        this.event = new TopicEvent();
+        this.event = new GAEvent();
         this.editMode = UXMode.INSERT;
       }
     } catch (error) {
@@ -56,7 +56,7 @@ export class EventPage {
 
     try {
       await this.loading.show();
-      let result: TopicEvent;
+      let result: GAEvent;
       if (this.editMode === UXMode.INSERT) result = await this._events.insert(this.event);
       else result = await this._events.update(this.event);
       this.event.load(result);
@@ -121,7 +121,7 @@ export class EventPage {
   }
 
   enterEditMode(): void {
-    this.entityBeforeChange = new TopicEvent(this.event);
+    this.entityBeforeChange = new GAEvent(this.event);
     this.editMode = UXMode.EDIT;
   }
   exitEditMode(): void {

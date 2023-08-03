@@ -5,10 +5,10 @@ import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
 import { AppService } from '@app/app.service';
 import { TopicsService, TopicsSortBy } from '@tabs/topics/topics.service';
 import { TopicCategoryService } from '@tabs/configurations/categories/categories.service';
-import { TopicEventsService } from '@tabs/configurations/events/events.service';
+import { GAEventsService } from '@tabs/configurations/events/events.service';
 
 import { TopicCategory } from '@models/category.model';
-import { TopicEvent } from '@models/event.model';
+import { GAEvent } from '@models/event.model';
 import { Topic } from '@models/topic.model';
 
 @Component({
@@ -22,7 +22,7 @@ export class ArchivePage implements OnInit {
   categories: TopicCategory[];
   filterByCategory: string = null;
 
-  events: TopicEvent[];
+  events: GAEvent[];
   filterByEvent: string = null;
 
   sortBy: TopicsSortBy = TopicsSortBy.CREATED_DATE_DESC;
@@ -33,7 +33,7 @@ export class ArchivePage implements OnInit {
     private message: IDEAMessageService,
     private _topics: TopicsService,
     private _categories: TopicCategoryService,
-    private _events: TopicEventsService,
+    private _events: GAEventsService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {

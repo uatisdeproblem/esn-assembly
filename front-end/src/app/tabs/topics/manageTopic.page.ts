@@ -8,12 +8,12 @@ import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
 import { TopicCategoryService } from '../configurations/categories/categories.service';
-import { TopicEventsService } from '../configurations/events/events.service';
+import { GAEventsService } from '../configurations/events/events.service';
 import { MediaService } from '@app/common/media.service';
 
 import { Topic } from '@models/topic.model';
 import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
-import { TopicEvent, TopicEventAttached } from '@models/event.model';
+import { GAEvent, GAEventAttached } from '@models/event.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { UserRoles } from '@models/user.model';
 import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
@@ -32,7 +32,7 @@ export class ManageTopicPage implements OnInit {
   entityBeforeChange: Topic;
 
   categories: TopicCategory[];
-  events: TopicEvent[];
+  events: GAEvent[];
 
   hasDeadlineForQuestions = false;
   hasDeadlineForAnswers = false;
@@ -58,7 +58,7 @@ export class ManageTopicPage implements OnInit {
     private t: IDEATranslationsService,
     private _topics: TopicsService,
     private _categories: TopicCategoryService,
-    private _events: TopicEventsService,
+    private _events: GAEventsService,
     private _media: MediaService,
     public app: AppService
   ) {}
@@ -109,7 +109,7 @@ export class ManageTopicPage implements OnInit {
     }
   }
 
-  compareWithEvent(e1: TopicEventAttached, e2: TopicEventAttached): boolean {
+  compareWithEvent(e1: GAEventAttached, e2: GAEventAttached): boolean {
     return e1 && e2 ? e1.eventId === e2.eventId : e1 === e2;
   }
   compareWithCategory(c1: TopicCategoryAttached, c2: TopicCategoryAttached): boolean {

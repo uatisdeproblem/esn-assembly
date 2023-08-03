@@ -7,7 +7,7 @@ import { utils, write } from 'xlsx';
 import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
 
-import { TopicEvent } from '../models/event.model';
+import { GAEvent } from '../models/event.model';
 import { Topic, TopicQuestionsExportable } from '../models/topic.model';
 import { User } from '../models/user.model';
 import { Question } from '../models/question.model';
@@ -30,15 +30,15 @@ const S3_BUCKET_MEDIA = process.env.S3_BUCKET_MEDIA;
 const S3_DOWNLOADS_FOLDER = process.env.S3_DOWNLOADS_FOLDER;
 const s3 = new S3();
 
-export const handler = (ev: any, _: any, cb: any): Promise<void> => new TopicEvents(ev, cb).handleRequest();
+export const handler = (ev: any, _: any, cb: any): Promise<void> => new GAEvents(ev, cb).handleRequest();
 
 ///
 /// RESOURCE CONTROLLER
 ///
 
-class TopicEvents extends ResourceController {
+class GAEvents extends ResourceController {
   galaxyUser: User;
-  topicEvent: TopicEvent;
+  gaEvent: GAEvent;
 
   constructor(event: any, callback: any) {
     super(event, callback, { resourceId: 'eventId' });
@@ -49,44 +49,42 @@ class TopicEvents extends ResourceController {
     if (!this.resourceId) return;
 
     try {
-      this.topicEvent = new TopicEvent(
-        await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.resourceId } })
-      );
+      this.gaEvent = new GAEvent(await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.resourceId } }));
     } catch (err) {
       throw new RCError('Event not found');
     }
   }
 
-  protected async getResources(): Promise<TopicEvent[]> {
-    let events: TopicEvent[] = await ddb.scan({ TableName: DDB_TABLES.events });
-    events = events.map(x => new TopicEvent(x));
+  protected async getResources(): Promise<GAEvent[]> {
+    let events: GAEvent[] = await ddb.scan({ TableName: DDB_TABLES.events });
+    events = events.map(x => new GAEvent(x));
     if (!this.queryParams.all) events = events.filter(x => !x.archivedAt);
     return events.sort((a, b): number => a.name.localeCompare(b.name));
   }
 
-  private async putSafeResource(opts: { noOverwrite: boolean }): Promise<TopicEvent> {
-    const errors = this.topicEvent.validate();
+  private async putSafeResource(opts: { noOverwrite: boolean }): Promise<GAEvent> {
+    const errors = this.gaEvent.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
 
-    const putParams: any = { TableName: DDB_TABLES.events, Item: this.topicEvent };
+    const putParams: any = { TableName: DDB_TABLES.events, Item: this.gaEvent };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(eventId)';
     await ddb.put(putParams);
 
-    return this.topicEvent;
+    return this.gaEvent;
   }
 
-  protected async postResources(): Promise<TopicEvent> {
+  protected async postResources(): Promise<GAEvent> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
-    this.topicEvent = new TopicEvent(this.body);
-    this.topicEvent.eventId = await ddb.IUNID(PROJECT);
+    this.gaEvent = new GAEvent(this.body);
+    this.gaEvent.eventId = await ddb.IUNID(PROJECT);
 
     return await this.putSafeResource({ noOverwrite: true });
   }
 
-  protected async getResource(): Promise<TopicEvent | SignedURL> {
+  protected async getResource(): Promise<GAEvent | SignedURL> {
     if (this.queryParams.summarySpreadsheet) return await this.getSummarySpreadsheet();
-    else return this.topicEvent;
+    else return this.gaEvent;
   }
   private async getSummarySpreadsheet(): Promise<SignedURL> {
     // @todo to optimise with indexes
@@ -97,7 +95,7 @@ class TopicEvents extends ResourceController {
     const topicsExportable: TopicQuestionsExportable[] = [];
     topics
       .map(t => new Topic(t))
-      .filter(t => t.event.eventId === this.topicEvent.eventId)
+      .filter(t => t.event.eventId === this.gaEvent.eventId)
       .filter(t => !t.isDraft())
       .sort((a, b): number => b.createdAt.localeCompare(a.createdAt))
       .forEach(t => {
@@ -129,21 +127,21 @@ class TopicEvents extends ResourceController {
     return await s3.createDownloadURLFromData(buffer, {
       bucket: S3_BUCKET_MEDIA,
       prefix: S3_DOWNLOADS_FOLDER,
-      key: `${this.topicEvent.name}.xlsx`,
+      key: `${this.gaEvent.name}.xlsx`,
       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
   }
 
-  protected async putResource(): Promise<TopicEvent> {
+  protected async putResource(): Promise<GAEvent> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
-    const oldEvent = new TopicEvent(this.topicEvent);
-    this.topicEvent.safeLoad(this.body, oldEvent);
+    const oldEvent = new GAEvent(this.gaEvent);
+    this.gaEvent.safeLoad(this.body, oldEvent);
 
     return await this.putSafeResource({ noOverwrite: false });
   }
 
-  protected async patchResource(): Promise<TopicEvent> {
+  protected async patchResource(): Promise<GAEvent> {
     switch (this.body.action) {
       case 'ARCHIVE':
         return await this.manageArchive(true);
@@ -153,23 +151,23 @@ class TopicEvents extends ResourceController {
         throw new RCError('Unsupported action');
     }
   }
-  private async manageArchive(archive: boolean): Promise<TopicEvent> {
+  private async manageArchive(archive: boolean): Promise<GAEvent> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
-    if (archive) this.topicEvent.archivedAt = new Date().toISOString();
-    else delete this.topicEvent.archivedAt;
+    if (archive) this.gaEvent.archivedAt = new Date().toISOString();
+    else delete this.gaEvent.archivedAt;
 
-    await ddb.put({ TableName: DDB_TABLES.events, Item: this.topicEvent });
-    return this.topicEvent;
+    await ddb.put({ TableName: DDB_TABLES.events, Item: this.gaEvent });
+    return this.gaEvent;
   }
 
   protected async deleteResource(): Promise<void> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
 
     const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
-    const topicsWithEvent = topics.filter(x => x.event.eventId === this.topicEvent.eventId);
+    const topicsWithEvent = topics.filter(x => x.event.eventId === this.gaEvent.eventId);
     if (topicsWithEvent.length > 0) throw new RCError('Event is used');
 
-    await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.topicEvent.eventId } });
+    await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.gaEvent.eventId } });
   }
 }

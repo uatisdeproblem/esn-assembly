@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { TopicEvent } from '@models/event.model';
+import { GAEvent } from '@models/event.model';
 
 @Injectable({ providedIn: 'root' })
-export class TopicEventsService {
-  private events: TopicEvent[];
+export class GAEventsService {
+  private events: GAEvent[];
 
   /**
    * Whether in the cache we loaded all the events or only the NOT archived ones.
@@ -26,8 +26,8 @@ export class TopicEventsService {
     this.all = all;
     const params: any = {};
     if (all) params.all = true;
-    const events: TopicEvent[] = await this.api.getResource('events', { params });
-    this.events = events.map(x => new TopicEvent(x));
+    const events: GAEvent[] = await this.api.getResource('events', { params });
+    this.events = events.map(x => new GAEvent(x));
   }
   /**
    * Get (and optionally filter) the list of events.
@@ -41,7 +41,7 @@ export class TopicEventsService {
       withPagination?: boolean;
       startPaginationAfterId?: string;
     } = {}
-  ): Promise<TopicEvent[]> {
+  ): Promise<GAEvent[]> {
     if (!this.events || options.force || options.all !== this.all) await this.loadList(options.all);
     if (!this.events) return null;
 
@@ -69,48 +69,48 @@ export class TopicEventsService {
   /**
    * Get a event by its id.
    */
-  async getById(eventId: string): Promise<TopicEvent> {
-    return new TopicEvent(await this.api.getResource(['events', eventId]));
+  async getById(eventId: string): Promise<GAEvent> {
+    return new GAEvent(await this.api.getResource(['events', eventId]));
   }
 
   /**
    * Insert a event.
    */
-  async insert(event: TopicEvent): Promise<TopicEvent> {
-    return new TopicEvent(await this.api.postResource('events', { body: event }));
+  async insert(event: GAEvent): Promise<GAEvent> {
+    return new GAEvent(await this.api.postResource('events', { body: event }));
   }
 
   /**
    * Update a event.
    */
-  async update(event: TopicEvent): Promise<TopicEvent> {
-    return new TopicEvent(await this.api.putResource(['events', event.eventId], { body: event }));
+  async update(event: GAEvent): Promise<GAEvent> {
+    return new GAEvent(await this.api.putResource(['events', event.eventId], { body: event }));
   }
 
   /**
    * Archive an event.
    */
-  async archive(event: TopicEvent): Promise<void> {
+  async archive(event: GAEvent): Promise<void> {
     await this.api.patchResource(['events', event.eventId], { body: { action: 'ARCHIVE' } });
   }
   /**
    * Unarchive an event.
    */
-  async unarchive(event: TopicEvent): Promise<void> {
+  async unarchive(event: GAEvent): Promise<void> {
     await this.api.patchResource(['events', event.eventId], { body: { action: 'UNARCHIVE' } });
   }
 
   /**
    * Delete an event.
    */
-  async delete(event: TopicEvent): Promise<void> {
+  async delete(event: GAEvent): Promise<void> {
     await this.api.deleteResource(['events', event.eventId]);
   }
 
   /**
    * Get the URL to a summary spreadsheet containing questions and answers to this event's topics.
    */
-  async downloadSummarySpreadsheet(event: TopicEvent): Promise<string> {
+  async downloadSummarySpreadsheet(event: GAEvent): Promise<string> {
     const { url } = await this.api.getResource(['events', event.eventId], { params: { summarySpreadsheet: true } });
     return url;
   }
