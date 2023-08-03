@@ -7,13 +7,9 @@ import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from 
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
-import { TopicCategoryService } from '../configurations/categories/categories.service';
-import { GAEventsService } from '../configurations/events/events.service';
 import { MediaService } from '@app/common/media.service';
 
 import { Topic } from '@models/topic.model';
-import { TopicCategory, TopicCategoryAttached } from '@models/category.model';
-import { GAEvent, GAEventAttached } from '@models/event.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { UserRoles } from '@models/user.model';
 import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
@@ -30,9 +26,6 @@ export class ManageTopicPage implements OnInit {
   UXMode = UXMode;
   errors = new Set<string>();
   entityBeforeChange: Topic;
-
-  categories: TopicCategory[];
-  events: GAEvent[];
 
   hasDeadlineForQuestions = false;
   hasDeadlineForAnswers = false;
@@ -57,19 +50,14 @@ export class ManageTopicPage implements OnInit {
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
     private _topics: TopicsService,
-    private _categories: TopicCategoryService,
-    private _events: GAEventsService,
     private _media: MediaService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
     if (!this.app.user.isAdministrator) return this.app.closePage('COMMON.UNAUTHORIZED');
 
-    [this.categories, this.events, this.activeTopics] = await Promise.all([
-      this._categories.getList(),
-      this._events.getList(),
-      this._topics.getActiveList()
-    ]);
+    this.activeTopics = await this._topics.getActiveList();
+
     this.rolesAbleToAskQuestionsChecks = Object.entries(UserRoles).map(
       role => new Check({ value: role[0], name: this.t._('USER_ROLES.'.concat(role[1])) })
     );
@@ -107,13 +95,6 @@ export class ManageTopicPage implements OnInit {
     } finally {
       this.loading.hide();
     }
-  }
-
-  compareWithEvent(e1: GAEventAttached, e2: GAEventAttached): boolean {
-    return e1 && e2 ? e1.eventId === e2.eventId : e1 === e2;
-  }
-  compareWithCategory(c1: TopicCategoryAttached, c2: TopicCategoryAttached): boolean {
-    return c1 && c2 ? c1.categoryId === c2.categoryId : c1 === c2;
   }
 
   handleChangeOfPublishingOption(): void {

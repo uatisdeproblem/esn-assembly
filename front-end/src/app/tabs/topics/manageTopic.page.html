@@ -18,35 +18,18 @@
       </ion-label>
       <ion-input [(ngModel)]="topic.name" [disabled]="!editMode"></ion-input>
     </ion-item>
-    <ion-item [class.fieldHasError]="hasFieldAnError('category')">
-      <ion-label position="stacked">
-        {{ 'TOPICS.CATEGORY' | translate }} <ion-text class="obligatoryDot"></ion-text>
-      </ion-label>
-      <ion-select
-        interface="popover"
-        [compareWith]="compareWithCategory"
-        [(ngModel)]="topic.category"
-        [disabled]="!editMode || !categories"
-      >
-        <ion-select-option *ngFor="let category of categories" [value]="category">
-          {{ category.name }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item [class.fieldHasError]="hasFieldAnError('event')">
-      <ion-label position="stacked">
-        {{ 'TOPICS.EVENT' | translate }} <ion-text class="obligatoryDot"></ion-text>
-      </ion-label>
-      <ion-select
-        interface="popover"
-        [compareWith]="compareWithEvent"
-        [(ngModel)]="topic.event"
-        [disabled]="!editMode || !events"
-      >
-        <ion-select-option *ngFor="let event of events" [value]="event">{{ event.name }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
+    <app-categories-picker
+      [class.fieldHasError]="hasFieldAnError('category')"
+      [editMode]="!!editMode"
+      [obligatory]="true"
+      [(category)]="topic.category"
+    ></app-categories-picker>
+    <app-events-picker
+      [class.fieldHasError]="hasFieldAnError('event')"
+      [editMode]="!!editMode"
+      [obligatory]="true"
+      [(event)]="topic.event"
+    ></app-events-picker>
     <ion-list-header>
       <ion-label>
         <h2>{{ 'TOPICS.PUBLISHING_OPTIONS' | translate }}</h2>

@@ -15,6 +15,8 @@ import { SubjectModule } from '@common/subject.module';
 import { EditModeButtonsModule } from 'src/app/common/editModeButtons.module';
 import { AttachmentsModule } from 'src/app/common/attachments.module';
 import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
+import { EventsPickerComponent } from 'src/app/common/eventsPicker.component';
+import { CategoriesPickerComponent } from 'src/app/common/categoriesPicker.component';
 
 @NgModule({
   imports: [
@@ -30,7 +32,9 @@ import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
     SubjectModule,
     EditModeButtonsModule,
     AttachmentsModule,
-    HTMLEditorModule
+    HTMLEditorModule,
+    EventsPickerComponent,
+    CategoriesPickerComponent
   ],
   declarations: [TopicsPage, TopicPage, ManageTopicPage]
 })

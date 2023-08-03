@@ -237,6 +237,7 @@
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",
+    "CATEGORY": "Category",
     "MANAGE_CATEGORY": "Manage category",
     "NAME": "Name",
     "COLOR": "Color",
@@ -245,6 +246,7 @@
   },
   "EVENTS": {
     "EVENTS": "Events",
+    "EVENT": "Event",
     "MANAGE_EVENT": "Manage event",
     "NAME": "Name",
     "CANT_DELETE_IF_USED_WARNING": "The deletion will fail in case the event is used in any topic. In that case, prefer the archive action instead.",
