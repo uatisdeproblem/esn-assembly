@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: ESN General Assembly app
-  version: 1.1.9
+  version: 1.2.0
   contact:
     name: Matteo Carbone
     email: email@matteocarbone.com
