@@ -1,13 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { AlertController } from '@ionic/angular';
+import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { GAEventsService } from './events.service';
 
 import { GAEvent } from '@models/event.model';
-import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
-import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'event',
@@ -15,6 +14,7 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['event.page.scss']
 })
 export class EventPage {
+  @Input() eventId = 'new';
   event: GAEvent;
 
   editMode = UXMode.VIEW;
@@ -24,7 +24,6 @@ export class EventPage {
 
   constructor(
     private location: Location,
-    private route: ActivatedRoute,
     private alertCtrl: AlertController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
@@ -33,11 +32,10 @@ export class EventPage {
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
-    const eventId = this.route.snapshot.paramMap.get('eventId') ?? 'new';
     try {
       await this.loading.show();
-      if (eventId !== 'new') {
-        this.event = await this._events.getById(eventId);
+      if (this.eventId !== 'new') {
+        this.event = await this._events.getById(this.eventId);
         this.editMode = UXMode.VIEW;
       } else {
         this.event = new GAEvent();

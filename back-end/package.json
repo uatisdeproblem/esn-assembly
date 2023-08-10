@@ -10,30 +10,30 @@
     "deploy-quick": "npm run compile && cdk --profile esn-ga deploy esn-ga-dev-api --context stage=dev --exclusively --hotswap"
   },
   "dependencies": {
-    "axios": "^1.2.6",
-    "idea-aws": "^3.16.2",
-    "idea-toolbox": "^6.7.0",
-    "jsonwebtoken": "^9.0.0",
-    "string-strip-html": "^13.2.3",
+    "axios": "^1.4.0",
+    "idea-aws": "^3.16.7",
+    "idea-toolbox": "^6.7.3",
+    "jsonwebtoken": "^9.0.1",
+    "string-strip-html": "^13.4.2",
     "xlsx": "^0.18.5",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
     "@iter-idea/ses-verify-identities": "^1.0.2",
-    "@tsconfig/node16": "^1.0.3",
-    "@types/aws-lambda": "^8.10.109",
+    "@tsconfig/node18": "^18.2.0",
+    "@types/aws-lambda": "^8.10.119",
     "@types/jsonwebtoken": "^9.0.1",
-    "@types/node": "^16.18.10",
+    "@types/node": "^18.17.4",
     "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
-    "aws-cdk": "^2.87.0",
-    "aws-cdk-lib": "^2.87.0",
-    "aws-sdk": "^2.1416.0",
+    "aws-cdk": "^2.90.0",
+    "aws-cdk-lib": "^2.90.0",
+    "aws-sdk": "^2.1432.0",
     "constructs": "^10.2.69",
-    "esbuild": "^0.16.10",
-    "eslint": "^8.30.0",
-    "typescript": "^4.8.4"
+    "esbuild": "^0.19.0",
+    "eslint": "^8.46.0",
+    "typescript": "^5.1.6"
   }
 }

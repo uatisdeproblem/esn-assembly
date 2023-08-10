@@ -1,5 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input, ViewChild } from '@angular/core';
 import { AlertController, IonContent, IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
 import { Attachment, epochISOString } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
@@ -20,6 +19,7 @@ import { dateStringIsPast, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.co
   styleUrls: ['topic.page.scss']
 })
 export class TopicPage {
+  @Input() topicId: string;
   topic: Topic;
   questions: Question[];
 
@@ -36,7 +36,6 @@ export class TopicPage {
   relatedTopics: Topic[];
 
   constructor(
-    private route: ActivatedRoute,
     private alertCtrl: AlertController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
@@ -57,8 +56,7 @@ export class TopicPage {
     }
   }
   private async loadResources(): Promise<void> {
-    const topicId = this.route.snapshot.paramMap.get('topicId');
-    this.topic = await this._topics.getById(topicId);
+    this.topic = await this._topics.getById(this.topicId);
     await this.filterQuestions(this.searchbar?.value, null, true);
     this.relatedTopics = await this._topics.getRelated(this.topic);
   }

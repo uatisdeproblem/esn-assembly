@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { Check } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
@@ -20,6 +19,7 @@ import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.
   styleUrls: ['manageTopic.page.scss']
 })
 export class ManageTopicPage implements OnInit {
+  @Input() topicId = 'new';
   topic: Topic;
 
   editMode = UXMode.VIEW;
@@ -44,7 +44,6 @@ export class ManageTopicPage implements OnInit {
 
   constructor(
     private location: Location,
-    private route: ActivatedRoute,
     private alertCtrl: AlertController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
@@ -63,11 +62,10 @@ export class ManageTopicPage implements OnInit {
     );
   }
   async ionViewWillEnter(): Promise<void> {
-    const topicId = this.route.snapshot.paramMap.get('topicId') ?? 'new';
     try {
       await this.loading.show();
-      if (topicId !== 'new') {
-        this.topic = await this._topics.getById(topicId);
+      if (this.topicId !== 'new') {
+        this.topic = await this._topics.getById(this.topicId);
         this.setUIHelpersForComplexFields();
         this.relatedTopics = await this._topics.getRelated(this.topic);
         this.relatedTopicsChecks = this.activeTopics

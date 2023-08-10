@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/@tsconfig/node16/tsconfig.json",
+  "extends": "./node_modules/@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "lib": ["es2020"],
     "module": "commonjs",

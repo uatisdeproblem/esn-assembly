@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input, OnInit } from '@angular/core';
 import { IDEAStorageService } from '@idea-ionic/common';
 
 import { AppService } from '../app.service';
@@ -12,17 +11,18 @@ import { environment as env } from '@env';
   styleUrls: ['auth.page.scss']
 })
 export class AuthPage implements OnInit {
+  @Input() token: string;
+
   version = env.idea.app.version;
 
-  constructor(private storage: IDEAStorageService, private route: ActivatedRoute, public app: AppService) {}
+  constructor(private storage: IDEAStorageService, public app: AppService) {}
   async ngOnInit(): Promise<void> {
-    const apiToken = this.route.snapshot.queryParamMap.get('token');
     // complete the flow from ESN Accounts
-    if (apiToken) {
-      const user = parseJWT(apiToken);
+    if (this.token) {
+      const user = parseJWT(this.token);
       const tokenExpiresAt = user.exp * 1000;
       if (tokenExpiresAt > Date.now()) {
-        await this.storage.set('token', apiToken);
+        await this.storage.set('token', this.token);
         await this.storage.set('tokenExpiresAt', tokenExpiresAt);
         await this.storage.set('user', user);
       }

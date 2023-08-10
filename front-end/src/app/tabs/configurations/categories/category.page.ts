@@ -1,13 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { AlertController } from '@ionic/angular';
+import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { TopicCategoryService } from './categories.service';
 
 import { CATEGORY_COLORS, TopicCategory } from '@models/category.model';
-import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
-import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'category',
@@ -15,6 +14,7 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['category.page.scss']
 })
 export class CategoryPage {
+  @Input() categoryId = 'new';
   category: TopicCategory;
   colors = CATEGORY_COLORS;
 
@@ -25,7 +25,6 @@ export class CategoryPage {
 
   constructor(
     private location: Location,
-    private route: ActivatedRoute,
     private alertCtrl: AlertController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
@@ -34,11 +33,10 @@ export class CategoryPage {
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
-    const categoryId = this.route.snapshot.paramMap.get('categoryId') ?? 'new';
     try {
       await this.loading.show();
-      if (categoryId !== 'new') {
-        this.category = await this._categories.getById(categoryId);
+      if (this.categoryId !== 'new') {
+        this.category = await this._categories.getById(this.categoryId);
         this.editMode = UXMode.VIEW;
       } else {
         this.category = new TopicCategory();

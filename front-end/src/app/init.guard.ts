@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn } from '@angular/router';
 import { Platform } from '@ionic/angular';
 import { IDEAStorageService, IDEATranslationsService } from '@idea-ionic/common';
 
@@ -7,24 +7,19 @@ import { AppService } from './app.service';
 
 import { ServiceLanguages } from '@models/serviceLanguages.enum';
 
-@Injectable({ providedIn: 'root' })
-export class InitGuard implements CanActivate {
-  constructor(
-    private platform: Platform,
-    private storage: IDEAStorageService,
-    private t: IDEATranslationsService,
-    private app: AppService
-  ) {}
+export const initGuard: CanActivateFn = async (): Promise<boolean> => {
+  const platform = inject(Platform);
+  const storage = inject(IDEAStorageService);
+  const t = inject(IDEATranslationsService);
+  const app = inject(AppService);
 
-  async canActivate(): Promise<boolean> {
-    if (this.app.initReady) return true;
+  if (app.initReady) return true;
 
-    await this.platform.ready();
-    await this.storage.ready();
+  await platform.ready();
+  await storage.ready();
 
-    await this.t.init(Object.values(ServiceLanguages), ServiceLanguages.English);
+  await t.init(Object.values(ServiceLanguages), ServiceLanguages.English);
 
-    this.app.initReady = true;
-    return true;
-  }
-}
+  app.initReady = true;
+  return true;
+};

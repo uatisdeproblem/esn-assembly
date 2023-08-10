@@ -20,12 +20,7 @@ export class EmailTemplateComponent implements OnInit {
   subject: string;
   content: string;
 
-  @Input() variables: { code: string; description: string }[] = [
-    { code: 'user', description: this.t._('EMAIL_TEMPLATE.VARIABLES.USER') },
-    { code: 'topic', description: this.t._('EMAIL_TEMPLATE.VARIABLES.TOPIC') },
-    { code: 'question', description: this.t._('EMAIL_TEMPLATE.VARIABLES.QUESTION') },
-    { code: 'url', description: this.t._('EMAIL_TEMPLATE.VARIABLES.URL') }
-  ];
+  @Input() variables: { code: string; description: string }[];
 
   errors: Set<string> = new Set();
 
@@ -42,6 +37,12 @@ export class EmailTemplateComponent implements OnInit {
     const { subject, content } = await this.getTemplate();
     this.subject = subject;
     this.content = content;
+    this.variables = [
+      { code: 'user', description: this.t._('EMAIL_TEMPLATE.VARIABLES.USER') },
+      { code: 'topic', description: this.t._('EMAIL_TEMPLATE.VARIABLES.TOPIC') },
+      { code: 'question', description: this.t._('EMAIL_TEMPLATE.VARIABLES.QUESTION') },
+      { code: 'url', description: this.t._('EMAIL_TEMPLATE.VARIABLES.URL') }
+    ];
   }
 
   hasFieldAnError(field: string): boolean {

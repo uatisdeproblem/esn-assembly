@@ -1,26 +1,30 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
-import { InitGuard } from './init.guard';
-import { AuthGuard } from './auth.guard';
+import { initGuard } from './init.guard';
+import { authGuard } from './auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 't', pathMatch: 'full' },
   {
     path: 'auth',
     loadChildren: (): Promise<any> => import('./auth/auth.module').then(m => m.AuthModule),
-    canActivate: [InitGuard]
+    canActivate: [initGuard]
   },
   {
     path: 't',
     loadChildren: (): Promise<any> => import('./tabs/tabs.module').then(m => m.TabsModule),
-    canActivate: [InitGuard, AuthGuard]
+    canActivate: [initGuard, authGuard]
   }
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules, paramsInheritanceStrategy: 'always' })
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+      paramsInheritanceStrategy: 'always',
+      bindToComponentInputs: true
+    })
   ],
   exports: [RouterModule]
 })
