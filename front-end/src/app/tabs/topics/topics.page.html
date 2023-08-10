@@ -19,7 +19,7 @@
           [disabled]="!categories"
           (ionChange)="filter(searchbar.value)"
         >
-          <ion-select-option value="">{{ 'TOPICS.ALL_CATEGORIES' | translate }}</ion-select-option>
+          <ion-select-option [value]="null">{{ 'TOPICS.ALL_CATEGORIES' | translate }}</ion-select-option>
           <ion-select-option *ngFor="let category of categories" [value]="category.categoryId">
             {{ category.name }}
           </ion-select-option>
@@ -32,13 +32,13 @@
           [disabled]="!events"
           (ionChange)="filter(searchbar.value)"
         >
-          <ion-select-option value="">{{ 'TOPICS.ALL_EVENTS' | translate }}</ion-select-option>
+          <ion-select-option [value]="null">{{ 'TOPICS.ALL_EVENTS' | translate }}</ion-select-option>
           <ion-select-option *ngFor="let event of events" [value]="event.eventId">{{ event.name }}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item lines="none" color="ideaToolbar" class="ion-hide-lg-down">
         <ion-select interface="popover" [(ngModel)]="filterByStatus" (ionChange)="filter(searchbar.value)">
-          <ion-select-option value="">{{ 'TOPICS.ALL_STATUSES' | translate }}</ion-select-option>
+          <ion-select-option [value]="null">{{ 'TOPICS.ALL_STATUSES' | translate }}</ion-select-option>
           <ion-select-option [value]="true">{{ 'TOPICS.STATUSES.OPEN' | translate }}</ion-select-option>
           <ion-select-option [value]="false">{{ 'TOPICS.STATUSES.CLOSED' | translate }}</ion-select-option>
         </ion-select>

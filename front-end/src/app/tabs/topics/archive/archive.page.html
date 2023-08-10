@@ -19,7 +19,7 @@
     <ion-buttons slot="end">
       <ion-item lines="none" color="ideaToolbar">
         <ion-select interface="popover" [(ngModel)]="filterByCategory" [disabled]="!categories">
-          <ion-select-option value="">{{ 'TOPICS.ALL_CATEGORIES' | translate }}</ion-select-option>
+          <ion-select-option [value]="null">{{ 'TOPICS.ALL_CATEGORIES' | translate }}</ion-select-option>
           <ion-select-option *ngFor="let category of categories" [value]="category.categoryId">
             {{ category.name }}
           </ion-select-option>
@@ -27,7 +27,7 @@
       </ion-item>
       <ion-item lines="none" color="ideaToolbar">
         <ion-select interface="popover" [(ngModel)]="filterByEvent" [disabled]="!events">
-          <ion-select-option value="">{{ 'TOPICS.ALL_EVENTS' | translate }}</ion-select-option>
+          <ion-select-option [value]="null">{{ 'TOPICS.ALL_EVENTS' | translate }}</ion-select-option>
           <ion-select-option *ngFor="let event of events" [value]="event.eventId">{{ event.name }}</ion-select-option>
         </ion-select>
       </ion-item>

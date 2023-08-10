@@ -56,7 +56,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
             {{ 'DEADLINES.ACTION_COLOR' | translate }}
           </ion-label>
           <ion-select interface="popover" [(ngModel)]="deadline.actionColor">
-            <ion-select-option value=""></ion-select-option>
+            <ion-select-option [value]="null"></ion-select-option>
             <ion-select-option *ngFor="let color of COLORS" [value]="color">{{ color }}</ion-select-option>
           </ion-select>
         </ion-item>

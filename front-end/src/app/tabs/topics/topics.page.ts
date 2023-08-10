@@ -26,7 +26,7 @@ export class TopicsPage implements OnInit {
   events: GAEvent[];
   filterByEvent: string = null;
 
-  filterByStatus: boolean;
+  filterByStatus: boolean = null;
 
   sortBy: TopicsSortBy = TopicsSortBy.CREATED_DATE_DESC;
   TopicsSortBy = TopicsSortBy;

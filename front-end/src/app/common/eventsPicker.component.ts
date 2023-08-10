@@ -24,7 +24,7 @@ import { GAEvent, GAEventAttached } from '@models/event.model';
         (ngModelChange)="eventChange.emit($event)"
         [disabled]="!editMode || !events"
       >
-        <ion-select-option *ngIf="!obligatory" value=""></ion-select-option>
+        <ion-select-option *ngIf="!obligatory" [value]="null"></ion-select-option>
         <ion-select-option *ngFor="let event of events" [value]="event">{{ event.name }}</ion-select-option>
       </ion-select>
     </ion-item>

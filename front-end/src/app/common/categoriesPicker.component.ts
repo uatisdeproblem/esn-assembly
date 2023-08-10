@@ -24,7 +24,7 @@ import { TopicCategoryAttached } from '@models/category.model';
         (ngModelChange)="categoryChange.emit($event)"
         [disabled]="!editMode || !categories"
       >
-        <ion-select-option *ngIf="!obligatory" value=""></ion-select-option>
+        <ion-select-option *ngIf="!obligatory" [value]="null"></ion-select-option>
         <ion-select-option *ngFor="let category of categories" [value]="category">
           {{ category.name }}
         </ion-select-option>
