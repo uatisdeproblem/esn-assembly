@@ -131,7 +131,7 @@ class Topics extends ResourceController {
     const attachmentId = await ddb.IUNID(PROJECT.concat('-attachment'));
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}.png`;
-    const signedURL = s3.signedURLPut(S3_BUCKET_MEDIA, key);
+    const signedURL = await s3.signedURLPut(S3_BUCKET_MEDIA, key);
     signedURL.id = attachmentId;
 
     return signedURL;
@@ -141,9 +141,7 @@ class Topics extends ResourceController {
     if (!attachmentId) throw new RCError('Missing attachment ID');
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}.png`;
-    const signedURL = s3.signedURLGet(S3_BUCKET_MEDIA, key);
-
-    return signedURL;
+    return await s3.signedURLGet(S3_BUCKET_MEDIA, key);
   }
 
   protected async getResource(): Promise<Topic> {

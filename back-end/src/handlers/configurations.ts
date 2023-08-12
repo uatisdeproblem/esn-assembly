@@ -99,7 +99,7 @@ class ConfigurationsRC extends ResourceController {
   private async getEmailTemplate(emailTemplate: string): Promise<{ subject: string; content: string }> {
     try {
       const template = await ses.getTemplate(`${emailTemplate}-${STAGE}`);
-      return { subject: template.SubjectPart, content: template.HtmlPart };
+      return { subject: template.Subject, content: template.Html };
     } catch (error) {
       throw new RCError('Template not found');
     }
@@ -136,11 +136,11 @@ class ConfigurationsRC extends ResourceController {
   }
   private async resetEmailTemplate(emailTemplate: string): Promise<void> {
     const subject = `${emailTemplate}-${STAGE}`;
-    const content = await s3.getObject({
+    const content = (await s3.getObject({
       bucket: S3_BUCKET_MEDIA,
       key: S3_ASSETS_FOLDER.concat('/', emailTemplate, '.hbs'),
       type: GetObjectTypes.TEXT
-    });
+    })) as string;
     await ses.setTemplate(`${emailTemplate}-${STAGE}`, subject, content, true);
   }
 }

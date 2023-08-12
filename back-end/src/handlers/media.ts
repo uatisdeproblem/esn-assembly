@@ -40,7 +40,7 @@ class Media extends ResourceController {
     const imageURI = await ddb.IUNID(PROJECT.concat('-media'));
 
     const key = `${S3_IMAGES_FOLDER}/${imageURI}.png`;
-    const signedURL = s3.signedURLPut(S3_BUCKET_MEDIA, key);
+    const signedURL = await s3.signedURLPut(S3_BUCKET_MEDIA, key);
     signedURL.id = imageURI;
 
     return signedURL;
