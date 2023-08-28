@@ -40,6 +40,7 @@ import { Communication } from '@models/communication.model';
     `
       ion-card {
         margin: 0 4px 16px 4px;
+        max-width: 600px;
       }
       ion-img {
         object-fit: cover;
