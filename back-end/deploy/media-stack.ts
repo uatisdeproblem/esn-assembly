@@ -78,25 +78,24 @@ export class MediaStack extends cdk.Stack {
   }
 }
 
-const createThumbnailer = (scope: Construct, s3BucketIDEALambdaFn: S3.Bucket | cdk.aws_s3.IBucket): Lambda.Function => {
+const createThumbnailer = (scope: Construct, s3BucketIDEALambdaFn: S3.Bucket | cdk.aws_s3.IBucket): Lambda.Alias => {
   const ghostScriptLayer = new Lambda.LayerVersion(scope, 'GhostScriptLayer', {
     description: 'To convert images',
     layerVersionName: 'idea_ghost_script',
-    code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'layer-ghost-script.zip'),
-    compatibleRuntimes: [Lambda.Runtime.NODEJS_14_X]
+    code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'layer-ghost-script.zip')
   });
 
   const imageMagickLayer = new Lambda.LayerVersion(scope, 'ImageMagickLayer', {
     description: 'To convert images',
     layerVersionName: 'idea_image_magick',
-
-    code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'layer-image-magick.zip'),
-    compatibleRuntimes: [Lambda.Runtime.NODEJS_14_X]
+    code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'layer-image-magick.zip')
   });
 
-  const thumbnailerFn = new Lambda.Function(scope, 'ThumbnailerFunction', {
+  const THUMBNAILER_KEY = 'ThumbnailerFn';
+  const thumbnailerFn = new Lambda.Function(scope, THUMBNAILER_KEY, {
     description: 'Convert an S3 uploaded media into a thumbnail',
-    runtime: Lambda.Runtime.NODEJS_14_X,
+    architecture: Lambda.Architecture.X86_64,
+    runtime: Lambda.Runtime.NODEJS_18_X,
     memorySize: 1536,
     timeout: Duration.seconds(10),
     code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'fn-thumbnailer.zip'),
@@ -110,23 +109,32 @@ const createThumbnailer = (scope: Construct, s3BucketIDEALambdaFn: S3.Bucket | c
     layers: [ghostScriptLayer, imageMagickLayer],
     logRetention: RetentionDays.TWO_WEEKS
   });
+  const thumbnailerFnProdVersion = new Lambda.Version(scope, THUMBNAILER_KEY.concat('ProdVersion'), {
+    lambda: thumbnailerFn,
+    description: 'Production version'
+  });
+  const thumbnailerFnProdAlias = new Lambda.Alias(scope, THUMBNAILER_KEY.concat('ProdAlias'), {
+    version: thumbnailerFnProdVersion,
+    aliasName: 'prod',
+    description: 'Production alias'
+  });
 
-  return thumbnailerFn;
+  return thumbnailerFnProdAlias;
 };
 
 const createHTMLToPDFLambdaFunctions = (
   scope: Construct,
   s3BucketIDEALambdaFn: S3.Bucket | cdk.aws_s3.IBucket
-): Lambda.Function[] => {
+): Lambda.Alias[] => {
   const chromiumPuppetteerLayer = new Lambda.LayerVersion(scope, 'ChromiumPuppetteerLayer', {
     description: 'Chromium and Puppetteer',
     layerVersionName: 'idea_chromium_puppetter',
-    code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'layer-chromium-puppetteer.zip'),
-    compatibleRuntimes: [Lambda.Runtime.NODEJS_14_X]
+    code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'layer-chromium-puppetteer.zip')
   });
 
   const lambdaFnOptions = {
-    runtime: Lambda.Runtime.NODEJS_14_X,
+    architecture: Lambda.Architecture.X86_64,
+    runtime: Lambda.Runtime.NODEJS_18_X,
     memorySize: 1536,
     timeout: Duration.seconds(20),
     handler: 'index.handler',
@@ -134,21 +142,41 @@ const createHTMLToPDFLambdaFunctions = (
     logRetention: RetentionDays.TWO_WEEKS
   };
 
-  const htmlToPDFFunction = new Lambda.Function(scope, 'HTMLToPDFFunction', {
+  const HTML_TO_PDF_KEY = 'HTMLToPDFFn';
+  const htmlToPDFFn = new Lambda.Function(scope, HTML_TO_PDF_KEY, {
     ...lambdaFnOptions,
     description: 'Create a PDF from an HTML source',
     functionName: 'idea_html2pdf',
     code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'fn-html2pdf.zip')
   });
+  const htmlToPDFFunctionProdVersion = new Lambda.Version(scope, HTML_TO_PDF_KEY.concat('ProdVersion'), {
+    lambda: htmlToPDFFn,
+    description: 'Production version'
+  });
+  const htmlToPDFFunctionProdAlias = new Lambda.Alias(scope, HTML_TO_PDF_KEY.concat('ProdAlias'), {
+    version: htmlToPDFFunctionProdVersion,
+    aliasName: 'prod',
+    description: 'Production alias'
+  });
 
-  const htmlToPDFFViaS3BucketFunction = new Lambda.Function(scope, 'HTMLToPDFViaS3BucketFunction', {
+  const HTML_TO_PDF_VIA_S3_KEY = 'HTMLToPDFViaS3Fn';
+  const htmlToPDFFViaS3BFn = new Lambda.Function(scope, HTML_TO_PDF_VIA_S3_KEY, {
     ...lambdaFnOptions,
     description: 'Create a PDF from an HTML source and offer the result via S3 bucket',
     functionName: 'idea_html2pdf_viaS3Bucket',
     code: Lambda.Code.fromBucket(s3BucketIDEALambdaFn, 'fn-html2pdf_viaS3Bucket.zip')
   });
+  const htmlToPDFFViaS3BFnProdVersion = new Lambda.Version(scope, HTML_TO_PDF_VIA_S3_KEY.concat('ProdVersion'), {
+    lambda: htmlToPDFFViaS3BFn,
+    description: 'Production version'
+  });
+  const htmlToPDFFViaS3BFnProdAlias = new Lambda.Alias(scope, HTML_TO_PDF_VIA_S3_KEY.concat('ProdAlias'), {
+    version: htmlToPDFFViaS3BFnProdVersion,
+    aliasName: 'prod',
+    description: 'Production alias'
+  });
 
-  return [htmlToPDFFunction, htmlToPDFFViaS3BucketFunction];
+  return [htmlToPDFFunctionProdAlias, htmlToPDFFViaS3BFnProdAlias];
 };
 
 const createCloudFrontDistributionForMediaBucket = (
