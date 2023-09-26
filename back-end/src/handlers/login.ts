@@ -5,7 +5,7 @@
 import { default as Axios } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { sign } from 'jsonwebtoken';
-import { DynamoDB, RCError, ResourceController, SecretsManager } from 'idea-aws';
+import { DynamoDB, RCError, ResourceController, SystemsManager } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { Configurations } from '../models/configurations.model';
@@ -23,8 +23,8 @@ const PROJECT = process.env.PROJECT;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
-const SECRETS_PATH = 'esn-ga/auth';
-const secretsManager = new SecretsManager();
+const SECRETS_PATH = '/esn-ga/auth';
+const systemsManager = new SystemsManager();
 
 let JWT_SECRET: string;
 
@@ -82,7 +82,7 @@ class Login extends ResourceController {
       this.logger.info('ESN Accounts login', user);
 
       const userData = JSON.parse(JSON.stringify(user));
-      const secret = await getJwtSecretFromSecretsManager();
+      const secret = await getJwtSecretFromSystemsManager();
       const token = sign(userData, secret, { expiresIn: JWT_EXPIRE_TIME });
 
       // redirect to the front-end with the fresh new token (instead of resolving)
@@ -95,7 +95,7 @@ class Login extends ResourceController {
   }
 }
 
-const getJwtSecretFromSecretsManager = async (): Promise<string> => {
-  if (!JWT_SECRET) JWT_SECRET = await secretsManager.getStringById(SECRETS_PATH);
+const getJwtSecretFromSystemsManager = async (): Promise<string> => {
+  if (!JWT_SECRET) JWT_SECRET = await systemsManager.getSecretByName(SECRETS_PATH);
   return JWT_SECRET;
 };

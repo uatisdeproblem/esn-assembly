@@ -85,7 +85,7 @@ export class ApiStack extends cdk.Stack {
       assetsFolder: 'assets',
       otherFolders: ['attachments', 'downloads', 'images']
     });
-    this.allowLambdaFunctionsToSecretsManager({ lambdaFunctions: Object.values(lambdaFunctions) });
+    this.allowLambdaFunctionsToSystemsManager({ lambdaFunctions: Object.values(lambdaFunctions) });
     this.allowLambdaFunctionsToAccessSES({
       lambdaFunctions: Object.values(lambdaFunctions),
       sesIdentityArn: props.ses.identityArn,
@@ -293,18 +293,14 @@ export class ApiStack extends cdk.Stack {
       destinationKeyPrefix: params.assetsFolder.concat('/', params.stage)
     });
   }
-  private allowLambdaFunctionsToSecretsManager(params: { lambdaFunctions: NodejsFunction[] }): void {
-    const accessSecretsManagerPolicy = new IAM.Policy(this, 'AccessSecretsManager', {
+  private allowLambdaFunctionsToSystemsManager(params: { lambdaFunctions: NodejsFunction[] }): void {
+    const accessSystemsManagerPolicy = new IAM.Policy(this, 'AccessSystemsManager', {
       statements: [
-        new IAM.PolicyStatement({
-          effect: IAM.Effect.ALLOW,
-          actions: ['secretsmanager:GetSecretValue'],
-          resources: ['*']
-        })
+        new IAM.PolicyStatement({ effect: IAM.Effect.ALLOW, actions: ['ssm:GetParameter'], resources: ['*'] })
       ]
     });
     params.lambdaFunctions.forEach(lambdaFn => {
-      if (lambdaFn.role) lambdaFn.role.attachInlinePolicy(accessSecretsManagerPolicy);
+      if (lambdaFn.role) lambdaFn.role.attachInlinePolicy(accessSystemsManagerPolicy);
     });
   }
   private allowLambdaFunctionsToAccessSES(params: {

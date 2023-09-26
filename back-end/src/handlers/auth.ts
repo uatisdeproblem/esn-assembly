@@ -4,7 +4,7 @@
 
 import { APIGatewayProxyEventV2WithRequestContext } from 'aws-lambda';
 import { JwtPayload, verify } from 'jsonwebtoken';
-import { DynamoDB, SecretsManager } from 'idea-aws';
+import { DynamoDB, SystemsManager } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { Configurations } from '../models/configurations.model';
@@ -17,8 +17,8 @@ const PROJECT = process.env.PROJECT;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
-const SECRETS_PATH = 'esn-ga/auth';
-const secretsManager = new SecretsManager();
+const PARAMETERS_PATH = '/esn-ga/auth';
+const ssm = new SystemsManager();
 
 let JWT_SECRET: string;
 
@@ -40,12 +40,12 @@ export const handler = async (event: APIGatewayProxyEventV2WithRequestContext<Au
 // HELPERS
 //
 
-const getJwtSecretFromSecretsManager = async (): Promise<string> => {
-  if (!JWT_SECRET) JWT_SECRET = await secretsManager.getStringById(SECRETS_PATH);
+const getJwtSecretFromSystemsManager = async (): Promise<string> => {
+  if (!JWT_SECRET) JWT_SECRET = await ssm.getSecretByName(PARAMETERS_PATH);
   return JWT_SECRET;
 };
 const verifyTokenAndGetESNAccountsUser = async (token: string): Promise<User> => {
-  const secret = await getJwtSecretFromSecretsManager();
+  const secret = await getJwtSecretFromSystemsManager();
   try {
     const result = verify(token, secret) as JwtPayload;
     return new User(result);
