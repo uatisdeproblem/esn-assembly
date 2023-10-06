@@ -70,7 +70,14 @@ export class DashboardPage implements OnInit {
       component: CommunicationDetailComponent,
       componentProps: { communication }
     });
-    await modal.present();
+    modal.present();
+
+    // request the communication so that it counts in the statistics (even if we don't need it)
+    try {
+      await this._communications.getById(communication.communicationId);
+    } catch (error) {
+      // no problem
+    }
   }
   async manageCommunication(communication: Communication): Promise<void> {
     if (!this.editMode) return;
@@ -114,7 +121,15 @@ export class DashboardPage implements OnInit {
 
   async openUsefulLink(usefulLink: UsefulLink): Promise<void> {
     if (this.editMode) return;
-    await this.app.openURL(usefulLink.url);
+
+    this.app.openURL(usefulLink.url);
+
+    // request the link so that it counts in the statistics (even if we don't need it)
+    try {
+      await this._usefulLinks.getById(usefulLink.linkId);
+    } catch (error) {
+      // no problem
+    }
   }
   async swapSortUsefulLinks(usefulLinkA: UsefulLink, usefulLinkB: UsefulLink, event?: Event): Promise<void> {
     if (event) event.stopPropagation();
