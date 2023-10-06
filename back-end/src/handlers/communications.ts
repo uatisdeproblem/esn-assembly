@@ -4,9 +4,12 @@
 
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
+import { addStatisticEntry } from './statistics';
+
 import { User } from '../models/user.model';
 import { Communication } from '../models/communication.model';
 import { GAEventAttached } from '../models/event.model';
+import { StatisticEntityTypes } from '../models/statistic.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -48,9 +51,13 @@ class Communications extends ResourceController {
     communications = communications.map(x => new Communication(x));
 
     const archived = this.queryParams.archived !== undefined && this.queryParams.archived !== 'false';
-    communications = communications.filter(x => (archived ? x.isArchived() : !x.isArchived()));
+    communications = communications
+      .filter(x => (archived ? x.isArchived() : !x.isArchived()))
+      .sort((a, b): number => b.date.localeCompare(a.date));
 
-    return communications.sort((a, b): number => b.date.localeCompare(a.date));
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.COMMUNICATIONS);
+
+    return communications;
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Communication> {
@@ -84,6 +91,7 @@ class Communications extends ResourceController {
   }
 
   protected async getResource(): Promise<Communication> {
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.COMMUNICATIONS, this.resourceId);
     return this.communication;
   }
 

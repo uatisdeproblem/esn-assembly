@@ -6,6 +6,7 @@ import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
 
 import { addBadgeToUser } from './badges';
+import { addStatisticEntry } from './statistics';
 
 import { TopicCategoryAttached } from '../models/category.model';
 import { GAEventAttached } from '../models/event.model';
@@ -13,6 +14,7 @@ import { RelatedTopic, Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
 import { SubjectTypes } from '../models/subject.model';
+import { StatisticEntityTypes } from '../models/statistic.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -69,7 +71,11 @@ class Topics extends ResourceController {
     if (this.queryParams.categoryId) topics = topics.filter(x => x.category.categoryId === this.queryParams.categoryId);
     if (this.queryParams.eventId) topics = topics.filter(x => x.event.eventId === this.queryParams.eventId);
 
-    return topics.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
+    topics = topics.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
+
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.TOPICS);
+
+    return topics;
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Topic> {
@@ -146,6 +152,9 @@ class Topics extends ResourceController {
 
   protected async getResource(): Promise<Topic> {
     if (this.topic.isDraft() && !this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.TOPICS, this.resourceId);
+
     return this.topic;
   }
 

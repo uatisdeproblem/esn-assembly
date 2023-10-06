@@ -4,9 +4,12 @@
 
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
+import { addStatisticEntry } from './statistics';
+
 import { User } from '../models/user.model';
 import { Deadline } from '../models/deadline.model';
 import { GAEventAttached } from '../models/event.model';
+import { StatisticEntityTypes } from '../models/statistic.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -45,8 +48,14 @@ class Deadlines extends ResourceController {
 
   protected async getResources(): Promise<Deadline[]> {
     let deadlines: Deadline[] = await ddb.scan({ TableName: DDB_TABLES.deadlines });
-    deadlines = deadlines.map(x => new Deadline(x));
-    return deadlines.sort((a, b): number => a.at.localeCompare(b.at)).filter(x => x.at >= new Date().toISOString());
+    deadlines = deadlines
+      .map(x => new Deadline(x))
+      .filter(x => x.at >= new Date().toISOString())
+      .sort((a, b): number => a.at.localeCompare(b.at));
+
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.DEADLINES);
+
+    return deadlines;
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Deadline> {
@@ -80,6 +89,7 @@ class Deadlines extends ResourceController {
   }
 
   protected async getResource(): Promise<Deadline> {
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.DEADLINES, this.resourceId);
     return this.deadline;
   }
 

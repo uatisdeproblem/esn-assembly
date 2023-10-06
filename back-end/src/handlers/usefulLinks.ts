@@ -4,9 +4,12 @@
 
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
+import { addStatisticEntry } from './statistics';
+
 import { User } from '../models/user.model';
 import { UsefulLink } from '../models/usefulLink.model';
 import { GAEventAttached } from '../models/event.model';
+import { StatisticEntityTypes } from '../models/statistic.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -45,8 +48,11 @@ class UsefulLinks extends ResourceController {
 
   protected async getResources(): Promise<UsefulLink[]> {
     let usefulLinks: UsefulLink[] = await ddb.scan({ TableName: DDB_TABLES.usefulLinks });
-    usefulLinks = usefulLinks.map(x => new UsefulLink(x));
-    return usefulLinks.sort((a, b): number => a.sort - b.sort);
+    usefulLinks = usefulLinks.map(x => new UsefulLink(x)).sort((a, b): number => a.sort - b.sort);
+
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.USEFUL_LINKS);
+
+    return usefulLinks;
   }
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<UsefulLink> {
@@ -80,6 +86,7 @@ class UsefulLinks extends ResourceController {
   }
 
   protected async getResource(): Promise<UsefulLink> {
+    await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.USEFUL_LINKS, this.resourceId);
     return this.usefulLink;
   }
 

@@ -43,6 +43,8 @@ tags:
     description: The deadlines the users should be aware of
   - name: Communications
     description: The communications towards the users
+  - name: Statistics
+    description: General statistics on the use of the app
 
 paths:
   /login:
@@ -1495,6 +1497,41 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /statistics:
+    get:
+      summary: Get statistics on the use of the app
+      description: Requires to be Administrator
+      tags: [Statistics]
+      parameters:
+        - name: since
+          in: query
+          description: The starting date interval (YYYY-MM-DDTHH, in UTC)
+          required: true
+          schema:
+            type: string
+        - name: to
+          in: query
+          description: The ending date interval (YYYY-MM-DDTHH, in UTC)
+          required: true
+          schema:
+            type: string
+        - name: entityType
+          in: query
+          description: The type of entity to filter
+          required: false
+          schema:
+            type: string
+        - name: entityId
+          in: query
+          description: The ID of the specific entity's entry to filter
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Statistics'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -1529,6 +1566,9 @@ components:
       type: object
       additionalProperties: {}
     Subject:
+      type: object
+      additionalProperties: {}
+    Statistic:
       type: object
       additionalProperties: {}
 
@@ -1690,6 +1730,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Subject'
+    Statistic:
+      description: A statistic entry
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Statistic'
+    Statistics:
+      description: Some statistics
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Statistic'
     BadParameters:
       description: Bad input parameters
       content:
