@@ -66,7 +66,7 @@ export class AppService {
    * Open an alert to get the token for running requests against this project's API.
    */
   async getTokenId(): Promise<void> {
-    const message = this.api.authToken;
+    const message = this.api.authToken as string;
     const alert = await this.alertCtrl.create({ message, buttons: ['Thanks 🙌'], cssClass: 'selectable' });
     alert.present();
   }
