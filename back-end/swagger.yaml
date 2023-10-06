@@ -1365,7 +1365,7 @@ paths:
     delete:
       summary: Delete a deadline
       description: Requires to be Administrator
-      tags: [Deadline]
+      tags: [Deadlines]
       security:
         - AuthFunction: []
       parameters:
@@ -1502,23 +1502,25 @@ paths:
       summary: Get statistics on the use of the app
       description: Requires to be Administrator
       tags: [Statistics]
+      security:
+        - AuthFunction: []
       parameters:
         - name: since
           in: query
-          description: The starting date interval (YYYY-MM-DDTHH, in UTC)
+          description: The starting date interval
           required: true
           schema:
             type: string
         - name: to
           in: query
-          description: The ending date interval (YYYY-MM-DDTHH, in UTC)
+          description: The ending date interval
           required: true
           schema:
             type: string
         - name: entityType
           in: query
           description: The type of entity to filter
-          required: false
+          required: true
           schema:
             type: string
         - name: entityId

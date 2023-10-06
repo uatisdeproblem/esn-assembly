@@ -3,7 +3,7 @@ import { Resource } from 'idea-toolbox';
 /**
  * An entry for statistics of interfactions in the app.
  */
-export class Statistic extends Resource {
+export class StatisticEntry extends Resource {
   /**
    * The concatenation of `entityType` and `entityId` (if any).
    */
@@ -25,11 +25,14 @@ export class Statistic extends Resource {
     return [entityType, entityId].filter(x => x).join('###');
   }
   static getSK(userId: string): string {
-    return [Statistic.getTimestamp(), Statistic.getHashOfString(userId)].join('###');
+    return [StatisticEntry.generateTimestamp(), StatisticEntry.getHashOfString(userId)].join('###');
   }
-  private static getTimestamp(input?: string | number | Date): string {
+  static generateTimestamp(input?: string | number | Date): string {
     const d = input ? new Date(input) : new Date();
     return d.toISOString().slice(0, 13);
+  }
+  static getTimestamp(entry: StatisticEntry): string {
+    return entry.SK.split('###')[0];
   }
   private static getHashOfString(s: string): string {
     return s
@@ -55,4 +58,21 @@ export enum StatisticEntityTypes {
   COMMUNICATIONS = 'COMMUNICATIONS',
   DEADLINES = 'DEADLINES',
   USEFUL_LINKS = 'USEFUL_LINKS'
+}
+
+/**
+ * A statistic to display regarding an entity or entity type, elaborated by one or more raw statistic entries.
+ */
+export interface Statistic {
+  entityType: StatisticEntityTypes;
+  entityId?: string;
+  details: StatisticDetail[];
+}
+/**
+ * The detail in time of a statistic to display.
+ */
+export interface StatisticDetail {
+  timestamp: string;
+  country: string;
+  counter: number;
 }

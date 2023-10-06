@@ -52,7 +52,7 @@ const apiResources: ResourceController[] = [
   { name: 'communications', paths: ['/communications', '/communications/{communicationId}'] },
   { name: 'scheduledOps' },
   { name: 'sesNotifications' },
-  { name: 'statistics', paths: ['statistics'] }
+  { name: 'statistics', paths: ['/statistics'] }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
