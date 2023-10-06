@@ -71,7 +71,6 @@ export class User extends Resource {
   section: string;
   /**
    * ESN Country.
-   * @todo there's a known error from ESN Accounts: here is returned the Section and not the Country.
    */
   country: string;
   /**
