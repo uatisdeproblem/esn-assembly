@@ -57,6 +57,12 @@
       <ion-button fill="solid" color="ESNgreen" *ngIf="app.user.isAdministrator" (click)="addTopic()">
         <ion-icon icon="add" slot="icon-only"></ion-icon>
       </ion-button>
+      <app-statistics-button
+        *ngIf="app.user.isAdministrator"
+        [entityType]="SET.TOPICS"
+        [title]="'TABS.TOPICS' | translate"
+        [color]="app.isInDarkMode() ? 'dark' : 'white'"
+      />
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

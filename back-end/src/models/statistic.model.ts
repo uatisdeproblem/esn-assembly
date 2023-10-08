@@ -27,12 +27,16 @@ export class StatisticEntry extends Resource {
   static getSK(userId: string): string {
     return [StatisticEntry.generateTimestamp(), StatisticEntry.getHashOfString(userId)].join('###');
   }
-  static generateTimestamp(input?: string | number | Date): string {
+  static generateTimestamp(input?: string | number | Date, addHours = 0): string {
     const d = input ? new Date(input) : new Date();
+    d.setHours(d.getHours() + addHours);
     return d.toISOString().slice(0, 13);
   }
   static getTimestamp(entry: StatisticEntry): string {
     return entry.SK.split('###')[0];
+  }
+  static getUserHash(entry: StatisticEntry): string {
+    return entry.SK.split('###')[1];
   }
   private static getHashOfString(s: string): string {
     return s
@@ -66,13 +70,6 @@ export enum StatisticEntityTypes {
 export interface Statistic {
   entityType: StatisticEntityTypes;
   entityId?: string;
-  details: StatisticDetail[];
-}
-/**
- * The detail in time of a statistic to display.
- */
-export interface StatisticDetail {
-  timestamp: string;
-  country: string;
-  counter: number;
+  totals: { countries: number; users: number };
+  details: { [timestamp: string]: { [country: string]: number } };
 }

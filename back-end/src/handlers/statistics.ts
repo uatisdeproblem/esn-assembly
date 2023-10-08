@@ -37,8 +37,8 @@ class StatisticsRC extends ResourceController {
     if (!this.queryParams.entityType) throw new RCError('Missing entity type');
 
     const pk = StatisticEntry.getPK(this.queryParams.entityType, this.queryParams.entityId);
-    const since = StatisticEntry.generateTimestamp(this.queryParams.since);
-    const to = StatisticEntry.generateTimestamp(this.queryParams.to);
+    const since = StatisticEntry.generateTimestamp(this.queryParams.since, -1);
+    const to = StatisticEntry.generateTimestamp(this.queryParams.to, 1);
 
     const rawStatisticsSortedByTimestamp: StatisticEntry[] = await ddb.query({
       TableName: DDB_TABLES.statistics,
@@ -49,25 +49,35 @@ class StatisticsRC extends ResourceController {
     const statistics: Statistic = {
       entityType: this.queryParams.entityType,
       entityId: this.queryParams.entityId,
-      details: []
+      totals: { countries: 0, users: 0 },
+      details: {}
     };
 
     let prevTimestamp: string;
+    const countries = new Set<string>();
+    const users = new Set<string>();
     const currentTimestampCountryCounterMap: Map<string, number> = new Map();
     rawStatisticsSortedByTimestamp.forEach((entry, index): void => {
       const timestamp = StatisticEntry.getTimestamp(entry);
 
-      const currentCounterForCountry = currentTimestampCountryCounterMap.get(entry.country) ?? 0;
-      currentTimestampCountryCounterMap.set(entry.country, currentCounterForCountry + 1);
+      countries.add(entry.country);
+      users.add(StatisticEntry.getUserHash(entry));
+
+      const counterForCountryInTimestamp = currentTimestampCountryCounterMap.get(entry.country) ?? 0;
+      currentTimestampCountryCounterMap.set(entry.country, counterForCountryInTimestamp + 1);
 
       if (!prevTimestamp || prevTimestamp !== timestamp || rawStatisticsSortedByTimestamp.length === index + 1) {
         currentTimestampCountryCounterMap.forEach((counter, country): void => {
-          statistics.details.push({ timestamp, country, counter });
+          if (!statistics.details[timestamp]) statistics.details[timestamp] = {};
+          statistics.details[timestamp][country] = counter;
         });
         currentTimestampCountryCounterMap.clear();
         prevTimestamp = timestamp;
       }
     });
+
+    statistics.totals.countries = countries.size;
+    statistics.totals.users = users.size;
 
     return statistics;
   }

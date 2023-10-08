@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
+import { StatisticsModule } from '@common/statistics.module';
+
 import { TopicComponent } from './topic.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, StatisticsModule],
   declarations: [TopicComponent],
   exports: [TopicComponent]
 })

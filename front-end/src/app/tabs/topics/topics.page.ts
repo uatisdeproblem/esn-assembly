@@ -9,6 +9,7 @@ import { GAEventsService } from '../configurations/events/events.service';
 import { TopicCategory } from '@models/category.model';
 import { GAEvent } from '@models/event.model';
 import { Topic } from '@models/topic.model';
+import { StatisticEntityTypes } from '@models/statistic.model';
 
 @Component({
   selector: 'topics',
@@ -30,6 +31,8 @@ export class TopicsPage implements OnInit {
 
   sortBy: TopicsSortBy = TopicsSortBy.CREATED_DATE_DESC;
   TopicsSortBy = TopicsSortBy;
+
+  SET = StatisticEntityTypes;
 
   constructor(
     private _topics: TopicsService,

@@ -187,7 +187,9 @@
     "DEADLINES": "Deadlines",
     "SEE_ALL_DEADLINES": "See all",
     "USEFUL_LINKS": "Useful links",
-    "USEFUL_LINKS_I": "Access more information through these sources."
+    "USEFUL_LINKS_I": "Access more information through these sources.",
+    "STATISTICS_RECAP": "In the last week, we had <b>{{users}}</b> visiting users from <b>{{countries}}</b> ESN countries.",
+    "STATISTICS_APP_ACCESS": "App access"
   },
   "COMMUNICATIONS": {
     "MANAGE_COMMUNICATION": "Manage communication",
@@ -369,5 +371,20 @@
       "QUESTION": "The summary of the question",
       "URL": "The link to the question"
     }
+  },
+  "STATISTICS": {
+    "VIEWING_STATISTICS": "Viewing statistics",
+    "SINCE": "Since",
+    "TO": "To",
+    "GROUP_BY_COUNTRY": "Group by country",
+    "TODAY": "Today",
+    "GRANULARITY": "Granularity",
+    "GRANULARITIES": {
+      "HOURLY": "Hourly",
+      "DAILY": "Daily",
+      "MONTHLY": "Monthly"
+    },
+    "ALL_COUNTRIES": "All countries",
+    "TOTALS": "Totals"
   }
 }

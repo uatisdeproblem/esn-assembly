@@ -4,6 +4,8 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
+import { StatisticsModule } from '@common/statistics.module';
+
 import { DashboardRoutingModule } from './dashboard.routing.module';
 import { DashboardPage } from './dashboard.page';
 
@@ -21,6 +23,7 @@ import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.compon
     FormsModule,
     IonicModule,
     IDEATranslationsModule,
+    StatisticsModule,
     DashboardRoutingModule,
     CommunicationComponent,
     CommunicationDetailComponent,

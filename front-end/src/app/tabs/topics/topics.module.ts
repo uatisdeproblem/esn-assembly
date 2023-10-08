@@ -4,6 +4,14 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { IDEACheckerModule, IDEADateTimeModule, IDEATranslationsModule } from '@idea-ionic/common';
 
+import { SubjectModule } from '@common/subject.module';
+import { EditModeButtonsModule } from '@common/editModeButtons.module';
+import { AttachmentsModule } from '@common/attachments.module';
+import { HTMLEditorModule } from '@common/htmlEditor.module';
+import { EventsPickerComponent } from '@common/eventsPicker.component';
+import { CategoriesPickerComponent } from '@common/categoriesPicker.component';
+import { StatisticsModule } from '@common/statistics.module';
+
 import { TopicsRoutingModule } from './topics.routing.module';
 import { TopicsPage } from './topics.page';
 import { TopicPage } from './topic.page';
@@ -11,12 +19,6 @@ import { ManageTopicPage } from './manageTopic.page';
 
 import { TopicModule } from '../topics/topic.module';
 import { QuestionModule } from './questions/question.module';
-import { SubjectModule } from '@common/subject.module';
-import { EditModeButtonsModule } from 'src/app/common/editModeButtons.module';
-import { AttachmentsModule } from 'src/app/common/attachments.module';
-import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
-import { EventsPickerComponent } from 'src/app/common/eventsPicker.component';
-import { CategoriesPickerComponent } from 'src/app/common/categoriesPicker.component';
 
 @NgModule({
   imports: [
@@ -34,7 +36,8 @@ import { CategoriesPickerComponent } from 'src/app/common/categoriesPicker.compo
     AttachmentsModule,
     HTMLEditorModule,
     EventsPickerComponent,
-    CategoriesPickerComponent
+    CategoriesPickerComponent,
+    StatisticsModule
   ],
   declarations: [TopicsPage, TopicPage, ManageTopicPage]
 })

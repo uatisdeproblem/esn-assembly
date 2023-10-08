@@ -1,0 +1,71 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar [color]="app.isInDarkMode() ? 'white' : 'ideaToolbar'">
+    <ion-buttons slot="start">
+      <ion-button [title]="'COMMON.CLOSE' | translate" (click)="close()">
+        <ion-icon icon="close-circle-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'STATISTICS.VIEWING_STATISTICS' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content color="white">
+  <ion-row class="ion-align-items-center infoRow">
+    <ion-col [size]="8" [sizeLg]="9">
+      <ion-item lines="none">
+        <ion-label>
+          <b *ngIf="title">{{ title }}</b>
+          {{ 'STATISTICS.SINCE' | translate | lowercase }}
+          <ion-badge color="ESNpink">{{ since | dateLocale : 'MMM YYYY' }}</ion-badge>
+          {{ 'STATISTICS.TO' | translate | lowercase }}
+          <ion-badge color="ESNpink">
+            {{ isToday(to) ? ('STATISTICS.TODAY' | translate | lowercase) : (to | dateLocale : 'shortDate') }}
+          </ion-badge>
+        </ion-label>
+      </ion-item>
+    </ion-col>
+    <ion-col [size]="4" [sizeLg]="3" *ngIf="statistic">
+      <ion-item lines="none">
+        <ion-label class="ion-text-right">{{ 'STATISTICS.TOTALS' | translate }}:</ion-label>
+        <ion-chip slot="end" disabled>
+          <ion-icon name="person"></ion-icon>
+          <ion-label>{{ statistic.totals.users }}</ion-label>
+        </ion-chip>
+        <ion-chip slot="end" disabled>
+          <ion-icon name="earth"></ion-icon>
+          <ion-label>{{ statistic.totals.countries }}</ion-label>
+        </ion-chip>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-align-items-center ion-text-center actionsRow">
+    <ion-col [size]="12" [sizeSm]="4">
+      <ion-segment style="width: 200px; margin: 0 auto" color="dark" [(ngModel)]="chartType" (ionChange)="buildChart()">
+        <ion-segment-button value="line">
+          <ion-icon icon="analytics" size="small"></ion-icon>
+        </ion-segment-button>
+        <ion-segment-button value="bar">
+          <ion-icon icon="stats-chart" size="small"></ion-icon>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-col>
+    <ion-col [size]="12" [sizeSm]="4">
+      <ion-select
+        interface="popover"
+        style="max-width: 200px; margin: 0 auto"
+        [label]="('STATISTICS.GRANULARITY' | translate) + ':'"
+        [(ngModel)]="granularity"
+        (ionChange)="buildChart()"
+      >
+        <ion-select-option *ngFor="let g of Granularities | keyvalue" [value]="g.value">
+          {{ 'STATISTICS.GRANULARITIES.' + g.key | translate }}
+        </ion-select-option>
+      </ion-select>
+    </ion-col>
+    <ion-col [size]="12" [sizeSm]="4">
+      <ion-checkbox class="ion-padding-end" [(ngModel)]="groupByCountry" (ionChange)="buildChart()">
+        {{ 'STATISTICS.GROUP_BY_COUNTRY' | translate }}
+      </ion-checkbox>
+    </ion-col>
+  </ion-row>
+  <canvas height="100" id="theChart"></canvas>
+</ion-content>

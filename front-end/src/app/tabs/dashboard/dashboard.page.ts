@@ -12,11 +12,13 @@ import { AppService } from '@app/app.service';
 import { CommunicationsService } from './communications/communications.service';
 import { DeadlinesService } from './deadlines/deadlines.service';
 import { UsefulLinksService } from './usefulLinks/usefulLinks.service';
+import { StatisticsService } from '@app/common/statistics.service';
 
 import { Communication } from '@models/communication.model';
 import { Deadline } from '@models/deadline.model';
 import { UsefulLink } from '@models/usefulLink.model';
 import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
+import { Statistic, StatisticEntityTypes } from '@models/statistic.model';
 
 /**
  * The number of days to consider a deadline "upcoming"/next.
@@ -42,6 +44,9 @@ export class DashboardPage implements OnInit {
 
   editMode = false;
 
+  SET = StatisticEntityTypes;
+  statistic: Statistic;
+
   constructor(
     private modalCtrl: ModalController,
     private loading: IDEALoadingService,
@@ -49,6 +54,7 @@ export class DashboardPage implements OnInit {
     private _communications: CommunicationsService,
     private _deadlines: DeadlinesService,
     private _usefulLinks: UsefulLinksService,
+    private _statistics: StatisticsService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
@@ -58,6 +64,7 @@ export class DashboardPage implements OnInit {
       this._usefulLinks.getList()
     ]);
     this.nextDeadlines = this.getNextDeadlines();
+    if (this.app.user.isAdministrator) this.statistic = await this._statistics.recapOfLastNumDays(7);
   }
 
   //

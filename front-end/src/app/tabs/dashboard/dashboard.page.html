@@ -21,6 +21,22 @@
 </ion-header>
 <ion-content>
   <ion-grid [class.ion-no-padding]="app.isInMobileMode()">
+    <ion-row *ngIf="app.user.isAdministrator && !editMode && statistic">
+      <ion-col>
+        <ion-card>
+          <ion-item color="white" lines="none">
+            <app-statistics-button
+              slot="start"
+              [entityType]="SET.COMMUNICATIONS"
+              [title]="'DASHBOARD.STATISTICS_APP_ACCESS' | translate"
+            />
+            <ion-label
+              [innerHTML]="'DASHBOARD.STATISTICS_RECAP' | translate: { users: statistic.totals.users, countries: statistic.totals.countries }"
+            ></ion-label>
+          </ion-item>
+        </ion-card>
+      </ion-col>
+    </ion-row>
     <ion-row>
       <ion-col [size]="12" [sizeLg]="6">
         <ion-list class="aList" *ngIf="!app.isInMobileMode() || segment === MobileSegments.NEWS">
@@ -43,13 +59,24 @@
             [button]="!editMode"
             (select)="openCommunication(communication)"
           >
-            <ng-container *ngIf="editMode">
-              <p class="ion-text-right">
-                <ion-button slot="end" fill="clear" color="ESNgreen" (click)="manageCommunication(communication)">
-                  <ion-icon icon="pencil" slot="icon-only"></ion-icon>
-                </ion-button>
-              </p>
-            </ng-container>
+            <p class="ion-text-right">
+              <app-statistics-button
+                *ngIf="app.user.isAdministrator && !editMode"
+                [entityType]="SET.COMMUNICATIONS"
+                [entityId]="communication.communicationId"
+                [title]="communication.name"
+              />
+
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="ESNgreen"
+                *ngIf="editMode"
+                (click)="manageCommunication(communication)"
+              >
+                <ion-icon icon="pencil" slot="icon-only"></ion-icon>
+              </ion-button>
+            </p>
           </app-communication>
         </ion-list>
       </ion-col>
@@ -96,6 +123,13 @@
             [button]="!editMode"
             (select)="openUsefulLink(link)"
           >
+            <app-statistics-button
+              *ngIf="app.user.isAdministrator && !editMode"
+              slot="end"
+              [entityType]="SET.USEFUL_LINKS"
+              [entityId]="link.linkId"
+              [title]="link.name"
+            />
             <ng-container *ngIf="editMode">
               <ion-button
                 slot="end"
