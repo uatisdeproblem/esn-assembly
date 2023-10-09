@@ -10,22 +10,24 @@
 </ion-header>
 <ion-content color="white">
   <ion-row class="ion-align-items-center infoRow">
-    <ion-col [size]="8" [sizeLg]="9">
+    <ion-col [size]="7" [sizeSm]="8" [sizeLg]="9">
       <ion-item lines="none">
-        <ion-label>
+        <ion-label class="ion-text-wrap">
           <b *ngIf="title">{{ title }}</b>
-          {{ 'STATISTICS.SINCE' | translate | lowercase }}
-          <ion-badge color="ESNpink">{{ since | dateLocale : 'MMM YYYY' }}</ion-badge>
-          {{ 'STATISTICS.TO' | translate | lowercase }}
-          <ion-badge color="ESNpink">
-            {{ isToday(to) ? ('STATISTICS.TODAY' | translate | lowercase) : (to | dateLocale : 'shortDate') }}
-          </ion-badge>
+          <p>
+            {{ 'STATISTICS.SINCE' | translate | lowercase }}
+            <ion-badge color="ESNpink">{{ since | dateLocale : 'MMM YYYY' }}</ion-badge>
+            {{ 'STATISTICS.TO' | translate | lowercase }}
+            <ion-badge color="ESNpink">
+              {{ isToday(to) ? ('STATISTICS.TODAY' | translate | lowercase) : (to | dateLocale : 'shortDate') }}
+            </ion-badge>
+          </p>
         </ion-label>
       </ion-item>
     </ion-col>
-    <ion-col [size]="4" [sizeLg]="3" *ngIf="statistic">
+    <ion-col [size]="5" [sizeSm]="4" [sizeLg]="3" *ngIf="statistic">
       <ion-item lines="none">
-        <ion-label class="ion-text-right">{{ 'STATISTICS.TOTALS' | translate }}:</ion-label>
+        <ion-label class="ion-text-right ion-hide-md-down">{{ 'STATISTICS.TOTALS' | translate }}:</ion-label>
         <ion-chip slot="end" disabled>
           <ion-icon name="person"></ion-icon>
           <ion-label>{{ statistic.totals.users }}</ion-label>
@@ -67,5 +69,7 @@
       </ion-checkbox>
     </ion-col>
   </ion-row>
-  <canvas height="100" id="theChart"></canvas>
+  <div class="chartContainer">
+    <canvas id="theChart"></canvas>
+  </div>
 </ion-content>

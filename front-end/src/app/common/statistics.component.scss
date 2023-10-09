@@ -2,12 +2,15 @@ ion-row.infoRow {
   ion-item {
     ion-label {
       b {
-        font-size: 1.4em;
+        font-size: 1.3em;
         padding-right: 4px;
       }
-      ion-badge {
-        vertical-align: sub;
-        margin: 0 4px;
+      p {
+        margin-top: 6px;
+        ion-badge {
+          vertical-align: sub;
+          margin: 0 4px;
+        }
       }
     }
     ion-label.ion-text-right {
@@ -30,5 +33,14 @@ ion-row.actionsRow {
   }
   ion-select::part(text) {
     font-weight: 500;
+  }
+}
+
+.chartContainer {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  canvas {
+    margin: 0 auto;
   }
 }
