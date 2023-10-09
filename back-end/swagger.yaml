@@ -1517,6 +1517,14 @@ paths:
           required: true
           schema:
             type: string
+        - name: granularity
+          in: query
+          description: The desired granularity for the statistic
+          required: false
+          schema:
+            type: string
+            enum: [DAILY, MONTHLY]
+            default: MONTHLY
         - name: entityType
           in: query
           description: The type of entity to filter

@@ -56,7 +56,7 @@
         style="max-width: 200px; margin: 0 auto"
         [label]="('STATISTICS.GRANULARITY' | translate) + ':'"
         [(ngModel)]="granularity"
-        (ionChange)="buildChart()"
+        (ionChange)="loadStatisticAndBuildChart()"
       >
         <ion-select-option *ngFor="let g of Granularities | keyvalue" [value]="g.value">
           {{ 'STATISTICS.GRANULARITIES.' + g.key | translate }}

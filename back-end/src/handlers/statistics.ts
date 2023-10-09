@@ -2,10 +2,11 @@
 /// IMPORTS
 ///
 
+import { addDays, addMonths, endOfDay, endOfMonth, isBefore, startOfDay, startOfMonth } from 'date-fns';
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
-import { Statistic, StatisticEntityTypes, StatisticEntry } from '../models/statistic.model';
+import { Statistic, StatisticEntityTypes, StatisticEntry, StatisticGranularities } from '../models/statistic.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -39,47 +40,81 @@ class StatisticsRC extends ResourceController {
     const pk = StatisticEntry.getPK(this.queryParams.entityType, this.queryParams.entityId);
     const since = StatisticEntry.generateTimestamp(this.queryParams.since, -1);
     const to = StatisticEntry.generateTimestamp(this.queryParams.to, 1);
+    const granularity =
+      this.queryParams.granularity === StatisticGranularities.DAILY
+        ? StatisticGranularities.DAILY
+        : StatisticGranularities.MONTHLY;
 
-    const rawStatisticsSortedByTimestamp: StatisticEntry[] = await ddb.query({
+    const statisticEntries: StatisticEntry[] = await ddb.query({
       TableName: DDB_TABLES.statistics,
       KeyConditionExpression: 'PK = :pk AND SK BETWEEN :since AND :to',
       ExpressionAttributeValues: { ':pk': pk, ':since': since, ':to': to }
     });
+    const countries = Array.from(new Set(statisticEntries.map(x => x.country)));
 
-    const statistics: Statistic = {
+    const timePoints = this.buildTimePointsBasedOnGranularity(this.queryParams.since, this.queryParams.to, granularity);
+
+    const statistic: Statistic = {
       entityType: this.queryParams.entityType,
       entityId: this.queryParams.entityId,
+      timePoints,
       totals: { countries: 0, users: 0 },
       details: {}
     };
 
-    let prevTimestamp: string;
-    const countries = new Set<string>();
-    const users = new Set<string>();
-    const currentTimestampCountryCounterMap: Map<string, number> = new Map();
-    rawStatisticsSortedByTimestamp.forEach((entry, index): void => {
-      const timestamp = StatisticEntry.getTimestamp(entry);
+    const countriesDistinct = new Set<string>();
+    const usersDistinct = new Set<string>();
 
-      countries.add(entry.country);
-      users.add(StatisticEntry.getUserHash(entry));
+    const usersPresenceInTimePoint = new Set<string>();
+    const countryValueInTimePoint = new Map<string, number>();
 
-      const counterForCountryInTimestamp = currentTimestampCountryCounterMap.get(entry.country) ?? 0;
-      currentTimestampCountryCounterMap.set(entry.country, counterForCountryInTimestamp + 1);
+    timePoints.forEach(timePoint => {
+      const entriesInTimePoint = statisticEntries.filter(x => StatisticEntry.getTimestamp(x).startsWith(timePoint));
+      entriesInTimePoint.forEach(entry => {
+        const countryUser = [entry.country, StatisticEntry.getUserHash(entry)].join('###');
+        usersPresenceInTimePoint.add(countryUser);
+      });
+      Array.from(usersPresenceInTimePoint).forEach(countryUser => {
+        const [country, user] = countryUser.split('###');
+        countriesDistinct.add(country);
+        usersDistinct.add(user);
+        const currentCountryValue = countryValueInTimePoint.get(country) ?? 0;
+        countryValueInTimePoint.set(country, currentCountryValue + 1);
+      });
+      countries.forEach(country => {
+        if (!statistic.details[country]) statistic.details[country] = [];
+        statistic.details[country].push(countryValueInTimePoint.get(country) ?? 0);
+      });
 
-      if (!prevTimestamp || prevTimestamp !== timestamp || rawStatisticsSortedByTimestamp.length === index + 1) {
-        currentTimestampCountryCounterMap.forEach((counter, country): void => {
-          if (!statistics.details[timestamp]) statistics.details[timestamp] = {};
-          statistics.details[timestamp][country] = counter;
-        });
-        currentTimestampCountryCounterMap.clear();
-        prevTimestamp = timestamp;
-      }
+      usersPresenceInTimePoint.clear();
+      countryValueInTimePoint.clear();
     });
 
-    statistics.totals.countries = countries.size;
-    statistics.totals.users = users.size;
+    statistic.totals.countries = countriesDistinct.size;
+    statistic.totals.users = usersDistinct.size;
 
-    return statistics;
+    return statistic;
+  }
+  private buildTimePointsBasedOnGranularity(
+    sinceDate: string,
+    toDate: string,
+    granularity: StatisticGranularities
+  ): string[] {
+    const timePoints = [];
+    let currentDate = new Date(sinceDate);
+    const to = new Date(toDate);
+    if (granularity === StatisticGranularities.DAILY) {
+      while (isBefore(startOfDay(currentDate), endOfDay(to))) {
+        timePoints.push(currentDate.toISOString().slice(0, 10));
+        currentDate = addDays(currentDate, 1);
+      }
+    } else {
+      while (isBefore(startOfMonth(currentDate), endOfMonth(to))) {
+        timePoints.push(currentDate.toISOString().slice(0, 7));
+        currentDate = addMonths(currentDate, 1);
+      }
+    }
+    return timePoints;
   }
 }
 

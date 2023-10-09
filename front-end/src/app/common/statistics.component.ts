@@ -1,16 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import {
-  addDays,
-  addMonths,
-  addYears,
-  endOfDay,
-  endOfMonth,
-  isBefore,
-  isToday,
-  startOfDay,
-  startOfMonth
-} from 'date-fns/esm';
+import { addYears, isToday } from 'date-fns/esm';
 import Chart from 'chart.js/auto';
 import { epochISOString } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
@@ -18,7 +8,7 @@ import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from 
 import { AppService } from '@app/app.service';
 import { StatisticsService } from './statistics.service';
 
-import { StatisticEntityTypes, Statistic } from '@models/statistic.model';
+import { StatisticEntityTypes, Statistic, StatisticGranularities } from '@models/statistic.model';
 
 @Component({
   selector: 'app-statistics-button',
@@ -87,8 +77,8 @@ export class StatisticsComponent implements OnInit {
 
   chartType: 'bar' | 'line' = 'bar';
   groupByCountry = false;
-  granularity = Granularities.MONTHLY;
-  Granularities = Granularities;
+  granularity = StatisticGranularities.MONTHLY;
+  Granularities = StatisticGranularities;
 
   chart: Chart;
 
@@ -101,14 +91,18 @@ export class StatisticsComponent implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
+    await this.loadStatisticAndBuildChart();
+  }
+  async loadStatisticAndBuildChart(): Promise<void> {
     try {
       await this.loading.show();
-      this.statistic = await this._statistics.getInTimeWindowOfEntity(
-        this.since,
-        this.to,
-        this.entityType,
-        this.entityId
-      );
+      this.statistic = await this._statistics.getInTimeWindowOfEntity({
+        since: this.since,
+        to: this.to,
+        granularity: this.granularity,
+        entityType: this.entityType,
+        entityId: this.entityId
+      });
     } catch (error) {
       this.message.error('COMMON.SOMETHING_WENT_WRONG');
     } finally {
@@ -117,15 +111,25 @@ export class StatisticsComponent implements OnInit {
     this.buildChart();
   }
   buildChart(): void {
-    if (this.since > this.to) return;
-
     this.chart?.destroy();
 
-    const timePoints = this.buildTimePointsBasedOnGranularity(true);
-    const labels = timePoints.map(x =>
-      this.t.formatDate(x, this.granularity === Granularities.DAILY ? 'd MMM yy' : 'MMM YYYY')
+    const datasets: { label: string; data: number[] }[] = [];
+
+    const labels = this.statistic.timePoints.map(x =>
+      this.t.formatDate(x, this.granularity === StatisticGranularities.DAILY ? 'd MMM yy' : 'MMM YYYY')
     );
-    const datasets = this.buildDatasetsBasedOnGrouping(timePoints);
+
+    if (this.groupByCountry) {
+      Object.entries(this.statistic.details).forEach(([country, data]): number =>
+        datasets.push({ label: country, data })
+      );
+    } else {
+      const data = [];
+      Object.values(this.statistic.details).forEach(valuesOfCountry =>
+        valuesOfCountry.forEach((value, index): void => (data[index] = (data[index] ?? 0) + value))
+      );
+      datasets.push({ label: this.t._('STATISTICS.ALL_COUNTRIES'), data });
+    }
 
     const chartCanvas = document.getElementById('theChart') as HTMLCanvasElement;
     this.chart = new Chart(chartCanvas, {
@@ -136,57 +140,10 @@ export class StatisticsComponent implements OnInit {
         plugins: { colors: { enabled: true }, tooltip: {}, legend: {} },
         scales: {
           x: { stacked: this.chartType === 'bar' && this.groupByCountry },
-          y: { stacked: this.chartType === 'bar' && this.groupByCountry }
+          y: { stacked: this.chartType === 'bar' && this.groupByCountry, ticks: { precision: 0 } }
         }
       }
     });
-  }
-  buildTimePointsBasedOnGranularity(translate = false): string[] {
-    const timePoints = [];
-    let currentDate = new Date(this.since);
-    const to = new Date(this.to);
-    if (this.granularity === Granularities.DAILY) {
-      while (isBefore(startOfDay(currentDate), endOfDay(to))) {
-        timePoints.push(currentDate.toISOString().slice(0, 10));
-        currentDate = addDays(currentDate, 1);
-      }
-    } else {
-      while (isBefore(startOfMonth(currentDate), endOfMonth(to))) {
-        timePoints.push(currentDate.toISOString().slice(0, 7));
-        currentDate = addMonths(currentDate, 1);
-      }
-    }
-    return timePoints;
-  }
-  buildDatasetsBasedOnGrouping(timePoints: string[]): { label: string; data: number[] }[] {
-    const countriesSet = new Set<string>();
-    Object.values(this.statistic.details).map(x => Object.keys(x).forEach(x => countriesSet.add(x)));
-    const countries = Array.from(countriesSet);
-
-    const allCountriesKey = this.t._('STATISTICS.ALL_COUNTRIES');
-    const datasets = this.groupByCountry
-      ? countries.map(country => ({ label: country, data: [] }))
-      : [{ label: allCountriesKey, data: [] }];
-
-    timePoints.forEach(timePoint => {
-      const valueOfCountriesForTimePoint: Map<string, number> = new Map();
-
-      const timestampsInCurrentTimePoint = Object.keys(this.statistic.details).filter(x => x.startsWith(timePoint));
-      timestampsInCurrentTimePoint.forEach(timestamp => {
-        countries.forEach(country => {
-          const valueOfCountryInTimestamp = this.statistic.details[timestamp][country] ?? 0;
-          const mapKey = this.groupByCountry ? country : allCountriesKey;
-          const totalOfCountryInTimePoint = valueOfCountriesForTimePoint.get(mapKey) ?? 0;
-          valueOfCountriesForTimePoint.set(mapKey, totalOfCountryInTimePoint + valueOfCountryInTimestamp);
-        });
-      });
-
-      datasets.forEach(dataset => {
-        dataset.data.push(valueOfCountriesForTimePoint.get(dataset.label));
-      });
-    });
-
-    return datasets;
   }
 
   isToday(date: string | number | Date): boolean {
@@ -196,10 +153,4 @@ export class StatisticsComponent implements OnInit {
   close(): void {
     this.modalCtrl.dismiss();
   }
-}
-
-enum Granularities {
-  // HOURLY = 'HOURLY',
-  DAILY = 'DAILY',
-  MONTHLY = 'MONTHLY'
 }

@@ -3,7 +3,7 @@ import { addDays } from 'date-fns/esm';
 import { epochISOString } from 'idea-toolbox';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { Statistic, StatisticEntityTypes } from '@models/statistic.model';
+import { Statistic, StatisticEntityTypes, StatisticGranularities } from '@models/statistic.model';
 
 @Injectable({ providedIn: 'root' })
 export class StatisticsService {
@@ -12,14 +12,15 @@ export class StatisticsService {
   /**
    * Get the statistics for a time window of an entity (type or ID).
    */
-  async getInTimeWindowOfEntity(
-    since: epochISOString,
-    to: epochISOString,
-    entityType: StatisticEntityTypes,
-    entityId?: string
-  ): Promise<Statistic> {
-    const params: Record<string, string> = { since, to, entityType };
-    if (entityId) params.entityId = entityId;
+  async getInTimeWindowOfEntity(options: {
+    since: epochISOString;
+    to: epochISOString;
+    granularity: StatisticGranularities;
+    entityType: StatisticEntityTypes;
+    entityId?: string;
+  }): Promise<Statistic> {
+    const params: Record<string, string> = {};
+    for (const attr in options) if (options[attr]) params[attr] = options[attr];
     return await this.api.getResource('statistics', { params });
   }
 

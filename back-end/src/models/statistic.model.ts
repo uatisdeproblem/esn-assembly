@@ -70,6 +70,15 @@ export enum StatisticEntityTypes {
 export interface Statistic {
   entityType: StatisticEntityTypes;
   entityId?: string;
+  timePoints: string[];
   totals: { countries: number; users: number };
-  details: { [timestamp: string]: { [country: string]: number } };
+  details: { [country: string]: number[] };
+}
+
+/**
+ * The granularities for the statistics.
+ */
+export enum StatisticGranularities {
+  DAILY = 'DAILY',
+  MONTHLY = 'MONTHLY'
 }
