@@ -136,6 +136,7 @@ export class StatisticsComponent implements OnInit {
       type: this.chartType,
       data: { labels, datasets },
       options: {
+        maintainAspectRatio: false,
         layout: { padding: 20 },
         plugins: { colors: { enabled: true }, tooltip: {}, legend: {} },
         scales: {
