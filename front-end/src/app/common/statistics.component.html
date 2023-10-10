@@ -14,12 +14,12 @@
       <ion-item lines="none">
         <ion-label class="ion-text-wrap">
           <b *ngIf="title">{{ title }}</b>
-          <p>
+          <p *ngIf="statistic?.timePoints.length">
             {{ 'STATISTICS.SINCE' | translate | lowercase }}
-            <ion-badge color="ESNpink">{{ since | dateLocale : 'MMM YYYY' }}</ion-badge>
+            <ion-badge color="ESNpink">{{ getFirstDateOfStatistic() | date : 'dd MMM YYYY' }}</ion-badge>
             {{ 'STATISTICS.TO' | translate | lowercase }}
             <ion-badge color="ESNpink">
-              {{ isToday(to) ? ('STATISTICS.TODAY' | translate | lowercase) : (to | dateLocale : 'shortDate') }}
+              {{ 'STATISTICS.TODAY' | translate | lowercase }}
             </ion-badge>
           </p>
         </ion-label>
@@ -39,36 +39,62 @@
       </ion-item>
     </ion-col>
   </ion-row>
-  <ion-row class="ion-align-items-center ion-text-center actionsRow">
-    <ion-col [size]="12" [sizeSm]="4">
-      <ion-segment style="width: 200px; margin: 0 auto" color="dark" [(ngModel)]="chartType" (ionChange)="buildChart()">
-        <ion-segment-button value="line">
-          <ion-icon icon="analytics" size="small"></ion-icon>
-        </ion-segment-button>
-        <ion-segment-button value="bar">
-          <ion-icon icon="stats-chart" size="small"></ion-icon>
-        </ion-segment-button>
-      </ion-segment>
-    </ion-col>
-    <ion-col [size]="12" [sizeSm]="4">
+  <ion-list class="actionsRow" lines="none">
+    <ion-item>
       <ion-select
         interface="popover"
-        style="max-width: 200px; margin: 0 auto"
+        [label]="('STATISTICS.CHART_TYPE' | translate) + ':'"
+        [(ngModel)]="chartType"
+        (ionChange)="buildChart()"
+      >
+        <ion-select-option value="bar">
+          {{ 'STATISTICS.CHART_TYPES.BAR' | translate }}
+        </ion-select-option>
+        <ion-select-option value="line">
+          {{ 'STATISTICS.CHART_TYPES.LINE' | translate }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-select
+        interface="popover"
+        [label]="('STATISTICS.PERIOD' | translate) + ':'"
+        [(ngModel)]="period"
+        (ionChange)="loadStatisticAndBuildChart()"
+      >
+        <ion-select-option *ngFor="let period of PeriodsList" [value]="Periods[period]">
+          {{ 'STATISTICS.PERIODS.' + period | translate }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-select
+        interface="popover"
         [label]="('STATISTICS.GRANULARITY' | translate) + ':'"
         [(ngModel)]="granularity"
         (ionChange)="loadStatisticAndBuildChart()"
       >
-        <ion-select-option *ngFor="let g of Granularities | keyvalue" [value]="g.value">
-          {{ 'STATISTICS.GRANULARITIES.' + g.key | translate }}
+        <ion-select-option *ngFor="let g of GranularitiesList" [value]="g">
+          {{ 'STATISTICS.GRANULARITIES.' + g | translate }}
         </ion-select-option>
       </ion-select>
-    </ion-col>
-    <ion-col [size]="12" [sizeSm]="4">
-      <ion-checkbox class="ion-padding-end" [(ngModel)]="groupByCountry" (ionChange)="buildChart()">
-        {{ 'STATISTICS.GROUP_BY_COUNTRY' | translate }}
-      </ion-checkbox>
-    </ion-col>
-  </ion-row>
+    </ion-item>
+    <ion-item>
+      <ion-select
+        interface="popover"
+        [label]="('STATISTICS.GROUP_BY' | translate) + ':'"
+        [(ngModel)]="groupByCountry"
+        (ionChange)="buildChart()"
+      >
+        <ion-select-option [value]="false">
+          {{ 'STATISTICS.GROUP_BYS.NONE' | translate }}
+        </ion-select-option>
+        <ion-select-option [value]="true">
+          {{ 'STATISTICS.GROUP_BYS.COUNTRY' | translate }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
   <div class="chartContainer">
     <canvas id="theChart"></canvas>
   </div>

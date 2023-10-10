@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { addYears, isToday } from 'date-fns/esm';
+import { addDays } from 'date-fns/esm';
 import Chart from 'chart.js/auto';
-import { epochISOString } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
@@ -28,13 +27,21 @@ export class StatisticsButtonComponent {
    */
   @Input() entityId: string = null;
   /**
-   * The starting date for the the statistics data to acquire and display.
+   * The period to consider for the statistics data to acquire and display.
    */
-  @Input() since: epochISOString = addYears(new Date(), -1).toISOString();
+  @Input() period: StatisticPeriods = StatisticPeriods.ONE_YEAR;
   /**
-   * The ending date for the the statistics data to acquire and display.
+   * The granularity of the statistic to display.
    */
-  @Input() to: epochISOString = new Date().toISOString();
+  @Input() granularity: StatisticGranularities = StatisticGranularities.MONTHLY;
+  /**
+   * Whether to group the statistic per ESN country.
+   */
+  @Input() groupByCountry = false;
+  /**
+   * The type of chart to display.
+   */
+  @Input() chartType: 'bar' | 'line' = 'bar';
   /**
    * An optional title to show
    */
@@ -51,8 +58,10 @@ export class StatisticsButtonComponent {
     const componentProps = {
       entityType: this.entityType,
       entityId: this.entityId,
-      since: this.since,
-      to: this.to,
+      period: this.period,
+      granularity: this.granularity,
+      groupByCountry: this.groupByCountry,
+      chartType: this.chartType,
       title: this.title
     };
     const cssClass = 'modalFullScreen';
@@ -69,16 +78,18 @@ export class StatisticsButtonComponent {
 export class StatisticsComponent implements OnInit {
   @Input({ required: true }) entityType: StatisticEntityTypes;
   @Input({ required: true }) entityId: string | null;
-  @Input({ required: true }) since: epochISOString;
-  @Input({ required: true }) to: epochISOString;
+  @Input({ required: true }) period: StatisticPeriods;
+  @Input({ required: true }) granularity: StatisticGranularities;
+  @Input({ required: true }) groupByCountry: boolean;
+  @Input({ required: true }) chartType: 'bar' | 'line';
   @Input({ required: true }) title: string | null;
 
   statistic: Statistic;
 
-  chartType: 'bar' | 'line' = 'bar';
-  groupByCountry = false;
-  granularity = StatisticGranularities.MONTHLY;
+  GranularitiesList = Object.keys(StatisticGranularities);
   Granularities = StatisticGranularities;
+  Periods = StatisticPeriods;
+  PeriodsList = Object.keys(StatisticPeriods).filter(x => isNaN(Number(x)));
 
   chart: Chart;
 
@@ -97,8 +108,8 @@ export class StatisticsComponent implements OnInit {
     try {
       await this.loading.show();
       this.statistic = await this._statistics.getInTimeWindowOfEntity({
-        since: this.since,
-        to: this.to,
+        since: addDays(new Date(), -this.period).toISOString(),
+        to: new Date().toISOString(),
         granularity: this.granularity,
         entityType: this.entityType,
         entityId: this.entityId
@@ -116,7 +127,14 @@ export class StatisticsComponent implements OnInit {
     const datasets: { label: string; data: number[] }[] = [];
 
     const labels = this.statistic.timePoints.map(x =>
-      this.t.formatDate(x, this.granularity === StatisticGranularities.DAILY ? 'd MMM yy' : 'MMM YYYY')
+      this.t.formatDate(
+        x,
+        this.granularity === StatisticGranularities.HOURLY
+          ? `HH':00', d MMM yy`
+          : this.granularity === StatisticGranularities.DAILY
+          ? 'd MMM yy'
+          : 'MMM YYYY'
+      )
     );
 
     if (this.groupByCountry) {
@@ -147,11 +165,23 @@ export class StatisticsComponent implements OnInit {
     });
   }
 
-  isToday(date: string | number | Date): boolean {
-    return isToday(new Date(date));
+  getFirstDateOfStatistic(): Date {
+    return this.statistic.timePoints.length ? new Date(this.statistic.timePoints[0].slice(0, 10)) : null;
   }
 
   close(): void {
     this.modalCtrl.dismiss();
   }
+}
+
+/**
+ * The period choices (in number of days) to gather data for a statistic.
+ */
+export enum StatisticPeriods {
+  THREE_YEARS = 1095,
+  ONE_YEAR = 365,
+  THREE_MONTHS = 92,
+  ONE_MONTH = 31,
+  ONE_WEEK = 7,
+  TODAY = 0
 }

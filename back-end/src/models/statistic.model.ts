@@ -79,6 +79,7 @@ export interface Statistic {
  * The granularities for the statistics.
  */
 export enum StatisticGranularities {
+  MONTHLY = 'MONTHLY',
   DAILY = 'DAILY',
-  MONTHLY = 'MONTHLY'
+  HOURLY = 'HOURLY'
 }

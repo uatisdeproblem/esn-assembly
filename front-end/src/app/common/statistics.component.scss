@@ -22,24 +22,30 @@ ion-row.infoRow {
     }
   }
 }
-ion-row.actionsRow {
-  max-width: 700px;
-  margin: 0 auto;
-  margin-right: 0;
-  padding-bottom: 8px;
-  ion-select,
-  ion-checkbox {
-    font-size: 0.95em;
+
+ion-list.actionsRow {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding: 0 12px;
+  text-align: right;
+  &::-webkit-scrollbar {
+    display: none;
   }
-  ion-select::part(text) {
-    font-weight: 500;
+  > ion-item {
+    display: inline-block;
+    max-width: 300px;
+    font-size: 0.95em;
+    ion-select::part(text) {
+      font-weight: 500;
+    }
   }
 }
 
 .chartContainer {
   width: 100%;
   max-width: 1000px;
-  min-height: 600px;
+  min-height: 550px;
   margin: 0 auto;
   canvas {
     margin: 0 auto;

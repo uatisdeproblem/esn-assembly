@@ -376,13 +376,31 @@
     "VIEWING_STATISTICS": "Viewing statistics",
     "SINCE": "Since",
     "TO": "To",
-    "GROUP_BY_COUNTRY": "Group by country",
+    "CHART_TYPE": "Chart",
+    "CHART_TYPES": {
+      "BAR": "Bar",
+      "LINE": "Line"
+    },
+    "GROUP_BY": "Group by",
+    "GROUP_BYS": {
+      "NONE": "None",
+      "COUNTRY": "ESN country"
+    },
     "TODAY": "Today",
     "GRANULARITY": "Granularity",
     "GRANULARITIES": {
       "HOURLY": "Hourly",
       "DAILY": "Daily",
       "MONTHLY": "Monthly"
+    },
+    "PERIOD": "Period",
+    "PERIODS": {
+      "THREE_YEARS": "Three years",
+      "ONE_YEAR": "One year",
+      "THREE_MONTHS": "Three months",
+      "ONE_MONTH": "One month",
+      "ONE_WEEK": "One week",
+      "TODAY": "Today"
     },
     "ALL_COUNTRIES": "All countries",
     "TOTALS": "Totals"

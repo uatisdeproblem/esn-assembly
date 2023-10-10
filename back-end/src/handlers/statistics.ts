@@ -2,7 +2,18 @@
 /// IMPORTS
 ///
 
-import { addDays, addMonths, endOfDay, endOfMonth, isBefore, startOfDay, startOfMonth } from 'date-fns';
+import {
+  addDays,
+  addHours,
+  addMonths,
+  endOfDay,
+  endOfHour,
+  endOfMonth,
+  isBefore,
+  startOfDay,
+  startOfHour,
+  startOfMonth
+} from 'date-fns';
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
@@ -40,10 +51,6 @@ class StatisticsRC extends ResourceController {
     const pk = StatisticEntry.getPK(this.queryParams.entityType, this.queryParams.entityId);
     const since = StatisticEntry.generateTimestamp(this.queryParams.since, -1);
     const to = StatisticEntry.generateTimestamp(this.queryParams.to, 1);
-    const granularity =
-      this.queryParams.granularity === StatisticGranularities.DAILY
-        ? StatisticGranularities.DAILY
-        : StatisticGranularities.MONTHLY;
 
     const statisticEntries: StatisticEntry[] = await ddb.query({
       TableName: DDB_TABLES.statistics,
@@ -52,6 +59,9 @@ class StatisticsRC extends ResourceController {
     });
     const countries = Array.from(new Set(statisticEntries.map(x => x.country)));
 
+    const granularity = Object.keys(StatisticGranularities).includes(this.queryParams.granularity)
+      ? this.queryParams.granularity
+      : StatisticGranularities.MONTHLY;
     const timePoints = this.buildTimePointsBasedOnGranularity(this.queryParams.since, this.queryParams.to, granularity);
 
     const statistic: Statistic = {
@@ -101,17 +111,22 @@ class StatisticsRC extends ResourceController {
     granularity: StatisticGranularities
   ): string[] {
     const timePoints = [];
-    let currentDate = new Date(sinceDate);
+    let currentTimePoint = new Date(sinceDate);
     const to = new Date(toDate);
-    if (granularity === StatisticGranularities.DAILY) {
-      while (isBefore(startOfDay(currentDate), endOfDay(to))) {
-        timePoints.push(currentDate.toISOString().slice(0, 10));
-        currentDate = addDays(currentDate, 1);
+    if (granularity === StatisticGranularities.HOURLY) {
+      while (isBefore(startOfHour(currentTimePoint), endOfHour(to))) {
+        timePoints.push(currentTimePoint.toISOString().slice(0, 13));
+        currentTimePoint = addHours(currentTimePoint, 1);
+      }
+    } else if (granularity === StatisticGranularities.DAILY) {
+      while (isBefore(startOfDay(currentTimePoint), endOfDay(to))) {
+        timePoints.push(currentTimePoint.toISOString().slice(0, 10));
+        currentTimePoint = addDays(currentTimePoint, 1);
       }
     } else {
-      while (isBefore(startOfMonth(currentDate), endOfMonth(to))) {
-        timePoints.push(currentDate.toISOString().slice(0, 7));
-        currentDate = addMonths(currentDate, 1);
+      while (isBefore(startOfMonth(currentTimePoint), endOfMonth(to))) {
+        timePoints.push(currentTimePoint.toISOString().slice(0, 7));
+        currentTimePoint = addMonths(currentTimePoint, 1);
       }
     }
     return timePoints;
