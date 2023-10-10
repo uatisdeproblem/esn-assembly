@@ -28,11 +28,13 @@
             <app-statistics-button
               slot="start"
               [entityType]="SET.COMMUNICATIONS"
+              [period]="Periods.ONE_MONTH"
+              [granularity]="Granularities.DAILY"
               [title]="'DASHBOARD.STATISTICS_APP_ACCESS' | translate"
             />
             <ion-label
               class="ion-text-wrap"
-              [innerHTML]="'DASHBOARD.STATISTICS_RECAP' | translate: { users: statistic.totals.users, countries: statistic.totals.countries }"
+              [innerHTML]="'DASHBOARD.STATISTICS_RECAP' | translate: { days: Periods.ONE_MONTH, users: statistic.totals.users, countries: statistic.totals.countries }"
             ></ion-label>
           </ion-item>
           <ion-item color="white" lines="none" *ngIf="!statistic">

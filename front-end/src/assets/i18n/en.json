@@ -188,7 +188,7 @@
     "SEE_ALL_DEADLINES": "See all",
     "USEFUL_LINKS": "Useful links",
     "USEFUL_LINKS_I": "Access more information through these sources.",
-    "STATISTICS_RECAP": "In the last week, we had <b>{{users}}</b> visiting users from <b>{{countries}}</b> ESN countries.",
+    "STATISTICS_RECAP": "In the last {{days}} days, we had <b>{{users}}</b> visiting users from <b>{{countries}}</b> ESN countries.",
     "STATISTICS_APP_ACCESS": "App access"
   },
   "COMMUNICATIONS": {

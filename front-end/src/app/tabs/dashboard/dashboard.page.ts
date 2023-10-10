@@ -7,6 +7,7 @@ import { CommunicationDetailComponent } from './communications/communicationDeta
 import { ManageCommunicationComponent } from './communications/manageCommunication.component';
 import { DeadlinesComponent } from './deadlines/deadlines.component';
 import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.component';
+import { StatisticPeriods } from '@app/common/statistics.component';
 
 import { AppService } from '@app/app.service';
 import { CommunicationsService } from './communications/communications.service';
@@ -18,7 +19,7 @@ import { Communication } from '@models/communication.model';
 import { Deadline } from '@models/deadline.model';
 import { UsefulLink } from '@models/usefulLink.model';
 import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
-import { Statistic, StatisticEntityTypes } from '@models/statistic.model';
+import { Statistic, StatisticEntityTypes, StatisticGranularities } from '@models/statistic.model';
 
 /**
  * The number of days to consider a deadline "upcoming"/next.
@@ -45,6 +46,8 @@ export class DashboardPage implements OnInit {
   editMode = false;
 
   SET = StatisticEntityTypes;
+  Granularities = StatisticGranularities;
+  Periods = StatisticPeriods;
   statistic: Statistic;
 
   constructor(
@@ -64,7 +67,8 @@ export class DashboardPage implements OnInit {
       this._usefulLinks.getList()
     ]);
     this.nextDeadlines = this.getNextDeadlines();
-    if (this.app.user.isAdministrator) this.statistic = await this._statistics.recapOfLastNumDays(7);
+    if (this.app.user.isAdministrator)
+      this.statistic = await this._statistics.recapOfLastNumDays(StatisticPeriods.ONE_MONTH);
   }
 
   //
