@@ -1,33 +1,41 @@
-.flexBox {
-  background: var(--ion-color-white-shade);
-}
 .authCard {
-  min-width: 400px;
   max-width: 500px;
   margin: 0 auto;
-  margin-left: 10px;
-  margin-right: 10px;
-  padding: 20px;
-  background-color: var(--ion-color-white);
   border-radius: 10px;
   text-align: center;
   ion-img {
-    width: 150px;
+    width: 120px;
     display: block;
-    margin: 0 auto;
-    margin-bottom: 10px;
+    margin: 10px auto;
   }
-  ion-card-title {
-    font-size: 2em;
-  }
-  ion-card-subtitle {
-    font-size: 1.2em;
+  ion-card-header {
+    padding: 20px 40px;
+    ion-card-title {
+      font-size: 2em;
+    }
+    ion-card-subtitle {
+      font-size: 1.2em;
+    }
   }
   ion-card-content {
-    padding-top: 16px;
+    margin-top: 6px;
+    ion-button {
+      width: 300px;
+      height: 40px;
+      text-transform: none;
+    }
     p.version {
-      margin-top: 30px;
+      margin: 30px;
       font-size: 0.9em;
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .authCard {
+    margin: 10px;
+    ion-img {
+      width: 80px;
     }
   }
 }

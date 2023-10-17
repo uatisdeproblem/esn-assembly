@@ -84,7 +84,7 @@
   "AUTH": {
     "TITLE": "General Assembly app",
     "SUBTITLE": "Erasmus Student Network",
-    "LOGIN_WITH_ESN_ACCOUNTS": "Login with ESN Accounts"
+    "LOGIN_WITH_ESN_ACCOUNTS": "Sign in with ESN Accounts"
   },
   "TABS": {
     "DASHBOARD": "Dashboard",

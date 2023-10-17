@@ -61,14 +61,15 @@ export class DashboardPage implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    [this.communications, this.deadlines, this.usefulLinks] = await Promise.all([
+    [this.communications, this.deadlines, this.usefulLinks, this.statistic] = await Promise.all([
       this._communications.getList(),
       this._deadlines.getList(),
-      this._usefulLinks.getList()
+      this._usefulLinks.getList(),
+      this.app.user.isAdministrator
+        ? this._statistics.recapOfLastNumDays(StatisticPeriods.ONE_MONTH)
+        : Promise.resolve(null)
     ]);
     this.nextDeadlines = this.getNextDeadlines();
-    if (this.app.user.isAdministrator)
-      this.statistic = await this._statistics.recapOfLastNumDays(StatisticPeriods.ONE_MONTH);
   }
 
   //

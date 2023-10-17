@@ -28,7 +28,11 @@ const ESN_STAR_FALLBACK_URL = './assets/icons/icon.svg';
 /**
  * The local URL to the icon.
  */
-const APP_ICON_PATH = 'assets/icons/icon.svg';
+const APP_ICON_PATH = './assets/icons/icon.svg';
+/**
+ * The local URL to the icon.
+ */
+const APP_ICON_WHITE_PATH = './assets/icons/star-white.svg';
 
 @Injectable({ providedIn: 'root' })
 export class AppService {
@@ -194,8 +198,8 @@ export class AppService {
   /**
    * Get the app's main icon.
    */
-  getIcon(): string {
-    return APP_ICON_PATH;
+  getIcon(white = false): string {
+    return white ? APP_ICON_WHITE_PATH : APP_ICON_PATH;
   }
 
   /**
