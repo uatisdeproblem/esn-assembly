@@ -52,7 +52,8 @@ const apiResources: ResourceController[] = [
   { name: 'communications', paths: ['/communications', '/communications/{communicationId}'] },
   { name: 'scheduledOps' },
   { name: 'sesNotifications' },
-  { name: 'statistics', paths: ['/statistics'] }
+  { name: 'statistics', paths: ['/statistics'] },
+  { name: 'userDrafts', paths: ['/drafts', '/drafts/{draftId}'] }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
@@ -141,6 +142,11 @@ const tables: { [tableName: string]: DDBTable } = {
   statistics: {
     PK: { name: 'PK', type: DDB.AttributeType.STRING },
     SK: { name: 'SK', type: DDB.AttributeType.STRING },
+    expiresAtField: 'expiresAt'
+  },
+  usersDrafts: {
+    PK: { name: 'userId', type: DDB.AttributeType.STRING },
+    SK: { name: 'draftId', type: DDB.AttributeType.STRING },
     expiresAtField: 'expiresAt'
   }
 };

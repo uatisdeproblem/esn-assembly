@@ -2,16 +2,18 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { AlertController, PopoverController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
-import { SubjectsReactionsComponent } from 'src/app/common/subjectsReactions.component';
+import { SubjectsReactionsComponent } from '@app/common/subjectsReactions.component';
 
 import { AppService } from '@app/app.service';
 import { QuestionsService } from './questions.service';
 import { AnswersService } from './answers/answers.service';
+import { UserDraftsService } from '../drafts/drafts.service';
 
 import { Question } from '@models/question.model';
 import { Answer } from '@models/answer.model';
 import { Topic } from '@models/topic.model';
 import { Subject } from '@models/subject.model';
+import { UserDraft } from '@models/userDraft.model';
 
 @Component({
   selector: 'app-question',
@@ -40,6 +42,8 @@ export class QuestionComponent implements OnChanges {
   newAnswer: Answer;
   errors = new Set<string>();
 
+  fromDraft: UserDraft;
+
   constructor(
     private alertCtrl: AlertController,
     private popoverCtrl: PopoverController,
@@ -48,14 +52,16 @@ export class QuestionComponent implements OnChanges {
     private t: IDEATranslationsService,
     private _questions: QuestionsService,
     private _answers: AnswersService,
+    private _drafts: UserDraftsService,
     public app: AppService
   ) {}
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     if (changes.question?.currentValue)
-      [this.answers, this.userUpvoted, this.userClapped] = await Promise.all([
+      [this.answers, this.userUpvoted, this.userClapped, this.fromDraft] = await Promise.all([
         this._answers.getListOfQuestion(this.question, { force: true }),
         this._questions.userHasUpvoted(this.topic, this.question),
-        this._questions.userClaps(this.topic, this.question)
+        this._questions.userClaps(this.topic, this.question),
+        this._drafts.getAnswerOfQuestion(this.question)
       ]);
   }
 
@@ -114,7 +120,8 @@ export class QuestionComponent implements OnChanges {
   }
 
   writeAnswer(): void {
-    this.newAnswer = new Answer({ creator: Subject.fromUser(this.app.user) });
+    this.newAnswer = new Answer({ creator: Subject.fromUser(this.app.user), questionId: this.question.questionId });
+    if (this.fromDraft) this.newAnswer.text = this.fromDraft.text;
   }
   async cancelNewAnswer(): Promise<void> {
     if (!this.newAnswer.text) {
@@ -142,6 +149,14 @@ export class QuestionComponent implements OnChanges {
         this.question.numOfAnswers++;
         this.answers.push(answer);
         this.newAnswer = null;
+        try {
+          if (this.fromDraft) {
+            await this._drafts.delete(this.fromDraft);
+            this.fromDraft = null;
+          }
+        } catch (error) {
+          // no problem
+        }
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (err) {
         this.message.error('COMMON.OPERATION_FAILED');
@@ -161,6 +176,46 @@ export class QuestionComponent implements OnChanges {
   }
   hasFieldAnError(field: string): boolean {
     return this.errors.has(field);
+  }
+
+  async saveNewAnswerAsDraft(): Promise<void> {
+    this.errors = new Set(this.newAnswer.validate());
+    if (this.errors.size) return this.message.error('COMMON.FORM_HAS_ERROR_TO_CHECK');
+
+    try {
+      await this.loading.show();
+      this.fromDraft = UserDraft.fromAnswer(this.newAnswer, this.fromDraft);
+      if (this.fromDraft.draftId) this.fromDraft = await this._drafts.update(this.fromDraft);
+      else this.fromDraft = await this._drafts.insert(this.fromDraft);
+      this.newAnswer = null;
+      this.message.success('COMMON.OPERATION_COMPLETED');
+    } catch (err) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      this.loading.hide();
+    }
+  }
+  async deleteDraft(): Promise<void> {
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._drafts.delete(this.fromDraft);
+        this.fromDraft = null;
+      } catch (err) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
   }
 
   getLastAnswer(): Answer {

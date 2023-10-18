@@ -45,6 +45,8 @@ tags:
     description: The communications towards the users
   - name: Statistics
     description: General statistics on the use of the app
+  - name: Drafts
+    description: The drafts of the users for questions and answers
 
 paths:
   /login:
@@ -1542,6 +1544,98 @@ paths:
           $ref: '#/components/responses/Statistics'
         400:
           $ref: '#/components/responses/BadParameters'
+  /drafts:
+    get:
+      summary: Get your drafts
+      tags: [Drafts]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: query
+          description: Topic ID (to retrieve drafts of questions)
+          schema:
+            type: string
+        - name: questionId
+          in: query
+          description: Question ID (to retrieve drafts of answers)
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Drafts'
+    post:
+      summary: Save a new draft
+      tags: [Drafts]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Draft'
+      responses:
+        200:
+          $ref: '#/components/responses/Draft'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /drafts/{draftId}:
+    get:
+      summary: Get a draft of yours
+      tags: [Drafts]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: draftId
+          in: path
+          description: Draft ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Draft'
+    put:
+      summary: Edit one of your drafts
+      tags: [Drafts]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: draftId
+          in: path
+          description: Draft ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Draft'
+      responses:
+        200:
+          $ref: '#/components/responses/Draft'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete one of your drafts
+      tags: [Drafts]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: draftId
+          in: path
+          description: Draft ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -1579,6 +1673,9 @@ components:
       type: object
       additionalProperties: {}
     Statistic:
+      type: object
+      additionalProperties: {}
+    Draft:
       type: object
       additionalProperties: {}
 
@@ -1755,6 +1852,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Statistic'
+    Draft:
+      description: A draft for a question or answer
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Draft'
+    Drafts:
+      description: The drafts of a user
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Draft'
     BadParameters:
       description: Bad input parameters
       content:

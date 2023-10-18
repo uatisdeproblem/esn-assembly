@@ -85,41 +85,67 @@
             </ion-list>
           </ion-card-content>
         </ion-card>
-        <ion-list class="aList" *ngIf="topic && !newQuestion">
-          <ion-list-header>
-            <ion-label>
-              <h2>
-                {{ 'TOPICS.QUESTIONS' | translate }}
-                <ion-text *ngIf="questions?.length">({{ questions.length }})</ion-text>
-              </h2>
-            </ion-label>
-            <ion-button size="small" color="medium" (click)="filterQuestions(searchbar?.value, null, true)">
-              <ion-icon name="refresh" slot="icon-only"></ion-icon>
-            </ion-button>
-            <ion-button
-              fill="solid"
-              size="small"
-              *ngIf="!topic.closedAt && topic.canUserAskQuestions(app.user)"
-              (click)="startNewQuestion()"
-            >
-              {{ 'TOPICS.MAKE_A_QUESTION' | translate }}
-            </ion-button>
-          </ion-list-header>
-          <ion-searchbar #searchbar (ionInput)="filterQuestions($event.target.value)"></ion-searchbar>
-          <ion-item lines="full" class="ion-text-center noElements" *ngIf="questions && !questions.length">
-            <ion-label>{{ 'TOPICS.NO_QUESTIONS_ASKED_YET' | translate }}</ion-label>
-          </ion-item>
-          <app-question-summary *ngIf="!questions"></app-question-summary>
-          <app-question-summary
-            *ngFor="let question of questions"
-            [question]="question"
-            [current]="currentQuestion === question"
-            (select)="selectQuestion(question)"
-          ></app-question-summary>
-          <ion-infinite-scroll (ionInfinite)="filterQuestions(searchbar.value, $event.target)">
-            <ion-infinite-scroll-content></ion-infinite-scroll-content>
-          </ion-infinite-scroll>
-        </ion-list>
+        <ng-container *ngIf="topic && !newQuestion">
+          <ion-list class="aList" *ngIf="drafts?.length">
+            <ion-list-header>
+              <ion-label>
+                <h2>{{ 'DRAFTS.YOUR_DRAFTS' | translate }}</h2>
+              </ion-label>
+            </ion-list-header>
+            <ion-item *ngFor="let draft of drafts">
+              <ion-label>
+                <i>{{ draft.summary }}</i>
+              </ion-label>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="danger"
+                [title]="'DRAFTS.DELETE_DRAFT' | translate"
+                (click)="deleteDraft(draft)"
+              >
+                <ion-icon icon="trash" slot="icon-only" size="small"></ion-icon>
+              </ion-button>
+              <ion-button slot="end" fill="clear" (click)="startNewQuestion(draft)">
+                {{ 'DRAFTS.RESUME' | translate }}
+              </ion-button>
+            </ion-item>
+          </ion-list>
+          <ion-list class="aList">
+            <ion-list-header>
+              <ion-label>
+                <h2>
+                  {{ 'TOPICS.QUESTIONS' | translate }}
+                  <ion-text *ngIf="questions?.length">({{ questions.length }})</ion-text>
+                </h2>
+              </ion-label>
+              <ion-button size="small" color="medium" (click)="filterQuestions(searchbar?.value, null, true)">
+                <ion-icon name="refresh" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button
+                fill="solid"
+                size="small"
+                *ngIf="!topic.closedAt && topic.canUserAskQuestions(app.user)"
+                (click)="startNewQuestion()"
+              >
+                {{ 'TOPICS.MAKE_A_QUESTION' | translate }}
+              </ion-button>
+            </ion-list-header>
+            <ion-searchbar #searchbar (ionInput)="filterQuestions($event.target.value)"></ion-searchbar>
+            <ion-item lines="full" class="ion-text-center noElements" *ngIf="questions && !questions.length">
+              <ion-label>{{ 'TOPICS.NO_QUESTIONS_ASKED_YET' | translate }}</ion-label>
+            </ion-item>
+            <app-question-summary *ngIf="!questions"></app-question-summary>
+            <app-question-summary
+              *ngFor="let question of questions"
+              [question]="question"
+              [current]="currentQuestion === question"
+              (select)="selectQuestion(question)"
+            ></app-question-summary>
+            <ion-infinite-scroll (ionInfinite)="filterQuestions(searchbar.value, $event.target)">
+              <ion-infinite-scroll-content></ion-infinite-scroll-content>
+            </ion-infinite-scroll>
+          </ion-list>
+        </ng-container>
       </ion-col>
       <ion-col [size]="12" [sizeLg]="6" *ngIf="currentQuestion">
         <p *ngIf="!app.isInMobileMode()">
@@ -161,6 +187,9 @@
               </ion-button>
             </ion-col>
             <ion-col class="ion-text-right">
+              <ion-button fill="clear" (click)="saveNewQuestionAsDraft()">
+                {{ 'DRAFTS.SAVE_AS_DRAFT' | translate }}
+              </ion-button>
               <ion-button (click)="sendNewQuestion()">
                 {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
               </ion-button>

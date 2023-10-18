@@ -167,7 +167,7 @@
     "SUMMARY_PLACEHOLDER": "e.g. Budget - Accomodation",
     "CONTENT_I": "Ask your question",
     "CONTENT_II": "You can add here below your full question.",
-    "YOU_WILL_LOSE_THE_CONTENT": "You will lose all the content you wrote.",
+    "YOU_WILL_LOSE_THE_CONTENT": "You will lose all the content you didn't save.",
     "IS_YOUR_QUESTION_READY": "Is your question ready?",
     "NO_ANSWERS_YET": "No answers yet.",
     "DELETE_QUESTION": "Delete question",
@@ -404,5 +404,12 @@
     },
     "ALL_COUNTRIES": "All countries",
     "TOTALS": "Totals"
+  },
+  "DRAFTS": {
+    "SAVE_AS_DRAFT": "Save as draft",
+    "YOUR_DRAFTS": "Your drafts",
+    "RESUME": "Resume",
+    "RESUME_DRAFT": "Resume draft",
+    "DELETE_DRAFT": "Delete draft"
   }
 }

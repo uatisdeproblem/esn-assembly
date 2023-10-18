@@ -60,14 +60,19 @@
         <ion-label>{{ 'QUESTIONS.NO_ANSWERS_YET' | translate }}</ion-label>
       </ion-item>
 
-      <ion-button
-        expand="block"
-        class="ion-margin-top"
-        *ngIf="topic.canUserAnswerQuestions(app.user) && !newAnswer"
-        (click)="writeAnswer()"
-      >
-        {{ 'QUESTIONS.ANSWER' | translate }} <ion-icon name="pencil" slot="end"></ion-icon>
-      </ion-button>
+      <ion-row class="ion-margin-top" *ngIf="topic.canUserAnswerQuestions(app.user) && !newAnswer">
+        <ion-col *ngIf="fromDraft">
+          <ion-button expand="block" fill="clear" color="danger" (click)="deleteDraft()">
+            <ion-icon icon="trash" slot="start"></ion-icon> {{ 'DRAFTS.DELETE_DRAFT' | translate }}
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button expand="block" (click)="writeAnswer()">
+            {{ (fromDraft ? 'DRAFTS.RESUME_DRAFT' : 'QUESTIONS.ANSWER') | translate }}
+            <ion-icon [icon]="fromDraft ? 'create' : 'pencil'" slot="end"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
       <ng-container *ngIf="newAnswer">
         <app-html-editor [(content)]="newAnswer.text" [editMode]="true"></app-html-editor>
         <ion-row class="ion-margin">
@@ -77,6 +82,9 @@
             </ion-button>
           </ion-col>
           <ion-col class="ion-text-right">
+            <ion-button fill="clear" (click)="saveNewAnswerAsDraft()">
+              {{ 'DRAFTS.SAVE_AS_DRAFT' | translate }}
+            </ion-button>
             <ion-button (click)="sendNewAnswer()">
               {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
             </ion-button>

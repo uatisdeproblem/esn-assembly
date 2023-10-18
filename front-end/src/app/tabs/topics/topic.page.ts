@@ -7,11 +7,13 @@ import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
 import { AttachmentsService } from 'src/app/common/attachments.service';
 import { QuestionsService } from './questions/questions.service';
+import { UserDraftsService } from './drafts/drafts.service';
 
 import { Topic } from '@models/topic.model';
 import { Question } from '@models/question.model';
 import { Subject } from '@models/subject.model';
 import { dateStringIsPast, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
+import { UserDraft } from '@models/userDraft.model';
 
 @Component({
   selector: 'topic',
@@ -35,6 +37,9 @@ export class TopicPage {
 
   relatedTopics: Topic[];
 
+  drafts: UserDraft[];
+  fromDraft: UserDraft;
+
   constructor(
     private alertCtrl: AlertController,
     private loading: IDEALoadingService,
@@ -43,6 +48,7 @@ export class TopicPage {
     private _topics: TopicsService,
     private _attachments: AttachmentsService,
     private _questions: QuestionsService,
+    private _drafts: UserDraftsService,
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
@@ -57,11 +63,15 @@ export class TopicPage {
   }
   private async loadResources(): Promise<void> {
     this.topic = await this._topics.getById(this.topicId);
-    await this.filterQuestions(this.searchbar?.value, null, true);
-    this.relatedTopics = await this._topics.getRelated(this.topic);
+    [, this.relatedTopics, this.drafts] = await Promise.all([
+      this.filterQuestions(this.searchbar?.value, null, true),
+      this._topics.getRelated(this.topic),
+      this._drafts.getQuestionsOfTopic(this.topic)
+    ]);
   }
   async handleRefresh(refresh: IonRefresher): Promise<void> {
     this.questions = null;
+    this.drafts = null;
     await this.loadResources();
     refresh.complete();
   }
@@ -106,25 +116,33 @@ export class TopicPage {
     if (scrollToNextPage) setTimeout((): Promise<void> => scrollToNextPage.complete(), 100);
   }
 
-  startNewQuestion(): void {
+  startNewQuestion(draft?: UserDraft): void {
     this.selectQuestion(null);
-    this.newQuestion = new Question({ creator: Subject.fromUser(this.app.user) });
+    this.newQuestion = new Question({ creator: Subject.fromUser(this.app.user), topicId: this.topic.topicId });
+    this.fromDraft = null;
+    if (draft) {
+      this.fromDraft = draft;
+      this.newQuestion.summary = draft.summary;
+      this.newQuestion.text = draft.text;
+    }
     setTimeout((): void => {
       const newQuestionElement = document.getElementById('newQuestion');
       if (newQuestionElement) this.content.scrollToPoint(0, newQuestionElement.getBoundingClientRect().top - 100, 500);
     }, 100);
   }
   async cancelNewQuestion(): Promise<void> {
-    if (!this.newQuestion.summary && !this.newQuestion.text) {
+    const doCancel = (): void => {
       this.newQuestion = null;
-      return;
-    }
+      this.fromDraft = null;
+    };
+
+    if (!this.newQuestion.summary && !this.newQuestion.text) return doCancel();
 
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const message = this.t._('QUESTIONS.YOU_WILL_LOSE_THE_CONTENT');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: (): void => (this.newQuestion = null) }
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doCancel }
     ];
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
@@ -139,6 +157,15 @@ export class TopicPage {
         await this._questions.insert(this.topic, this.newQuestion);
         await this.filterQuestions(this.searchbar?.value, null, true);
         this.newQuestion = null;
+        try {
+          if (this.fromDraft) {
+            await this._drafts.delete(this.fromDraft);
+            this.drafts.splice(this.drafts.indexOf(this.fromDraft), 1);
+            this.fromDraft = null;
+          }
+        } catch (error) {
+          // no problem
+        }
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (err) {
         this.message.error('COMMON.OPERATION_FAILED');
@@ -158,6 +185,50 @@ export class TopicPage {
   }
   hasFieldAnError(field: string): boolean {
     return this.errors.has(field);
+  }
+
+  async saveNewQuestionAsDraft(): Promise<void> {
+    this.errors = new Set(this.newQuestion.validate());
+    if (this.errors.size) return this.message.error('COMMON.FORM_HAS_ERROR_TO_CHECK');
+
+    try {
+      await this.loading.show();
+      this.fromDraft = UserDraft.fromQuestion(this.newQuestion, this.fromDraft);
+      if (this.fromDraft.draftId) await this._drafts.update(this.fromDraft);
+      else {
+        const newDraft = await this._drafts.insert(this.fromDraft);
+        this.drafts.push(newDraft);
+      }
+      this.newQuestion = null;
+      this.fromDraft = null;
+      this.message.success('COMMON.OPERATION_COMPLETED');
+    } catch (err) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      this.loading.hide();
+    }
+  }
+  async deleteDraft(draft: UserDraft): Promise<void> {
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._drafts.delete(draft);
+        this.drafts.splice(this.drafts.indexOf(draft), 1);
+      } catch (err) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
   }
 
   openTopic(topic: Topic): void {
