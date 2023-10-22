@@ -165,8 +165,8 @@
         [sizeLg]="fullScreen ? 12 : 6"
         [style.background-color]="app.isInMobileMode() ? 'var(--ion-color-light)' : 'none'"
       >
-        <ion-toolbar [color]="app.isInMobileMode() ? 'light' : 'transparent'">
-          <ion-segment *ngIf="!fullScreen" [(ngModel)]="segment">
+        <ion-toolbar *ngIf="!fullScreen" [color]="app.isInMobileMode() ? 'light' : 'transparent'">
+          <ion-segment [(ngModel)]="segment">
             <ion-segment-button [value]="MessageTypes.QUESTION">
               <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
             </ion-segment-button>
@@ -226,9 +226,12 @@
                 *ngFor="let appreciation of appreciations"
                 [class.author]="appreciation.creator?.id === app.user.userId"
               >
-                <ion-card-header *ngIf="appreciation.creator">
-                  <ion-card-title>
+                <ion-card-header>
+                  <ion-card-title *ngIf="appreciation.creator">
                     <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
+                  </ion-card-title>
+                  <ion-card-title *ngIf="!appreciation.creator">
+                    <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
                   </ion-card-title>
                 </ion-card-header>
                 <ion-card-content>{{ appreciation.text }}</ion-card-content>
