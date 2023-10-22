@@ -1,6 +1,6 @@
 <ion-header class="ion-no-border">
   <app-edit-mode-buttons
-    [title]="'TOPICS.MANAGE_TOPIC' | translate"
+    [title]="getTitle()"
     [editMode]="!!editMode"
     (enter)="enterEditMode()"
     (exit)="exitEditMode()"
@@ -52,51 +52,92 @@
       [hideClearButton]="true"
       [class.fieldHasError]="hasFieldAnError('publishedSince')"
     ></idea-date-time>
-
-    <ion-list-header>
-      <ion-label>
-        <h2>{{ 'TOPICS.DEADLINES' | translate }}</h2>
-        <p>{{ 'TOPICS.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
-      </ion-label>
-    </ion-list-header>
-    <ion-item>
-      <ion-checkbox
-        slot="start"
-        [(ngModel)]="hasDeadlineForQuestions"
+    <ng-container *ngIf="topic.type === TopicTypes.LIVE">
+      <ion-list-header>
+        <ion-label class="ion-text-wrap">
+          <p>{{ 'TOPICS.SHOULD_BE_LIVE_ON_I' | translate }}</p>
+          <p>{{ 'TOPICS.SHOULD_BE_LIVE_ON_II' | translate }}</p>
+        </ion-label>
+      </ion-list-header>
+      <idea-date-time
+        [(date)]="topic.shouldBeLiveAt"
+        [useISOFormat]="true"
+        [manualTimePicker]="true"
+        [label]="'TOPICS.SHOULD_BE_LIVE_ON' | translate"
         [disabled]="!editMode"
-        (ionChange)="shouldResetDeadlineForQuestions()"
-      ></ion-checkbox>
-      <ion-label>{{ 'TOPICS.SET_DEADLINE_QUESTIONS' | translate }}</ion-label>
-    </ion-item>
-    <idea-date-time
-      *ngIf="hasDeadlineForQuestions"
-      [(date)]="topic.willCloseAt"
-      [useISOFormat]="true"
-      [manualTimePicker]="true"
-      [label]="'TOPICS.DEADLINE_QUESTIONS' | translate"
-      [disabled]="!editMode"
-      [hideClearButton]="true"
-      [class.fieldHasError]="hasFieldAnError('willCloseAt')"
-    ></idea-date-time>
-    <ion-item>
-      <ion-checkbox
-        slot="start"
-        [(ngModel)]="hasDeadlineForAnswers"
+        [hideClearButton]="true"
+        [class.fieldHasError]="hasFieldAnError('shouldBeLiveAt')"
+      ></idea-date-time>
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'TOPICS.LIVE_OPTIONS' | translate }}</h2>
+          <p>{{ 'TOPICS.LIVE_OPTIONS_I' | translate }}</p>
+        </ion-label>
+      </ion-list-header>
+      <ion-item>
+        <ion-select
+          interface="popover"
+          [label]="'TOPICS.MESSAGES_AUTHENTICATION' | translate"
+          [(ngModel)]="topic.messagesAuth"
+          [disabled]="!editMode"
+          [class.fieldHasError]="hasFieldAnError('messagesAuth')"
+        >
+          <ion-select-option *ngFor="let config of LiveTopicAuthentications | keyvalue" [value]="config.value">
+            {{ ('TOPICS.MESSAGES_AUTHENTICATIONS.'+ config.key) | translate }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-checkbox slot="end" [(ngModel)]="topic.appreciations" [disabled]="!editMode"></ion-checkbox>
+        <ion-label>{{ 'TOPICS.ENABLE_APPRECIATIONS' | translate }}</ion-label>
+      </ion-item>
+    </ng-container>
+    <ng-container *ngIf="topic.type === TopicTypes.STANDARD">
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'TOPICS.DEADLINES' | translate }}</h2>
+          <p>{{ 'TOPICS.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+        </ion-label>
+      </ion-list-header>
+      <ion-item>
+        <ion-checkbox
+          slot="start"
+          [(ngModel)]="hasDeadlineForQuestions"
+          [disabled]="!editMode"
+          (ionChange)="shouldResetDeadlineForQuestions()"
+        ></ion-checkbox>
+        <ion-label>{{ 'TOPICS.SET_DEADLINE_QUESTIONS' | translate }}</ion-label>
+      </ion-item>
+      <idea-date-time
+        *ngIf="hasDeadlineForQuestions"
+        [(date)]="topic.willCloseAt"
+        [useISOFormat]="true"
+        [manualTimePicker]="true"
+        [label]="'TOPICS.DEADLINE_QUESTIONS' | translate"
         [disabled]="!editMode"
-        (ionChange)="shouldResetDeadlineForAnswers()"
-      ></ion-checkbox>
-      <ion-label>{{ 'TOPICS.SET_DEADLINE_ANSWERS' | translate }}</ion-label>
-    </ion-item>
-    <idea-date-time
-      *ngIf="hasDeadlineForAnswers"
-      [(date)]="topic.acceptAnswersUntil"
-      [useISOFormat]="true"
-      [manualTimePicker]="true"
-      [label]="'TOPICS.DEADLINE_ANSWERS' | translate"
-      [disabled]="!editMode"
-      [hideClearButton]="true"
-      [class.fieldHasError]="hasFieldAnError('acceptAnswersUntil')"
-    ></idea-date-time>
+        [hideClearButton]="true"
+        [class.fieldHasError]="hasFieldAnError('willCloseAt')"
+      ></idea-date-time>
+      <ion-item>
+        <ion-checkbox
+          slot="start"
+          [(ngModel)]="hasDeadlineForAnswers"
+          [disabled]="!editMode"
+          (ionChange)="shouldResetDeadlineForAnswers()"
+        ></ion-checkbox>
+        <ion-label>{{ 'TOPICS.SET_DEADLINE_ANSWERS' | translate }}</ion-label>
+      </ion-item>
+      <idea-date-time
+        *ngIf="hasDeadlineForAnswers"
+        [(date)]="topic.acceptAnswersUntil"
+        [useISOFormat]="true"
+        [manualTimePicker]="true"
+        [label]="'TOPICS.DEADLINE_ANSWERS' | translate"
+        [disabled]="!editMode"
+        [hideClearButton]="true"
+        [class.fieldHasError]="hasFieldAnError('acceptAnswersUntil')"
+      ></idea-date-time>
+    </ng-container>
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.CONTENT' | translate }}</h2></ion-label>
     </ion-list-header>
@@ -111,6 +152,9 @@
 
     <ion-list-header [class.fieldHasError]="hasFieldAnError('subjects')">
       <ion-label><h2>{{ 'TOPICS.SUBJECTS' | translate }}</h2></ion-label>
+      <ion-button *ngIf="!topic.subjects.length" (click)="addFirstSubjectWithUserData()">
+        {{ 'TOPICS.FILL_WITH_ME' | translate }}
+      </ion-button>
     </ion-list-header>
     <ion-grid class="ion-no-padding">
       <ion-row
@@ -217,6 +261,7 @@
       [label]="'TOPICS.RELATED_TOPICS' | translate"
       [noneText]="'TOPICS.NO_RELATED_TOPICS' | translate"
       [disabled]="!editMode || !relatedTopicsChecks"
+      [showCategoriesFilters]="true"
     ></idea-checker>
     <idea-checker
       [data]="rolesAbleToInteractChecks"

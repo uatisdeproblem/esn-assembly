@@ -162,7 +162,20 @@
     "PUBLISH_ON": "Publish on",
     "CLOSE_TOPIC": "Close topic",
     "REOPEN_TOPIC": "Reopen topic",
-    "CHOOSE_TYPE": "Choose a type"
+    "CHOOSE_TYPE": "Choose a type",
+    "LIVE_OPTIONS": "Options for live Q&A",
+    "LIVE_OPTIONS_I": "Choose your messaging preferences for the topic",
+    "SHOULD_BE_LIVE_ON": "It should be live on",
+    "SHOULD_BE_LIVE_ON_I": "Based on the agenda, choose the forecasted date and time for the topic to go live.",
+    "SHOULD_BE_LIVE_ON_II": "Note: this setting doesn't automatically open the topic.",
+    "MESSAGES_AUTHENTICATION": "Authentication",
+    "MESSAGES_AUTHENTICATIONS": {
+      "SIGNED": "Signed",
+      "ANONYMOUS": "Anonymous",
+      "USER_CHOICE": "User can choose"
+    },
+    "ENABLE_APPRECIATIONS": "Enable appreciations",
+    "FILL_WITH_ME": "Fill with my user"
   },
   "QUESTIONS": {
     "BY": "By",

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { AlertController } from '@ionic/angular';
 import { Check } from 'idea-toolbox';
@@ -8,7 +8,7 @@ import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
 import { MediaService } from '@app/common/media.service';
 
-import { Topic } from '@models/topic.model';
+import { LiveTopicAuthentications, Topic, TopicTypes } from '@models/topic.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { UserRoles } from '@models/user.model';
 import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
@@ -18,8 +18,8 @@ import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.
   templateUrl: 'manageTopic.page.html',
   styleUrls: ['manageTopic.page.scss']
 })
-export class ManageTopicPage implements OnInit {
-  @Input() topicId = 'new';
+export class ManageTopicPage {
+  @Input() topicId = 'new-standard';
   topic: Topic;
 
   editMode = UXMode.VIEW;
@@ -31,6 +31,8 @@ export class ManageTopicPage implements OnInit {
   hasDeadlineForAnswers = false;
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
+  TopicTypes = TopicTypes;
+  LiveTopicAuthentications = LiveTopicAuthentications;
   SubjectTypes = SubjectTypes;
 
   activeTopics: Topic[];
@@ -52,19 +54,19 @@ export class ManageTopicPage implements OnInit {
     private _media: MediaService,
     public app: AppService
   ) {}
-  async ngOnInit(): Promise<void> {
+  async ionViewWillEnter(): Promise<void> {
     if (!this.app.user.isAdministrator) return this.app.closePage('COMMON.UNAUTHORIZED');
 
-    this.activeTopics = await this._topics.getActiveList();
-
-    this.rolesAbleToInteractChecks = Object.entries(UserRoles).map(
-      role => new Check({ value: role[0], name: this.t._('USER_ROLES.'.concat(role[1])) })
-    );
-  }
-  async ionViewWillEnter(): Promise<void> {
     try {
       await this.loading.show();
-      if (this.topicId !== 'new') {
+
+      this.activeTopics = await this._topics.getActiveList();
+
+      this.rolesAbleToInteractChecks = Object.entries(UserRoles).map(
+        role => new Check({ value: role[0], name: this.t._('USER_ROLES.'.concat(role[1])) })
+      );
+
+      if (this.topicId !== 'new-standard' && this.topicId !== 'new-live') {
         this.topic = await this._topics.getById(this.topicId);
         this.setUIHelpersForComplexFields();
         this.relatedTopics = await this._topics.getRelated(this.topic);
@@ -75,7 +77,8 @@ export class ManageTopicPage implements OnInit {
               new Check({
                 value: x.topicId,
                 name: x.name,
-                checked: this.relatedTopics.some(y => x.topicId === y.topicId)
+                checked: this.relatedTopics.some(y => x.topicId === y.topicId),
+                category1: x.type
               })
           );
         this.rolesAbleToInteractChecks.forEach(
@@ -83,9 +86,14 @@ export class ManageTopicPage implements OnInit {
         );
         this.editMode = UXMode.VIEW;
       } else {
-        this.topic = new Topic();
+        this.topic = new Topic({
+          type: this.topicId === 'new-live' ? TopicTypes.LIVE : TopicTypes.STANDARD
+        });
+        if (this.topicId === 'new-live') this.topic.closedAt = new Date().toISOString();
         this.relatedTopics = [];
-        this.relatedTopicsChecks = this.activeTopics.map(x => new Check({ value: x.topicId, name: x.name }));
+        this.relatedTopicsChecks = this.activeTopics.map(
+          x => new Check({ value: x.topicId, name: x.name, category1: x.type })
+        );
         this.editMode = UXMode.INSERT;
       }
     } catch (error) {
@@ -113,6 +121,10 @@ export class ManageTopicPage implements OnInit {
   removeSubject(subject: Subject): void {
     this.topic.subjects.splice(this.topic.subjects.indexOf(subject), 1);
   }
+  addFirstSubjectWithUserData(): void {
+    if (this.topic.subjects.length) return;
+    this.topic.subjects.push(Subject.fromUser(this.app.user));
+  }
 
   setRolesAbleToInteractFromChecks(): void {
     if (this.rolesAbleToInteractChecks.every(x => x.checked)) this.topic.rolesAbleToInteract = [];
@@ -132,7 +144,12 @@ export class ManageTopicPage implements OnInit {
       if (this.editMode === UXMode.INSERT) result = await this._topics.insert(this.topic);
       else result = await this._topics.update(this.topic);
       this.topic.load(result);
-      this.location.replaceState(this.location.path().replace('/new', '/'.concat(this.topic.topicId)));
+      this.location.replaceState(
+        this.location
+          .path()
+          .replace('/new-standard', '/'.concat(this.topic.topicId))
+          .replace('/new-live', '/'.concat(this.topic.topicId))
+      );
       await this.handleChangesInRelated();
       this.editMode = UXMode.VIEW;
       this.message.success('COMMON.OPERATION_COMPLETED');
@@ -278,6 +295,12 @@ export class ManageTopicPage implements OnInit {
       if (target) target.value = '';
       this.loading.hide();
     }
+  }
+
+  getTitle(): string {
+    const str = this.t._('TOPICS.MANAGE_TOPIC');
+    if (this.topic?.type) return `${str} (${this.t._('TOPICS.TYPES.'.concat(this.topic.type)).toLowerCase()})`;
+    else return str;
   }
 }
 

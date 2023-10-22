@@ -86,12 +86,12 @@ export class TopicsPage implements OnInit {
       {
         text: this.t._('TOPICS.TYPES.STANDARD'),
         icon: 'chatbubbles',
-        handler: (): void => this.app.goToInTabs(['topics', 'new', 'manage'])
+        handler: (): void => this.app.goToInTabs(['topics', 'new-standard', 'manage'])
       },
       {
         text: this.t._('TOPICS.TYPES.LIVE'),
         icon: 'pulse',
-        handler: (): void => this.app.goToInTabs(['topics', 'new', 'manage']) // @todo
+        handler: (): void => this.app.goToInTabs(['topics', 'new-live', 'manage'])
       },
       { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
     ];
