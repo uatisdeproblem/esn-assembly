@@ -95,17 +95,22 @@
   "TOPICS": {
     "TOPIC": "Topic",
     "QUESTIONS": "Questions",
-    "TO_READ": "To read",
     "NAME": "Name",
     "CONTENT": "Content",
     "CATEGORY": "Category",
     "EVENT": "Event",
     "SUBJECTS": "Subjects",
-    "NUM_OF_QUESTIONS": "Questions",
+    "ACTIVITY": "Activity",
+    "LIVE_NOW": "Live now",
+    "LIVE_ON": "Live on",
     "STATUS": "Status",
     "STATUSES": {
       "OPEN": "Open",
       "CLOSED": "Closed"
+    },
+    "TYPES": {
+      "STANDARD": "Standard",
+      "LIVE": "Live"
     },
     "CREATED_AT": "Created",
     "UPDATED_AT": "Updated",
@@ -115,14 +120,15 @@
     "MANAGE_TOPIC": "Manage topic",
     "SORT_BY": "Sort by",
     "SORT_BY_OPTIONS": {
-      "CREATED_DATE_ASC": "Creation date ⬆",
-      "CREATED_DATE_DESC": "Creation date ⬇",
-      "NUM_OF_QUESTIONS_ASC": "# of questions ⬆",
-      "NUM_OF_QUESTIONS_DESC": "# of questions ⬇"
+      "CREATED_DATE_ASC": "Creation ⬆",
+      "CREATED_DATE_DESC": "Creation ⬇",
+      "ACTIVITY_ASC": "Activity ⬆",
+      "ACTIVITY_DESC": "Activity ⬇"
     },
     "ALL_CATEGORIES": "All categories",
     "ALL_EVENTS": "All events",
     "ALL_STATUSES": "All statuses",
+    "ALL_TYPES": "All types",
     "FILTER_ACTIVE_TOPICS": "Filter active topics",
     "ATTACHMENTS": "Attachments",
     "ATTRIBUTES": "Attributes",
@@ -155,7 +161,8 @@
     },
     "PUBLISH_ON": "Publish on",
     "CLOSE_TOPIC": "Close topic",
-    "REOPEN_TOPIC": "Reopen topic"
+    "REOPEN_TOPIC": "Reopen topic",
+    "CHOOSE_TYPE": "Choose a type"
   },
   "QUESTIONS": {
     "BY": "By",
@@ -259,7 +266,7 @@
     "CANT_DELETE_IF_USED_WARNING": "The deletion will fail in case the event is used in any topic. In that case, prefer the archive action instead.",
     "CANT_DELETE_IF_USED_ERROR": "You can't delete an event if it's used in at least a topic.",
     "DOWNLOAD_SUMMARY_SPREADSHEET": "Summary spreadsheet",
-    "DOWNLOAD_SUMMARY_SPREADSHEET_I": "You can download a spreadsheet containing questions and answers of this event's topics."
+    "DOWNLOAD_SUMMARY_SPREADSHEET_I": "You can download a spreadsheet containing questions and answers of this event's standard topics; note: live topics are not included."
   },
   "ATTACHMENTS": {
     "ERROR_UPLOADING_ATTACHMENT": "Error while uploading the attachment",

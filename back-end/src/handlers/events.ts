@@ -8,7 +8,7 @@ import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
 
 import { GAEvent } from '../models/event.model';
-import { Topic, TopicQuestionsExportable } from '../models/topic.model';
+import { Topic, StandardTopicQuestionsExportable, TopicTypes } from '../models/topic.model';
 import { User } from '../models/user.model';
 import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
@@ -92,9 +92,10 @@ class GAEvents extends ResourceController {
     const questions: Question[] = await ddb.scan({ TableName: DDB_TABLES.questions });
     const answers: Answer[] = await ddb.scan({ TableName: DDB_TABLES.answers });
 
-    const topicsExportable: TopicQuestionsExportable[] = [];
+    const topicsExportable: StandardTopicQuestionsExportable[] = [];
     topics
       .map(t => new Topic(t))
+      .filter(t => t.type === TopicTypes.STANDARD)
       .filter(t => t.event.eventId === this.gaEvent.eventId)
       .filter(t => !t.isDraft())
       .sort((a, b): number => b.createdAt.localeCompare(a.createdAt))

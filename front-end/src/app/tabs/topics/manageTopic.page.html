@@ -219,12 +219,12 @@
       [disabled]="!editMode || !relatedTopicsChecks"
     ></idea-checker>
     <idea-checker
-      [data]="rolesAbleToAskQuestionsChecks"
+      [data]="rolesAbleToInteractChecks"
       [label]="'TOPICS.ROLES_ALLOWED_TO_MAKE_QUESTIONS' | translate"
       [allText]="'TOPICS.NO_ROLES_RESTRICTIONS' | translate"
       [noneEqualsAll]="true"
       [disabled]="!editMode"
-      (change)="setRolesAbleToAskQuestionsFromChecks()"
+      (change)="setRolesAbleToInteractFromChecks()"
     ></idea-checker>
 
     <p class="ion-text-center" *ngIf="!editMode && !topic.isArchived()">

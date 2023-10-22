@@ -109,7 +109,7 @@ class Answers extends ResourceController {
   }
 
   protected async postResources(): Promise<Answer> {
-    if (!this.topic.canUserAnswerQuestions(this.galaxyUser)) throw new Error('Not allowed to answer');
+    if (!this.topic.canUserAnswerStandardQuestions(this.galaxyUser)) throw new Error('Not allowed to answer');
 
     this.answer = new Answer(this.body);
     this.answer.questionId = this.question.questionId;

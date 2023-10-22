@@ -124,7 +124,7 @@
               <ion-button
                 fill="solid"
                 size="small"
-                *ngIf="!topic.closedAt && topic.canUserAskQuestions(app.user)"
+                *ngIf="!topic.closedAt && topic.canUserInteract(app.user)"
                 (click)="startNewQuestion()"
               >
                 {{ 'TOPICS.MAKE_A_QUESTION' | translate }}

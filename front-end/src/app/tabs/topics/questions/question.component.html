@@ -60,7 +60,7 @@
         <ion-label>{{ 'QUESTIONS.NO_ANSWERS_YET' | translate }}</ion-label>
       </ion-item>
 
-      <ion-row class="ion-margin-top" *ngIf="topic.canUserAnswerQuestions(app.user) && !newAnswer">
+      <ion-row class="ion-margin-top" *ngIf="topic.canUserAnswerStandardQuestions(app.user) && !newAnswer">
         <ion-col *ngIf="fromDraft">
           <ion-button expand="block" fill="clear" color="danger" (click)="deleteDraft()">
             <ion-icon icon="trash" slot="start"></ion-icon> {{ 'DRAFTS.DELETE_DRAFT' | translate }}

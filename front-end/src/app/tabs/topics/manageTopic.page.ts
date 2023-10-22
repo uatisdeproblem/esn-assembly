@@ -37,7 +37,7 @@ export class ManageTopicPage implements OnInit {
   relatedTopics: Topic[];
   relatedTopicsChecks: Check[];
 
-  rolesAbleToAskQuestionsChecks: Check[];
+  rolesAbleToInteractChecks: Check[];
 
   publishingOption = PublishingOptions.DRAFT;
   PublishingOptions = PublishingOptions;
@@ -57,7 +57,7 @@ export class ManageTopicPage implements OnInit {
 
     this.activeTopics = await this._topics.getActiveList();
 
-    this.rolesAbleToAskQuestionsChecks = Object.entries(UserRoles).map(
+    this.rolesAbleToInteractChecks = Object.entries(UserRoles).map(
       role => new Check({ value: role[0], name: this.t._('USER_ROLES.'.concat(role[1])) })
     );
   }
@@ -78,8 +78,8 @@ export class ManageTopicPage implements OnInit {
                 checked: this.relatedTopics.some(y => x.topicId === y.topicId)
               })
           );
-        this.rolesAbleToAskQuestionsChecks.forEach(
-          c => (c.checked = this.topic.rolesAbleToAskQuestions.includes(c.value as UserRoles))
+        this.rolesAbleToInteractChecks.forEach(
+          c => (c.checked = this.topic.rolesAbleToInteract.includes(c.value as UserRoles))
         );
         this.editMode = UXMode.VIEW;
       } else {
@@ -114,10 +114,10 @@ export class ManageTopicPage implements OnInit {
     this.topic.subjects.splice(this.topic.subjects.indexOf(subject), 1);
   }
 
-  setRolesAbleToAskQuestionsFromChecks(): void {
-    if (this.rolesAbleToAskQuestionsChecks.every(x => x.checked)) this.topic.rolesAbleToAskQuestions = [];
+  setRolesAbleToInteractFromChecks(): void {
+    if (this.rolesAbleToInteractChecks.every(x => x.checked)) this.topic.rolesAbleToInteract = [];
     else
-      this.topic.rolesAbleToAskQuestions = this.rolesAbleToAskQuestionsChecks
+      this.topic.rolesAbleToInteract = this.rolesAbleToInteractChecks
         .filter(x => x.checked)
         .map(x => x.value as UserRoles);
   }

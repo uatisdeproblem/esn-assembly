@@ -10,7 +10,8 @@ import { addStatisticEntry } from './statistics';
 
 import { TopicCategoryAttached } from '../models/category.model';
 import { GAEventAttached } from '../models/event.model';
-import { RelatedTopic, Topic } from '../models/topic.model';
+import { Topic } from '../models/topic.model';
+import { RelatedTopic } from '../models/relatedTopic.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
 import { SubjectTypes } from '../models/subject.model';

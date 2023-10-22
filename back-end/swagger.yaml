@@ -299,7 +299,7 @@ paths:
             type: string
         - name: summarySpreadsheet
           in: query
-          description: Get the URL to a summary spreadsheet containing questions and answers to this event's topics
+          description: Get the URL to a summary spreadsheet containing questions and answers to this event's standard topics
           schema:
             type: boolean
       responses:

@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
+import { IDEAActionSheetController, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { TopicsService, TopicsSortBy } from './topics.service';
@@ -8,7 +9,7 @@ import { GAEventsService } from '../configurations/events/events.service';
 
 import { TopicCategory } from '@models/category.model';
 import { GAEvent } from '@models/event.model';
-import { Topic } from '@models/topic.model';
+import { Topic, TopicTypes } from '@models/topic.model';
 import { StatisticEntityTypes } from '@models/statistic.model';
 
 @Component({
@@ -29,12 +30,17 @@ export class TopicsPage implements OnInit {
 
   filterByStatus: boolean = null;
 
+  TopicTypes = TopicTypes;
+  filterByType: TopicTypes = null;
+
   sortBy: TopicsSortBy = TopicsSortBy.CREATED_DATE_DESC;
   TopicsSortBy = TopicsSortBy;
 
   SET = StatisticEntityTypes;
 
   constructor(
+    private actionsCtrl: IDEAActionSheetController,
+    private t: IDEATranslationsService,
     private _topics: TopicsService,
     private _categories: TopicCategoryService,
     private _events: GAEventsService,
@@ -62,6 +68,7 @@ export class TopicsPage implements OnInit {
       categoryId: this.filterByCategory,
       eventId: this.filterByEvent,
       status: this.filterByStatus,
+      type: this.filterByType,
       withPagination: true,
       startPaginationAfterId,
       sortBy: this.sortBy
@@ -73,7 +80,23 @@ export class TopicsPage implements OnInit {
   openTopic(topic: Topic): void {
     this.app.goToInTabs(['topics', topic.topicId]);
   }
-  addTopic(): void {
-    this.app.goToInTabs(['topics', 'new', 'manage']);
+  async addTopic(): Promise<void> {
+    const header = this.t._('TOPICS.CHOOSE_TYPE');
+    const buttons = [
+      {
+        text: this.t._('TOPICS.TYPES.STANDARD'),
+        icon: 'chatbubbles',
+        handler: (): void => this.app.goToInTabs(['topics', 'new', 'manage'])
+      },
+      {
+        text: this.t._('TOPICS.TYPES.LIVE'),
+        icon: 'pulse',
+        handler: (): void => this.app.goToInTabs(['topics', 'new', 'manage']) // @todo
+      },
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
+    ];
+
+    const actions = await this.actionsCtrl.create({ header, buttons });
+    actions.present();
   }
 }

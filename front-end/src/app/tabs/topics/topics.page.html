@@ -43,6 +43,13 @@
           <ion-select-option [value]="false">{{ 'TOPICS.STATUSES.CLOSED' | translate }}</ion-select-option>
         </ion-select>
       </ion-item>
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-xl-down">
+        <ion-select interface="popover" [(ngModel)]="filterByType" (ionChange)="filter(searchbar.value)">
+          <ion-select-option [value]="null">{{ 'TOPICS.ALL_TYPES' | translate }}</ion-select-option>
+          <ion-select-option [value]="TopicTypes.STANDARD">{{ 'TOPICS.TYPES.STANDARD' | translate }}</ion-select-option>
+          <ion-select-option [value]="TopicTypes.LIVE">{{ 'TOPICS.TYPES.LIVE' | translate }}</ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-item lines="none" color="ideaToolbar" class="ion-hide-md-down">
         <ion-select interface="popover" [(ngModel)]="sortBy" (ionChange)="filter(searchbar.value)">
           <ion-select-option *ngFor="let sortBy of TopicsSortBy | keyvalue" [value]="sortBy.key">

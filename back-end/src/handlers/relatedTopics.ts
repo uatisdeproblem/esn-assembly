@@ -4,7 +4,8 @@
 
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
-import { RelatedTopic, RelatedTopicRelations, Topic } from '../models/topic.model';
+import { Topic } from '../models/topic.model';
+import { RelatedTopic, RelatedTopicRelations } from '../models/relatedTopic.model';
 import { User } from '../models/user.model';
 
 ///

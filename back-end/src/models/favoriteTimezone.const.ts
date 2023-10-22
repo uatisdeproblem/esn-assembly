@@ -34,3 +34,17 @@ export const dateStringIsPast = (dateString: epochISODateString, timezone: strin
   const now = getDateStringInFavoriteTimezone(new Date(), timezone);
   return !dateString || now > getDateStringInFavoriteTimezone(dateString, timezone);
 };
+
+/**
+ * Whether the date equals today (granularity: day).
+ */
+export const dateStringIsToday = (dateString: epochISODateString, timezone: string): boolean => {
+  const sortableFormattingLocale = 'sv-SE';
+  const formatter = new Intl.DateTimeFormat(sortableFormattingLocale, {
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: timezone
+  });
+  return formatter.format(new Date()) === formatter.format(new Date(dateString));
+};
