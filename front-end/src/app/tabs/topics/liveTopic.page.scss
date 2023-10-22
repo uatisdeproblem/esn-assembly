@@ -54,3 +54,12 @@ app-html-editor {
   --app-html-editor-border-radius: 8px;
   --app-html-editor-color: var(--ion-color-step-800);
 }
+
+#qrCodeContainer {
+  max-width: 170px;
+  margin: 10px auto;
+}
+
+ion-segment-button {
+  text-transform: none;
+}

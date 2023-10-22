@@ -93,7 +93,7 @@
             <ion-col class="ion-padding-top ion-padding-start ion-padding-end">
               <ion-button expand="block" (click)="startNewMessage()">
                 {{ 'MESSAGES.ASK_A_QUESTION' | translate }}
-                <ion-icon icon="help" slot="end"></ion-icon>
+                <ion-icon icon="mic" slot="end"></ion-icon>
               </ion-button>
             </ion-col>
             <ion-col class="ion-padding-top ion-padding-start ion-padding-end" *ngIf="topic.appreciations">
@@ -171,7 +171,7 @@
         </ion-segment>
         <ion-list class="aList">
           <ion-row>
-            <ion-col *ngIf="fullScreen || segment === MessageTypes.QUESTION">
+            <ion-col *ngIf="(fullScreen && !hideQuestions) || (!fullScreen && segment === MessageTypes.QUESTION)">
               <ion-list-header *ngIf="fullScreen">
                 <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
               </ion-list-header>
@@ -184,11 +184,10 @@
               <ion-item *ngFor="let question of questions">
                 <ion-label>{{ question.text }}</ion-label>
               </ion-item>
-              <ion-infinite-scroll (ionInfinite)="filterQuestions($event.target)">
-                <ion-infinite-scroll-content></ion-infinite-scroll-content>
-              </ion-infinite-scroll>
             </ion-col>
-            <ion-col *ngIf="(fullScreen || segment === MessageTypes.APPRECIATION) && topic.appreciations">
+            <ion-col
+              *ngIf="topic.appreciations && (fullScreen && !hideAppreciations)  || (!fullScreen && segment === MessageTypes.APPRECIATION)"
+            >
               <ion-list-header *ngIf="fullScreen">
                 <ion-label>{{ 'MESSAGES.APPRECIATIONS' | translate }}</ion-label>
               </ion-list-header>
@@ -201,11 +200,16 @@
               <ion-item *ngFor="let appreciation of appreciations">
                 <ion-label>{{ appreciation.text }}</ion-label>
               </ion-item>
-              <ion-infinite-scroll (ionInfinite)="filterAppreciations($event.target)">
-                <ion-infinite-scroll-content></ion-infinite-scroll-content>
-              </ion-infinite-scroll>
+            </ion-col>
+            <ion-col *ngIf="fullScreen" [size]="2">
+              <div id="qrCodeContainer"></div>
             </ion-col>
           </ion-row>
+          <ion-infinite-scroll
+            (ionInfinite)="segment === MessageTypes.QUESTION ? filterQuestions($event.target) : filterAppreciations($event.target)"
+          >
+            <ion-infinite-scroll-content></ion-infinite-scroll-content>
+          </ion-infinite-scroll>
         </ion-list>
       </ion-col>
     </ion-row>
@@ -238,5 +242,23 @@
     (click)="exitFullScreen()"
   >
     <ion-icon icon="contract"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="medium"
+    size="small"
+    *ngIf="fullScreen && topic.appreciations"
+    [title]="'MESSAGES.TOGGLE_QUESTIONS' | translate"
+    (click)="hideQuestions = !hideQuestions"
+  >
+    <ion-icon [icon]="hideQuestions ? 'mic-off' : 'mic'"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="medium"
+    size="small"
+    *ngIf="fullScreen && topic.appreciations"
+    [title]="'MESSAGES.TOGGLE_APPRECIATIONS' | translate"
+    (click)="hideAppreciations = !hideAppreciations"
+  >
+    <ion-icon [icon]="hideAppreciations ? 'heart-dislike' : 'heart'"></ion-icon>
   </ion-fab-button>
 </ion-fab>

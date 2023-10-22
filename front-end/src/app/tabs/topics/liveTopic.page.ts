@@ -1,5 +1,6 @@
-import { Component, Input, ViewChild } from '@angular/core';
-import { AlertController, IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
+import { Component, Input } from '@angular/core';
+import { AlertController, IonInfiniteScroll, IonRefresher } from '@ionic/angular';
+import { toCanvas } from 'qrcode';
 import { Attachment } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
@@ -8,6 +9,7 @@ import { TopicsService } from './topics.service';
 import { AttachmentsService } from 'src/app/common/attachments.service';
 import { MessagesService } from './messages/messages.service';
 
+import { environment as env } from '@env';
 import { Topic, TopicTypes } from '@models/topic.model';
 import { Message, MessageTypes } from '@models/message.model';
 import { Subject } from '@models/subject.model';
@@ -36,6 +38,9 @@ export class LiveTopicPage {
   showTopicDetails: boolean;
   segment = MessageTypes.QUESTION;
   fullScreen = false;
+
+  hideQuestions = false;
+  hideAppreciations = false;
 
   constructor(
     private alertCtrl: AlertController,
@@ -183,10 +188,30 @@ export class LiveTopicPage {
     this.app.goToInTabs(['topics', topic.topicId, topic.type === TopicTypes.LIVE ? 'live' : 'standard']);
   }
 
-  enterFullScreen(): void {
+  async enterFullScreen(): Promise<void> {
     this.fullScreen = true;
+    setTimeout((): void => {
+      this.generateQRCodeCanvasByURL(env.idea.app.url.concat(`t/topics/${this.topic.topicId}/live`));
+    });
   }
   exitFullScreen(): void {
+    this.hideQuestions = false;
+    this.hideAppreciations = false;
     this.fullScreen = false;
+  }
+
+  private generateQRCodeCanvasByURL(url: string): Promise<void> {
+    return new Promise((resolve, reject): void => {
+      const container = document.getElementById('qrCodeContainer');
+      container.innerHTML = '';
+      toCanvas(url, { errorCorrectionLevel: 'L' }, (err: Error, canvas: HTMLCanvasElement): void => {
+        if (err) return reject(err);
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.borderRadius = '4px';
+        container.appendChild(canvas);
+        resolve();
+      });
+    });
   }
 }
