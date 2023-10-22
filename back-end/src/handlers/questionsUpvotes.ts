@@ -6,7 +6,7 @@ import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { addBadgeToUser } from './badges';
 
-import { Topic } from '../models/topic.model';
+import { Topic, TopicTypes } from '../models/topic.model';
 import { Question, QuestionUpvote } from '../models/question.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
@@ -47,6 +47,8 @@ class Questions extends ResourceController {
     } catch (err) {
       throw new RCError('Topic not found');
     }
+
+    if (this.topic.type !== TopicTypes.STANDARD) throw new RCError('Incompatible type of topic');
 
     try {
       this.question = new Question(

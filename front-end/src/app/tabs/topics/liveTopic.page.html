@@ -1,0 +1,242 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.closePage()">
+        <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-grid class="ion-no-padding" *ngIf="topic">
+    <ion-row>
+      <ion-col [size]="12" [sizeLg]="6" *ngIf="!fullScreen">
+        <ion-card color="white">
+          <ion-card-header>
+            <ion-row class="ion-align-items-center">
+              <ion-col [size]="10" [sizeMd]="9">
+                <ion-card-subtitle>{{ topic.event.name }}</ion-card-subtitle>
+                <ion-card-title>{{ topic.name }}</ion-card-title>
+                <p class="badges">
+                  <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
+                  <ion-badge *ngIf="topic.isDraft()" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
+                  <ion-badge *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">
+                    {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+                  </ion-badge>
+                  <ion-badge color="warning" *ngIf="topic.isArchived()">{{ 'TOPICS.ARCHIVED' | translate }}</ion-badge>
+                </p>
+              </ion-col>
+              <ion-col class="ion-text-right" [size]="2" [sizeMd]="3">
+                <ion-button color="medium" size="small" fill="clear" (click)="showTopicDetails = !showTopicDetails">
+                  <ng-container *ngIf="!app.isInMobileMode()">{{ 'TOPICS.DETAILS' | translate }}</ng-container>
+                  <ion-icon
+                    [slot]="app.isInMobileMode() ? 'icon-only' : 'end'"
+                    [icon]="showTopicDetails ? 'eye-off' : 'eye'"
+                  ></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-card-header>
+          <ion-card-content *ngIf="showTopicDetails">
+            <ion-list class="aList" lines="none">
+              <app-subject
+                color="white"
+                *ngFor="let subject of topic.subjects"
+                [subject]="subject"
+                [class.single]="topic.subjects?.length === 1"
+              ></app-subject>
+              <ion-row class="ion-margin-top" *ngIf="topic.isClosed() && !topic.isArchived() && topic.shouldBeLiveAt">
+                <ion-col>
+                  <ion-item class="ion-text-right importantDate">
+                    <ion-label>
+                      <p>{{ 'TOPICS.SHOULD_BE_LIVE_ON' | translate }}</p>
+                      {{ topic.shouldBeLiveAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+                      <p>{{ FAVORITE_TIMEZONE }}</p>
+                    </ion-label>
+                    <ion-icon icon="pulse-outline" slot="end" size="small"></ion-icon>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <app-html-editor *ngIf="topic.content" [content]="topic.content" [editMode]="false"></app-html-editor>
+              <ion-item
+                lines="inset"
+                class="attachment"
+                *ngFor="let attachment of topic.attachments; let first = first"
+                [class.ion-margin-top]="first"
+                button
+                (click)="downloadAttachment(attachment)"
+              >
+                <ion-icon name="attach" slot="start"></ion-icon>
+                <ion-label class="ion-text-wrap">{{ attachment.name }}.{{ attachment.format }}</ion-label>
+              </ion-item>
+              <ion-item
+                lines="inset"
+                *ngFor="let related of relatedTopics; let first = first"
+                [class.ion-margin-top]="first"
+                button
+                (click)="openTopic(related)"
+              >
+                <ion-label>
+                  <p>{{ 'TOPICS.RELATED_TO' | translate }}</p>
+                  {{ related.name }}
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+        <ng-container *ngIf="!topic.isClosed()">
+          <ion-row class="ion-margin-bottom" *ngIf="!newMessage">
+            <ion-col class="ion-padding-top ion-padding-start ion-padding-end">
+              <ion-button expand="block" (click)="startNewMessage()">
+                {{ 'MESSAGES.ASK_A_QUESTION' | translate }}
+                <ion-icon icon="help" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col class="ion-padding-top ion-padding-start ion-padding-end" *ngIf="topic.appreciations">
+              <ion-button expand="block" color="ESNpink" (click)="startNewMessage(true)">
+                {{ 'MESSAGES.WRITE_AN_APPRECIATION' | translate }}
+                <ion-icon icon="heart" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-list class="aList" *ngIf="newMessage" [class.ion-padding]="!app.isInMobileMode()">
+            <ng-container *ngIf="newMessage.type === MessageTypes.QUESTION">
+              <ion-list-header [class.fieldHasError]="hasFieldAnError('summary')">
+                <ion-label>
+                  <h2>{{ 'MESSAGES.QUESTION_SUMMARY_I' | translate }}</h2>
+                  <p>{{ 'MESSAGES.QUESTION_SUMMARY_II' | translate }}</p>
+                </ion-label>
+              </ion-list-header>
+              <ion-item>
+                <ion-input
+                  [placeholder]="'MESSAGES.QUESTION_SUMMARY_P' | translate"
+                  [(ngModel)]="newMessage.summary"
+                ></ion-input>
+              </ion-item>
+            </ng-container>
+            <ion-list-header [class.fieldHasError]="hasFieldAnError('text')">
+              <ion-label *ngIf="newMessage.type === MessageTypes.QUESTION">
+                <p>{{ 'MESSAGES.QUESTION_CONTENT_I' | translate }}</p>
+                <p>{{ 'MESSAGES.QUESTION_CONTENT_II' | translate }}</p>
+              </ion-label>
+              <ion-label *ngIf="newMessage.type === MessageTypes.APPRECIATION">
+                <h2>{{ 'MESSAGES.APPRECIATION_CONTENT_I' | translate }}</h2>
+                <p>{{ 'MESSAGES.APPRECIATION_CONTENT_II' | translate }}</p>
+              </ion-label>
+            </ion-list-header>
+            <ion-item>
+              <ion-textarea
+                [rows]="3"
+                [placeholder]="(newMessage.type === MessageTypes.QUESTION ? 'MESSAGES.QUESTION_CONTENT_P' : 'MESSAGES.APPRECIATION_CONTENT_P') | translate"
+                [(ngModel)]="newMessage.text"
+              ></ion-textarea>
+            </ion-item>
+            <ng-container *ngIf="newMessage.type === MessageTypes.APPRECIATION || !topic.mustBeSigned">
+              <ion-item-divider></ion-item-divider>
+              <ion-item>
+                <ion-checkbox
+                  slot="start"
+                  (ionChange)="handleMessageMarkedAnonymous($event.detail.checked)"
+                ></ion-checkbox>
+                <ion-label>{{ 'MESSAGES.SEND_ANONYMOUS' | translate }}</ion-label>
+              </ion-item>
+            </ng-container>
+            <ion-row class="ion-margin">
+              <ion-col>
+                <ion-button fill="clear" color="dark" (click)="cancelNewMessage()">
+                  {{ 'COMMON.CANCEL' | translate }} <ion-icon icon="close" slot="start"></ion-icon>
+                </ion-button>
+              </ion-col>
+              <ion-col class="ion-text-right">
+                <ion-button (click)="sendNewMessage()">
+                  {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-list>
+        </ng-container>
+      </ion-col>
+      <ion-col [size]="12" [sizeLg]="fullScreen ? 12 : 6">
+        <ion-segment *ngIf="!fullScreen" [(ngModel)]="segment" [class.ion-margin-top]="app.isInMobileMode()">
+          <ion-segment-button [value]="MessageTypes.QUESTION">
+            <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button *ngIf="topic.appreciations" [value]="MessageTypes.APPRECIATION">
+            <ion-label>{{ 'MESSAGES.APPRECIATIONS' | translate }}</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+        <ion-list class="aList">
+          <ion-row>
+            <ion-col *ngIf="fullScreen || segment === MessageTypes.QUESTION">
+              <ion-list-header *ngIf="fullScreen">
+                <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
+              </ion-list-header>
+              <ion-item *ngIf="!questions">
+                <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
+              </ion-item>
+              <ion-item class="noElements" *ngIf="questions && !questions.length">
+                <ion-label>{{ 'MESSAGES.NO_MESSAGES_YET' | translate }}</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let question of questions">
+                <ion-label>{{ question.text }}</ion-label>
+              </ion-item>
+              <ion-infinite-scroll (ionInfinite)="filterQuestions($event.target)">
+                <ion-infinite-scroll-content></ion-infinite-scroll-content>
+              </ion-infinite-scroll>
+            </ion-col>
+            <ion-col *ngIf="(fullScreen || segment === MessageTypes.APPRECIATION) && topic.appreciations">
+              <ion-list-header *ngIf="fullScreen">
+                <ion-label>{{ 'MESSAGES.APPRECIATIONS' | translate }}</ion-label>
+              </ion-list-header>
+              <ion-item *ngIf="!appreciations">
+                <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
+              </ion-item>
+              <ion-item class="noElements" *ngIf="appreciations && !appreciations.length">
+                <ion-label>{{ 'MESSAGES.NO_MESSAGES_YET' | translate }}</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let appreciation of appreciations">
+                <ion-label>{{ appreciation.text }}</ion-label>
+              </ion-item>
+              <ion-infinite-scroll (ionInfinite)="filterAppreciations($event.target)">
+                <ion-infinite-scroll-content></ion-infinite-scroll-content>
+              </ion-infinite-scroll>
+            </ion-col>
+          </ion-row>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+  <ion-fab-button
+    color="ESNgreen"
+    size="small"
+    *ngIf="!fullScreen"
+    [title]="'COMMON.MANAGE' | translate"
+    (click)="manageTopic()"
+  >
+    <ion-icon icon="build"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="primary"
+    size="small"
+    *ngIf="!fullScreen"
+    [title]="'MESSAGES.ENTER_FULL_SCREEN' | translate"
+    (click)="enterFullScreen()"
+  >
+    <ion-icon icon="expand"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="primary"
+    size="small"
+    *ngIf="fullScreen"
+    [title]="'MESSAGES.EXIT_FULL_SCREEN' | translate"
+    (click)="exitFullScreen()"
+  >
+    <ion-icon icon="contract"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

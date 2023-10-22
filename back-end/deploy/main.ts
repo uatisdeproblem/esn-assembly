@@ -46,6 +46,7 @@ const apiResources: ResourceController[] = [
       '/topics/{topicId}/questions/{questionId}/answers/{answerId}/claps/{userId}'
     ]
   },
+  { name: 'messages', paths: ['/topics/{topicId}/messages', '/topics/{topicId}/messages/{messageId}'] },
   { name: 'badges', paths: ['/badges', '/badges/{badge}'] },
   { name: 'usefulLinks', paths: ['/usefulLinks', '/usefulLinks/{linkId}'] },
   { name: 'deadlines', paths: ['/deadlines', '/deadlines/{deadlineId}'] },
@@ -125,6 +126,10 @@ const tables: { [tableName: string]: DDBTable } = {
         projectionType: DDB.ProjectionType.ALL
       }
     ]
+  },
+  messages: {
+    PK: { name: 'topicId', type: DDB.AttributeType.STRING },
+    SK: { name: 'messageId', type: DDB.AttributeType.STRING }
   },
   usersBadges: {
     PK: { name: 'userId', type: DDB.AttributeType.STRING },

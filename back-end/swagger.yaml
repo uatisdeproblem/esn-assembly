@@ -32,9 +32,11 @@ tags:
   - name: Topics
     description: The platform's topics for Q&As
   - name: Questions
-    description: The questions on a topic
+    description: The questions on a standard topic
   - name: Answers
-    description: The answers to the questions
+    description: The answers to the questions in a standard topic
+  - name: Messages
+    description: The messages in a live topic
   - name: Badges
     description: The badges earned by the users following actions on the platform
   - name: UsefulLinks
@@ -1111,6 +1113,71 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
+  /topics/{topicId}/messages:
+    get:
+      summary: Get the messages of a live topic
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Messages'
+    post:
+      summary: Insert a new message on a live topic
+      description: Permissions depend on topic configuration
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        200:
+          $ref: '#/components/responses/Message'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/messages/{messageId}:
+    delete:
+      summary: Delete the message of a live topic
+      description: Requires to be Administrator or the creator
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /badges:
     get:
       summary: Get the user's earned badges
@@ -1657,6 +1724,9 @@ components:
     Answer:
       type: object
       additionalProperties: {}
+    Message:
+      type: object
+      additionalProperties: {}
     Badge:
       type: object
       additionalProperties: {}
@@ -1762,6 +1832,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Answer'
+    Message:
+      description: A message
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Message'
+    Messages:
+      description: The messages
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Message'
     Badge:
       description: A badge
       content:

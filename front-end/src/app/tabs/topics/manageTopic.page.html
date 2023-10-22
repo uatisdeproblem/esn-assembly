@@ -75,21 +75,12 @@
         </ion-label>
       </ion-list-header>
       <ion-item>
-        <ion-select
-          interface="popover"
-          [label]="'TOPICS.MESSAGES_AUTHENTICATION' | translate"
-          [(ngModel)]="topic.messagesAuth"
-          [disabled]="!editMode"
-          [class.fieldHasError]="hasFieldAnError('messagesAuth')"
-        >
-          <ion-select-option *ngFor="let config of LiveTopicAuthentications | keyvalue" [value]="config.value">
-            {{ ('TOPICS.MESSAGES_AUTHENTICATIONS.'+ config.key) | translate }}
-          </ion-select-option>
-        </ion-select>
+        <ion-checkbox slot="end" [(ngModel)]="topic.mustBeSigned" [disabled]="!editMode"></ion-checkbox>
+        <ion-label class="ion-text-wrap">{{ 'TOPICS.QUESTIONS_MUST_BE_SIGNED' | translate }}</ion-label>
       </ion-item>
       <ion-item>
         <ion-checkbox slot="end" [(ngModel)]="topic.appreciations" [disabled]="!editMode"></ion-checkbox>
-        <ion-label>{{ 'TOPICS.ENABLE_APPRECIATIONS' | translate }}</ion-label>
+        <ion-label class="ion-text-wrap">{{ 'TOPICS.ENABLE_APPRECIATIONS' | translate }}</ion-label>
       </ion-item>
     </ng-container>
     <ng-container *ngIf="topic.type === TopicTypes.STANDARD">
@@ -274,7 +265,7 @@
 
     <p class="ion-text-center" *ngIf="!editMode && !topic.isArchived()">
       <ion-button [color]="topic.closedAt ? 'ESNgreen': 'ESNpink'" (click)="manageTopicStatus(!!topic.closedAt)">
-        {{ (topic.closedAt ? 'TOPICS.REOPEN_TOPIC' : 'TOPICS.CLOSE_TOPIC') | translate }}
+        {{ (topic.closedAt ? 'TOPICS.OPEN_TOPIC' : 'TOPICS.CLOSE_TOPIC') | translate }}
       </ion-button>
     </p>
     <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">

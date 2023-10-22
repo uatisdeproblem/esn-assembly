@@ -78,7 +78,7 @@ export class TopicsPage implements OnInit {
   }
 
   openTopic(topic: Topic): void {
-    this.app.goToInTabs(['topics', topic.topicId]);
+    this.app.goToInTabs(['topics', topic.topicId, topic.type === TopicTypes.LIVE ? 'live' : 'standard']);
   }
   async addTopic(): Promise<void> {
     const header = this.t._('TOPICS.CHOOSE_TYPE');

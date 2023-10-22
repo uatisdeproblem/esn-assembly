@@ -7,7 +7,7 @@ import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
 import { isEmailInBlockList } from './sesNotifications';
 import { addBadgeToUser } from './badges';
 
-import { Topic } from '../models/topic.model';
+import { Topic, TopicTypes } from '../models/topic.model';
 import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
 import { User } from '../models/user.model';
@@ -62,6 +62,8 @@ class Questions extends ResourceController {
     } catch (err) {
       throw new RCError('Topic not found');
     }
+
+    if (this.topic.type !== TopicTypes.STANDARD) throw new RCError('Incompatible type of topic');
 
     if (!this.resourceId) return;
 

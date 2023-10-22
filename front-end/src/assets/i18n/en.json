@@ -161,21 +161,17 @@
     },
     "PUBLISH_ON": "Publish on",
     "CLOSE_TOPIC": "Close topic",
-    "REOPEN_TOPIC": "Reopen topic",
+    "OPEN_TOPIC": "Open topic",
     "CHOOSE_TYPE": "Choose a type",
     "LIVE_OPTIONS": "Options for live Q&A",
     "LIVE_OPTIONS_I": "Choose your messaging preferences for the topic",
     "SHOULD_BE_LIVE_ON": "It should be live on",
     "SHOULD_BE_LIVE_ON_I": "Based on the agenda, choose the forecasted date and time for the topic to go live.",
     "SHOULD_BE_LIVE_ON_II": "Note: this setting doesn't automatically open the topic.",
-    "MESSAGES_AUTHENTICATION": "Authentication",
-    "MESSAGES_AUTHENTICATIONS": {
-      "SIGNED": "Signed",
-      "ANONYMOUS": "Anonymous",
-      "USER_CHOICE": "User can choose"
-    },
+    "QUESTIONS_MUST_BE_SIGNED": "Questions must be signed (can't be anonymous)",
     "ENABLE_APPRECIATIONS": "Enable appreciations",
-    "FILL_WITH_ME": "Fill with my user"
+    "FILL_WITH_ME": "Fill with my user",
+    "DETAILS": "Details"
   },
   "QUESTIONS": {
     "BY": "By",
@@ -431,5 +427,26 @@
     "RESUME": "Resume",
     "RESUME_DRAFT": "Resume draft",
     "DELETE_DRAFT": "Delete draft"
+  },
+  "MESSAGES": {
+    "ASK_A_QUESTION": "Ask a question",
+    "WRITE_AN_APPRECIATION": "Write an appreciation",
+    "QUESTION_SUMMARY_I": "What is your question about?",
+    "QUESTION_SUMMARY_II": "Insert a brief title so that people can quickly understand what the question is about.",
+    "QUESTION_SUMMARY_P": "e.g. Budget - Accomodation",
+    "QUESTION_CONTENT_I": "If you want, you can add your full question here below.",
+    "QUESTION_CONTENT_II": "It will help with the minutes as well — thank you!",
+    "QUESTION_CONTENT_P": "...",
+    "APPRECIATION_CONTENT_I": "Write your appreciation",
+    "APPRECIATION_CONTENT_II": "Only good vibes.",
+    "APPRECIATION_CONTENT_P": "You are great!",
+    "NO_MESSAGES_YET": "No messages yet",
+    "YOU_WILL_LOSE_THE_CONTENT": "You will lose all the content you didn't save.",
+    "IS_YOUR_MESSAGE_READY": "Is everything ready?",
+    "QUESTIONS": "Questions",
+    "APPRECIATIONS": "Appreciations",
+    "ENTER_FULL_SCREEN": "Enter full screen",
+    "EXIT_FULL_SCREEN": "Exit full screen",
+    "SEND_ANONYMOUS": "Send as anonymous"
   }
 }

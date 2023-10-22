@@ -87,10 +87,10 @@ export class Topic extends Resource {
   acceptAnswersUntil?: epochISOString;
 
   /**
-   * The possible ways for a user to post live messages to the topic.
+   * Whether messages (`MessageTypes.QUESTION`) for this topic must be signed.
    * Only for `TopicTypes.LIVE`.
    */
-  messagesAuth?: LiveTopicAuthentications;
+  mustBeSigned?: boolean;
   /**
    * Whether to enable live appreciations for this topic.
    * Only for `TopicTypes.LIVE`.
@@ -128,7 +128,7 @@ export class Topic extends Resource {
         this.acceptAnswersUntil = this.clean(x.acceptAnswersUntil, d => new Date(d).toISOString());
       else delete this.acceptAnswersUntil;
     } else if (this.type === TopicTypes.LIVE) {
-      this.messagesAuth = this.clean(x.messagesAuth, String, LiveTopicAuthentications.SIGNED);
+      this.mustBeSigned = this.clean(x.mustBeSigned, Boolean, true);
       this.appreciations = this.clean(x.appreciations, Boolean);
       this.shouldBeLiveAt = this.clean(x.shouldBeLiveAt, d => new Date(d).toISOString());
     }
@@ -164,8 +164,6 @@ export class Topic extends Resource {
         (this.iE(this.acceptAnswersUntil, 'date') || (this.willCloseAt && this.acceptAnswersUntil < this.willCloseAt))
       )
         e.push('acceptAnswersUntil');
-    } else if (this.type === TopicTypes.LIVE) {
-      if (!Object.values(LiveTopicAuthentications).includes(this.messagesAuth)) e.push('messagesAuth');
     }
 
     return e;
@@ -246,13 +244,4 @@ export interface StandardTopicQuestionsExportable {
   Question: string;
   Creator: string;
   Answers: string;
-}
-
-/**
- * The possible configurations to post messages to a live topic.
- */
-export enum LiveTopicAuthentications {
-  USER_CHOICE = 'USER_CHOICE',
-  SIGNED = 'SIGNED',
-  ANONYMOUS = 'ANONYMOUS'
 }

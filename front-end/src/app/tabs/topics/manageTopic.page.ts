@@ -8,7 +8,7 @@ import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
 import { MediaService } from '@app/common/media.service';
 
-import { LiveTopicAuthentications, Topic, TopicTypes } from '@models/topic.model';
+import { Topic, TopicTypes } from '@models/topic.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { UserRoles } from '@models/user.model';
 import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
@@ -32,7 +32,6 @@ export class ManageTopicPage {
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   TopicTypes = TopicTypes;
-  LiveTopicAuthentications = LiveTopicAuthentications;
   SubjectTypes = SubjectTypes;
 
   activeTopics: Topic[];
