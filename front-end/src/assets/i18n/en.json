@@ -449,6 +449,7 @@
     "EXIT_FULL_SCREEN": "Exit full screen",
     "SEND_ANONYMOUS": "Send as anonymous",
     "TOGGLE_QUESTIONS": "Toggle questions",
-    "TOGGLE_APPRECIATIONS": "Toggle appreciations"
+    "TOGGLE_APPRECIATIONS": "Toggle appreciations",
+    "ANONYMOUS": "Anonymous"
   }
 }

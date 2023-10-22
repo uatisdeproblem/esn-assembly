@@ -15,7 +15,7 @@
   <ion-grid class="ion-no-padding" *ngIf="topic">
     <ion-row>
       <ion-col [size]="12" [sizeLg]="6" *ngIf="!fullScreen">
-        <ion-card color="white">
+        <ion-card color="white" class="topicCard">
           <ion-card-header>
             <ion-row class="ion-align-items-center">
               <ion-col [size]="10" [sizeMd]="9">
@@ -160,20 +160,29 @@
           </ion-list>
         </ng-container>
       </ion-col>
-      <ion-col [size]="12" [sizeLg]="fullScreen ? 12 : 6">
-        <ion-segment *ngIf="!fullScreen" [(ngModel)]="segment" [class.ion-margin-top]="app.isInMobileMode()">
-          <ion-segment-button [value]="MessageTypes.QUESTION">
-            <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
-          </ion-segment-button>
-          <ion-segment-button *ngIf="topic.appreciations" [value]="MessageTypes.APPRECIATION">
-            <ion-label>{{ 'MESSAGES.APPRECIATIONS' | translate }}</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-        <ion-list class="aList">
+      <ion-col
+        [size]="12"
+        [sizeLg]="fullScreen ? 12 : 6"
+        [style.background-color]="app.isInMobileMode() ? 'var(--ion-color-light)' : 'none'"
+      >
+        <ion-toolbar [color]="app.isInMobileMode() ? 'light' : 'transparent'">
+          <ion-segment *ngIf="!fullScreen" [(ngModel)]="segment">
+            <ion-segment-button [value]="MessageTypes.QUESTION">
+              <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
+            </ion-segment-button>
+            <ion-segment-button *ngIf="topic.appreciations" [value]="MessageTypes.APPRECIATION">
+              <ion-label>{{ 'MESSAGES.APPRECIATIONS' | translate }}</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </ion-toolbar>
+        <ion-list class="aList messagesList">
           <ion-row>
             <ion-col *ngIf="(fullScreen && !hideQuestions) || (!fullScreen && segment === MessageTypes.QUESTION)">
               <ion-list-header *ngIf="fullScreen">
-                <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
+                <ion-label class="ion-padding-start">
+                  <h1>{{ 'MESSAGES.QUESTIONS' | translate }}</h1>
+                </ion-label>
+                <ion-icon icon="mic" size="large"></ion-icon>
               </ion-list-header>
               <ion-item *ngIf="!questions">
                 <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
@@ -181,15 +190,30 @@
               <ion-item class="noElements" *ngIf="questions && !questions.length">
                 <ion-label>{{ 'MESSAGES.NO_MESSAGES_YET' | translate }}</ion-label>
               </ion-item>
-              <ion-item *ngFor="let question of questions">
-                <ion-label>{{ question.text }}</ion-label>
-              </ion-item>
+              <ion-card
+                class="messageCard"
+                *ngFor="let question of questions"
+                [class.author]="question.creator?.id === app.user.userId"
+              >
+                <ion-card-header>
+                  <ion-card-title *ngIf="question.creator">
+                    <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
+                  </ion-card-title>
+                  <ion-card-title *ngIf="!question.creator">
+                    <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
+                  </ion-card-title>
+                </ion-card-header>
+                <ion-card-content>{{ question.summary }}</ion-card-content>
+              </ion-card>
             </ion-col>
             <ion-col
               *ngIf="topic.appreciations && (fullScreen && !hideAppreciations)  || (!fullScreen && segment === MessageTypes.APPRECIATION)"
             >
               <ion-list-header *ngIf="fullScreen">
-                <ion-label>{{ 'MESSAGES.APPRECIATIONS' | translate }}</ion-label>
+                <ion-label class="ion-padding-start">
+                  <h1>{{ 'MESSAGES.APPRECIATIONS' | translate }}</h1>
+                </ion-label>
+                <ion-icon icon="heart" size="large"></ion-icon>
               </ion-list-header>
               <ion-item *ngIf="!appreciations">
                 <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
@@ -197,9 +221,18 @@
               <ion-item class="noElements" *ngIf="appreciations && !appreciations.length">
                 <ion-label>{{ 'MESSAGES.NO_MESSAGES_YET' | translate }}</ion-label>
               </ion-item>
-              <ion-item *ngFor="let appreciation of appreciations">
-                <ion-label>{{ appreciation.text }}</ion-label>
-              </ion-item>
+              <ion-card
+                class="messageCard"
+                *ngFor="let appreciation of appreciations"
+                [class.author]="appreciation.creator?.id === app.user.userId"
+              >
+                <ion-card-header *ngIf="appreciation.creator">
+                  <ion-card-title>
+                    <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
+                  </ion-card-title>
+                </ion-card-header>
+                <ion-card-content>{{ appreciation.text }}</ion-card-content>
+              </ion-card>
             </ion-col>
             <ion-col *ngIf="fullScreen" [size]="2">
               <div id="qrCodeContainer"></div>

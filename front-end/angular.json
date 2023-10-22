@@ -50,7 +50,8 @@
               "localforage",
               "@aws-crypto/sha256-js",
               "js-cookie",
-              "docs-soap"
+              "docs-soap",
+              "qrcode"
             ]
           },
           "configurations": {

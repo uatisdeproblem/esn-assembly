@@ -1,4 +1,4 @@
-ion-card {
+ion-card.topicCard {
   @media screen and (max-width: 991px) {
     margin: 0;
     width: 100%;
@@ -62,4 +62,21 @@ app-html-editor {
 
 ion-segment-button {
   text-transform: none;
+}
+
+ion-list.messagesList {
+  ion-list-header {
+    margin-top: 8px;
+  }
+  ion-card.messageCard {
+    ion-card-title {
+      font-size: 1em;
+    }
+    ion-card-header {
+      padding-bottom: 4px;
+    }
+  }
+  ion-card.messageCard.author {
+    border-left: 4px solid var(--ion-color-primary);
+  }
 }
