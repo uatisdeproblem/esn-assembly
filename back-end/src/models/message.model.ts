@@ -2,7 +2,6 @@ import { epochISOString, Resource } from 'idea-toolbox';
 
 import { Topic } from './topic.model';
 import { Subject } from './subject.model';
-import { User } from './user.model';
 import { FAVORITE_TIMEZONE, getDateStringInFavoriteTimezone } from './favoriteTimezone.const';
 
 /**
@@ -44,9 +43,9 @@ export class Message extends Resource {
    */
   numOfUpvotes: number;
 
-  static getPK(createdByUser: User): string {
+  static getPK(userId: string): string {
     const timestamp = getDateStringInFavoriteTimezone(new Date(), FAVORITE_TIMEZONE, true);
-    return [timestamp, createdByUser.userId].join('_');
+    return [timestamp, userId].join('_');
   }
 
   load(x: any): void {
