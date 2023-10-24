@@ -36,7 +36,7 @@ export class LiveTopicPage {
 
   appreciations: Message[];
   showCompletedAppreciations = false;
-  sortAppreciationsBy = MessagesSortBy.CREATION_ASC;
+  sortAppreciationsBy = MessagesSortBy.CREATION_DESC;
 
   MessageTypes = MessageTypes;
   MessagesSortBy = MessagesSortBy;
@@ -280,6 +280,11 @@ export class LiveTopicPage {
     const alert = await this.alertCtrl.create({ header, subHeader, message: messageAlert, buttons });
     alert.present();
   }
+  private async readMessageFullText(message: Message): Promise<void> {
+    const buttons = [{ text: this.t._('COMMON.CLOSE') }];
+    const alert = await this.alertCtrl.create({ message: message.text, buttons });
+    alert.present();
+  }
   async actionsOnMessage(message: Message): Promise<void> {
     if (!message) return;
 
@@ -303,6 +308,13 @@ export class LiveTopicPage {
     }
 
     if (this.app.user.isAdministrator) {
+      if (message.type === MessageTypes.QUESTION && message.text) {
+        buttons.push({
+          text: this.t._('MESSAGES.READ_FULL_TEXT'),
+          icon: 'document-text',
+          handler: (): Promise<void> => this.readMessageFullText(message)
+        });
+      }
       buttons.push({
         text: this.t._('MESSAGES.SEE_UPVOTERS'),
         icon: 'eye',

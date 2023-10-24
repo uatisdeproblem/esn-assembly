@@ -266,7 +266,10 @@
                     </ion-col>
                   </ion-row>
                 </ion-card-header>
-                <ion-card-content>{{ question.summary }}</ion-card-content>
+                <ion-card-content>
+                  {{ question.summary }}
+                  <ion-icon icon="document-text" *ngIf="question.text && app.user.isAdministrator"></ion-icon>
+                </ion-card-content>
               </ion-card>
             </ion-col>
             <ion-col
