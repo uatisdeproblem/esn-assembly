@@ -23,13 +23,13 @@ const DDB_TABLES = {
 };
 const ddb = new DynamoDB();
 
-export const handler = (ev: any, _: any, cb: any): Promise<void> => new Questions(ev, cb).handleRequest();
+export const handler = (ev: any, _: any, cb: any): Promise<void> => new QuestionsUpvotesRC(ev, cb).handleRequest();
 
 ///
 /// RESOURCE CONTROLLER
 ///
 
-class Questions extends ResourceController {
+class QuestionsUpvotesRC extends ResourceController {
   galaxyUser: User;
   topic: Topic;
   question: Question;
