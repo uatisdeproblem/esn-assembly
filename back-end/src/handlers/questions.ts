@@ -13,6 +13,7 @@ import { Answer } from '../models/answer.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
 import { Subject } from '../models/subject.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -24,7 +25,8 @@ const DDB_TABLES = {
   questions: process.env.DDB_TABLE_questions,
   topics: process.env.DDB_TABLE_topics,
   answers: process.env.DDB_TABLE_answers,
-  answersClaps: process.env.DDB_TABLE_answersClaps
+  answersClaps: process.env.DDB_TABLE_answersClaps,
+  configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB();
 
@@ -103,6 +105,11 @@ class Questions extends ResourceController {
 
   protected async postResources(): Promise<Question> {
     if (!this.topic.canUserInteract(this.galaxyUser)) throw new Error('Not allowed to interact');
+
+    const { bannedUsersIds } = new Configurations(
+      await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+    );
+    if (bannedUsersIds.includes(this.galaxyUser.userId)) throw new Error('User is banned');
 
     this.question = new Question(this.body);
     this.question.topicId = this.topic.topicId;

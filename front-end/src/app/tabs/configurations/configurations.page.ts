@@ -68,6 +68,40 @@ export class ConfigurationsPage implements OnInit {
     const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();
   }
+  async addBannedUser(): Promise<void> {
+    const doAdd = async ({ userId }): Promise<void> => {
+      if (!userId) return;
+      const newConfigurations = new Configurations(this.configurations);
+      newConfigurations.bannedUsersIds.push(userId);
+      await this.updateConfigurations(newConfigurations);
+    };
+
+    const header = this.t._('CONFIGURATIONS.ADD_BANNED_USER');
+    const message = this.t._('CONFIGURATIONS.BANNED_USERS_I');
+    const inputs: any = [{ name: 'userId', type: 'text' }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.ADD'), handler: doAdd }
+    ];
+
+    const alert = await this.alertCtrl.create({ header, message, inputs, buttons });
+    await alert.present();
+  }
+  async removeBannedUserById(userId: string): Promise<void> {
+    const doRemove = async (): Promise<void> => {
+      const newConfigurations = new Configurations(this.configurations);
+      newConfigurations.bannedUsersIds.splice(newConfigurations.bannedUsersIds.indexOf(userId), 1);
+      await this.updateConfigurations(newConfigurations);
+    };
+
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.REMOVE'), handler: doRemove }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
+  }
   private async updateConfigurations(newConfigurations: Configurations): Promise<void> {
     try {
       await this.loading.show();
@@ -80,7 +114,7 @@ export class ConfigurationsPage implements OnInit {
     }
   }
 
-  async openAdministratorProfileById(userId: string): Promise<void> {
+  async openUserProfileById(userId: string): Promise<void> {
     const url = 'https://accounts.esn.org/user/'.concat(cleanESNAccountsIdForURL(userId));
     await this.app.openURL(url);
   }

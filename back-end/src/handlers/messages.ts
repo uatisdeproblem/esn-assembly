@@ -9,12 +9,18 @@ import { Message } from '../models/message.model';
 import { Topic, TopicTypes } from '../models/topic.model';
 import { User } from '../models/user.model';
 import { Subject } from '../models/subject.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const DDB_TABLES = { messages: process.env.DDB_TABLE_messages, topics: process.env.DDB_TABLE_topics };
+const PROJECT = process.env.PROJECT;
+const DDB_TABLES = {
+  messages: process.env.DDB_TABLE_messages,
+  topics: process.env.DDB_TABLE_topics,
+  configurations: process.env.DDB_TABLE_configurations
+};
 const ddb = new DynamoDB();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new MessagesRC(ev, cb).handleRequest();
@@ -73,6 +79,11 @@ class MessagesRC extends ResourceController {
 
   protected async postResources(): Promise<Message> {
     if (!this.topic.canUserInteract(this.galaxyUser)) throw new Error('Not allowed to interact');
+
+    const { bannedUsersIds } = new Configurations(
+      await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+    );
+    if (bannedUsersIds.includes(this.galaxyUser.userId)) throw new Error('User is banned');
 
     this.message = new Message(this.body);
     this.message.topicId = this.topic.topicId;
