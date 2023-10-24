@@ -11,7 +11,6 @@ AWS_PROFILE='esn-ga'
 ACTION=$1
 SRC_FOLDER="${PWD}/src"
 BACK_END_FOLDER="back-end"
-SWAGGER_FILE="swagger.yaml"
 C='\033[4;32m' # color
 NC='\033[0m'   # reset (no color)
 
@@ -55,16 +54,12 @@ ionic build --prod 1>/dev/null
 
 # upload the project's files to the S3 bucket
 echo -e "${C}Uploading...${NC}"
-aws s3 sync ./www ${BUCKET} --profile ${AWS_PROFILE} --exclude ".well-known/*" --exclude "${SWAGGER_FILE}" 1>/dev/null
-
-# add the Swagger (OpenApi 3.0) file
-echo -e "${C}Adding API docs...${NC}"
-aws s3 cp ../${BACK_END_FOLDER}/${SWAGGER_FILE} ${BUCKET}/${SWAGGER_FILE} --profile ${AWS_PROFILE} 1>/dev/null
+aws s3 sync ./www ${BUCKET} --profile ${AWS_PROFILE} --exclude ".well-known/*" 1>/dev/null
 
 # invalidate old common files from the CloudFront distribution
 echo -e "${C}Cleaning...${NC}"
 aws cloudfront create-invalidation --profile ${AWS_PROFILE} --distribution-id ${DISTRIBUTION} \
-  --paths "/index.html" "/assets/i18n*" "/${SWAGGER_FILE}" \
+  --paths "/index.html" "/assets/i18n*" \
   1>/dev/null
 
 echo -e "${C}Done!${NC}"

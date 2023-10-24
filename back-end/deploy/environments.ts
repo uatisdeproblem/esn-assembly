@@ -4,12 +4,14 @@ export const parameters: Parameters = {
   awsRegion: 'eu-south-1',
   apiDomain: 'api.esn-ga.link',
   mediaDomain: 'media.esn-ga.link',
-  firstAdminEmail: 'email@matteocarbone.com'
+  firstAdminEmail: 'email@matteocarbone.com',
+  frontEndCertificateARN: 'arn:aws:acm:us-east-1:772823474617:certificate/12d7466b-c989-46ee-86c5-61b2cda3c35c'
 };
 
 export const stages: { [stage: string]: Stage } = {
   prod: {
     domain: 'esn-ga.link',
+    alternativeDomains: ['ga.esn.org', 'qa.esn.org'],
     destroyDataOnDelete: false
   },
   dev: {
@@ -43,6 +45,10 @@ export interface Parameters {
    * The email address of the first (admin) user.
    */
   firstAdminEmail: string;
+  /**
+   * The custom front-end certificate ARN to use, to support alternative domains.
+   */
+  frontEndCertificateARN: string;
 }
 
 export interface Stage {
@@ -50,6 +56,10 @@ export interface Stage {
    * The domain name where to reach the front-end.
    */
   domain: string;
+  /**
+   * The (optional) alternative domain names to reach the front-end.
+   */
+  alternativeDomains?: string[];
   /**
    * Whether to delete the data when the environment is deleted.
    * It should be True for dev and False for prod environments.

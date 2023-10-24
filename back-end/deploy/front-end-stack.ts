@@ -12,23 +12,13 @@ export interface FrontEndProps extends cdk.StackProps {
   project: string;
   stage: string;
   domain: string;
+  alternativeDomains?: string[];
+  certificateARN: string;
 }
 
 export class FrontEndStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: FrontEndProps) {
     super(scope, id, props);
-
-    const corsForDocs =
-      props.stage === 'dev'
-        ? [
-            {
-              allowedHeaders: ['*'],
-              allowedMethods: [S3.HttpMethods.GET],
-              allowedOrigins: ['https://docs.iter-idea.com']
-            }
-          ]
-        : [];
-    const publicAccessForDocs = props.stage === 'dev' ? undefined : S3.BlockPublicAccess.BLOCK_ALL;
 
     const frontEndBucket = new S3.Bucket(this, 'Bucket', {
       bucketName: props.project.concat('-', props.stage, '-front-end'),
@@ -36,17 +26,8 @@ export class FrontEndStack extends cdk.Stack {
       websiteIndexDocument: 'index.html',
       websiteErrorDocument: 'index.html',
       removalPolicy: RemovalPolicy.DESTROY,
-      blockPublicAccess: publicAccessForDocs,
-      cors: corsForDocs
+      blockPublicAccess: S3.BlockPublicAccess.BLOCK_ALL
     });
-    if (props.stage === 'dev')
-      frontEndBucket.addToResourcePolicy(
-        new IAM.PolicyStatement({
-          actions: ['s3:GetObject'],
-          resources: [frontEndBucket.arnForObjects('swagger.yaml')],
-          principals: [new IAM.AnyPrincipal()]
-        })
-      );
 
     new cdk.CfnOutput(this, 'S3BucketName', { value: frontEndBucket.bucketName });
 
@@ -54,11 +35,7 @@ export class FrontEndStack extends cdk.Stack {
       domainName: props.domain.split('.').slice(-2).join('.')
     });
 
-    const certificate = new ACM.DnsValidatedCertificate(this, 'Certificate', {
-      domainName: props.domain,
-      hostedZone: zone,
-      region: 'us-east-1'
-    });
+    const certificate = ACM.Certificate.fromCertificateArn(this, 'CloudFrontCertificate', props.certificateARN);
 
     const frontEndDistributionOAI = new CloudFront.OriginAccessIdentity(this, 'DistributionOAI', {
       comment: `OAI for https://${props.domain}`
@@ -77,7 +54,10 @@ export class FrontEndStack extends cdk.Stack {
         { errorCachingMinTtl: 0, errorCode: 403, responseCode: 200, responsePagePath: '/index.html' },
         { errorCachingMinTtl: 0, errorCode: 404, responseCode: 200, responsePagePath: '/index.html' }
       ],
-      viewerCertificate: CloudFront.ViewerCertificate.fromAcmCertificate(certificate, { aliases: [props.domain] })
+      viewerCertificate: CloudFront.ViewerCertificate.fromAcmCertificate(certificate, {
+        aliases: props.alternativeDomains ? [props.domain, ...props.alternativeDomains] : [props.domain],
+        securityPolicy: CloudFront.SecurityPolicyProtocol.TLS_V1_2_2021
+      })
     });
     new cdk.CfnOutput(this, 'CloudFrontDistributionID', { value: frontEndDistribution.distributionId });
     frontEndBucket.addToResourcePolicy(
