@@ -100,6 +100,14 @@ export class MessagesService {
     const path = ['topics', topic.topicId, 'messages'];
     return new Message(await this.api.postResource(path, { body: message }));
   }
+  /**
+   * Insert a message in a topic anonymously.
+   */
+  async insertAnonymous(topic: Topic, message: Message): Promise<Message> {
+    const path = ['topics', topic.topicId, 'messages-anonymous'];
+    const headers = { Authorization: '' };
+    return new Message(await this.api.postResource(path, { body: message, headers }));
+  }
 
   /**
    * Upvote a message.

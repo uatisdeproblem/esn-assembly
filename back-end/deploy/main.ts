@@ -47,6 +47,7 @@ const apiResources: ResourceController[] = [
     ]
   },
   { name: 'messages', paths: ['/topics/{topicId}/messages', '/topics/{topicId}/messages/{messageId}'] },
+  { name: 'messagesAnonymous', paths: ['/topics/{topicId}/messages-anonymous'] },
   { name: 'badges', paths: ['/badges', '/badges/{badge}'] },
   { name: 'usefulLinks', paths: ['/usefulLinks', '/usefulLinks/{linkId}'] },
   { name: 'deadlines', paths: ['/deadlines', '/deadlines/{deadlineId}'] },

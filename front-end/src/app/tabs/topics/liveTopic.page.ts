@@ -175,7 +175,9 @@ export class LiveTopicPage {
     const doSend = async (): Promise<void> => {
       try {
         await this.loading.show();
-        const message = await this._messages.insert(this.topic, this.newMessage);
+        let message: Message;
+        if (this.newMessage.creator) message = await this._messages.insert(this.topic, this.newMessage);
+        else message = await this._messages.insertAnonymous(this.topic, this.newMessage);
         // @todo to check
         if (message.type === MessageTypes.QUESTION) this.questions.push(message);
         if (message.type === MessageTypes.APPRECIATION) this.appreciations.push(message);

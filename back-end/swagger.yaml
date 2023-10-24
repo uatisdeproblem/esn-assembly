@@ -1178,6 +1178,29 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/messages-anonymous:
+    post:
+      summary: Insert a new message on a live topic, anonimously
+      description: Only if the live topics allows it
+      tags: [Messages]
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        200:
+          $ref: '#/components/responses/Message'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /badges:
     get:
       summary: Get the user's earned badges

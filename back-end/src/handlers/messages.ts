@@ -2,7 +2,6 @@
 /// IMPORTS
 ///
 
-import { createHash } from 'crypto';
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { Message } from '../models/message.model';
@@ -87,13 +86,8 @@ class MessagesRC extends ResourceController {
 
     this.message = new Message(this.body);
     this.message.topicId = this.topic.topicId;
-    if (this.message.creator) {
-      this.message.messageId = Message.getPK(this.galaxyUser.userId);
-      this.message.creator = Subject.fromUser(this.galaxyUser);
-    } else {
-      // anonymous
-      this.message.messageId = Message.getPK(createHash('sha512').update(this.galaxyUser.userId).digest('hex'));
-    }
+    this.message.messageId = Message.getPK(this.galaxyUser.userId);
+    this.message.creator = Subject.fromUser(this.galaxyUser);
     this.message.createdAt = new Date().toISOString();
     this.message.numOfUpvotes = 0;
 
