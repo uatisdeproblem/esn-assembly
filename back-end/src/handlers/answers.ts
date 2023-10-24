@@ -25,7 +25,7 @@ const DDB_TABLES = {
 };
 const ddb = new DynamoDB();
 
-const DOMAIN_URL = STAGE === 'prod' ? 'qa.esn.org' : 'dev.esn-ga.link';
+const DOMAIN_URL = STAGE === 'prod' ? 'ga.esn.org' : 'dev.esn-ga.link';
 const QUESTION_BASE_URL = `https://${DOMAIN_URL}/t/topics/`;
 const SES_CONFIG = {
   sourceName: 'ESN General Assembly app',
