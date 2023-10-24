@@ -17,7 +17,7 @@ import { Configurations } from '../models/configurations.model';
 const CAS_URL = 'https://accounts.esn.org/cas';
 const JWT_EXPIRE_TIME = '1 day';
 
-const APP_URL = process.env.STAGE === 'prod' ? 'https://qa.esn.org' : 'https://dev.esn-ga.link';
+const APP_URL = process.env.STAGE === 'prod' ? 'https://ga.esn.org' : 'https://dev.esn-ga.link';
 
 const PROJECT = process.env.PROJECT;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };

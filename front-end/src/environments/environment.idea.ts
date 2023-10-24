@@ -6,7 +6,7 @@ export const environment = {
     project: 'esn-ga',
     app: {
       version: '1.4.0',
-      url: 'https://qa.esn.org',
+      url: 'https://ga.esn.org',
       mediaUrl: 'https://media.esn-ga.link',
       title: 'ESN General Assembly app',
       bundle: 'com.matteocarbone.esnga',
@@ -17,11 +17,6 @@ export const environment = {
       url: 'api.esn-ga.link',
       stage: 'prod'
     },
-    auth: {
-      registrationIsPossible: false,
-      singleSimultaneousSession: false
-    },
-    ionicExtraModules: ['common'],
-    website: 'https://esn.org'
+    ionicExtraModules: ['common']
   }
 };
