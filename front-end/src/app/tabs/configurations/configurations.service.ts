@@ -20,6 +20,15 @@ export class ConfigurationsService {
   async update(configurations: Configurations): Promise<Configurations> {
     return new Configurations(await this.api.putResource('configurations', { body: configurations }));
   }
+  /**
+   * Ban a user by its ID.
+   */
+  async banUserByID(userId: string): Promise<void> {
+    const config = await this.get();
+    if (config.bannedUsersIds.includes(userId)) return;
+    config.bannedUsersIds.push(userId);
+    await this.update(config);
+  }
 
   /**
    * Set a new email template.

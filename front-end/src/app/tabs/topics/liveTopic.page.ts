@@ -11,8 +11,9 @@ import {
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
-import { AttachmentsService } from 'src/app/common/attachments.service';
+import { AttachmentsService } from '@app/common/attachments.service';
 import { MessagesService, MessagesSortBy } from './messages/messages.service';
+import { ConfigurationsService } from '../configurations/configurations.service';
 
 import { environment as env } from '@env';
 import { Topic, TopicTypes } from '@models/topic.model';
@@ -62,6 +63,7 @@ export class LiveTopicPage {
     private _topics: TopicsService,
     private _attachments: AttachmentsService,
     private _messages: MessagesService,
+    private _configurations: ConfigurationsService,
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
@@ -107,12 +109,13 @@ export class LiveTopicPage {
     }
   }
 
-  async filterQuestions(scrollToNextPage?: IonInfiniteScroll): Promise<void> {
+  async filterQuestions(scrollToNextPage?: IonInfiniteScroll, force = false): Promise<void> {
     let startPaginationAfterId = null;
     if (scrollToNextPage && this.questions?.length)
       startPaginationAfterId = this.questions[this.questions.length - 1].messageId;
 
     this.questions = await this._messages.getListOfTopic(this.topic, {
+      force,
       filterByType: MessageTypes.QUESTION,
       showCompleted: this.topic.isClosed() ? true : this.showCompletedQuestions,
       sortBy: this.sortQuestionsBy,
@@ -122,12 +125,13 @@ export class LiveTopicPage {
 
     if (scrollToNextPage) setTimeout((): Promise<void> => scrollToNextPage.complete(), 100);
   }
-  async filterAppreciations(scrollToNextPage?: IonInfiniteScroll): Promise<void> {
+  async filterAppreciations(scrollToNextPage?: IonInfiniteScroll, force = false): Promise<void> {
     let startPaginationAfterId = null;
     if (scrollToNextPage && this.appreciations?.length)
       startPaginationAfterId = this.appreciations[this.appreciations.length - 1].messageId;
 
     this.appreciations = await this._messages.getListOfTopic(this.topic, {
+      force,
       filterByType: MessageTypes.APPRECIATION,
       showCompleted: this.topic.isClosed() ? true : this.showCompletedAppreciations,
       sortBy: this.sortAppreciationsBy,
@@ -178,9 +182,8 @@ export class LiveTopicPage {
         let message: Message;
         if (this.newMessage.creator) message = await this._messages.insert(this.topic, this.newMessage);
         else message = await this._messages.insertAnonymous(this.topic, this.newMessage);
-        // @todo to check
-        if (message.type === MessageTypes.QUESTION) this.questions.push(message);
-        if (message.type === MessageTypes.APPRECIATION) this.appreciations.push(message);
+        if (message.type === MessageTypes.QUESTION) this.filterQuestions(null, true);
+        if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations(null, true);
         this.newMessage = null;
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (err) {
@@ -212,14 +215,70 @@ export class LiveTopicPage {
   async seeMessageUpvoters(message: Message): Promise<void> {
     // @todo
   }
-  private async markMessageComplete(message: Message): Promise<void> {
-    // @todo
+  private async changeCompleteStatus(message: Message, complete: boolean): Promise<void> {
+    try {
+      await this.loading.show();
+      if (complete) message.load(await this._messages.markComplete(this.topic, message));
+      else message.load(await this._messages.undoComplete(this.topic, message));
+      if (message.type === MessageTypes.QUESTION) this.filterQuestions();
+      if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations();
+      this.message.success('COMMON.OPERATION_COMPLETED');
+    } catch (err) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      this.loading.hide();
+    }
   }
   private async deleteMessage(message: Message): Promise<void> {
-    // @todo
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._messages.delete(this.topic, message);
+        if (message.type === MessageTypes.QUESTION) this.filterQuestions(null, true);
+        if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations(null, true);
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (err) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
   }
   private async deleteMessageAndBanUser(message: Message): Promise<void> {
-    // @todo
+    if (!message.creator) return;
+
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._messages.delete(this.topic, message);
+        if (message.type === MessageTypes.QUESTION) this.filterQuestions(null, true);
+        if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations(null, true);
+        await this._configurations.banUserByID(message.creator.id);
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (err) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
+    const header = this.t._('MESSAGES.DELETE_AND_BAN_USER');
+    const subHeader = this.t._('COMMON.ARE_YOU_SURE');
+    const messageAlert = this.t._('MESSAGES.DELETE_AND_BAN_USER_I');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, subHeader, message: messageAlert, buttons });
+    alert.present();
   }
   async actionsOnMessage(message: Message): Promise<void> {
     if (!message) return;
@@ -227,11 +286,21 @@ export class LiveTopicPage {
     const header = this.t._('MESSAGES.ACTIONS');
     const buttons = [];
 
-    buttons.push({
-      text: this.t._('MESSAGES.MARK_COMPLETE'),
-      icon: 'checkmark-done',
-      handler: (): Promise<void> => this.markMessageComplete(message)
-    });
+    if (!this.topic.isClosed()) {
+      if (!message.completedAt) {
+        buttons.push({
+          text: this.t._('MESSAGES.MARK_COMPLETE'),
+          icon: 'checkmark-done',
+          handler: (): Promise<void> => this.changeCompleteStatus(message, true)
+        });
+      } else if (this.app.user.isAdministrator) {
+        buttons.push({
+          text: this.t._('MESSAGES.UNDO_COMPLETE'),
+          icon: 'square-outline',
+          handler: (): Promise<void> => this.changeCompleteStatus(message, false)
+        });
+      }
+    }
 
     if (this.app.user.isAdministrator) {
       buttons.push({

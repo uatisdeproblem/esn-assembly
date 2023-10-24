@@ -1154,6 +1154,39 @@ paths:
         400:
           $ref: '#/components/responses/BadParameters'
   /topics/{topicId}/messages/{messageId}:
+    patch:
+      summary: Actions on a message of a live topic
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [MARK_COMPLETE, UNDO_COMPLETE]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
     delete:
       summary: Delete the message of a live topic
       description: Requires to be Administrator or the creator

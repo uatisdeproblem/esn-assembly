@@ -141,6 +141,23 @@ export class MessagesService {
   }
 
   /**
+   * Mark a message as complete.
+   */
+  async markComplete(topic: Topic, message: Message): Promise<Message> {
+    const path = ['topics', topic.topicId, 'messages', message.messageId];
+    const body = { action: 'MARK_COMPLETE' };
+    return new Message(await this.api.patchResource(path, { body }));
+  }
+  /**
+   * Undo the status "complete" of a message.
+   */
+  async undoComplete(topic: Topic, message: Message): Promise<Message> {
+    const path = ['topics', topic.topicId, 'messages', message.messageId];
+    const body = { action: 'UNDO_COMPLETE' };
+    return new Message(await this.api.patchResource(path, { body }));
+  }
+
+  /**
    * Delete a message.
    */
   async delete(topic: Topic, message: Message): Promise<void> {

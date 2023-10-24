@@ -111,4 +111,44 @@ class MessagesRC extends ResourceController {
       Key: { topicId: this.topic.topicId, messageId: this.message.messageId }
     });
   }
+
+  protected async patchResource(): Promise<Message> {
+    switch (this.body.action) {
+      case 'MARK_COMPLETE':
+        return await this.markComplete();
+      case 'UNDO_COMPLETE':
+        return await this.undoComplete();
+      default:
+        throw new RCError('Unsupported action');
+    }
+  }
+  private async markComplete(): Promise<Message> {
+    if (this.topic.isClosed()) throw new Error('Topic is closed');
+    if (this.message.completedAt) throw new Error('Message is already complete');
+
+    this.message.completedAt = new Date().toISOString();
+    await ddb.update({
+      TableName: DDB_TABLES.messages,
+      Key: { topicId: this.topic.topicId, messageId: this.resourceId },
+      UpdateExpression: 'SET completedAt = :completedAt',
+      ExpressionAttributeValues: { ':completedAt': this.message.completedAt }
+    });
+
+    return this.message;
+  }
+  private async undoComplete(): Promise<Message> {
+    if (this.topic.isClosed()) throw new Error('Topic is closed');
+    if (!this.galaxyUser.isAdministrator) throw new Error('Unauthorized');
+
+    if (!this.message.completedAt) return this.message;
+
+    delete this.message.completedAt;
+    await ddb.update({
+      TableName: DDB_TABLES.messages,
+      Key: { topicId: this.topic.topicId, messageId: this.resourceId },
+      UpdateExpression: 'REMOVE completedAt'
+    });
+
+    return this.message;
+  }
 }

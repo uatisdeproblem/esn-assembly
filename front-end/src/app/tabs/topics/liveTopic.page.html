@@ -211,7 +211,7 @@
                 <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
               </ion-item>
               <ion-item class="noElements" *ngIf="questions && !questions.length">
-                <ion-label>{{ 'MESSAGES.NO_MESSAGES_YET' | translate }}</ion-label>
+                <ion-label>{{ 'MESSAGES.NO_MESSAGES' | translate }}</ion-label>
               </ion-item>
               <ion-card
                 class="messageCard"
@@ -221,11 +221,16 @@
                 <ion-card-header>
                   <ion-row class="ion-align-items-center">
                     <ion-col [size]="12" [sizeLg]="9">
-                      <ion-card-title *ngIf="question.creator">
-                        <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
-                      </ion-card-title>
-                      <ion-card-title *ngIf="!question.creator">
-                        <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
+                      <ion-card-title>
+                        <ion-icon
+                          icon="checkmark-done"
+                          class="ion-padding-end"
+                          *ngIf="!topic.isClosed() && question.completedAt"
+                        />
+                        <ion-text *ngIf="question.creator">
+                          <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
+                        </ion-text>
+                        <i *ngIf="!question.creator">{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
                       </ion-card-title>
                     </ion-col>
                     <ion-col
@@ -303,7 +308,7 @@
                 <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
               </ion-item>
               <ion-item class="noElements" *ngIf="appreciations && !appreciations.length">
-                <ion-label>{{ 'MESSAGES.NO_MESSAGES_YET' | translate }}</ion-label>
+                <ion-label>{{ 'MESSAGES.NO_MESSAGES' | translate }}</ion-label>
               </ion-item>
               <ion-card
                 class="messageCard"
@@ -313,11 +318,16 @@
                 <ion-card-header>
                   <ion-row class="ion-align-items-center">
                     <ion-col [size]="12" [sizeLg]="9">
-                      <ion-card-title *ngIf="appreciation.creator">
-                        <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
-                      </ion-card-title>
-                      <ion-card-title *ngIf="!appreciation.creator">
-                        <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
+                      <ion-card-title>
+                        <ion-icon
+                          icon="checkmark-done"
+                          class="ion-padding-end"
+                          *ngIf="!topic.isClosed() && appreciation.completedAt"
+                        />
+                        <ion-text *ngIf="appreciation.creator">
+                          <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
+                        </ion-text>
+                        <i *ngIf="!appreciation.creator">{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
                       </ion-card-title>
                     </ion-col>
                     <ion-col
