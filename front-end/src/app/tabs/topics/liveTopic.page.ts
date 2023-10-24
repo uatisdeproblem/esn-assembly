@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AlertController, IonInfiniteScroll, IonRefresher } from '@ionic/angular';
+import { AlertController, IonInfiniteScroll, IonRefresher, PopoverController } from '@ionic/angular';
 import { toCanvas } from 'qrcode';
 import { Attachment } from 'idea-toolbox';
 import {
@@ -8,6 +8,8 @@ import {
   IDEAMessageService,
   IDEATranslationsService
 } from '@idea-ionic/common';
+
+import { SubjectsReactionsComponent } from '@app/common/subjectsReactions.component';
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
@@ -54,9 +56,12 @@ export class LiveTopicPage {
   hideQuestions = false;
   hideAppreciations = false;
 
+  hasUserUpvotedMessage: Record<string, boolean> = {}; // @todo
+
   constructor(
     private alertCtrl: AlertController,
     private actionsCtrl: IDEAActionSheetController,
+    private popoverCtrl: PopoverController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
@@ -79,9 +84,10 @@ export class LiveTopicPage {
   }
   private async loadResources(): Promise<void> {
     this.topic = await this._topics.getById(this.topicId);
-    [, this.relatedTopics] = await Promise.all([
+    [, this.relatedTopics, this.hasUserUpvotedMessage] = await Promise.all([
       this._messages.getListOfTopic(this.topic),
-      this._topics.getRelated(this.topic)
+      this._topics.getRelated(this.topic),
+      this._topics.userMessagesUpvotesForTopic(this.topic)
     ]);
     await this.filterQuestions();
     await this.filterAppreciations();
@@ -205,23 +211,42 @@ export class LiveTopicPage {
     return this.errors.has(field);
   }
 
-  async upvoteMessage(message: Message): Promise<void> {
-    // @todo
+  async upvoteMessage(message: Message, upvote: boolean): Promise<void> {
+    try {
+      this.hasUserUpvotedMessage[message.messageId] = upvote;
+      if (upvote) {
+        await this._messages.upvote(this.topic, message);
+        message.numOfUpvotes++;
+      } else {
+        await this._messages.upvoteCancel(this.topic, message);
+        message.numOfUpvotes--;
+      }
+    } catch (error) {
+      this.hasUserUpvotedMessage[message.messageId] = !upvote;
+      this.message.error('COMMON.OPERATION_FAILED');
+    }
   }
-  hasUserUpvotedMessage(message: Message): boolean {
-    // @todo
-    return false;
-  }
-  async seeMessageUpvoters(message: Message): Promise<void> {
-    // @todo
+  async seeMessageUpvoters(message: Message, event?: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    const subjectsPromise = this._messages.getUpvoters(this.topic, message);
+    const popover = await this.popoverCtrl.create({
+      component: SubjectsReactionsComponent,
+      componentProps: {
+        subjectsPromise,
+        reaction: message.type === MessageTypes.APPRECIATION ? 'appreciation' : 'upvote'
+      },
+      cssClass: 'mediumPopover',
+      event
+    });
+    await popover.present();
   }
   private async changeCompleteStatus(message: Message, complete: boolean): Promise<void> {
     try {
       await this.loading.show();
-      if (complete) message.load(await this._messages.markComplete(this.topic, message));
-      else message.load(await this._messages.undoComplete(this.topic, message));
-      if (message.type === MessageTypes.QUESTION) this.filterQuestions();
-      if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations();
+      if (complete) await this._messages.markComplete(this.topic, message);
+      else await this._messages.undoComplete(this.topic, message);
+      if (message.type === MessageTypes.QUESTION) this.filterQuestions(null, true);
+      if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations(null, true);
       this.message.success('COMMON.OPERATION_COMPLETED');
     } catch (err) {
       this.message.error('COMMON.OPERATION_FAILED');
@@ -285,6 +310,9 @@ export class LiveTopicPage {
     const alert = await this.alertCtrl.create({ message: message.text, buttons });
     alert.present();
   }
+  private openUserProfile(creator: Subject): void {
+    this.app.openURL(creator.getURL());
+  }
   async actionsOnMessage(message: Message): Promise<void> {
     if (!message) return;
 
@@ -307,19 +335,31 @@ export class LiveTopicPage {
       }
     }
 
-    if (this.app.user.isAdministrator) {
-      if (message.type === MessageTypes.QUESTION && message.text) {
-        buttons.push({
-          text: this.t._('MESSAGES.READ_FULL_TEXT'),
-          icon: 'document-text',
-          handler: (): Promise<void> => this.readMessageFullText(message)
-        });
-      }
+    if (
+      (this.app.user.isAdministrator || message.creator?.id === this.app.user.userId) &&
+      message.type === MessageTypes.QUESTION &&
+      message.text
+    ) {
       buttons.push({
-        text: this.t._('MESSAGES.SEE_UPVOTERS'),
+        text: this.t._('MESSAGES.READ_FULL_TEXT'),
+        icon: 'document-text',
+        handler: (): Promise<void> => this.readMessageFullText(message)
+      });
+    }
+
+    if (this.app.user.isAdministrator) {
+      buttons.push({
+        text: this.t._('MESSAGES.SEE_WHO_REACTED'),
         icon: 'eye',
         handler: (): Promise<void> => this.seeMessageUpvoters(message)
       });
+      if (message.creator) {
+        buttons.push({
+          text: this.t._('MESSAGES.OPEN_PROFILE'),
+          icon: 'person',
+          handler: (): void => this.openUserProfile(message.creator)
+        });
+      }
     }
 
     buttons.push({

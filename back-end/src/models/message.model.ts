@@ -99,6 +99,49 @@ export class MessageUpvote extends Resource {
    */
   userId: string;
   /**
+   * The ID of the topic for which the message was posted.
+   */
+  topicId: string;
+  /**
+   * The data of the user who upvoted.
+   */
+  creator: Subject;
+  /**
+   * The timestamp of creation of the upvote.
+   */
+  createdAt: epochISOString;
+
+  load(x: any): void {
+    super.load(x);
+    this.messageId = this.clean(x.messageId, String);
+    this.userId = this.clean(x.userId, String);
+    this.topicId = this.clean(x.topicId, String);
+    this.creator = new Subject(x.creator);
+    this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
+  }
+}
+
+/**
+ * The type of messages in a live topic.
+ */
+export enum MessageTypes {
+  QUESTION = 'QUESTION',
+  APPRECIATION = 'APPRECIATION'
+}
+
+/**
+ * The act of upvoting a message.
+ */
+export class QuestionUpvote extends Resource {
+  /**
+   * The ID of the message.
+   */
+  messageId: string;
+  /**
+   * The ID of the user who upvoted.
+   */
+  userId: string;
+  /**
    * The data of the user who upvoted.
    */
   creator: Subject;
@@ -114,12 +157,4 @@ export class MessageUpvote extends Resource {
     this.creator = new Subject(x.creator);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
   }
-}
-
-/**
- * The type of messages in a live topic.
- */
-export enum MessageTypes {
-  QUESTION = 'QUESTION',
-  APPRECIATION = 'APPRECIATION'
 }

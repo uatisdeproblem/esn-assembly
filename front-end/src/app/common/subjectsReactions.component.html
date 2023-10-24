@@ -6,12 +6,8 @@
       </ion-button>
     </ion-buttons>
     <ion-buttons slot="end" *ngIf="reaction">
-      <ion-text [color]="reaction === 'upvote' ? 'ESNgreen' : 'ESNpink'">{{ subjects?.length }}</ion-text>
-      <ion-icon
-        class="ion-padding-end"
-        [icon]="reaction === 'upvote' ? 'thumbs-up' : '/assets/icons/clap.svg'"
-        [color]="reaction === 'upvote' ? 'ESNgreen' : 'ESNpink'"
-      ></ion-icon>
+      <ion-text [color]="color">{{ subjects?.length }}</ion-text>
+      <ion-icon class="ion-padding-end" [icon]="icon" [color]="color"></ion-icon>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>

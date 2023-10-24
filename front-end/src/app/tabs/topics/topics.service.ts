@@ -226,6 +226,17 @@ export class TopicsService {
   async unlinkByIds(topicA: string, topicB: string): Promise<void> {
     await this.api.deleteResource(['topics', topicA, 'related', topicB]);
   }
+
+  /**
+   * Get the messages of the live topic that the user upvoted.
+   */
+  async userMessagesUpvotesForTopic(topic: Topic): Promise<{ [messageId: string]: boolean }> {
+    const path = ['topics', topic.topicId];
+    const answersIds: string[] = await this.api.patchResource(path, { body: { action: 'MESSAGES_UPVOTES' } });
+    const upvoteMap = {};
+    answersIds.forEach(a => (upvoteMap[a] = true));
+    return upvoteMap;
+  }
 }
 
 /**

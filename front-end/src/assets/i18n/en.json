@@ -470,7 +470,8 @@
     "DELETE_AND_BAN_USER_I": "The user won't be able to send messages until you remove the ban from the Configurations.",
     "UPVOTE": "Upvote",
     "CANCEL_UPVOTE": "Cancel upvote",
-    "SEE_UPVOTERS": "See who upvoted",
-    "READ_FULL_TEXT": "Read full text"
+    "SEE_WHO_REACTED": "See who reacted",
+    "READ_FULL_TEXT": "Read full text",
+    "OPEN_PROFILE": "Open profile"
   }
 }

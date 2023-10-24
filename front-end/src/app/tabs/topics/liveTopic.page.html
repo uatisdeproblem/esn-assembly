@@ -211,7 +211,7 @@
                     </ion-checkbox>
                   </ion-item>
                 </ion-col>
-                <ion-col>
+                <ion-col class="ion-hide-sm-down">
                   <ion-item color="transparent" lines="none">
                     <ion-select
                       interface="popover"
@@ -223,6 +223,11 @@
                         {{ ('MESSAGES.SORT_BY_OPTIONS.' + sortBy.key) | translate }}
                       </ion-select-option>
                     </ion-select>
+                  </ion-item>
+                </ion-col>
+                <ion-col [size]="2" [sizeSm]="1">
+                  <ion-item color="transparent" lines="none">
+                    <ion-label><b>{{ questions.length }}</b></ion-label>
                   </ion-item>
                 </ion-col>
               </ion-row>
@@ -259,20 +264,25 @@
                       [size]="12"
                       [sizeLg]="3"
                     >
-                      <ion-button fill="clear" *ngIf="!app.user.isAdministrator" (click)="seeMessageUpvoters(question)">
-                        <ion-icon name="eye-outline"></ion-icon>
+                      <ion-button
+                        fill="clear"
+                        color="medium"
+                        *ngIf="!app.user.isAdministrator"
+                        (click)="seeMessageUpvoters(question, $event)"
+                      >
+                        <ion-icon name="eye"></ion-icon>
                       </ion-button>
                       <ion-button
                         fill="clear"
                         color="ESNgreen"
                         *ngIf="!topic.isClosed()"
-                        (click)="upvoteMessage(question)"
+                        (click)="upvoteMessage(question, !hasUserUpvotedMessage[question.messageId])"
                       >
                         <ion-icon
                           slot="start"
-                          [name]="hasUserUpvotedMessage(question) ? 'thumbs-up' : 'thumbs-up-outline'"
+                          [name]="hasUserUpvotedMessage[question.messageId] ? 'thumbs-up' : 'thumbs-up-outline'"
                         ></ion-icon>
-                        {{ question.numOfUpvotes }}
+                        <b>{{ question.numOfUpvotes }}</b>
                       </ion-button>
                       <ion-button
                         fill="clear"
@@ -312,7 +322,7 @@
                     </ion-checkbox>
                   </ion-item>
                 </ion-col>
-                <ion-col>
+                <ion-col class="ion-hide-sm-down">
                   <ion-item color="transparent" lines="none">
                     <ion-select
                       interface="popover"
@@ -324,6 +334,11 @@
                         {{ ('MESSAGES.SORT_BY_OPTIONS.' + sortBy.key) | translate }}
                       </ion-select-option>
                     </ion-select>
+                  </ion-item>
+                </ion-col>
+                <ion-col [size]="2" [sizeSm]="1">
+                  <ion-item color="transparent" lines="none">
+                    <ion-label><b>{{ appreciations.length }}</b></ion-label>
                   </ion-item>
                 </ion-col>
               </ion-row>
@@ -362,22 +377,23 @@
                     >
                       <ion-button
                         fill="clear"
+                        color="medium"
                         *ngIf="!app.user.isAdministrator"
-                        (click)="seeMessageUpvoters(appreciation)"
+                        (click)="seeMessageUpvoters(appreciation, $event)"
                       >
-                        <ion-icon name="eye-outline"></ion-icon>
+                        <ion-icon name="eye"></ion-icon>
                       </ion-button>
                       <ion-button
                         fill="clear"
                         color="ESNpink"
                         *ngIf="!topic.isClosed()"
-                        (click)="upvoteMessage(appreciation)"
+                        (click)="upvoteMessage(appreciation, !hasUserUpvotedMessage[appreciation.messageId])"
                       >
                         <ion-icon
                           slot="start"
-                          [name]="hasUserUpvotedMessage(appreciation) ? 'heart' : 'heart-outline'"
+                          [name]="hasUserUpvotedMessage[appreciation.messageId] ? 'heart' : 'heart-outline'"
                         ></ion-icon>
-                        {{ appreciation.numOfUpvotes }}
+                        <b>{{ appreciation.numOfUpvotes }}</b>
                       </ion-button>
                       <ion-button
                         fill="clear"

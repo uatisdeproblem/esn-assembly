@@ -48,6 +48,10 @@ const apiResources: ResourceController[] = [
   },
   { name: 'messages', paths: ['/topics/{topicId}/messages', '/topics/{topicId}/messages/{messageId}'] },
   { name: 'messagesAnonymous', paths: ['/topics/{topicId}/messages-anonymous'] },
+  {
+    name: 'messagesUpvotes',
+    paths: ['/topics/{topicId}/messages/{messageId}/upvotes', '/topics/{topicId}/messages/{messageId}/upvotes/{userId}']
+  },
   { name: 'badges', paths: ['/badges', '/badges/{badge}'] },
   { name: 'usefulLinks', paths: ['/usefulLinks', '/usefulLinks/{linkId}'] },
   { name: 'deadlines', paths: ['/deadlines', '/deadlines/{deadlineId}'] },
@@ -131,6 +135,24 @@ const tables: { [tableName: string]: DDBTable } = {
   messages: {
     PK: { name: 'topicId', type: DDB.AttributeType.STRING },
     SK: { name: 'messageId', type: DDB.AttributeType.STRING }
+  },
+  messagesUpvotes: {
+    PK: { name: 'messageId', type: DDB.AttributeType.STRING },
+    SK: { name: 'userId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'inverted-index',
+        partitionKey: { name: 'userId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'messageId', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.ALL
+      },
+      {
+        indexName: 'topicId-userId-index',
+        partitionKey: { name: 'topicId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'userId', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.ALL
+      }
+    ]
   },
   usersBadges: {
     PK: { name: 'userId', type: DDB.AttributeType.STRING },

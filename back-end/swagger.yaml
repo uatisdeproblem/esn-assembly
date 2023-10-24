@@ -525,7 +525,7 @@ paths:
               properties:
                 action:
                   type: string
-                  enum: [OPEN, CLOSE, ARCHIVE, UNARCHIVE]
+                  enum: [OPEN, CLOSE, ARCHIVE, UNARCHIVE, MESSAGES_UPVOTES]
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
@@ -1234,6 +1234,102 @@ paths:
           $ref: '#/components/responses/Message'
         400:
           $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/messages/{messageId}/upvotes:
+    get:
+      summary: Get the users who upvoted the message
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Subjects'
+    post:
+      summary: Upvote a message
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Cancel the upvote to a message
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /topics/{topicId}/messages/{messageId}/upvotes/{userId}:
+    get:
+      summary: Whether the user has upvoted the message
+      tags: [Messages]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: topicId
+          in: path
+          description: Topic ID
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          description: Message ID
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
   /badges:
     get:
       summary: Get the user's earned badges

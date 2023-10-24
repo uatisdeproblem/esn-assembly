@@ -18,15 +18,31 @@ export class SubjectsReactionsComponent implements AfterViewInit {
   /**
    * The reaction.
    */
-  @Input() reaction: 'upvote' | 'clap';
+  @Input() reaction: 'upvote' | 'clap' | 'appreciation';
 
   showSpinner = true;
   subjects: Subject[];
+
+  icon: string;
+  color: string;
 
   constructor(private popoverCtrl: PopoverController, public app: AppService) {}
   async ngAfterViewInit(): Promise<void> {
     if (this.subjectsPromise) this.subjects = await this.subjectsPromise;
     this.showSpinner = false;
+    this.icon = this.getIcon();
+    this.color = this.getColor();
+  }
+
+  private getIcon(): string {
+    if (this.reaction === 'upvote') return 'thumbs-up';
+    if (this.reaction === 'clap') return '/assets/icons/clap.svg';
+    if (this.reaction === 'appreciation') return 'heart';
+  }
+  private getColor(): string {
+    if (this.reaction === 'upvote') return 'ESNgreen';
+    if (this.reaction === 'clap') return 'ESNpink';
+    if (this.reaction === 'appreciation') return 'ESNpink';
   }
 
   close(): void {
