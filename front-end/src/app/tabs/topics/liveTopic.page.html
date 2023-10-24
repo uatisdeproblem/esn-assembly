@@ -217,6 +217,7 @@
                 class="messageCard"
                 *ngFor="let question of questions"
                 [class.author]="question.creator?.id === app.user.userId"
+                [class.complete]="!topic.isClosed() && question.completedAt"
               >
                 <ion-card-header>
                   <ion-row class="ion-align-items-center">
@@ -314,6 +315,7 @@
                 class="messageCard"
                 *ngFor="let appreciation of appreciations"
                 [class.author]="appreciation.creator?.id === app.user.userId"
+                [class.complete]="!topic.isClosed() && appreciation.completedAt"
               >
                 <ion-card-header>
                   <ion-row class="ion-align-items-center">

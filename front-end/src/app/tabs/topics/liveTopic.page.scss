@@ -90,6 +90,9 @@ ion-list.messagesList {
   ion-card.messageCard.author {
     border-left: 4px solid var(--ion-color-primary);
   }
+  ion-card.messageCard.complete {
+    opacity: 0.6;
+  }
   .messagesFilters {
     ion-item {
       font-size: 0.85em;
