@@ -17,11 +17,6 @@ export const environment = {
       url: 'api.esn-ga.link',
       stage: 'prod'
     },
-    auth: {
-      registrationIsPossible: false,
-      singleSimultaneousSession: false
-    },
-    ionicExtraModules: ['common'],
-    website: 'https://esn.org'
+    ionicExtraModules: ['common']
   }
 };
