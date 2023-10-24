@@ -35,9 +35,11 @@ export class MessagesService {
       force?: boolean;
       search?: string;
       filterByType?: MessageTypes;
+      sortBy?: MessagesSortBy;
+      showCompleted?: boolean;
       withPagination?: boolean;
       startPaginationAfterId?: string;
-    } = {}
+    } = { sortBy: MessagesSortBy.CREATION_ASC }
   ): Promise<Message[]> {
     if (!this.messages || options.force) await this.loadListOfTopic(topic);
     if (!this.messages) return null;
@@ -58,6 +60,28 @@ export class MessagesService {
       );
 
     if (options.filterByType) filteredList = filteredList.filter(x => x.type === options.filterByType);
+
+    if (options.showCompleted !== undefined)
+      filteredList = filteredList.filter(x => (options.showCompleted ? true : !x.completedAt));
+
+    switch (options.sortBy) {
+      case MessagesSortBy.CREATION_ASC:
+        filteredList = filteredList.sort((a, b): number => a.messageId.localeCompare(b.messageId));
+        break;
+      case MessagesSortBy.CREATION_DESC:
+        filteredList = filteredList.sort((a, b): number => b.messageId.localeCompare(a.messageId));
+        break;
+      case MessagesSortBy.UPVOTES_ASC:
+        filteredList = filteredList.sort(
+          (a, b): number => a.numOfUpvotes - b.numOfUpvotes || a.messageId.localeCompare(b.messageId)
+        );
+        break;
+      case MessagesSortBy.UPVOTES_DESC:
+        filteredList = filteredList.sort(
+          (a, b): number => b.numOfUpvotes - a.numOfUpvotes || a.messageId.localeCompare(b.messageId)
+        );
+        break;
+    }
 
     if (options.withPagination && filteredList.length > this.MAX_PAGE_SIZE) {
       let indexOfLastOfPreviousPage = 0;
@@ -115,4 +139,14 @@ export class MessagesService {
     const path = ['topics', topic.topicId, 'messages', message.messageId];
     await this.api.deleteResource(path);
   }
+}
+
+/**
+ * The possible sortings for lists of messages.
+ */
+export enum MessagesSortBy {
+  CREATION_DESC = 'CREATION_DESC',
+  CREATION_ASC = 'CREATION_ASC',
+  UPVOTES_DESC = 'UPVOTES_DESC',
+  UPVOTES_ASC = 'UPVOTES_ASC'
 }

@@ -110,21 +110,21 @@ ion-list.aList {
     }
   }
   ion-row.row,
-  ion-item {
+  ion-item:not([color]) {
     // all the three definitions are important
     background-color: var(--ion-color-white);
     --ion-background-color: var(--ion-color-white);
     --background: var(--ion-color-white);
   }
   ion-row.row.odd,
-  ion-item.odd {
+  ion-item:not([color]).odd {
     // all the three definitions are important
     background-color: var(--ion-color-light);
     --ion-background-color: var(--ion-color-light);
     --background: var(--ion-color-light);
   }
   ion-row.row ion-item,
-  ion-row.headerRow ion-item {
+  ion-row.headerRow ion-item:not([color]) {
     // all the three definitions are important
     background-color: transparent;
     --ion-background-color: transparent;

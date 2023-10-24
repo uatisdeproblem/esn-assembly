@@ -42,6 +42,10 @@ export class Message extends Resource {
    * The number of upvotes for the message.
    */
   numOfUpvotes: number;
+  /**
+   * The timestamp when the messages was marked as completed.
+   */
+  completedAt?: epochISOString;
 
   static getPK(userId: string): string {
     const timestamp = getDateStringInFavoriteTimezone(new Date(), FAVORITE_TIMEZONE, true);
@@ -58,6 +62,7 @@ export class Message extends Resource {
     this.creator = x.creator ? new Subject(x.creator) : null;
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
     this.numOfUpvotes = this.clean(x.numOfUpvotes, Number, 0);
+    if (x.completedAt) this.completedAt = this.clean(x.completedAt, d => new Date(d).toISOString());
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -68,6 +73,7 @@ export class Message extends Resource {
     this.creator = safeData.creator;
     this.createdAt = safeData.createdAt;
     this.numOfUpvotes = safeData.numOfUpvotes;
+    if (safeData.completedAt) this.completedAt = safeData.completedAt;
   }
 
   validate(topic: Topic): string[] {

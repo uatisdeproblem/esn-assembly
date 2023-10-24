@@ -450,6 +450,21 @@
     "SEND_ANONYMOUS": "Send as anonymous",
     "TOGGLE_QUESTIONS": "Toggle questions",
     "TOGGLE_APPRECIATIONS": "Toggle appreciations",
-    "ANONYMOUS": "Anonymous"
+    "ANONYMOUS": "Anonymous",
+    "SHOW_COMPLETED": "Show completed",
+    "SORT_BY": "Show first",
+    "SORT_BY_OPTIONS": {
+      "CREATION_ASC": "Oldest",
+      "CREATION_DESC": "Newest",
+      "UPVOTES_ASC": "Least upvoted",
+      "UPVOTES_DESC": "Most upvoted"
+    },
+    "ACTIONS": "Actions",
+    "MARK_COMPLETE": "Mark complete",
+    "DELETE": "Delete message",
+    "DELETE_AND_BAN_USER": "Delete message and ban user",
+    "UPVOTE": "Upvote",
+    "CANCEL_UPVOTE": "Cancel upvote",
+    "SEE_UPVOTERS": "See who upvoted"
   }
 }

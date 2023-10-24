@@ -2,12 +2,17 @@ import { Component, Input } from '@angular/core';
 import { AlertController, IonInfiniteScroll, IonRefresher } from '@ionic/angular';
 import { toCanvas } from 'qrcode';
 import { Attachment } from 'idea-toolbox';
-import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
+import {
+  IDEAActionSheetController,
+  IDEALoadingService,
+  IDEAMessageService,
+  IDEATranslationsService
+} from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
 import { AttachmentsService } from 'src/app/common/attachments.service';
-import { MessagesService } from './messages/messages.service';
+import { MessagesService, MessagesSortBy } from './messages/messages.service';
 
 import { environment as env } from '@env';
 import { Topic, TopicTypes } from '@models/topic.model';
@@ -25,9 +30,15 @@ export class LiveTopicPage {
   topic: Topic;
 
   questions: Message[];
+  showCompletedQuestions = false;
+  sortQuestionsBy = MessagesSortBy.CREATION_ASC;
+
   appreciations: Message[];
+  showCompletedAppreciations = false;
+  sortAppreciationsBy = MessagesSortBy.CREATION_ASC;
 
   MessageTypes = MessageTypes;
+  MessagesSortBy = MessagesSortBy;
   newMessage: Message;
   errors = new Set<string>();
 
@@ -44,6 +55,7 @@ export class LiveTopicPage {
 
   constructor(
     private alertCtrl: AlertController,
+    private actionsCtrl: IDEAActionSheetController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
@@ -102,6 +114,8 @@ export class LiveTopicPage {
 
     this.questions = await this._messages.getListOfTopic(this.topic, {
       filterByType: MessageTypes.QUESTION,
+      showCompleted: this.topic.isClosed() ? true : this.showCompletedQuestions,
+      sortBy: this.sortQuestionsBy,
       withPagination: true,
       startPaginationAfterId
     });
@@ -115,6 +129,8 @@ export class LiveTopicPage {
 
     this.appreciations = await this._messages.getListOfTopic(this.topic, {
       filterByType: MessageTypes.APPRECIATION,
+      showCompleted: this.topic.isClosed() ? true : this.showCompletedAppreciations,
+      sortBy: this.sortAppreciationsBy,
       withPagination: true,
       startPaginationAfterId
     });
@@ -182,6 +198,66 @@ export class LiveTopicPage {
   }
   hasFieldAnError(field: string): boolean {
     return this.errors.has(field);
+  }
+
+  async upvoteMessage(message: Message): Promise<void> {
+    // @todo
+  }
+  hasUserUpvotedMessage(message: Message): boolean {
+    // @todo
+    return false;
+  }
+  async seeMessageUpvoters(message: Message): Promise<void> {
+    // @todo
+  }
+  private async markMessageComplete(message: Message): Promise<void> {
+    // @todo
+  }
+  private async deleteMessage(message: Message): Promise<void> {
+    // @todo
+  }
+  private async deleteMessageAndBanUser(message: Message): Promise<void> {
+    // @todo
+  }
+  async actionsOnMessage(message: Message): Promise<void> {
+    if (!message) return;
+
+    const header = this.t._('MESSAGES.ACTIONS');
+    const buttons = [];
+
+    buttons.push({
+      text: this.t._('MESSAGES.MARK_COMPLETE'),
+      icon: 'checkmark-done',
+      handler: (): Promise<void> => this.markMessageComplete(message)
+    });
+
+    if (this.app.user.isAdministrator) {
+      buttons.push({
+        text: this.t._('MESSAGES.SEE_UPVOTERS'),
+        icon: 'eye',
+        handler: (): Promise<void> => this.seeMessageUpvoters(message)
+      });
+    }
+
+    buttons.push({
+      text: this.t._('MESSAGES.DELETE'),
+      icon: 'trash',
+      role: 'destructive',
+      handler: (): Promise<void> => this.deleteMessage(message)
+    });
+    if (this.app.user.isAdministrator && message.creator) {
+      buttons.push({
+        text: this.t._('MESSAGES.DELETE_AND_BAN_USER'),
+        icon: 'ban',
+        role: 'destructive',
+        handler: (): Promise<void> => this.deleteMessageAndBanUser(message)
+      });
+    }
+
+    buttons.push({ text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' });
+
+    const actions = await this.actionsCtrl.create({ header, buttons });
+    actions.present();
   }
 
   openTopic(topic: Topic): void {

@@ -89,7 +89,7 @@
           </ion-card-content>
         </ion-card>
         <ng-container *ngIf="!topic.isClosed()">
-          <ion-row class="ion-margin-bottom" *ngIf="!newMessage">
+          <ion-row class="ion-margin-bottom ion-padding-bottom" *ngIf="!newMessage">
             <ion-col class="ion-padding-top ion-padding-start ion-padding-end">
               <ion-button expand="block" (click)="startNewMessage()">
                 {{ 'MESSAGES.ASK_A_QUESTION' | translate }}
@@ -184,6 +184,29 @@
                 </ion-label>
                 <ion-icon icon="mic" size="large"></ion-icon>
               </ion-list-header>
+              <ion-row class="ion-align-items-center messagesFilters" *ngIf="!topic.isClosed()">
+                <ion-col>
+                  <ion-item color="transparent" lines="none">
+                    <ion-checkbox justify="end" [(ngModel)]="showCompletedQuestions" (ionChange)="filterQuestions()">
+                      {{ 'MESSAGES.SHOW_COMPLETED' | translate }}
+                    </ion-checkbox>
+                  </ion-item>
+                </ion-col>
+                <ion-col>
+                  <ion-item color="transparent" lines="none">
+                    <ion-select
+                      interface="popover"
+                      [label]="('MESSAGES.SORT_BY' | translate) + ':'"
+                      [(ngModel)]="sortQuestionsBy"
+                      (ionChange)="filterQuestions()"
+                    >
+                      <ion-select-option *ngFor="let sortBy of MessagesSortBy | keyvalue" [value]="sortBy.key">
+                        {{ ('MESSAGES.SORT_BY_OPTIONS.' + sortBy.key) | translate }}
+                      </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
               <ion-item *ngIf="!questions">
                 <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
               </ion-item>
@@ -196,12 +219,46 @@
                 [class.author]="question.creator?.id === app.user.userId"
               >
                 <ion-card-header>
-                  <ion-card-title *ngIf="question.creator">
-                    <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
-                  </ion-card-title>
-                  <ion-card-title *ngIf="!question.creator">
-                    <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
-                  </ion-card-title>
+                  <ion-row class="ion-align-items-center">
+                    <ion-col [size]="12" [sizeLg]="9">
+                      <ion-card-title *ngIf="question.creator">
+                        <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
+                      </ion-card-title>
+                      <ion-card-title *ngIf="!question.creator">
+                        <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
+                      </ion-card-title>
+                    </ion-col>
+                    <ion-col
+                      *ngIf="!topic.isClosed() || app.user.isAdministrator"
+                      [class.ion-text-right]="!app.isInMobileMode()"
+                      [size]="12"
+                      [sizeLg]="3"
+                    >
+                      <ion-button fill="clear" *ngIf="!app.user.isAdministrator" (click)="seeMessageUpvoters(question)">
+                        <ion-icon name="eye-outline"></ion-icon>
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="ESNgreen"
+                        *ngIf="!topic.isClosed()"
+                        (click)="upvoteMessage(question)"
+                      >
+                        <ion-icon
+                          slot="start"
+                          [name]="hasUserUpvotedMessage(question) ? 'thumbs-up' : 'thumbs-up-outline'"
+                        ></ion-icon>
+                        {{ question.numOfUpvotes }}
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="medium"
+                        *ngIf="app.user.isAdministrator || question.creator?.id === app.user.userId"
+                        (click)="actionsOnMessage(question)"
+                      >
+                        <ion-icon name="ellipsis-horizontal"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
                 </ion-card-header>
                 <ion-card-content>{{ question.summary }}</ion-card-content>
               </ion-card>
@@ -215,6 +272,33 @@
                 </ion-label>
                 <ion-icon icon="heart" size="large"></ion-icon>
               </ion-list-header>
+              <ion-row class="ion-align-items-center messagesFilters" *ngIf="!topic.isClosed()">
+                <ion-col>
+                  <ion-item color="transparent" lines="none">
+                    <ion-checkbox
+                      justify="end"
+                      [(ngModel)]="showCompletedAppreciations"
+                      (ionChange)="filterAppreciations()"
+                    >
+                      {{ 'MESSAGES.SHOW_COMPLETED' | translate }}
+                    </ion-checkbox>
+                  </ion-item>
+                </ion-col>
+                <ion-col>
+                  <ion-item color="transparent" lines="none">
+                    <ion-select
+                      interface="popover"
+                      [label]="('MESSAGES.SORT_BY' | translate) + ':'"
+                      [(ngModel)]="sortAppreciationsBy"
+                      (ionChange)="filterAppreciations()"
+                    >
+                      <ion-select-option *ngFor="let sortBy of MessagesSortBy | keyvalue" [value]="sortBy.key">
+                        {{ ('MESSAGES.SORT_BY_OPTIONS.' + sortBy.key) | translate }}
+                      </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
               <ion-item *ngIf="!appreciations">
                 <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
               </ion-item>
@@ -227,12 +311,50 @@
                 [class.author]="appreciation.creator?.id === app.user.userId"
               >
                 <ion-card-header>
-                  <ion-card-title *ngIf="appreciation.creator">
-                    <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
-                  </ion-card-title>
-                  <ion-card-title *ngIf="!appreciation.creator">
-                    <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
-                  </ion-card-title>
+                  <ion-row class="ion-align-items-center">
+                    <ion-col [size]="12" [sizeLg]="9">
+                      <ion-card-title *ngIf="appreciation.creator">
+                        <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
+                      </ion-card-title>
+                      <ion-card-title *ngIf="!appreciation.creator">
+                        <i>{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
+                      </ion-card-title>
+                    </ion-col>
+                    <ion-col
+                      *ngIf="!topic.isClosed() || app.user.isAdministrator"
+                      [class.ion-text-right]="!app.isInMobileMode()"
+                      [size]="12"
+                      [sizeLg]="3"
+                    >
+                      <ion-button
+                        fill="clear"
+                        *ngIf="!app.user.isAdministrator"
+                        (click)="seeMessageUpvoters(appreciation)"
+                      >
+                        <ion-icon name="eye-outline"></ion-icon>
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="ESNpink"
+                        *ngIf="!topic.isClosed()"
+                        (click)="upvoteMessage(appreciation)"
+                      >
+                        <ion-icon
+                          slot="start"
+                          [name]="hasUserUpvotedMessage(appreciation) ? 'heart' : 'heart-outline'"
+                        ></ion-icon>
+                        {{ appreciation.numOfUpvotes }}
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="medium"
+                        *ngIf="app.user.isAdministrator || appreciation.creator?.id === app.user.userId"
+                        (click)="actionsOnMessage(appreciation)"
+                      >
+                        <ion-icon name="ellipsis-horizontal"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
                 </ion-card-header>
                 <ion-card-content>{{ appreciation.text }}</ion-card-content>
               </ion-card>

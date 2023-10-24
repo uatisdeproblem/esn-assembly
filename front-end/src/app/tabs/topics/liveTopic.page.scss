@@ -69,14 +69,30 @@ ion-list.messagesList {
     margin-top: 8px;
   }
   ion-card.messageCard {
-    ion-card-title {
-      font-size: 1em;
-    }
     ion-card-header {
-      padding-bottom: 4px;
+      padding-top: 12px;
+      padding-bottom: 0;
+      ion-card-title {
+        font-size: 1em;
+      }
+      ion-button {
+        --padding-top: 0;
+        --padding-bottom: 0;
+        --padding-start: 6px;
+        --padding-end: 6px;
+        margin: 0 12px 0 0;
+      }
+    }
+    ion-card-content {
+      padding-bottom: 16px;
     }
   }
   ion-card.messageCard.author {
     border-left: 4px solid var(--ion-color-primary);
+  }
+  .messagesFilters {
+    ion-item {
+      font-size: 0.85em;
+    }
   }
 }
