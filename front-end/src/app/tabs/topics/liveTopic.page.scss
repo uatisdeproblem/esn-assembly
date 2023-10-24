@@ -44,20 +44,33 @@ ion-card.topicCard {
       }
     }
   }
+
+  app-html-editor {
+    --app-html-editor-margin: 16px 2px;
+    --app-html-editor-padding: 20px 16px;
+    --app-html-editor-background-color: var(--ion-color-white-tint);
+    --app-html-editor-box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px;
+    --app-html-editor-border-radius: 8px;
+    --app-html-editor-color: var(--ion-color-step-800);
+  }
 }
 
-app-html-editor {
-  --app-html-editor-margin: 16px 2px;
-  --app-html-editor-padding: 20px 16px;
-  --app-html-editor-background-color: var(--ion-color-white-tint);
-  --app-html-editor-box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px;
-  --app-html-editor-border-radius: 8px;
-  --app-html-editor-color: var(--ion-color-step-800);
-}
-
-#qrCodeContainer {
-  max-width: 170px;
-  margin: 10px auto;
+ion-card.newMessageCard {
+  margin-top: 20px;
+  padding: 12px;
+  @media only screen and (max-width: 767px) {
+    margin: 20px 0;
+    padding: 0;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  ion-item:not([color='white']) {
+    --padding-start: 8px;
+  }
+  ion-item[color='white'] {
+    border-radius: 4px;
+  }
 }
 
 ion-segment-button {
@@ -98,4 +111,9 @@ ion-list.messagesList {
       font-size: 0.85em;
     }
   }
+}
+
+#qrCodeContainer {
+  max-width: 170px;
+  margin: 10px auto;
 }

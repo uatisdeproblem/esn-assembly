@@ -103,61 +103,80 @@
               </ion-button>
             </ion-col>
           </ion-row>
-          <ion-list class="aList" *ngIf="newMessage" [class.ion-padding]="!app.isInMobileMode()">
-            <ng-container *ngIf="newMessage.type === MessageTypes.QUESTION">
-              <ion-list-header [class.fieldHasError]="hasFieldAnError('summary')">
-                <ion-label>
-                  <h2>{{ 'MESSAGES.QUESTION_SUMMARY_I' | translate }}</h2>
-                  <p>{{ 'MESSAGES.QUESTION_SUMMARY_II' | translate }}</p>
+          <ion-card
+            class="newMessageCard"
+            *ngIf="newMessage"
+            [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+          >
+            <ion-card-content>
+              <ng-container *ngIf="newMessage.type === MessageTypes.QUESTION">
+                <ion-item
+                  lines="none"
+                  [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+                  [class.fieldHasError]="hasFieldAnError('summary')"
+                >
+                  <ion-label class="ion-text-wrap">
+                    <b>{{ 'MESSAGES.QUESTION_SUMMARY_I' | translate }}</b>
+                    <p>{{ 'MESSAGES.QUESTION_SUMMARY_II' | translate }}</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item color="white" class="ion-margin-bottom">
+                  <ion-input
+                    [placeholder]="'MESSAGES.QUESTION_SUMMARY_P' | translate"
+                    [(ngModel)]="newMessage.summary"
+                  ></ion-input>
+                </ion-item>
+              </ng-container>
+              <ion-item
+                lines="none"
+                [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+                [class.fieldHasError]="hasFieldAnError('summary')"
+              >
+                <ion-label
+                  class="ion-text-wrap"
+                  *ngIf="newMessage.type === MessageTypes.QUESTION"
+                  [class.fieldHasError]="hasFieldAnError('text')"
+                >
+                  <p>{{ 'MESSAGES.QUESTION_CONTENT_I' | translate }}</p>
                 </ion-label>
-              </ion-list-header>
-              <ion-item>
-                <ion-input
-                  [placeholder]="'MESSAGES.QUESTION_SUMMARY_P' | translate"
-                  [(ngModel)]="newMessage.summary"
-                ></ion-input>
+                <ion-label
+                  *ngIf="newMessage.type === MessageTypes.APPRECIATION"
+                  [class.fieldHasError]="hasFieldAnError('text')"
+                >
+                  <b>{{ 'MESSAGES.APPRECIATION_CONTENT_I' | translate }}</b>
+                </ion-label>
               </ion-item>
-            </ng-container>
-            <ion-list-header [class.fieldHasError]="hasFieldAnError('text')">
-              <ion-label *ngIf="newMessage.type === MessageTypes.QUESTION">
-                <p>{{ 'MESSAGES.QUESTION_CONTENT_I' | translate }}</p>
-                <p>{{ 'MESSAGES.QUESTION_CONTENT_II' | translate }}</p>
-              </ion-label>
-              <ion-label *ngIf="newMessage.type === MessageTypes.APPRECIATION">
-                <h2>{{ 'MESSAGES.APPRECIATION_CONTENT_I' | translate }}</h2>
-                <p>{{ 'MESSAGES.APPRECIATION_CONTENT_II' | translate }}</p>
-              </ion-label>
-            </ion-list-header>
-            <ion-item>
-              <ion-textarea
-                [rows]="3"
-                [placeholder]="(newMessage.type === MessageTypes.QUESTION ? 'MESSAGES.QUESTION_CONTENT_P' : 'MESSAGES.APPRECIATION_CONTENT_P') | translate"
-                [(ngModel)]="newMessage.text"
-              ></ion-textarea>
-            </ion-item>
-            <ng-container *ngIf="newMessage.type === MessageTypes.APPRECIATION || !topic.mustBeSigned">
-              <ion-item-divider></ion-item-divider>
-              <ion-item>
-                <ion-checkbox
-                  slot="start"
-                  (ionChange)="handleMessageMarkedAnonymous($event.detail.checked)"
-                ></ion-checkbox>
-                <ion-label>{{ 'MESSAGES.SEND_ANONYMOUS' | translate }}</ion-label>
+              <ion-item color="white">
+                <ion-textarea
+                  [rows]="3"
+                  [placeholder]="(newMessage.type === MessageTypes.QUESTION ? 'MESSAGES.QUESTION_CONTENT_P' : 'MESSAGES.APPRECIATION_CONTENT_P') | translate"
+                  [(ngModel)]="newMessage.text"
+                ></ion-textarea>
               </ion-item>
-            </ng-container>
-            <ion-row class="ion-margin">
-              <ion-col>
-                <ion-button fill="clear" color="dark" (click)="cancelNewMessage()">
-                  {{ 'COMMON.CANCEL' | translate }} <ion-icon icon="close" slot="start"></ion-icon>
-                </ion-button>
-              </ion-col>
-              <ion-col class="ion-text-right">
-                <ion-button (click)="sendNewMessage()">
-                  {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-list>
+              <ng-container *ngIf="newMessage.type === MessageTypes.APPRECIATION || !topic.mustBeSigned">
+                <ion-item color="white" class="ion-margin-top">
+                  <ion-checkbox
+                    slot="start"
+                    [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+                    (ionChange)="handleMessageMarkedAnonymous($event.detail.checked)"
+                  ></ion-checkbox>
+                  <ion-label>{{ 'MESSAGES.SEND_ANONYMOUS' | translate }}</ion-label>
+                </ion-item>
+              </ng-container>
+              <ion-row class="ion-margin">
+                <ion-col>
+                  <ion-button fill="clear" [color]="app.isInDarkMode() ? 'dark' : 'white'" (click)="cancelNewMessage()">
+                    {{ 'COMMON.CANCEL' | translate }} <ion-icon icon="close" slot="start"></ion-icon>
+                  </ion-button>
+                </ion-col>
+                <ion-col class="ion-text-right">
+                  <ion-button fill="clear" [color]="app.isInDarkMode() ? 'dark' : 'white'" (click)="sendNewMessage()">
+                    {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-card-content>
+          </ion-card>
         </ng-container>
       </ion-col>
       <ion-col
@@ -401,7 +420,7 @@
   <ion-fab-button
     color="primary"
     size="small"
-    *ngIf="!fullScreen"
+    *ngIf="!fullScreen && !app.isInMobileMode()"
     [title]="'MESSAGES.ENTER_FULL_SCREEN' | translate"
     (click)="enterFullScreen()"
   >
