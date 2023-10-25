@@ -1,13 +1,13 @@
 <ng-container *ngIf="!row">
   <ion-item *ngIf="topic" button (click)="select.emit()">
-    <ion-badge
-      slot="start"
+    <ion-icon
+      icon="ellipse"
       color="ESNpink"
-      class="liveDot"
+      size="small"
+      class="ion-margin-end"
       *ngIf="!topic.isClosed() && topic.type === TopicTypes.LIVE"
       [title]="'TOPICS.LIVE_NOW' | translate"
-      >&nbsp;</ion-badge
-    >
+    />
     <app-statistics-button
       slot="start"
       *ngIf="app.user.isAdministrator"
@@ -66,15 +66,15 @@
   </ion-row>
   <ion-row class="ion-align-items-center row tappable" *ngIf="!header && topic" (click)="select.emit()">
     <ion-col [sizeLg]="5" [sizeXl]="3">
-      <ion-badge
+      <ion-icon
+        icon="ellipse"
         color="ESNpink"
-        class="liveDot"
+        style="vertical-align: middle"
         *ngIf="!topic.isClosed() && topic.type === TopicTypes.LIVE"
         [title]="'TOPICS.LIVE_NOW' | translate"
-        >&nbsp;</ion-badge
-      >
+      />
       <app-statistics-button
-        style="vertical-align: middle"
+        style="vertical-align: super"
         *ngIf="app.user.isAdministrator"
         [entityType]="SET.TOPICS"
         [entityId]="topic.topicId"
