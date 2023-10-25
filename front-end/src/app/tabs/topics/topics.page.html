@@ -65,6 +65,7 @@
         <ion-icon icon="add" slot="icon-only"></ion-icon>
       </ion-button>
       <app-statistics-button
+        class="ion-hide-sm-down"
         *ngIf="app.user.isAdministrator"
         [entityType]="SET.TOPICS"
         [title]="'TABS.TOPICS' | translate"
