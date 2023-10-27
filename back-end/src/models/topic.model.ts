@@ -2,18 +2,22 @@ import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 
 import { TopicCategoryAttached } from './category.model';
 import { GAEventAttached } from './event.model';
-import { FAVORITE_TIMEZONE, dateStringIsFuture, dateStringIsPast } from './favoriteTimezone.const';
+import { FAVORITE_TIMEZONE, dateStringIsFuture, dateStringIsPast, dateStringIsToday } from './favoriteTimezone.const';
 import { Subject } from './subject.model';
 import { User, UserRoles } from './user.model';
 
 /**
- * A topic for a Q&A set.
+ * A topic for a Q&A set. It could be standard or live.
  */
 export class Topic extends Resource {
   /**
    * The ID of the topic.
    */
   topicId: string;
+  /**
+   * The type of topic.
+   */
+  type: TopicTypes;
   /**
    * A brief description (title) of the topic.
    */
@@ -35,10 +39,6 @@ export class Topic extends Resource {
    */
   subjects: Subject[];
   /**
-   * The current total number of questions about this topic.
-   */
-  numOfQuestions: number;
-  /**
    * The timestamp of creation.
    */
   createdAt: epochISOString;
@@ -57,14 +57,9 @@ export class Topic extends Resource {
    */
   willCloseAt?: epochISOString;
   /**
-   * The timestamp when the topic was closed. A topic which is closed cannot accept new questions.
+   * The timestamp when the topic was closed. A topic which is closed cannot accept new interactions.
    */
   closedAt?: epochISOString;
-  /**
-   * The timestamp until answers can still be posted (if allowed).
-   * If not set, answers can be created until the topic is archived.
-   */
-  acceptAnswersUntil?: epochISOString;
   /**
    * The timestamp when the topic was archived. A topic archived is also closed.
    */
@@ -74,75 +69,121 @@ export class Topic extends Resource {
    */
   attachments: Attachment[];
   /**
-   * To be able to ask questions, a user must have at least a role (ESN Accounts) included in this list.
-   * An empty string means that any user (regardless the role) can ask questions.
+   * To be able to interact, a user must have at least a role (ESN Accounts) included in this list.
+   * An empty string means that any user (regardless the role) can interact.
    */
-  rolesAbleToAskQuestions: UserRoles[];
+  rolesAbleToInteract: UserRoles[];
+
+  /**
+   * The current total number of standard questions about this topic.
+   * Only for `TopicTypes.STANDARD`.
+   */
+  numOfQuestions?: number;
+  /**
+   * The timestamp until answers to standard questions can still be posted (if allowed).
+   * If not set, answers can be created until the topic is archived.
+   * Only for `TopicTypes.STANDARD`.
+   */
+  acceptAnswersUntil?: epochISOString;
+
+  /**
+   * Whether messages (`MessageTypes.QUESTION`) for this topic must be signed.
+   * Only for `TopicTypes.LIVE`.
+   */
+  mustBeSigned?: boolean;
+  /**
+   * Whether to enable live appreciations for this topic.
+   * Only for `TopicTypes.LIVE`.
+   */
+  appreciations?: boolean;
+  /**
+   * The timestamp when the topic should be live. It's a reference date for sortings, but not used as a mechanism.
+   * Only for `TopicTypes.LIVE`.
+   */
+  shouldBeLiveAt?: epochISOString;
 
   load(x: any): void {
     super.load(x);
     this.topicId = this.clean(x.topicId, String);
+    this.type = this.clean(x.type, String, TopicTypes.STANDARD);
     this.name = this.clean(x.name, String);
     this.content = this.clean(x.content, String);
     this.event = new GAEventAttached(x.event);
     this.category = new TopicCategoryAttached(x.category);
     this.subjects = this.cleanArray(x.subjects, s => new Subject(s));
-    this.numOfQuestions = this.clean(x.numOfQuestions, Number, 0);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     if (x.publishedSince) this.publishedSince = this.clean(x.publishedSince, d => new Date(d).toISOString());
     else delete this.publishedSince;
     if (x.willCloseAt) this.willCloseAt = this.clean(x.willCloseAt, d => new Date(d).toISOString());
     else delete this.willCloseAt;
-    if (x.acceptAnswersUntil)
-      this.acceptAnswersUntil = this.clean(x.acceptAnswersUntil, d => new Date(d).toISOString());
-    else delete this.acceptAnswersUntil;
     if (x.closedAt) this.closedAt = this.clean(x.closedAt, d => new Date(d).toISOString());
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.attachments = this.cleanArray(x.attachments, a => new Attachment(a));
-    this.rolesAbleToAskQuestions = this.cleanArray(x.rolesAbleToAskQuestions, String);
+    this.rolesAbleToInteract = this.cleanArray(x.rolesAbleToInteract, String);
+
+    if (this.type === TopicTypes.STANDARD) {
+      this.numOfQuestions = this.clean(x.numOfQuestions, Number, 0);
+      if (x.acceptAnswersUntil)
+        this.acceptAnswersUntil = this.clean(x.acceptAnswersUntil, d => new Date(d).toISOString());
+      else delete this.acceptAnswersUntil;
+    } else if (this.type === TopicTypes.LIVE) {
+      this.mustBeSigned = this.clean(x.mustBeSigned, Boolean, true);
+      this.appreciations = this.clean(x.appreciations, Boolean);
+      this.shouldBeLiveAt = this.clean(x.shouldBeLiveAt, d => new Date(d).toISOString());
+    }
   }
 
   safeLoad(newData: any, safeData: any): void {
     super.safeLoad(newData, safeData);
     this.topicId = safeData.topicId;
-    this.numOfQuestions = safeData.numOfQuestions;
+    this.type = safeData.type;
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     if (safeData.closedAt) this.closedAt = safeData.closedAt;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
+
+    this.numOfQuestions = safeData.numOfQuestions;
   }
 
   validate(): string[] {
     const e = super.validate();
     if (this.iE(this.name)) e.push('name');
+    if (!Object.values(TopicTypes).includes(this.type)) e.push('type');
     if (this.iE(this.event?.eventId)) e.push('event');
     if (this.iE(this.category?.categoryId)) e.push('category');
+    if (this.iE(this.subjects)) e.push('subjects');
+    this.subjects.forEach((s, index): void => s.validate().forEach(ea => e.push(`subjects[${index}].${ea}`)));
     if (this.publishedSince && this.iE(this.publishedSince, 'date')) e.push('publishedSince');
     if (this.willCloseAt && (this.iE(this.willCloseAt, 'date') || this.willCloseAt < new Date().toISOString()))
       e.push('willCloseAt');
-    if (
-      this.acceptAnswersUntil &&
-      (this.iE(this.acceptAnswersUntil, 'date') || (this.willCloseAt && this.acceptAnswersUntil < this.willCloseAt))
-    )
-      e.push('acceptAnswersUntil');
-    if (this.iE(this.subjects)) e.push('subjects');
-    this.subjects.forEach((s, index): void => s.validate().forEach(ea => e.push(`subjects[${index}].${ea}`)));
+
+    if (this.type === TopicTypes.STANDARD) {
+      if (
+        this.acceptAnswersUntil &&
+        (this.iE(this.acceptAnswersUntil, 'date') || (this.willCloseAt && this.acceptAnswersUntil < this.willCloseAt))
+      )
+        e.push('acceptAnswersUntil');
+    }
+
     return e;
   }
 
   /**
-   * Whether the user is allowed to ask questions on the topic.
+   * Whether the user is allowed to ask questions/post messages on the topic.
    */
-  canUserAskQuestions(user: User): boolean {
+  canUserInteract(user: User): boolean {
     if (this.isClosed()) return false;
-    if (!this.rolesAbleToAskQuestions.length) return true;
-    return User.isAllowedBasedOnRoles(user, this.rolesAbleToAskQuestions);
+    if (!this.rolesAbleToInteract.length) return true;
+    return User.isAllowedBasedOnRoles(user, this.rolesAbleToInteract);
   }
   /**
    * Whether the user is allowed to answer questions on the topic.
+   * Only for `TopicTypes.STANDARD`.
    */
-  canUserAnswerQuestions(user: User, excludeAdmin = false): boolean {
+  canUserAnswerStandardQuestions(user: User, excludeAdmin = false): boolean {
+    if (this.type !== TopicTypes.STANDARD) return false;
+
     const timeCheck = !this.acceptAnswersUntil || dateStringIsFuture(this.acceptAnswersUntil, FAVORITE_TIMEZONE);
     const adminCheck = user.isAdministrator && !excludeAdmin;
     const subjectCheck = this.subjects.some(s => s.id === user.userId);
@@ -169,28 +210,33 @@ export class Topic extends Resource {
   isArchived(): boolean {
     return !!this.archivedAt;
   }
+
+  /**
+   * Whether the topic will be live in the future or is live today.
+   * Only for `TopicTypes.STANDARD`.
+   */
+  isLiveTodayOrInFuture(): boolean {
+    if (this.type !== TopicTypes.LIVE) return false;
+    return (
+      this.shouldBeLiveAt &&
+      (dateStringIsFuture(this.shouldBeLiveAt, FAVORITE_TIMEZONE) ||
+        dateStringIsToday(this.shouldBeLiveAt, FAVORITE_TIMEZONE))
+    );
+  }
 }
 
 /**
- * A link between two topics. Note: there are always two rows representing the relation (two-way).
+ * The types of topic.
  */
-export interface RelatedTopic {
-  topicA: string;
-  topicB: string;
-  relation: RelatedTopicRelations;
+export enum TopicTypes {
+  STANDARD = 'STANDARD',
+  LIVE = 'LIVE'
 }
 
 /**
- * The possible relations between topics.
+ * A summary, exportable version for a standard topic (and its questions and answers).
  */
-export enum RelatedTopicRelations {
-  LINK = 'LINK'
-}
-
-/**
- * A summary, exportable version for a topic (and its questions and answers).
- */
-export interface TopicQuestionsExportable {
+export interface StandardTopicQuestionsExportable {
   Topic: string;
   Category: string;
   Subjects: string;

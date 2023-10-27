@@ -14,8 +14,9 @@ import { StatisticsModule } from '@common/statistics.module';
 
 import { TopicsRoutingModule } from './topics.routing.module';
 import { TopicsPage } from './topics.page';
-import { TopicPage } from './topic.page';
+import { StandardTopicPage } from './standardTopic.page';
 import { ManageTopicPage } from './manageTopic.page';
+import { LiveTopicPage } from './liveTopic.page';
 
 import { TopicModule } from '../topics/topic.module';
 import { QuestionModule } from './questions/question.module';
@@ -39,6 +40,6 @@ import { QuestionModule } from './questions/question.module';
     CategoriesPickerComponent,
     StatisticsModule
   ],
-  declarations: [TopicsPage, TopicPage, ManageTopicPage]
+  declarations: [TopicsPage, StandardTopicPage, LiveTopicPage, ManageTopicPage]
 })
 export class TopicsModule {}

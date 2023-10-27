@@ -46,6 +46,12 @@ const apiResources: ResourceController[] = [
       '/topics/{topicId}/questions/{questionId}/answers/{answerId}/claps/{userId}'
     ]
   },
+  { name: 'messages', paths: ['/topics/{topicId}/messages', '/topics/{topicId}/messages/{messageId}'] },
+  { name: 'messagesAnonymous', paths: ['/topics/{topicId}/messages-anonymous'] },
+  {
+    name: 'messagesUpvotes',
+    paths: ['/topics/{topicId}/messages/{messageId}/upvotes', '/topics/{topicId}/messages/{messageId}/upvotes/{userId}']
+  },
   { name: 'badges', paths: ['/badges', '/badges/{badge}'] },
   { name: 'usefulLinks', paths: ['/usefulLinks', '/usefulLinks/{linkId}'] },
   { name: 'deadlines', paths: ['/deadlines', '/deadlines/{deadlineId}'] },
@@ -126,6 +132,29 @@ const tables: { [tableName: string]: DDBTable } = {
       }
     ]
   },
+  messages: {
+    PK: { name: 'topicId', type: DDB.AttributeType.STRING },
+    SK: { name: 'messageId', type: DDB.AttributeType.STRING },
+    stream: DDB.StreamViewType.NEW_AND_OLD_IMAGES
+  },
+  messagesUpvotes: {
+    PK: { name: 'messageId', type: DDB.AttributeType.STRING },
+    SK: { name: 'userId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'inverted-index',
+        partitionKey: { name: 'userId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'messageId', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.ALL
+      },
+      {
+        indexName: 'topicId-userId-index',
+        partitionKey: { name: 'topicId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'userId', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.ALL
+      }
+    ]
+  },
   usersBadges: {
     PK: { name: 'userId', type: DDB.AttributeType.STRING },
     SK: { name: 'badge', type: DDB.AttributeType.STRING }
@@ -184,6 +213,11 @@ const createApp = async (): Promise<void> => {
     domain: parameters.apiDomain
   });
 
+  const webSocketApiDomainStack = new ApiDomainStack(app, `${parameters.project}-socket-api-domain`, {
+    env,
+    domain: parameters.webSocketApiDomain
+  });
+
   const sesStack = new SESStack(app, `${parameters.project}-ses`, {
     env,
     project: parameters.project,
@@ -202,6 +236,7 @@ const createApp = async (): Promise<void> => {
     firstAdminEmail: parameters.firstAdminEmail,
     apiDomain: parameters.apiDomain,
     apiDefinitionFile: './swagger.yaml',
+    webSocketApiDomain: parameters.webSocketApiDomain,
     resourceControllers: apiResources,
     tables,
     mediaBucketArn: mediaStack.mediaBucketArn,
@@ -210,6 +245,7 @@ const createApp = async (): Promise<void> => {
   });
   apiStack.addDependency(mediaStack);
   apiStack.addDependency(apiDomainStack);
+  apiStack.addDependency(webSocketApiDomainStack);
   apiStack.addDependency(sesStack);
 
   new FrontEndStack(app, `${parameters.project}-${STAGE}-front-end`, {

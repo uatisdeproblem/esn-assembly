@@ -15,7 +15,15 @@ import { StatisticEntityTypes, Statistic, StatisticGranularities } from '@models
     <ion-button size="small" fill="clear" [color]="color" (click)="openStatistics($event)">
       <ion-icon icon="stats-chart" slot="icon-only" size="small" />
     </ion-button>
-  `
+  `,
+  styles: [
+    `
+      ion-button {
+        --padding-start: 4px;
+        --padding-end: 4px;
+      }
+    `
+  ]
 })
 export class StatisticsButtonComponent {
   /**

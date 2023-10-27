@@ -21,6 +21,10 @@
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.102.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.102.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.102.0-alpha.0",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.435.0",
     "@iter-idea/ses-verify-identities": "^1.0.2",
     "@tsconfig/node18": "^18.2.0",
     "@types/aws-lambda": "^8.10.119",
@@ -29,9 +33,9 @@
     "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
-    "aws-cdk": "^2.90.0",
-    "aws-cdk-lib": "^2.90.0",
-    "constructs": "^10.2.69",
+    "aws-cdk": "^2.102.0",
+    "aws-cdk-lib": "^2.102.0",
+    "constructs": "^10.3.0",
     "esbuild": "^0.19.0",
     "eslint": "^8.46.0",
     "typescript": "^5.1.6"

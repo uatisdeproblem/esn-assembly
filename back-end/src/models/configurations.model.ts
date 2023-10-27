@@ -12,11 +12,17 @@ export class Configurations extends Resource {
    * The IDs of the platform's administrators.
    */
   administratorsIds: string[];
+  /**
+   * The IDs of the users banned; these users won't be able to add new contents (questions, messages, etc.).
+   * Note: it's not a data model by itself becase we hope this list will always stay empty/short.
+   */
+  bannedUsersIds: string[];
 
   load(x: any): void {
     super.load(x);
     this.PK = this.clean(x.PK, String);
     this.administratorsIds = this.cleanArray(x.administratorsIds, String);
+    this.bannedUsersIds = this.cleanArray(x.bannedUsersIds, String);
   }
 
   safeLoad(newData: any, safeData: any): void {

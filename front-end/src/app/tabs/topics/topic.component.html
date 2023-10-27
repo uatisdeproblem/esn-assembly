@@ -1,8 +1,16 @@
 <ng-container *ngIf="!row">
   <ion-item *ngIf="topic" button (click)="select.emit()">
-    <!--<ion-badge slot="start" color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>-->
+    <ion-icon
+      icon="ellipse"
+      color="ESNpink"
+      size="small"
+      class="ion-margin-end"
+      *ngIf="!topic.isClosed() && topic.type === TopicTypes.LIVE"
+      [title]="'TOPICS.LIVE_NOW' | translate"
+    />
     <app-statistics-button
       slot="start"
+      class="ion-hide-sm-down"
       *ngIf="app.user.isAdministrator"
       [entityType]="SET.TOPICS"
       [entityId]="topic.topicId"
@@ -13,8 +21,15 @@
       {{ topic.name }}
       <p class="itemDetails">
         <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
-        <ion-text class="ion-padding-start">
+        <ion-text class="ion-padding-start" *ngIf="topic.type === TopicTypes.STANDARD">
           {{ topic.numOfQuestions }} {{ 'TOPICS.QUESTIONS' | translate | lowercase }}
+        </ion-text>
+        <ion-text class="ion-padding-start" *ngIf="topic.type === TopicTypes.LIVE">
+          <b *ngIf="!topic.isClosed()">{{ 'TOPICS.LIVE_NOW' | translate }}</b>
+          <ng-container *ngIf="topic.isClosed() && topic.isLiveTodayOrInFuture()">
+            {{ 'TOPICS.LIVE_ON' | translate }} {{ topic.shouldBeLiveAt | date : 'MMM dd' }}
+          </ng-container>
+          <ng-container *ngIf="topic.isClosed() && !topic.isLiveTodayOrInFuture()">-</ng-container>
         </ion-text>
       </p>
     </ion-label>
@@ -46,15 +61,21 @@
     <ion-col [sizeLg]="3" [sizeXl]="2">{{ 'TOPICS.CATEGORY' | translate }}</ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="2">{{ 'TOPICS.EVENT' | translate }}</ion-col>
     <ion-col [sizeLg]="2">{{ 'TOPICS.SUBJECTS' | translate }}</ion-col>
-    <ion-col [sizeLg]="1">{{ 'TOPICS.NUM_OF_QUESTIONS' | translate }}</ion-col>
-    <ion-col [sizeLg]="1">{{ 'TOPICS.STATUS' | translate }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="1">{{ 'TOPICS.ACTIVITY' | translate }}</ion-col>
+    <ion-col [sizeLg]="2" [sizeXl]="1">{{ 'TOPICS.STATUS' | translate }}</ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="1">{{ 'TOPICS.CREATED_AT' | translate }}</ion-col>
   </ion-row>
   <ion-row class="ion-align-items-center row tappable" *ngIf="!header && topic" (click)="select.emit()">
     <ion-col [sizeLg]="5" [sizeXl]="3">
-      <!--<ion-badge color="ESNcyan" class="unreadDot" [title]="'TOPICS.TO_READ' | translate">&nbsp;</ion-badge>-->
-      <app-statistics-button
+      <ion-icon
+        icon="ellipse"
+        color="ESNpink"
         style="vertical-align: middle"
+        *ngIf="!topic.isClosed() && topic.type === TopicTypes.LIVE"
+        [title]="'TOPICS.LIVE_NOW' | translate"
+      />
+      <app-statistics-button
+        style="vertical-align: super"
         *ngIf="app.user.isAdministrator"
         [entityType]="SET.TOPICS"
         [entityId]="topic.topicId"
@@ -74,8 +95,19 @@
         ></ion-img>
       </ion-avatar>
     </ion-col>
-    <ion-col [sizeLg]="1">{{ topic.numOfQuestions }}</ion-col>
-    <ion-col [sizeLg]="1">
+    <ion-col class="ion-hide-xl-down" [sizeLg]="1">
+      <ion-text *ngIf="topic.type === TopicTypes.STANDARD">
+        {{ topic.numOfQuestions }} {{ 'TOPICS.QUESTIONS' | translate | lowercase }}
+      </ion-text>
+      <ion-text *ngIf="topic.type === TopicTypes.LIVE">
+        <b *ngIf="!topic.isClosed()">{{ 'TOPICS.LIVE_NOW' | translate }}</b>
+        <ng-container *ngIf="topic.isClosed() && topic.isLiveTodayOrInFuture()">
+          {{ 'TOPICS.LIVE_ON' | translate }} {{ topic.shouldBeLiveAt | date : 'MMM dd' }}
+        </ng-container>
+        <ng-container *ngIf="topic.isClosed() && !topic.isLiveTodayOrInFuture()">-</ng-container>
+      </ion-text>
+    </ion-col>
+    <ion-col [sizeLg]="2" [sizeXl]="1">
       <ng-container *ngIf="!topic.isArchived()">
         <ion-badge *ngIf="topic.isDraft()" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
         <ion-badge *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">

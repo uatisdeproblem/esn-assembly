@@ -10,7 +10,8 @@ import { addStatisticEntry } from './statistics';
 
 import { TopicCategoryAttached } from '../models/category.model';
 import { GAEventAttached } from '../models/event.model';
-import { RelatedTopic, Topic } from '../models/topic.model';
+import { Topic } from '../models/topic.model';
+import { RelatedTopic } from '../models/relatedTopic.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
 import { SubjectTypes } from '../models/subject.model';
@@ -25,7 +26,8 @@ const DDB_TABLES = {
   topics: process.env.DDB_TABLE_topics,
   relatedTopics: process.env.DDB_TABLE_relatedTopics,
   categories: process.env.DDB_TABLE_categories,
-  events: process.env.DDB_TABLE_events
+  events: process.env.DDB_TABLE_events,
+  messagesUpvotes: process.env.DDB_TABLE_messagesUpvotes
 };
 const ddb = new DynamoDB();
 
@@ -167,7 +169,7 @@ class Topics extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
-  protected async patchResource(): Promise<Topic> {
+  protected async patchResource(): Promise<Topic | string[]> {
     switch (this.body.action) {
       case 'OPEN':
         return await this.manageStatus(true);
@@ -177,6 +179,8 @@ class Topics extends ResourceController {
         return await this.manageArchive(true);
       case 'UNARCHIVE':
         return await this.manageArchive(false);
+      case 'MESSAGES_UPVOTES':
+        return await this.getMessagesIdsUpvotedByUser();
       default:
         throw new RCError('Unsupported action');
     }
@@ -200,6 +204,15 @@ class Topics extends ResourceController {
 
     await ddb.put({ TableName: DDB_TABLES.topics, Item: this.topic });
     return this.topic;
+  }
+  private async getMessagesIdsUpvotedByUser(): Promise<string[]> {
+    const messagesUpvoted = await ddb.query({
+      TableName: DDB_TABLES.messagesUpvotes,
+      IndexName: 'topicId-userId-index',
+      KeyConditionExpression: 'topicId = :topicId AND userId = :userId',
+      ExpressionAttributeValues: { ':topicId': this.topic.topicId, ':userId': this.galaxyUser.userId }
+    });
+    return messagesUpvoted.map(x => x.messageId);
   }
 
   protected async deleteResource(): Promise<void> {

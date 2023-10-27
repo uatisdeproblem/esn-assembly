@@ -1,5 +1,5 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
     <ion-buttons slot="start">
       <ion-button (click)="currentQuestion ? selectQuestion(null) : app.closePage()">
         <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
@@ -15,11 +15,11 @@
   <ion-grid class="ion-no-padding">
     <ion-row>
       <ion-col [size]="12" [sizeLg]="6" *ngIf="!app.isInMobileMode() || !currentQuestion">
-        <ion-card color="white" *ngIf="topic">
+        <ion-card color="white" class="topicCard" *ngIf="topic">
           <ion-card-header>
             <ion-card-subtitle>{{ topic.event.name }}</ion-card-subtitle>
             <ion-card-title>{{ topic.name }}</ion-card-title>
-            <p>
+            <p class="badges">
               <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
               <ion-badge *ngIf="topic.isDraft()" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
               <ion-badge *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">
@@ -38,7 +38,7 @@
               ></app-subject>
               <ion-row class="ion-margin-top" *ngIf="!topic.isArchived()">
                 <ion-col *ngIf="topic.willCloseAt">
-                  <ion-item class="ion-text-right deadline">
+                  <ion-item class="ion-text-right importantDate">
                     <ion-label>
                       <p>{{ 'TOPICS.QUESTIONS_UNTIL' | translate }}</p>
                       {{ topic.willCloseAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
@@ -48,7 +48,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col *ngIf="topic.acceptAnswersUntil && !dateStringIsPast(topic.acceptAnswersUntil)">
-                  <ion-item class="ion-text-right deadline">
+                  <ion-item class="ion-text-right importantDate">
                     <ion-label>
                       <p>{{ 'TOPICS.ANSWERS_UNTIL' | translate }}</p>
                       {{ topic.acceptAnswersUntil | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
@@ -124,7 +124,7 @@
               <ion-button
                 fill="solid"
                 size="small"
-                *ngIf="!topic.closedAt && topic.canUserAskQuestions(app.user)"
+                *ngIf="!topic.closedAt && topic.canUserInteract(app.user)"
                 (click)="startNewQuestion()"
               >
                 {{ 'TOPICS.MAKE_A_QUESTION' | translate }}

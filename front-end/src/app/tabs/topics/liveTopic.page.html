@@ -1,0 +1,472 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.closePage()">
+        <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-grid class="ion-no-padding" *ngIf="topic">
+    <ion-row>
+      <ion-col [size]="12" [sizeLg]="6" *ngIf="!fullScreen">
+        <ion-card color="white" class="topicCard">
+          <ion-card-header>
+            <ion-row class="ion-align-items-center">
+              <ion-col [size]="10" [sizeMd]="9">
+                <ion-card-subtitle>{{ topic.event.name }}</ion-card-subtitle>
+                <ion-card-title>{{ topic.name }}</ion-card-title>
+                <p class="badges">
+                  <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
+                  <ion-badge *ngIf="topic.isDraft()" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
+                  <ion-badge *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">
+                    {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+                  </ion-badge>
+                  <ion-badge color="warning" *ngIf="topic.isArchived()">{{ 'TOPICS.ARCHIVED' | translate }}</ion-badge>
+                </p>
+              </ion-col>
+              <ion-col class="ion-text-right" [size]="2" [sizeMd]="3">
+                <ion-button color="medium" size="small" fill="clear" (click)="showTopicDetails = !showTopicDetails">
+                  <ng-container *ngIf="!app.isInMobileMode()">{{ 'TOPICS.DETAILS' | translate }}</ng-container>
+                  <ion-icon
+                    [slot]="app.isInMobileMode() ? 'icon-only' : 'end'"
+                    [icon]="showTopicDetails ? 'eye-off' : 'eye'"
+                  ></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-card-header>
+          <ion-card-content *ngIf="showTopicDetails">
+            <ion-list class="aList" lines="none">
+              <app-subject
+                color="white"
+                *ngFor="let subject of topic.subjects"
+                [subject]="subject"
+                [class.single]="topic.subjects?.length === 1"
+              ></app-subject>
+              <ion-row class="ion-margin-top" *ngIf="topic.isClosed() && !topic.isArchived() && topic.shouldBeLiveAt">
+                <ion-col>
+                  <ion-item class="ion-text-right importantDate">
+                    <ion-label>
+                      <p>{{ 'TOPICS.SHOULD_BE_LIVE_ON' | translate }}</p>
+                      {{ topic.shouldBeLiveAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+                      <p>{{ FAVORITE_TIMEZONE }}</p>
+                    </ion-label>
+                    <ion-icon icon="pulse-outline" slot="end" size="small"></ion-icon>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <app-html-editor *ngIf="topic.content" [content]="topic.content" [editMode]="false"></app-html-editor>
+              <ion-item
+                lines="inset"
+                class="attachment"
+                *ngFor="let attachment of topic.attachments; let first = first"
+                [class.ion-margin-top]="first"
+                button
+                (click)="downloadAttachment(attachment)"
+              >
+                <ion-icon name="attach" slot="start"></ion-icon>
+                <ion-label class="ion-text-wrap">{{ attachment.name }}.{{ attachment.format }}</ion-label>
+              </ion-item>
+              <ion-item
+                lines="inset"
+                *ngFor="let related of relatedTopics; let first = first"
+                [class.ion-margin-top]="first"
+                button
+                (click)="openTopic(related)"
+              >
+                <ion-label>
+                  <p>{{ 'TOPICS.RELATED_TO' | translate }}</p>
+                  {{ related.name }}
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+        <ng-container *ngIf="!topic.isClosed()">
+          <ion-row class="ion-margin-bottom ion-padding-bottom" *ngIf="!newMessage">
+            <ion-col class="ion-padding-top ion-padding-start ion-padding-end">
+              <ion-button expand="block" (click)="startNewMessage()">
+                {{ 'MESSAGES.ASK_A_QUESTION' | translate }}
+                <ion-icon icon="mic" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col class="ion-padding-top ion-padding-start ion-padding-end" *ngIf="topic.appreciations">
+              <ion-button expand="block" color="ESNpink" (click)="startNewMessage(true)">
+                {{ 'MESSAGES.WRITE_AN_APPRECIATION' | translate }}
+                <ion-icon icon="heart" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-card
+            class="newMessageCard"
+            *ngIf="newMessage"
+            [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+          >
+            <ion-card-content>
+              <ng-container *ngIf="newMessage.type === MessageTypes.QUESTION">
+                <ion-item
+                  lines="none"
+                  [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+                  [class.fieldHasError]="hasFieldAnError('summary')"
+                >
+                  <ion-label class="ion-text-wrap">
+                    <b>{{ 'MESSAGES.QUESTION_SUMMARY_I' | translate }}</b>
+                    <p>{{ 'MESSAGES.QUESTION_SUMMARY_II' | translate }}</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item color="white" class="ion-margin-bottom">
+                  <ion-input
+                    [placeholder]="'MESSAGES.QUESTION_SUMMARY_P' | translate"
+                    [(ngModel)]="newMessage.summary"
+                  ></ion-input>
+                </ion-item>
+              </ng-container>
+              <ion-item
+                lines="none"
+                [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+                [class.fieldHasError]="hasFieldAnError('summary')"
+              >
+                <ion-label
+                  class="ion-text-wrap"
+                  *ngIf="newMessage.type === MessageTypes.QUESTION"
+                  [class.fieldHasError]="hasFieldAnError('text')"
+                >
+                  <p>{{ 'MESSAGES.QUESTION_CONTENT_I' | translate }}</p>
+                </ion-label>
+                <ion-label
+                  *ngIf="newMessage.type === MessageTypes.APPRECIATION"
+                  [class.fieldHasError]="hasFieldAnError('text')"
+                >
+                  <b>{{ 'MESSAGES.APPRECIATION_CONTENT_I' | translate }}</b>
+                </ion-label>
+              </ion-item>
+              <ion-item color="white">
+                <ion-textarea
+                  [rows]="3"
+                  [placeholder]="(newMessage.type === MessageTypes.QUESTION ? 'MESSAGES.QUESTION_CONTENT_P' : 'MESSAGES.APPRECIATION_CONTENT_P') | translate"
+                  [(ngModel)]="newMessage.text"
+                ></ion-textarea>
+              </ion-item>
+              <ng-container *ngIf="newMessage.type === MessageTypes.APPRECIATION || !topic.mustBeSigned">
+                <ion-item color="white" class="ion-margin-top">
+                  <ion-checkbox
+                    slot="start"
+                    [color]="newMessage.type === MessageTypes.QUESTION ? 'primary' : 'ESNpink'"
+                    (ionChange)="handleMessageMarkedAnonymous($event.detail.checked)"
+                  ></ion-checkbox>
+                  <ion-label>{{ 'MESSAGES.SEND_ANONYMOUS' | translate }}</ion-label>
+                </ion-item>
+              </ng-container>
+              <ion-row class="ion-margin">
+                <ion-col>
+                  <ion-button fill="clear" [color]="app.isInDarkMode() ? 'dark' : 'white'" (click)="cancelNewMessage()">
+                    {{ 'COMMON.CANCEL' | translate }} <ion-icon icon="close" slot="start"></ion-icon>
+                  </ion-button>
+                </ion-col>
+                <ion-col class="ion-text-right">
+                  <ion-button fill="clear" [color]="app.isInDarkMode() ? 'dark' : 'white'" (click)="sendNewMessage()">
+                    {{ 'COMMON.SEND' | translate }} <ion-icon icon="send" slot="end"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-card-content>
+          </ion-card>
+        </ng-container>
+      </ion-col>
+      <ion-col
+        [size]="12"
+        [sizeLg]="fullScreen ? 12 : 6"
+        [style.background-color]="app.isInMobileMode() ? 'var(--ion-color-light)' : 'none'"
+      >
+        <ion-toolbar *ngIf="!fullScreen" [color]="app.isInMobileMode() ? 'light' : 'transparent'">
+          <ion-segment [(ngModel)]="segment">
+            <ion-segment-button [value]="MessageTypes.QUESTION">
+              <ion-label>{{ 'MESSAGES.QUESTIONS' | translate }}</ion-label>
+            </ion-segment-button>
+            <ion-segment-button *ngIf="topic.appreciations" [value]="MessageTypes.APPRECIATION">
+              <ion-label>{{ 'MESSAGES.APPRECIATIONS' | translate }}</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </ion-toolbar>
+        <ion-list class="aList messagesList">
+          <ion-row>
+            <ion-col *ngIf="(fullScreen && !hideQuestions) || (!fullScreen && segment === MessageTypes.QUESTION)">
+              <ion-list-header *ngIf="fullScreen">
+                <ion-label class="ion-padding-start">
+                  <h1>{{ 'MESSAGES.QUESTIONS' | translate }}</h1>
+                </ion-label>
+                <ion-icon icon="mic" size="large"></ion-icon>
+              </ion-list-header>
+              <ion-row class="ion-align-items-center messagesFilters" *ngIf="!topic.isClosed()">
+                <ion-col>
+                  <ion-item color="transparent" lines="none">
+                    <ion-checkbox justify="end" [(ngModel)]="showCompletedQuestions" (ionChange)="filterQuestions()">
+                      {{ 'MESSAGES.SHOW_COMPLETED' | translate }}
+                    </ion-checkbox>
+                  </ion-item>
+                </ion-col>
+                <ion-col class="ion-hide-sm-down">
+                  <ion-item color="transparent" lines="none">
+                    <ion-select
+                      interface="popover"
+                      [label]="('MESSAGES.SORT_BY' | translate) + ':'"
+                      [(ngModel)]="sortQuestionsBy"
+                      (ionChange)="filterQuestions()"
+                    >
+                      <ion-select-option *ngFor="let sortBy of MessagesSortBy | keyvalue" [value]="sortBy.key">
+                        {{ ('MESSAGES.SORT_BY_OPTIONS.' + sortBy.key) | translate }}
+                      </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+                <ion-col [size]="2" [sizeSm]="1">
+                  <ion-item color="transparent" lines="none">
+                    <ion-label><b>{{ questions?.length }}</b></ion-label>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-item *ngIf="!questions">
+                <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
+              </ion-item>
+              <ion-item class="noElements" *ngIf="questions && !questions.length">
+                <ion-label>{{ 'MESSAGES.NO_MESSAGES' | translate }}</ion-label>
+              </ion-item>
+              <ion-card
+                class="messageCard"
+                *ngFor="let question of questions"
+                [class.author]="question.creator?.id === app.user.userId"
+                [class.complete]="!topic.isClosed() && question.completedAt"
+              >
+                <ion-card-header>
+                  <ion-row class="ion-align-items-center">
+                    <ion-col [size]="12" [sizeLg]="9">
+                      <ion-card-title>
+                        <ion-icon
+                          icon="checkmark-done"
+                          class="ion-padding-end"
+                          *ngIf="!topic.isClosed() && question.completedAt"
+                        />
+                        <ion-text *ngIf="question.creator">
+                          <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
+                        </ion-text>
+                        <i *ngIf="!question.creator">{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
+                      </ion-card-title>
+                    </ion-col>
+                    <ion-col
+                      *ngIf="!topic.isClosed() || app.user.isAdministrator"
+                      [class.ion-text-right]="!app.isInMobileMode()"
+                      [size]="12"
+                      [sizeLg]="3"
+                    >
+                      <ion-button
+                        fill="clear"
+                        color="medium"
+                        *ngIf="!app.user.isAdministrator"
+                        (click)="seeMessageUpvoters(question, $event)"
+                      >
+                        <ion-icon name="eye"></ion-icon>
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="ESNgreen"
+                        *ngIf="!topic.isClosed()"
+                        (click)="upvoteMessage(question, !hasUserUpvotedMessage[question.messageId])"
+                      >
+                        <ion-icon
+                          slot="start"
+                          [name]="hasUserUpvotedMessage[question.messageId] ? 'thumbs-up' : 'thumbs-up-outline'"
+                        ></ion-icon>
+                        <b>{{ question.numOfUpvotes }}</b>
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="medium"
+                        *ngIf="app.user.isAdministrator || question.creator?.id === app.user.userId"
+                        (click)="actionsOnMessage(question)"
+                      >
+                        <ion-icon name="ellipsis-horizontal"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-card-header>
+                <ion-card-content>
+                  {{ question.summary }}
+                  <ion-icon icon="document-text" *ngIf="question.text && app.user.isAdministrator"></ion-icon>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+            <ion-col
+              *ngIf="topic.appreciations && (fullScreen && !hideAppreciations)  || (!fullScreen && segment === MessageTypes.APPRECIATION)"
+            >
+              <ion-list-header *ngIf="fullScreen">
+                <ion-label class="ion-padding-start">
+                  <h1>{{ 'MESSAGES.APPRECIATIONS' | translate }}</h1>
+                </ion-label>
+                <ion-icon icon="heart" size="large"></ion-icon>
+              </ion-list-header>
+              <ion-row class="ion-align-items-center messagesFilters" *ngIf="!topic.isClosed()">
+                <ion-col>
+                  <ion-item color="transparent" lines="none">
+                    <ion-checkbox
+                      justify="end"
+                      [(ngModel)]="showCompletedAppreciations"
+                      (ionChange)="filterAppreciations()"
+                    >
+                      {{ 'MESSAGES.SHOW_COMPLETED' | translate }}
+                    </ion-checkbox>
+                  </ion-item>
+                </ion-col>
+                <ion-col class="ion-hide-sm-down">
+                  <ion-item color="transparent" lines="none">
+                    <ion-select
+                      interface="popover"
+                      [label]="('MESSAGES.SORT_BY' | translate) + ':'"
+                      [(ngModel)]="sortAppreciationsBy"
+                      (ionChange)="filterAppreciations()"
+                    >
+                      <ion-select-option *ngFor="let sortBy of MessagesSortBy | keyvalue" [value]="sortBy.key">
+                        {{ ('MESSAGES.SORT_BY_OPTIONS.' + sortBy.key) | translate }}
+                      </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+                <ion-col [size]="2" [sizeSm]="1">
+                  <ion-item color="transparent" lines="none">
+                    <ion-label><b>{{ appreciations?.length }}</b></ion-label>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-item *ngIf="!appreciations">
+                <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
+              </ion-item>
+              <ion-item class="noElements" *ngIf="appreciations && !appreciations.length">
+                <ion-label>{{ 'MESSAGES.NO_MESSAGES' | translate }}</ion-label>
+              </ion-item>
+              <ion-card
+                class="messageCard"
+                *ngFor="let appreciation of appreciations"
+                [class.author]="appreciation.creator?.id === app.user.userId"
+                [class.complete]="!topic.isClosed() && appreciation.completedAt"
+              >
+                <ion-card-header>
+                  <ion-row class="ion-align-items-center">
+                    <ion-col [size]="12" [sizeLg]="9">
+                      <ion-card-title>
+                        <ion-icon
+                          icon="checkmark-done"
+                          class="ion-padding-end"
+                          *ngIf="!topic.isClosed() && appreciation.completedAt"
+                        />
+                        <ion-text *ngIf="appreciation.creator">
+                          <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
+                        </ion-text>
+                        <i *ngIf="!appreciation.creator">{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
+                      </ion-card-title>
+                    </ion-col>
+                    <ion-col
+                      *ngIf="!topic.isClosed() || app.user.isAdministrator"
+                      [class.ion-text-right]="!app.isInMobileMode()"
+                      [size]="12"
+                      [sizeLg]="3"
+                    >
+                      <ion-button
+                        fill="clear"
+                        color="medium"
+                        *ngIf="!app.user.isAdministrator"
+                        (click)="seeMessageUpvoters(appreciation, $event)"
+                      >
+                        <ion-icon name="eye"></ion-icon>
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="ESNpink"
+                        *ngIf="!topic.isClosed()"
+                        (click)="upvoteMessage(appreciation, !hasUserUpvotedMessage[appreciation.messageId])"
+                      >
+                        <ion-icon
+                          slot="start"
+                          [name]="hasUserUpvotedMessage[appreciation.messageId] ? 'heart' : 'heart-outline'"
+                        ></ion-icon>
+                        <b>{{ appreciation.numOfUpvotes }}</b>
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        color="medium"
+                        *ngIf="app.user.isAdministrator || appreciation.creator?.id === app.user.userId"
+                        (click)="actionsOnMessage(appreciation)"
+                      >
+                        <ion-icon name="ellipsis-horizontal"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-card-header>
+                <ion-card-content>{{ appreciation.text }}</ion-card-content>
+              </ion-card>
+            </ion-col>
+            <ion-col *ngIf="fullScreen" [size]="2">
+              <div id="qrCodeContainer"></div>
+            </ion-col>
+          </ion-row>
+          <ion-infinite-scroll
+            (ionInfinite)="segment === MessageTypes.QUESTION ? filterQuestions($event.target) : filterAppreciations($event.target)"
+          >
+            <ion-infinite-scroll-content></ion-infinite-scroll-content>
+          </ion-infinite-scroll>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+  <ion-fab-button
+    color="ESNgreen"
+    size="small"
+    *ngIf="!fullScreen"
+    [title]="'COMMON.MANAGE' | translate"
+    (click)="manageTopic()"
+  >
+    <ion-icon icon="build"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="primary"
+    size="small"
+    *ngIf="!fullScreen && !app.isInMobileMode()"
+    [title]="'MESSAGES.ENTER_FULL_SCREEN' | translate"
+    (click)="enterFullScreen()"
+  >
+    <ion-icon icon="expand"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="primary"
+    size="small"
+    *ngIf="fullScreen"
+    [title]="'MESSAGES.EXIT_FULL_SCREEN' | translate"
+    (click)="exitFullScreen()"
+  >
+    <ion-icon icon="contract"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="medium"
+    size="small"
+    *ngIf="fullScreen && topic.appreciations"
+    [title]="'MESSAGES.TOGGLE_QUESTIONS' | translate"
+    (click)="hideQuestions = !hideQuestions"
+  >
+    <ion-icon [icon]="hideQuestions ? 'mic-off' : 'mic'"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button
+    color="medium"
+    size="small"
+    *ngIf="fullScreen && topic.appreciations"
+    [title]="'MESSAGES.TOGGLE_APPRECIATIONS' | translate"
+    (click)="hideAppreciations = !hideAppreciations"
+  >
+    <ion-icon [icon]="hideAppreciations ? 'heart-dislike' : 'heart'"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

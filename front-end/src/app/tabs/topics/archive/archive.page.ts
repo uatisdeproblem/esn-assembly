@@ -9,7 +9,7 @@ import { GAEventsService } from '@tabs/configurations/events/events.service';
 
 import { TopicCategory } from '@models/category.model';
 import { GAEvent } from '@models/event.model';
-import { Topic } from '@models/topic.model';
+import { Topic, TopicTypes } from '@models/topic.model';
 
 @Component({
   selector: 'archive',
@@ -71,6 +71,6 @@ export class ArchivePage implements OnInit {
   }
 
   openTopic(topic: Topic): void {
-    this.app.goToInTabs(['topics', topic.topicId]);
+    this.app.goToInTabs(['topics', topic.topicId, topic.type === TopicTypes.LIVE ? 'live' : 'standard']);
   }
 }

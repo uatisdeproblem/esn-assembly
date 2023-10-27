@@ -7,13 +7,16 @@ import { NodejsFunction, NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-node
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import * as IAM from 'aws-cdk-lib/aws-iam';
 import * as ApiGw from 'aws-cdk-lib/aws-apigatewayv2';
+import * as ApiGwAlpha from '@aws-cdk/aws-apigatewayv2-alpha';
+import * as ApiGwAlphaIntegrations from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import * as ApiGwAlphaAuthorizers from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
 import * as DDB from 'aws-cdk-lib/aws-dynamodb';
 import * as S3 from 'aws-cdk-lib/aws-s3';
 import * as S3Deployment from 'aws-cdk-lib/aws-s3-deployment';
 import { Subscription, SubscriptionProtocol, Topic } from 'aws-cdk-lib/aws-sns';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction as LambdaFunctionTarget } from 'aws-cdk-lib/aws-events-targets';
-import { SnsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { DynamoEventSource, SnsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 export interface ApiProps extends cdk.StackProps {
   project: string;
@@ -21,6 +24,7 @@ export interface ApiProps extends cdk.StackProps {
   firstAdminEmail: string;
   apiDomain: string;
   apiDefinitionFile: string;
+  webSocketApiDomain: string;
   resourceControllers: ResourceController[];
   tables: { [tableName: string]: DDBTable };
   mediaBucketArn: string;
@@ -92,7 +96,7 @@ export class ApiStack extends cdk.Stack {
       apiDomain: props.apiDomain
     });
 
-    this.createDDBTablesAndAllowLambdaFunctions({
+    const { tables } = this.createDDBTablesAndAllowLambdaFunctions({
       stackId: id,
       tables: props.tables,
       defaultTableProps: defaultDDBTableProps,
@@ -103,8 +107,6 @@ export class ApiStack extends cdk.Stack {
     //
     // PROJECT CUSTOM
     //
-
-    // @idea insert here project-custom constructs if needed
 
     if (lambdaFunctions['sesNotifications']) {
       const topic = Topic.fromTopicArn(this, 'SESTopicToHandleSESBounces', props.ses.notificationTopicArn);
@@ -123,6 +125,20 @@ export class ApiStack extends cdk.Stack {
       });
       rule.addTarget(new LambdaFunctionTarget(lambdaFunctions['scheduledOps']));
     }
+
+    const { lambdaFnWebSocket } = await this.createWebSocketAPIAndStage({
+      stackId: id,
+      project: props.project,
+      stage: props.stage,
+      apiDomain: props.webSocketApiDomain,
+      defaultLambdaFnProps,
+      defaultDDBTableProps,
+      authorizerLambdaFn: lambdaFunctions['auth']
+    });
+    if (tables['messages'])
+      lambdaFnWebSocket.addEventSource(
+        new DynamoEventSource(tables['messages'], { startingPosition: Lambda.StartingPosition.LATEST })
+      );
   }
 
   //
@@ -354,5 +370,83 @@ export class ApiStack extends cdk.Stack {
     }
 
     return { tables };
+  }
+
+  private async createWebSocketAPIAndStage(params: {
+    stackId: string;
+    project: string;
+    stage: string;
+    apiDomain: string;
+    defaultLambdaFnProps: NodejsFunctionProps;
+    defaultDDBTableProps: DDB.TableProps;
+    authorizerLambdaFn?: NodejsFunction;
+  }): Promise<{
+    webSocketApi: ApiGwAlpha.WebSocketApi;
+    ddbTableConnections: DDB.Table;
+    lambdaFnWebSocket: NodejsFunction;
+  }> {
+    const ddbTableConnections = new DDB.Table(this, 'WebSocketConnectionsTable', {
+      ...params.defaultDDBTableProps,
+      tableName: params.stackId.concat('_socketConnections'),
+      partitionKey: { name: 'connectionId', type: DDB.AttributeType.STRING },
+      timeToLiveAttribute: 'expiresAt',
+      removalPolicy: cdk.RemovalPolicy.DESTROY
+    });
+    ddbTableConnections.addGlobalSecondaryIndex({
+      indexName: 'type-referenceId-index',
+      partitionKey: { name: 'type', type: DDB.AttributeType.STRING },
+      sortKey: { name: 'referenceId', type: DDB.AttributeType.STRING },
+      projectionType: DDB.ProjectionType.ALL
+    });
+
+    const lambdaFnWebSocket = new NodejsFunction(this, 'WebSocketFunction', {
+      ...params.defaultLambdaFnProps,
+      functionName: params.project.concat('_', params.stage, '_webSocket'),
+      entry: './src/handlers/webSocket.ts'
+    });
+    ddbTableConnections.grantReadWriteData(lambdaFnWebSocket);
+    lambdaFnWebSocket.addEnvironment('DDB_CONNECTIONS_TABLE', ddbTableConnections.tableName);
+
+    const authorizer = params.authorizerLambdaFn
+      ? new ApiGwAlphaAuthorizers.WebSocketLambdaAuthorizer('WebSocketApiAuthorizer', params.authorizerLambdaFn, {
+          identitySource: ['route.request.querystring.authorization']
+        })
+      : undefined;
+
+    const webSocketApi = new ApiGwAlpha.WebSocketApi(this, 'WebSocketApi', {
+      apiName: params.project.concat('-', params.stage, '-socket'),
+      connectRouteOptions: {
+        integration: new ApiGwAlphaIntegrations.WebSocketLambdaIntegration('WSConnectIntegration', lambdaFnWebSocket),
+        authorizer
+      },
+      disconnectRouteOptions: {
+        integration: new ApiGwAlphaIntegrations.WebSocketLambdaIntegration('WSConnectIntegration', lambdaFnWebSocket)
+      },
+      defaultRouteOptions: {
+        integration: new ApiGwAlphaIntegrations.WebSocketLambdaIntegration('WSConnectIntegration', lambdaFnWebSocket),
+        returnResponse: true
+      }
+    });
+
+    lambdaFnWebSocket.addEnvironment(
+      'WEB_SOCKET_API_URL',
+      `https://${webSocketApi.apiId}.execute-api.${cdk.Stack.of(this).region}.amazonaws.com/$default`
+    );
+    webSocketApi.grantManageConnections(lambdaFnWebSocket);
+
+    const webSocketApiStage = new ApiGwAlpha.WebSocketStage(this, 'WebSocketApiDefaultStage', {
+      webSocketApi,
+      stageName: '$default',
+      autoDeploy: true
+    });
+
+    new ApiGw.CfnApiMapping(this, 'WebSocketApiMapping', {
+      domainName: params.apiDomain,
+      apiId: webSocketApi.apiId,
+      apiMappingKey: params.stage,
+      stage: webSocketApiStage.stageName
+    });
+
+    return { webSocketApi, ddbTableConnections, lambdaFnWebSocket };
   }
 }

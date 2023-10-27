@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { AppService } from '@app/app.service';
 
-import { Topic } from '@models/topic.model';
+import { Topic, TopicTypes } from '@models/topic.model';
 import { SubjectTypes } from '@models/subject.model';
 import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { StatisticEntityTypes } from '@models/statistic.model';
@@ -30,6 +30,7 @@ export class TopicComponent {
    */
   @Output() select = new EventEmitter<void>();
 
+  TopicTypes = TopicTypes;
   SubjectTypes = SubjectTypes;
   FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 

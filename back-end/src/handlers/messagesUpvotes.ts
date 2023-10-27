@@ -7,7 +7,7 @@ import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 import { addBadgeToUser } from './badges';
 
 import { Topic, TopicTypes } from '../models/topic.model';
-import { Question, QuestionUpvote } from '../models/question.model';
+import { Message, MessageUpvote } from '../models/message.model';
 import { User } from '../models/user.model';
 import { Badges } from '../models/userBadge.model';
 import { Subject } from '../models/subject.model';
@@ -18,21 +18,21 @@ import { Subject } from '../models/subject.model';
 
 const DDB_TABLES = {
   topics: process.env.DDB_TABLE_topics,
-  questions: process.env.DDB_TABLE_questions,
-  questionsUpvotes: process.env.DDB_TABLE_questionsUpvotes
+  messages: process.env.DDB_TABLE_messages,
+  messagesUpvotes: process.env.DDB_TABLE_messagesUpvotes
 };
 const ddb = new DynamoDB();
 
-export const handler = (ev: any, _: any, cb: any): Promise<void> => new QuestionsUpvotesRC(ev, cb).handleRequest();
+export const handler = (ev: any, _: any, cb: any): Promise<void> => new MessagesUpvotesRC(ev, cb).handleRequest();
 
 ///
 /// RESOURCE CONTROLLER
 ///
 
-class QuestionsUpvotesRC extends ResourceController {
+class MessagesUpvotesRC extends ResourceController {
   galaxyUser: User;
   topic: Topic;
-  question: Question;
+  message: Message;
 
   constructor(event: any, callback: any) {
     super(event, callback, { resourceId: 'userId' });
@@ -48,64 +48,65 @@ class QuestionsUpvotesRC extends ResourceController {
       throw new RCError('Topic not found');
     }
 
-    if (this.topic.type !== TopicTypes.STANDARD) throw new RCError('Incompatible type of topic');
+    if (this.topic.type !== TopicTypes.LIVE) throw new RCError('Incompatible type of topic');
 
     try {
-      this.question = new Question(
+      this.message = new Message(
         await ddb.get({
-          TableName: DDB_TABLES.questions,
-          Key: { topicId: this.pathParameters.topicId, questionId: this.pathParameters.questionId }
+          TableName: DDB_TABLES.messages,
+          Key: { topicId: this.pathParameters.topicId, messageId: this.pathParameters.messageId }
         })
       );
     } catch (err) {
-      throw new RCError('Question not found');
+      throw new RCError('Message not found');
     }
   }
 
   protected async getResources(): Promise<Subject[]> {
-    let questionUpvotes: QuestionUpvote[] = await ddb.query({
-      TableName: DDB_TABLES.questionsUpvotes,
-      KeyConditionExpression: 'questionId = :questionId',
-      ExpressionAttributeValues: { ':questionId': this.question.questionId }
+    let messageUpvotes: MessageUpvote[] = await ddb.query({
+      TableName: DDB_TABLES.messagesUpvotes,
+      KeyConditionExpression: 'messageId = :messageId',
+      ExpressionAttributeValues: { ':messageId': this.message.messageId }
     });
-    questionUpvotes = questionUpvotes
-      .map(x => new QuestionUpvote(x))
+    messageUpvotes = messageUpvotes
+      .map(x => new MessageUpvote(x))
       .sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
-    return questionUpvotes.map(x => x.creator);
+    return messageUpvotes.map(x => x.creator);
   }
 
   protected async postResources(): Promise<void> {
-    const upvoteItem = new QuestionUpvote({
-      questionId: this.question.questionId,
+    const upvoteItem = new MessageUpvote({
+      messageId: this.message.messageId,
       userId: this.galaxyUser.userId,
+      topicId: this.topic.topicId,
       creator: Subject.fromUser(this.galaxyUser)
     });
 
-    await ddb.put({ TableName: DDB_TABLES.questionsUpvotes, Item: upvoteItem });
+    await ddb.put({ TableName: DDB_TABLES.messagesUpvotes, Item: upvoteItem });
 
-    this.question.numOfUpvotes = await this.getLiveNumUpvotes();
-    await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
+    this.message.numOfUpvotes = await this.getLiveNumUpvotes();
+    await ddb.put({ TableName: DDB_TABLES.messages, Item: this.message });
 
     await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.NEWCOMER);
-    if ((await this.getNumQuestionsUpvotedByUser()) >= 15)
+    if ((await this.getNumMessagesUpvotedByUser()) >= 15)
       await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.LOVE_GIVER);
   }
 
   protected async deleteResources(): Promise<void> {
     await ddb.delete({
-      TableName: DDB_TABLES.questionsUpvotes,
-      Key: { questionId: this.question.questionId, userId: this.galaxyUser.userId }
+      TableName: DDB_TABLES.messagesUpvotes,
+      Key: { messageId: this.message.messageId, userId: this.galaxyUser.userId }
     });
 
-    this.question.numOfUpvotes = await this.getLiveNumUpvotes();
-    await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
+    this.message.numOfUpvotes = await this.getLiveNumUpvotes();
+    await ddb.put({ TableName: DDB_TABLES.messages, Item: this.message });
   }
 
   protected async getResource(): Promise<{ upvoted: boolean }> {
     try {
       await ddb.get({
-        TableName: DDB_TABLES.questionsUpvotes,
-        Key: { questionId: this.question.questionId, userId: this.resourceId }
+        TableName: DDB_TABLES.messagesUpvotes,
+        Key: { messageId: this.message.messageId, userId: this.resourceId }
       });
       return { upvoted: true };
     } catch (error) {
@@ -115,18 +116,18 @@ class QuestionsUpvotesRC extends ResourceController {
 
   private async getLiveNumUpvotes(): Promise<number> {
     const upvotes = await ddb.query({
-      TableName: DDB_TABLES.questionsUpvotes,
-      KeyConditionExpression: 'questionId = :questionId',
-      ExpressionAttributeValues: { ':questionId': this.question.questionId },
+      TableName: DDB_TABLES.messagesUpvotes,
+      KeyConditionExpression: 'messageId = :messageId',
+      ExpressionAttributeValues: { ':messageId': this.message.messageId },
       ConsistentRead: true
     });
     return upvotes.length;
   }
 
-  private async getNumQuestionsUpvotedByUser(): Promise<number> {
+  private async getNumMessagesUpvotedByUser(): Promise<number> {
     try {
       const upvotes = await ddb.query({
-        TableName: DDB_TABLES.questionsUpvotes,
+        TableName: DDB_TABLES.messagesUpvotes,
         IndexName: 'inverted-index',
         KeyConditionExpression: 'userId = :userId',
         ExpressionAttributeValues: { ':userId': this.galaxyUser.userId }

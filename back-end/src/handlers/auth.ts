@@ -22,9 +22,16 @@ const ssm = new SystemsManager();
 
 let JWT_SECRET: string;
 
-export const handler = async (event: APIGatewayProxyEventV2WithRequestContext<AuthResult>): Promise<AuthResult> => {
+export const handler = async (event: any): Promise<any> => {
+  if (event.methodArn) return authorizeWebSocketApi(event);
+  else return authorizeHTTPApi(event);
+};
+
+const authorizeHTTPApi = async (
+  event: APIGatewayProxyEventV2WithRequestContext<HTTPAuthResult>
+): Promise<HTTPAuthResult> => {
   const authorization = event?.headers?.authorization;
-  const result: AuthResult = { isAuthorized: false };
+  const result: HTTPAuthResult = { isAuthorized: false };
   const user = await verifyTokenAndGetESNAccountsUser(authorization);
 
   if (user) {
@@ -32,6 +39,22 @@ export const handler = async (event: APIGatewayProxyEventV2WithRequestContext<Au
     result.context = { principalId: user.userId, user };
     result.isAuthorized = true;
   }
+
+  return result;
+};
+
+const authorizeWebSocketApi = async (event: any): Promise<WebSocketAuthResult> => {
+  const authorization = event?.queryStringParameters?.authorization;
+  const user = await verifyTokenAndGetESNAccountsUser(authorization);
+
+  const result: WebSocketAuthResult = {};
+
+  if (user) {
+    if (user.isAdministrator) user.isAdministrator = await verifyIfUserIsStillAnAdministratorById(user.userId);
+    result.principalId = user.userId;
+  }
+
+  result.policyDocument = getPolicyDocumentToAllowWebSocketRequest(event.methodArn, !!user);
 
   return result;
 };
@@ -60,10 +83,34 @@ const verifyIfUserIsStillAnAdministratorById = async (userId: string): Promise<b
   return administratorsIds.includes(userId);
 };
 
+const getPolicyDocumentToAllowWebSocketRequest = (methodArn: string, allow: boolean): any => {
+  const policyDocument: any = {};
+  policyDocument.Version = '2012-10-17';
+  policyDocument.Statement = [];
+  const statementOne: any = {};
+  statementOne.Action = 'execute-api:Invoke';
+  statementOne.Effect = allow ? 'Allow' : 'Deny';
+  statementOne.Resource = methodArn;
+  policyDocument.Statement[0] = statementOne;
+  return policyDocument;
+};
+
+//
+// INTERFACES
+//
+
 /**
  * Expected result by a Lambda authorizer (payload format: 2.0).
  */
-interface AuthResult {
+interface HTTPAuthResult {
   isAuthorized: boolean;
   context?: { principalId: string; user: User };
+}
+
+/**
+ * Expected result by a Lambda authorizer (payload format: 1.0).
+ */
+interface WebSocketAuthResult {
+  policyDocument?: Record<string, any>;
+  principalId?: string;
 }

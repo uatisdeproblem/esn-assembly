@@ -9,18 +9,18 @@ import { AttachmentsService } from 'src/app/common/attachments.service';
 import { QuestionsService } from './questions/questions.service';
 import { UserDraftsService } from './drafts/drafts.service';
 
-import { Topic } from '@models/topic.model';
+import { Topic, TopicTypes } from '@models/topic.model';
 import { Question } from '@models/question.model';
 import { Subject } from '@models/subject.model';
 import { dateStringIsPast, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { UserDraft } from '@models/userDraft.model';
 
 @Component({
-  selector: 'topic',
-  templateUrl: 'topic.page.html',
-  styleUrls: ['topic.page.scss']
+  selector: 'standard-topic',
+  templateUrl: 'standardTopic.page.html',
+  styleUrls: ['standardTopic.page.scss']
 })
-export class TopicPage {
+export class StandardTopicPage {
   @Input() topicId: string;
   topic: Topic;
   questions: Question[];
@@ -232,7 +232,7 @@ export class TopicPage {
   }
 
   openTopic(topic: Topic): void {
-    this.app.goToInTabs(['topics', topic.topicId]);
+    this.app.goToInTabs(['topics', topic.topicId, topic.type === TopicTypes.LIVE ? 'live' : 'standard']);
   }
 
   dateStringIsPast(dateString: epochISOString): boolean {

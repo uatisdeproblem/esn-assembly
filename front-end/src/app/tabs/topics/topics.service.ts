@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { Topic } from '@models/topic.model';
+import { Topic, TopicTypes } from '@models/topic.model';
 
 @Injectable({ providedIn: 'root' })
 export class TopicsService {
@@ -33,6 +33,7 @@ export class TopicsService {
       categoryId?: string;
       eventId?: string;
       status?: boolean;
+      type?: TopicTypes;
       withPagination?: boolean;
       startPaginationAfterId?: string;
       sortBy?: TopicsSortBy;
@@ -63,6 +64,8 @@ export class TopicsService {
     if (options.status === true || options.status === false)
       filteredList = filteredList.filter(x => (options.status ? !x.closedAt : x.closedAt));
 
+    if (options.type) filteredList = filteredList.filter(x => options.type === x.type);
+
     switch (options.sortBy) {
       case TopicsSortBy.CREATED_DATE_ASC:
         filteredList = filteredList.sort((a, b): number => a.createdAt.localeCompare(b.createdAt));
@@ -70,11 +73,19 @@ export class TopicsService {
       case TopicsSortBy.CREATED_DATE_DESC:
         filteredList = filteredList.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
         break;
-      case TopicsSortBy.NUM_OF_QUESTIONS_ASC:
-        filteredList = filteredList.sort((a, b): number => a.numOfQuestions - b.numOfQuestions);
+      case TopicsSortBy.ACTIVITY_ASC:
+        filteredList = filteredList.sort((a, b): number => {
+          const liveA = a.type === TopicTypes.LIVE ? (a.isClosed() ? -1 : 1) : 0;
+          const liveB = b.type === TopicTypes.LIVE ? (b.isClosed() ? -1 : 1) : 0;
+          return liveA - liveB || a.numOfQuestions - b.numOfQuestions;
+        });
         break;
-      case TopicsSortBy.NUM_OF_QUESTIONS_DESC:
-        filteredList = filteredList.sort((a, b): number => b.numOfQuestions - a.numOfQuestions);
+      case TopicsSortBy.ACTIVITY_DESC:
+        filteredList = filteredList.sort((a, b): number => {
+          const liveA = a.type === TopicTypes.LIVE ? (a.isClosed() ? -1 : 1) : 0;
+          const liveB = b.type === TopicTypes.LIVE ? (b.isClosed() ? -1 : 1) : 0;
+          return liveB - liveA || b.numOfQuestions - a.numOfQuestions;
+        });
         break;
     }
 
@@ -124,10 +135,10 @@ export class TopicsService {
       case TopicsSortBy.CREATED_DATE_DESC:
         filteredList = filteredList.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
         break;
-      case TopicsSortBy.NUM_OF_QUESTIONS_ASC:
+      case TopicsSortBy.ACTIVITY_ASC:
         filteredList = filteredList.sort((a, b): number => a.numOfQuestions - b.numOfQuestions);
         break;
-      case TopicsSortBy.NUM_OF_QUESTIONS_DESC:
+      case TopicsSortBy.ACTIVITY_DESC:
         filteredList = filteredList.sort((a, b): number => b.numOfQuestions - a.numOfQuestions);
         break;
     }
@@ -215,6 +226,17 @@ export class TopicsService {
   async unlinkByIds(topicA: string, topicB: string): Promise<void> {
     await this.api.deleteResource(['topics', topicA, 'related', topicB]);
   }
+
+  /**
+   * Get the messages of the live topic that the user upvoted.
+   */
+  async userMessagesUpvotesForTopic(topic: Topic): Promise<{ [messageId: string]: boolean }> {
+    const path = ['topics', topic.topicId];
+    const answersIds: string[] = await this.api.patchResource(path, { body: { action: 'MESSAGES_UPVOTES' } });
+    const upvoteMap = {};
+    answersIds.forEach(a => (upvoteMap[a] = true));
+    return upvoteMap;
+  }
 }
 
 /**
@@ -223,6 +245,6 @@ export class TopicsService {
 export enum TopicsSortBy {
   CREATED_DATE_ASC = 'CREATED_DATE_ASC',
   CREATED_DATE_DESC = 'CREATED_DATE_DESC',
-  NUM_OF_QUESTIONS_ASC = 'NUM_OF_QUESTIONS_ASC',
-  NUM_OF_QUESTIONS_DESC = 'NUM_OF_QUESTIONS_DESC'
+  ACTIVITY_ASC = 'ACTIVITY_ASC',
+  ACTIVITY_DESC = 'ACTIVITY_DESC'
 }
