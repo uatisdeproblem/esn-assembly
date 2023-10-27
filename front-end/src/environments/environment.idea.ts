@@ -17,6 +17,10 @@ export const environment = {
       url: 'api.esn-ga.link',
       stage: 'prod'
     },
+    socket: {
+      url: 'socket.esn-ga.link',
+      stage: 'prod'
+    },
     ionicExtraModules: ['common']
   }
 };
