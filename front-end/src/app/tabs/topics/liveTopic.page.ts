@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AlertController, IonInfiniteScroll, IonRefresher, PopoverController } from '@ionic/angular';
 import { toCanvas } from 'qrcode';
 import { Attachment } from 'idea-toolbox';
@@ -6,7 +6,8 @@ import {
   IDEAActionSheetController,
   IDEALoadingService,
   IDEAMessageService,
-  IDEATranslationsService
+  IDEATranslationsService,
+  IDEAWebSocketApiService
 } from '@idea-ionic/common';
 
 import { SubjectsReactionsComponent } from '@app/common/subjectsReactions.component';
@@ -22,13 +23,14 @@ import { Topic, TopicTypes } from '@models/topic.model';
 import { Message, MessageTypes } from '@models/message.model';
 import { Subject } from '@models/subject.model';
 import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
+import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 
 @Component({
   selector: 'live-topic',
   templateUrl: 'liveTopic.page.html',
   styleUrls: ['liveTopic.page.scss']
 })
-export class LiveTopicPage {
+export class LiveTopicPage implements OnInit, OnDestroy {
   @Input() topicId: string;
   topic: Topic;
 
@@ -56,7 +58,7 @@ export class LiveTopicPage {
   hideQuestions = false;
   hideAppreciations = false;
 
-  hasUserUpvotedMessage: Record<string, boolean> = {}; // @todo
+  hasUserUpvotedMessage: Record<string, boolean> = {};
 
   constructor(
     private alertCtrl: AlertController,
@@ -65,12 +67,22 @@ export class LiveTopicPage {
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
+    private webSocket: IDEAWebSocketApiService,
     private _topics: TopicsService,
     private _attachments: AttachmentsService,
     private _messages: MessagesService,
     private _configurations: ConfigurationsService,
     public app: AppService
   ) {}
+  ngOnInit(): void {
+    this.webSocket.open({
+      openParams: { type: WebSocketConnectionTypes.MESSAGES, referenceId: this.topicId },
+      onMessage: message => this.handleMessageFromWebSocket(message)
+    });
+  }
+  ngOnDestroy(): void {
+    if (this.webSocket) this.webSocket.close();
+  }
   async ionViewWillEnter(): Promise<void> {
     try {
       await this.loading.show();
@@ -155,12 +167,10 @@ export class LiveTopicPage {
       type: appreciation ? MessageTypes.APPRECIATION : MessageTypes.QUESTION
     });
   }
-
   handleMessageMarkedAnonymous(anonymous: boolean): void {
     if (anonymous) delete this.newMessage.creator;
     else this.newMessage.creator = Subject.fromUser(this.app.user);
   }
-
   async cancelNewMessage(): Promise<void> {
     const doCancel = (): void => {
       this.errors = new Set();
@@ -185,11 +195,9 @@ export class LiveTopicPage {
     const doSend = async (): Promise<void> => {
       try {
         await this.loading.show();
-        let message: Message;
-        if (this.newMessage.creator) message = await this._messages.insert(this.topic, this.newMessage);
-        else message = await this._messages.insertAnonymous(this.topic, this.newMessage);
-        if (message.type === MessageTypes.QUESTION) this.filterQuestions(null, true);
-        if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations(null, true);
+        if (this.newMessage.creator) await this._messages.insert(this.topic, this.newMessage);
+        else await this._messages.insertAnonymous(this.topic, this.newMessage);
+        // message will be added to the UI by web a socket update
         this.newMessage = null;
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (err) {
@@ -259,8 +267,7 @@ export class LiveTopicPage {
       try {
         await this.loading.show();
         await this._messages.delete(this.topic, message);
-        if (message.type === MessageTypes.QUESTION) this.filterQuestions(null, true);
-        if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations(null, true);
+        // message will be removed from the UI by web a socket update
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (err) {
         this.message.error('COMMON.OPERATION_FAILED');
@@ -284,8 +291,7 @@ export class LiveTopicPage {
       try {
         await this.loading.show();
         await this._messages.delete(this.topic, message);
-        if (message.type === MessageTypes.QUESTION) this.filterQuestions(null, true);
-        if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations(null, true);
+        // message will be removed from the UI by web a socket update
         await this._configurations.banUserByID(message.creator.id);
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (err) {
@@ -412,5 +418,25 @@ export class LiveTopicPage {
         resolve();
       });
     });
+  }
+  private handleMessageFromWebSocket(webSocketMessage: WebSocketMessage): void {
+    const message = new Message(webSocketMessage.item);
+
+    const messagesList = message.type === MessageTypes.QUESTION ? this.questions : this.appreciations;
+
+    if (webSocketMessage.action === 'INSERT') {
+      this._messages.webSocketAdd(message);
+      messagesList.push(message);
+    }
+    if (webSocketMessage.action === 'MODIFY') {
+      this._messages.webSocketUpdate(message);
+      const existingMessage = messagesList.find(x => x.messageId === message.messageId);
+      if (existingMessage) existingMessage.load(message);
+    }
+    if (webSocketMessage.action === 'REMOVE') {
+      this._messages.webSocketRemoveById(message.messageId);
+      const index = messagesList.findIndex(x => x.messageId === message.messageId);
+      if (index !== -1) messagesList.splice(index, 1);
+    }
   }
 }

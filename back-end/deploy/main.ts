@@ -134,7 +134,8 @@ const tables: { [tableName: string]: DDBTable } = {
   },
   messages: {
     PK: { name: 'topicId', type: DDB.AttributeType.STRING },
-    SK: { name: 'messageId', type: DDB.AttributeType.STRING }
+    SK: { name: 'messageId', type: DDB.AttributeType.STRING },
+    stream: DDB.StreamViewType.NEW_AND_OLD_IMAGES
   },
   messagesUpvotes: {
     PK: { name: 'messageId', type: DDB.AttributeType.STRING },
@@ -212,6 +213,11 @@ const createApp = async (): Promise<void> => {
     domain: parameters.apiDomain
   });
 
+  const webSocketApiDomainStack = new ApiDomainStack(app, `${parameters.project}-socket-api-domain`, {
+    env,
+    domain: parameters.webSocketApiDomain
+  });
+
   const sesStack = new SESStack(app, `${parameters.project}-ses`, {
     env,
     project: parameters.project,
@@ -230,6 +236,7 @@ const createApp = async (): Promise<void> => {
     firstAdminEmail: parameters.firstAdminEmail,
     apiDomain: parameters.apiDomain,
     apiDefinitionFile: './swagger.yaml',
+    webSocketApiDomain: parameters.webSocketApiDomain,
     resourceControllers: apiResources,
     tables,
     mediaBucketArn: mediaStack.mediaBucketArn,
@@ -238,6 +245,7 @@ const createApp = async (): Promise<void> => {
   });
   apiStack.addDependency(mediaStack);
   apiStack.addDependency(apiDomainStack);
+  apiStack.addDependency(webSocketApiDomainStack);
   apiStack.addDependency(sesStack);
 
   new FrontEndStack(app, `${parameters.project}-${STAGE}-front-end`, {

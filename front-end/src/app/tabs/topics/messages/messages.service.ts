@@ -164,6 +164,27 @@ export class MessagesService {
     const path = ['topics', topic.topicId, 'messages', message.messageId];
     await this.api.deleteResource(path);
   }
+
+  /**
+   * Add a message signaled from a web socket update.
+   */
+  webSocketAdd(message: Message): void {
+    this.messages.push(message);
+  }
+  /**
+   * Update a message signaled from a web socket update.
+   */
+  webSocketUpdate(message: Message): void {
+    const existingMessage = this.messages.find(x => x.messageId === message.messageId);
+    if (existingMessage) existingMessage.load(message);
+  }
+  /**
+   * Remove a message signaled from a web socket update.
+   */
+  webSocketRemoveById(messageId: string): void {
+    const index = this.messages.findIndex(x => x.messageId === messageId);
+    if (index !== -1) this.messages.splice(index, 1);
+  }
 }
 
 /**
