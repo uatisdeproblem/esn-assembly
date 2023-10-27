@@ -24,8 +24,8 @@
                 <p class="badges">
                   <ion-badge [color]="topic.category.color">{{ topic.category.name }}</ion-badge>
                   <ion-badge *ngIf="topic.isDraft()" color="medium">{{ 'TOPICS.DRAFT' | translate }}</ion-badge>
-                  <ion-badge *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">
-                    {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+                  <ion-badge *ngIf="!topic.isDraft()" [color]="topic.isClosed() ? 'danger' : 'success'">
+                    {{ 'TOPICS.STATUSES.' + (topic.isClosed() ? 'CLOSED' : 'OPEN') | translate }}
                   </ion-badge>
                   <ion-badge color="warning" *ngIf="topic.isArchived()">{{ 'TOPICS.ARCHIVED' | translate }}</ion-badge>
                 </p>
@@ -203,7 +203,7 @@
                 </ion-label>
                 <ion-icon icon="mic" size="large"></ion-icon>
               </ion-list-header>
-              <ion-row class="ion-align-items-center messagesFilters" *ngIf="!topic.isClosed()">
+              <ion-row class="ion-align-items-center messagesFilters">
                 <ion-col>
                   <ion-item color="transparent" lines="none">
                     <ion-checkbox justify="end" [(ngModel)]="showCompletedQuestions" (ionChange)="filterQuestions()">
@@ -241,17 +241,13 @@
                 class="messageCard"
                 *ngFor="let question of questions"
                 [class.author]="question.creator?.id === app.user.userId"
-                [class.complete]="!topic.isClosed() && question.completedAt"
+                [class.complete]="question.completedAt"
               >
                 <ion-card-header>
                   <ion-row class="ion-align-items-center">
                     <ion-col [size]="12" [sizeLg]="9">
                       <ion-card-title>
-                        <ion-icon
-                          icon="checkmark-done"
-                          class="ion-padding-end"
-                          *ngIf="!topic.isClosed() && question.completedAt"
-                        />
+                        <ion-icon icon="checkmark-done" class="ion-padding-end" *ngIf="question.completedAt" />
                         <ion-text *ngIf="question.creator">
                           <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
                         </ion-text>
@@ -259,7 +255,7 @@
                       </ion-card-title>
                     </ion-col>
                     <ion-col
-                      *ngIf="!topic.isClosed() || app.user.isAdministrator"
+                      *ngIf="!topic.isArchived()"
                       [class.ion-text-right]="!app.isInMobileMode()"
                       [size]="12"
                       [sizeLg]="3"
@@ -267,7 +263,7 @@
                       <ion-button
                         fill="clear"
                         color="medium"
-                        *ngIf="!app.user.isAdministrator"
+                        *ngIf="!app.user.isAdministrator && !(question.creator?.id === app.user.userId)"
                         (click)="seeMessageUpvoters(question, $event)"
                       >
                         <ion-icon name="eye"></ion-icon>
@@ -275,7 +271,6 @@
                       <ion-button
                         fill="clear"
                         color="ESNgreen"
-                        *ngIf="!topic.isClosed()"
                         (click)="upvoteMessage(question, !hasUserUpvotedMessage[question.messageId])"
                       >
                         <ion-icon
@@ -310,7 +305,7 @@
                 </ion-label>
                 <ion-icon icon="heart" size="large"></ion-icon>
               </ion-list-header>
-              <ion-row class="ion-align-items-center messagesFilters" *ngIf="!topic.isClosed()">
+              <ion-row class="ion-align-items-center messagesFilters">
                 <ion-col>
                   <ion-item color="transparent" lines="none">
                     <ion-checkbox
@@ -352,17 +347,13 @@
                 class="messageCard"
                 *ngFor="let appreciation of appreciations"
                 [class.author]="appreciation.creator?.id === app.user.userId"
-                [class.complete]="!topic.isClosed() && appreciation.completedAt"
+                [class.complete]="appreciation.completedAt"
               >
                 <ion-card-header>
                   <ion-row class="ion-align-items-center">
                     <ion-col [size]="12" [sizeLg]="9">
                       <ion-card-title>
-                        <ion-icon
-                          icon="checkmark-done"
-                          class="ion-padding-end"
-                          *ngIf="!topic.isClosed() && appreciation.completedAt"
-                        />
+                        <ion-icon icon="checkmark-done" class="ion-padding-end" *ngIf="appreciation.completedAt" />
                         <ion-text *ngIf="appreciation.creator">
                           <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
                         </ion-text>
@@ -370,7 +361,7 @@
                       </ion-card-title>
                     </ion-col>
                     <ion-col
-                      *ngIf="!topic.isClosed() || app.user.isAdministrator"
+                      *ngIf="!topic.isArchived()"
                       [class.ion-text-right]="!app.isInMobileMode()"
                       [size]="12"
                       [sizeLg]="3"
@@ -378,7 +369,7 @@
                       <ion-button
                         fill="clear"
                         color="medium"
-                        *ngIf="!app.user.isAdministrator"
+                        *ngIf="!app.user.isAdministrator && !(appreciation.creator?.id === app.user.userId)"
                         (click)="seeMessageUpvoters(appreciation, $event)"
                       >
                         <ion-icon name="eye"></ion-icon>
@@ -386,7 +377,6 @@
                       <ion-button
                         fill="clear"
                         color="ESNpink"
-                        *ngIf="!topic.isClosed()"
                         (click)="upvoteMessage(appreciation, !hasUserUpvotedMessage[appreciation.messageId])"
                       >
                         <ion-icon

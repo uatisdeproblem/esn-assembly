@@ -88,7 +88,8 @@ const tables: { [tableName: string]: DDBTable } = {
         sortKey: { name: 'willCloseAt', type: DDB.AttributeType.STRING },
         projectionType: DDB.ProjectionType.KEYS_ONLY
       }
-    ]
+    ],
+    stream: DDB.StreamViewType.NEW_AND_OLD_IMAGES
   },
   relatedTopics: {
     PK: { name: 'topicA', type: DDB.AttributeType.STRING },

@@ -104,7 +104,7 @@ class MessagesRC extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.topic.canUserInteract(this.galaxyUser)) throw new Error('Not allowed to interact');
+    if (this.topic.isArchived()) throw new Error('Topic is archived');
 
     await ddb.delete({
       TableName: DDB_TABLES.messages,
@@ -123,7 +123,7 @@ class MessagesRC extends ResourceController {
     }
   }
   private async markComplete(): Promise<Message> {
-    if (this.topic.isClosed()) throw new Error('Topic is closed');
+    if (this.topic.isArchived()) throw new Error('Topic is archived');
     if (this.message.completedAt) throw new Error('Message is already complete');
 
     this.message.completedAt = new Date().toISOString();
@@ -137,7 +137,7 @@ class MessagesRC extends ResourceController {
     return this.message;
   }
   private async undoComplete(): Promise<Message> {
-    if (this.topic.isClosed()) throw new Error('Topic is closed');
+    if (this.topic.isArchived()) throw new Error('Topic is archived');
     if (!this.galaxyUser.isAdministrator) throw new Error('Unauthorized');
 
     if (!this.message.completedAt) return this.message;

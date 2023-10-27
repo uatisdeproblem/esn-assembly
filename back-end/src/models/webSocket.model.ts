@@ -50,5 +50,6 @@ export interface WebSocketMessage {
  * The types of entity to which users can establish web socket connections.
  */
 export enum WebSocketConnectionTypes {
+  TOPICS = 'topics',
   MESSAGES = 'messages'
 }

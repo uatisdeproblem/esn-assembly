@@ -135,10 +135,12 @@ export class ApiStack extends cdk.Stack {
       defaultDDBTableProps,
       authorizerLambdaFn: lambdaFunctions['auth']
     });
-    if (tables['messages'])
-      lambdaFnWebSocket.addEventSource(
-        new DynamoEventSource(tables['messages'], { startingPosition: Lambda.StartingPosition.LATEST })
-      );
+    lambdaFnWebSocket.addEventSource(
+      new DynamoEventSource(tables['topics'], { startingPosition: Lambda.StartingPosition.LATEST })
+    );
+    lambdaFnWebSocket.addEventSource(
+      new DynamoEventSource(tables['messages'], { startingPosition: Lambda.StartingPosition.LATEST })
+    );
   }
 
   //
@@ -393,9 +395,9 @@ export class ApiStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY
     });
     ddbTableConnections.addGlobalSecondaryIndex({
-      indexName: 'type-referenceId-index',
-      partitionKey: { name: 'type', type: DDB.AttributeType.STRING },
-      sortKey: { name: 'referenceId', type: DDB.AttributeType.STRING },
+      indexName: 'referenceId-type-index',
+      partitionKey: { name: 'referenceId', type: DDB.AttributeType.STRING },
+      sortKey: { name: 'type', type: DDB.AttributeType.STRING },
       projectionType: DDB.ProjectionType.ALL
     });
 

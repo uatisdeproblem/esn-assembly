@@ -77,7 +77,10 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.webSocket.open({
       openParams: { type: WebSocketConnectionTypes.MESSAGES, referenceId: this.topicId },
-      onMessage: message => this.handleMessageFromWebSocket(message)
+      onMessage: message =>
+        message.type === WebSocketConnectionTypes.MESSAGES
+          ? this.handleMessageFromWebSocket(message)
+          : this.handleRefresh()
     });
   }
   ngOnDestroy(): void {
@@ -101,14 +104,16 @@ export class LiveTopicPage implements OnInit, OnDestroy {
       this._topics.getRelated(this.topic),
       this._topics.userMessagesUpvotesForTopic(this.topic)
     ]);
+    this.showCompletedQuestions = this.topic.isClosed();
+    this.showCompletedAppreciations = this.topic.isClosed();
     await this.filterQuestions();
     await this.filterAppreciations();
   }
-  async handleRefresh(refresh: IonRefresher): Promise<void> {
+  async handleRefresh(refresh?: IonRefresher): Promise<void> {
     this.questions = null;
     this.appreciations = null;
     await this.loadResources();
-    refresh.complete();
+    if (refresh) refresh.complete();
   }
 
   manageTopic(): void {
@@ -135,7 +140,7 @@ export class LiveTopicPage implements OnInit, OnDestroy {
     this.questions = await this._messages.getListOfTopic(this.topic, {
       force,
       filterByType: MessageTypes.QUESTION,
-      showCompleted: this.topic.isClosed() ? true : this.showCompletedQuestions,
+      showCompleted: this.showCompletedQuestions,
       sortBy: this.sortQuestionsBy,
       withPagination: true,
       startPaginationAfterId
@@ -151,7 +156,7 @@ export class LiveTopicPage implements OnInit, OnDestroy {
     this.appreciations = await this._messages.getListOfTopic(this.topic, {
       force,
       filterByType: MessageTypes.APPRECIATION,
-      showCompleted: this.topic.isClosed() ? true : this.showCompletedAppreciations,
+      showCompleted: this.showCompletedAppreciations,
       sortBy: this.sortAppreciationsBy,
       withPagination: true,
       startPaginationAfterId
@@ -325,20 +330,18 @@ export class LiveTopicPage implements OnInit, OnDestroy {
     const header = this.t._('MESSAGES.ACTIONS');
     const buttons = [];
 
-    if (!this.topic.isClosed()) {
-      if (!message.completedAt) {
-        buttons.push({
-          text: this.t._('MESSAGES.MARK_COMPLETE'),
-          icon: 'checkmark-done',
-          handler: (): Promise<void> => this.changeCompleteStatus(message, true)
-        });
-      } else if (this.app.user.isAdministrator) {
-        buttons.push({
-          text: this.t._('MESSAGES.UNDO_COMPLETE'),
-          icon: 'square-outline',
-          handler: (): Promise<void> => this.changeCompleteStatus(message, false)
-        });
-      }
+    if (!message.completedAt) {
+      buttons.push({
+        text: this.t._('MESSAGES.MARK_COMPLETE'),
+        icon: 'checkmark-done',
+        handler: (): Promise<void> => this.changeCompleteStatus(message, true)
+      });
+    } else if (this.app.user.isAdministrator) {
+      buttons.push({
+        text: this.t._('MESSAGES.UNDO_COMPLETE'),
+        icon: 'square-outline',
+        handler: (): Promise<void> => this.changeCompleteStatus(message, false)
+      });
     }
 
     if (
@@ -353,34 +356,36 @@ export class LiveTopicPage implements OnInit, OnDestroy {
       });
     }
 
-    if (this.app.user.isAdministrator) {
-      buttons.push({
-        text: this.t._('MESSAGES.SEE_WHO_REACTED'),
-        icon: 'eye',
-        handler: (): Promise<void> => this.seeMessageUpvoters(message)
-      });
-      if (message.creator) {
+    buttons.push({
+      text: this.t._('MESSAGES.SEE_WHO_REACTED'),
+      icon: 'eye',
+      handler: (): Promise<void> => this.seeMessageUpvoters(message)
+    });
+
+    if (message.creator) {
+      if (this.app.user.isAdministrator) {
         buttons.push({
           text: this.t._('MESSAGES.OPEN_PROFILE'),
           icon: 'person',
           handler: (): void => this.openUserProfile(message.creator)
         });
       }
-    }
-
-    buttons.push({
-      text: this.t._('MESSAGES.DELETE'),
-      icon: 'trash',
-      role: 'destructive',
-      handler: (): Promise<void> => this.deleteMessage(message)
-    });
-    if (this.app.user.isAdministrator && message.creator) {
-      buttons.push({
-        text: this.t._('MESSAGES.DELETE_AND_BAN_USER'),
-        icon: 'ban',
-        role: 'destructive',
-        handler: (): Promise<void> => this.deleteMessageAndBanUser(message)
-      });
+      if (!this.topic.isClosed() || this.app.user.isAdministrator) {
+        buttons.push({
+          text: this.t._('MESSAGES.DELETE'),
+          icon: 'trash',
+          role: 'destructive',
+          handler: (): Promise<void> => this.deleteMessage(message)
+        });
+      }
+      if (this.app.user.isAdministrator) {
+        buttons.push({
+          text: this.t._('MESSAGES.DELETE_AND_BAN_USER'),
+          icon: 'ban',
+          role: 'destructive',
+          handler: (): Promise<void> => this.deleteMessageAndBanUser(message)
+        });
+      }
     }
 
     buttons.push({ text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' });
@@ -423,15 +428,22 @@ export class LiveTopicPage implements OnInit, OnDestroy {
     const message = new Message(webSocketMessage.item);
 
     const messagesList = message.type === MessageTypes.QUESTION ? this.questions : this.appreciations;
+    const shouldPushCompleted =
+      message.type === MessageTypes.QUESTION ? this.showCompletedQuestions : this.showCompletedAppreciations;
 
     if (webSocketMessage.action === 'INSERT') {
       this._messages.webSocketAdd(message);
-      messagesList.push(message);
+      if (!message.completedAt || shouldPushCompleted) messagesList.push(message);
     }
     if (webSocketMessage.action === 'MODIFY') {
+      const existingMessageInDisplayedList = messagesList.find(x => x.messageId === message.messageId);
+
+      if (message.completedAt && !shouldPushCompleted) {
+        const index = messagesList.indexOf(existingMessageInDisplayedList);
+        if (index !== -1) messagesList.splice(index, 1);
+      } else if (!message.completedAt && !existingMessageInDisplayedList) messagesList.push(message);
+
       this._messages.webSocketUpdate(message);
-      const existingMessage = messagesList.find(x => x.messageId === message.messageId);
-      if (existingMessage) existingMessage.load(message);
     }
     if (webSocketMessage.action === 'REMOVE') {
       this._messages.webSocketRemoveById(message.messageId);

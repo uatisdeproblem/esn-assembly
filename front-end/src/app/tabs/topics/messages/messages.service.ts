@@ -61,8 +61,7 @@ export class MessagesService {
 
     if (options.filterByType) filteredList = filteredList.filter(x => x.type === options.filterByType);
 
-    if (options.showCompleted !== undefined)
-      filteredList = filteredList.filter(x => (options.showCompleted ? true : !x.completedAt));
+    filteredList = filteredList.filter(x => (options.showCompleted ? true : !x.completedAt));
 
     switch (options.sortBy) {
       case MessagesSortBy.CREATION_ASC:

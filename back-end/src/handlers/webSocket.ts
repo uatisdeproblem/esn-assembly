@@ -92,10 +92,9 @@ class WebSocketStreamController extends StreamController {
 
     const connections: WebSocketConnection[] = await ddb.query({
       TableName: DDB_CONNECTIONS_TABLE,
-      IndexName: 'type-referenceId-index',
-      ExpressionAttributeNames: { '#type': 'type' },
-      KeyConditionExpression: '#type = :type AND referenceId = :referenceId',
-      ExpressionAttributeValues: { ':type': webSocketMessage.type, ':referenceId': webSocketMessage.referenceId }
+      IndexName: 'referenceId-type-index',
+      KeyConditionExpression: 'referenceId = :referenceId',
+      ExpressionAttributeValues: { ':referenceId': webSocketMessage.referenceId }
     });
 
     // for each open connection related to the referenceId, send the message (don't wait for the outcome, ignore errors)
@@ -113,7 +112,9 @@ class WebSocketStreamController extends StreamController {
       action === 'REMOVE' ? ddb.unmarshall(record.dynamodb.OldImage) : ddb.unmarshall(record.dynamodb.NewImage);
 
     let socketMessage: WebSocketMessage = null;
-    if (tableName.endsWith('_messages')) {
+    if (tableName.endsWith('_topics')) {
+      socketMessage = { action, type: WebSocketConnectionTypes.TOPICS, referenceId: itemKeys.topicId, item };
+    } else if (tableName.endsWith('_messages')) {
       socketMessage = { action, type: WebSocketConnectionTypes.MESSAGES, referenceId: itemKeys.topicId, item };
     }
     return socketMessage;
