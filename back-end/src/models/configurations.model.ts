@@ -21,8 +21,8 @@ export class Configurations extends Resource {
   load(x: any): void {
     super.load(x);
     this.PK = this.clean(x.PK, String);
-    this.administratorsIds = this.cleanArray(x.administratorsIds, String);
-    this.bannedUsersIds = this.cleanArray(x.bannedUsersIds, String);
+    this.administratorsIds = this.cleanArray(x.administratorsIds, String).map(x => x.toLowerCase());
+    this.bannedUsersIds = this.cleanArray(x.bannedUsersIds, String).map(x => x.toLowerCase());
   }
 
   safeLoad(newData: any, safeData: any): void {
