@@ -14,7 +14,7 @@ export class MessagesService {
   /**
    * The number of messages to consider for the pagination, when active.
    */
-  MAX_PAGE_SIZE = 24;
+  MAX_PAGE_SIZE = 96;
 
   constructor(private api: IDEAApiService, private app: AppService) {}
 
@@ -174,8 +174,8 @@ export class MessagesService {
    * Update a message signaled from a web socket update.
    */
   webSocketUpdate(message: Message): void {
-    const existingMessage = this.messages.find(x => x.messageId === message.messageId);
-    if (existingMessage) existingMessage.load(message);
+    const index = this.messages.findIndex(x => x.messageId === message.messageId);
+    if (index !== -1) this.messages[index] = message;
   }
   /**
    * Remove a message signaled from a web socket update.

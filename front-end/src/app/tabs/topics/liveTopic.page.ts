@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AlertController, IonInfiniteScroll, IonRefresher, PopoverController } from '@ionic/angular';
 import { toCanvas } from 'qrcode';
 import { Attachment } from 'idea-toolbox';
@@ -61,6 +61,7 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   hasUserUpvotedMessage: Record<string, boolean> = {};
 
   constructor(
+    private cd: ChangeDetectorRef,
     private alertCtrl: AlertController,
     private actionsCtrl: IDEAActionSheetController,
     private popoverCtrl: PopoverController,
@@ -427,28 +428,15 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   private handleMessageFromWebSocket(webSocketMessage: WebSocketMessage): void {
     const message = new Message(webSocketMessage.item);
 
-    const messagesList = message.type === MessageTypes.QUESTION ? this.questions : this.appreciations;
-    const shouldPushCompleted =
-      message.type === MessageTypes.QUESTION ? this.showCompletedQuestions : this.showCompletedAppreciations;
+    if (webSocketMessage.action === 'INSERT') this._messages.webSocketAdd(message);
+    else if (webSocketMessage.action === 'MODIFY') this._messages.webSocketUpdate(message);
+    else if (webSocketMessage.action === 'REMOVE') this._messages.webSocketRemoveById(message.messageId);
 
-    if (webSocketMessage.action === 'INSERT') {
-      this._messages.webSocketAdd(message);
-      if (!message.completedAt || shouldPushCompleted) messagesList.push(message);
-    }
-    if (webSocketMessage.action === 'MODIFY') {
-      const existingMessageInDisplayedList = messagesList.find(x => x.messageId === message.messageId);
+    if (message.type === MessageTypes.QUESTION) this.filterQuestions();
+    else if (message.type === MessageTypes.APPRECIATION) this.filterAppreciations();
+  }
 
-      if (message.completedAt && !shouldPushCompleted) {
-        const index = messagesList.indexOf(existingMessageInDisplayedList);
-        if (index !== -1) messagesList.splice(index, 1);
-      } else if (!message.completedAt && !existingMessageInDisplayedList) messagesList.push(message);
-
-      this._messages.webSocketUpdate(message);
-    }
-    if (webSocketMessage.action === 'REMOVE') {
-      this._messages.webSocketRemoveById(message.messageId);
-      const index = messagesList.findIndex(x => x.messageId === message.messageId);
-      if (index !== -1) messagesList.splice(index, 1);
-    }
+  trackBy(_: number, message: Message): string {
+    return message.messageId;
   }
 }

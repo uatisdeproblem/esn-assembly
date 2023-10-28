@@ -239,7 +239,7 @@
               </ion-item>
               <ion-card
                 class="messageCard"
-                *ngFor="let question of questions"
+                *ngFor="let question of questions; trackBy: trackBy"
                 [class.author]="question.creator?.id === app.user.userId"
                 [class.complete]="question.completedAt"
               >
@@ -345,7 +345,7 @@
               </ion-item>
               <ion-card
                 class="messageCard"
-                *ngFor="let appreciation of appreciations"
+                *ngFor="let appreciation of appreciations; trackBy: trackBy"
                 [class.author]="appreciation.creator?.id === app.user.userId"
                 [class.complete]="appreciation.completedAt"
               >
