@@ -156,7 +156,7 @@
     "PUBLISHING_OPTIONS": "Topic visibility",
     "PUBLISHING_OPTIONS_": {
       "DRAFT": "Keep as draft (only admins can see)",
-      "PUBLISH": "Visibile",
+      "PUBLISH": "Visible",
       "SCHEDULE": "Schedule publishing"
     },
     "PUBLISH_ON": "Publish on",
