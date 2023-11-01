@@ -59,7 +59,8 @@ const apiResources: ResourceController[] = [
   { name: 'scheduledOps' },
   { name: 'sesNotifications' },
   { name: 'statistics', paths: ['/statistics'] },
-  { name: 'userDrafts', paths: ['/drafts', '/drafts/{draftId}'] }
+  { name: 'userDrafts', paths: ['/drafts', '/drafts/{draftId}'] },
+  { name: 'opportunities', paths: ['/opportunities', '/opportunities/{opportunityId}'] }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
@@ -178,6 +179,17 @@ const tables: { [tableName: string]: DDBTable } = {
     PK: { name: 'userId', type: DDB.AttributeType.STRING },
     SK: { name: 'draftId', type: DDB.AttributeType.STRING },
     expiresAtField: 'expiresAt'
+  },
+  opportunities: {
+    PK: { name: 'opportunityId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'opportunityId-willCloseAt-index',
+        partitionKey: { name: 'opportunityId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'willCloseAt', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.KEYS_ONLY
+      }
+    ]
   }
 };
 

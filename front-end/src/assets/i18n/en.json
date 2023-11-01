@@ -89,6 +89,7 @@
   "TABS": {
     "DASHBOARD": "Dashboard",
     "TOPICS": "Q&A",
+    "OPPORTUNITIES": "Opportunities",
     "PROFILE": "Profile",
     "CONFIGURATIONS": "Configurations"
   },
@@ -236,8 +237,9 @@
   "ARCHIVE": {
     "ARCHIVE": "Archive",
     "QA_ARCHIVE": "Q&A archive",
-    "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters in the action bar above to search through archived topics.",
-    "NO_ELEMENT_FOUND_WITH_FILTERS": "No archived topics found with the filters selected"
+    "OPPORTUNITIES_ARCHIVE": "Opportunities archive",
+    "CHOOSE_FILTERS_AND_SEARCH": "Choose some filters in the action bar above to search through archived elements.",
+    "NO_ELEMENT_FOUND_WITH_FILTERS": "No archived elements found with the filters selected"
   },
   "CONFIGURATIONS": {
     "ENTITIES": "Entities",
@@ -473,5 +475,48 @@
     "SEE_WHO_REACTED": "See who reacted",
     "READ_FULL_TEXT": "Read full text",
     "OPEN_PROFILE": "Open profile"
+  },
+  "OPPORTUNITIES": {
+    "OPPORTUNITY": "Opportunity",
+    "STATUS": "Status",
+    "STATUSES": {
+      "OPEN": "Open",
+      "CLOSED": "Closed"
+    },
+    "SORT_BY": "Sort by",
+    "SORT_BY_OPTIONS": {
+      "CREATED_DATE_ASC": "Creation ⬆",
+      "CREATED_DATE_DESC": "Creation ⬇",
+      "CLOSING_DATE_ASC": "Closing ⬆",
+      "CLOSING_DATE_DESC": "Closing ⬇"
+    },
+    "ALL_STATUSES": "All statuses",
+    "FILTER_ACTIVE_OPPORTUNITIES": "Filter active opportunities",
+    "NO_ACTIVE_OPPORTUNITIES": "No active opportunities found",
+    "MANAGE_OPPORTUNITY": "Manage opportunity",
+    "ATTACHMENTS": "Attachments",
+    "ATTRIBUTES": "Attributes",
+    "NAME": "Name",
+    "CONTENT": "Content",
+    "CREATED_AT": "Created",
+    "UPDATED_AT": "Updated",
+    "OPPORTUNITIES": "Opportunities",
+    "PUBLISHING_OPTIONS": "Opportunity visibility",
+    "PUBLISHING_OPTIONS_": {
+      "DRAFT": "Keep as draft (only admins can see)",
+      "PUBLISH": "Visible",
+      "SCHEDULE": "Schedule publishing"
+    },
+    "PUBLISH_ON": "Publish on",
+    "CLOSE_OPPORTUNITY": "Close opportunity",
+    "OPEN_OPPORTUNITY": "Open opportunity",
+    "DEADLINES": "Deadlines",
+    "DATES_IN_FAVORITE_TIMEZONE": "Dates must be set in the timezone {{timezone}}",
+    "DEADLINE_APPLICATIONS": "Deadline for applications",
+    "SET_DEADLINE_APPLICATIONS": "Set deadline for applications",
+    "APPLICATIONS": "Applications",
+    "DRAFT": "Draft",
+    "OPEN_UNTIL": "Open until",
+    "NO_CONTENT": "No content"
   }
 }

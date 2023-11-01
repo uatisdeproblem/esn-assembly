@@ -1,0 +1,104 @@
+<ion-header class="ion-no-border">
+  <app-edit-mode-buttons
+    [title]="'OPPORTUNITIES.MANAGE_OPPORTUNITY' | translate"
+    [editMode]="!!editMode"
+    (enter)="enterEditMode()"
+    (exit)="exitEditMode()"
+    (save)="save()"
+  ></app-edit-mode-buttons>
+</ion-header>
+<ion-content [class.viewMode]="!editMode">
+  <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="opportunity">
+    <ion-list-header>
+      <ion-label><h2>{{ 'OPPORTUNITIES.ATTRIBUTES' | translate }}</h2> </ion-label>
+    </ion-list-header>
+    <ion-item [class.fieldHasError]="hasFieldAnError('name')">
+      <ion-label position="stacked">
+        {{ 'OPPORTUNITIES.NAME' | translate }} <ion-text class="obligatoryDot"></ion-text>
+      </ion-label>
+      <ion-input [(ngModel)]="opportunity.name" [disabled]="!editMode"></ion-input>
+    </ion-item>
+    <ion-list-header>
+      <ion-label>
+        <h2>{{ 'OPPORTUNITIES.PUBLISHING_OPTIONS' | translate }}</h2>
+        <p>{{ 'OPPORTUNITIES.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+      </ion-label>
+    </ion-list-header>
+    <ion-radio-group [(ngModel)]="publishingOption" (ionBlur)="handleChangeOfPublishingOption()">
+      <ion-item *ngFor="let option of PublishingOptions | keyvalue">
+        <ion-radio slot="start" [value]="option.value" [disabled]="!editMode"></ion-radio>
+        <ion-label>{{ ('OPPORTUNITIES.PUBLISHING_OPTIONS_.' + option.value) | translate }}</ion-label>
+      </ion-item>
+    </ion-radio-group>
+    <idea-date-time
+      *ngIf="publishingOption === PublishingOptions.SCHEDULE"
+      [(date)]="opportunity.publishedSince"
+      [useISOFormat]="true"
+      [manualTimePicker]="true"
+      [label]="'OPPORTUNITIES.PUBLISH_ON' | translate"
+      [disabled]="!editMode"
+      [hideClearButton]="true"
+      [class.fieldHasError]="hasFieldAnError('publishedSince')"
+    ></idea-date-time>
+    <ion-list-header>
+      <ion-label>
+        <h2>{{ 'OPPORTUNITIES.DEADLINES' | translate }}</h2>
+        <p>{{ 'OPPORTUNITIES.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+      </ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-checkbox
+        slot="start"
+        [(ngModel)]="hasDeadline"
+        [disabled]="!editMode"
+        (ionChange)="shouldResetDeadlineForApplications()"
+      ></ion-checkbox>
+      <ion-label>{{ 'OPPORTUNITIES.SET_DEADLINE_APPLICATIONS' | translate }}</ion-label>
+    </ion-item>
+    <idea-date-time
+      *ngIf="hasDeadline"
+      [(date)]="opportunity.willCloseAt"
+      [useISOFormat]="true"
+      [manualTimePicker]="true"
+      [label]="'OPPORTUNITIES.DEADLINE_APPLICATIONS' | translate"
+      [disabled]="!editMode"
+      [hideClearButton]="true"
+      [class.fieldHasError]="hasFieldAnError('willCloseAt')"
+    ></idea-date-time>
+    <ion-list-header>
+      <ion-label><h2>{{ 'OPPORTUNITIES.CONTENT' | translate }}</h2></ion-label>
+    </ion-list-header>
+    <ion-item class="noElements" *ngIf="!opportunity.content && !editMode">
+      <ion-label>{{ 'OPPORTUNITIES.NO_CONTENT' | translate }}</ion-label>
+    </ion-item>
+    <app-html-editor
+      *ngIf="opportunity.content || editMode"
+      [(content)]="opportunity.content"
+      [editMode]="!!editMode"
+    ></app-html-editor>
+
+    <ion-list-header>
+      <ion-label><h2>{{ 'OPPORTUNITIES.ATTACHMENTS' | translate }}</h2> </ion-label>
+    </ion-list-header>
+    <app-attachments lines="inset" [attachments]="opportunity.attachments" [editMode]="!!editMode"></app-attachments>
+
+    <p class="ion-text-center" *ngIf="!editMode && !opportunity.isArchived()">
+      <ion-button
+        [color]="opportunity.closedAt ? 'ESNgreen': 'ESNpink'"
+        (click)="manageOpportunityStatus(!!opportunity.closedAt)"
+      >
+        {{ (opportunity.closedAt ? 'OPPORTUNITIES.OPEN_OPPORTUNITY' : 'OPPORTUNITIES.CLOSE_OPPORTUNITY') | translate }}
+      </ion-button>
+    </p>
+    <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
+      <ion-col>
+        <ion-button color="warning" (click)="archiveOpportunity(!opportunity.isArchived())">
+          {{ (opportunity.isArchived() ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
+        </ion-button>
+      </ion-col>
+      <ion-col class="ion-text-right">
+        <ion-button color="danger" (click)="deleteOpportunity()">{{ 'COMMON.DELETE' | translate }}</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,74 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.closePage()">
+        <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <ion-col [size]="12" [sizeLg]="6">
+        <ion-card color="white" class="opportunityCard" *ngIf="opportunity">
+          <ion-card-header>
+            <ion-card-title>{{ opportunity.name }}</ion-card-title>
+            <p class="badges">
+              <ion-badge *ngIf="opportunity.isDraft()" color="medium">
+                {{ 'OPPORTUNITIES.DRAFT' | translate }}
+              </ion-badge>
+              <ion-badge *ngIf="!opportunity.isDraft()" [color]="opportunity.closedAt ? 'danger' : 'success'">
+                {{ 'OPPORTUNITIES.STATUSES.' + (opportunity.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+              </ion-badge>
+              <ion-badge color="warning" *ngIf="opportunity.isArchived()">
+                {{ 'OPPORTUNITIES.ARCHIVED' | translate }}
+              </ion-badge>
+            </p>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list class="aList" lines="none">
+              <ion-row *ngIf="!opportunity.isArchived()">
+                <ion-col *ngIf="opportunity.willCloseAt">
+                  <ion-item class="ion-text-right importantDate">
+                    <ion-label>
+                      <p>{{ 'OPPORTUNITIES.OPEN_UNTIL' | translate }}</p>
+                      {{ opportunity.willCloseAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+                      <p>{{ FAVORITE_TIMEZONE }}</p>
+                    </ion-label>
+                    <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <app-html-editor
+                *ngIf="opportunity.content"
+                [content]="opportunity.content"
+                [editMode]="false"
+              ></app-html-editor>
+              <ion-item
+                lines="inset"
+                class="attachment"
+                *ngFor="let attachment of opportunity.attachments; let first = first"
+                [class.ion-margin-top]="first"
+                button
+                (click)="downloadAttachment(attachment)"
+              >
+                <ion-icon name="attach" slot="start"></ion-icon>
+                <ion-label class="ion-text-wrap">{{ attachment.name }}.{{ attachment.format }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+  <ion-fab-button color="ESNgreen" size="small" [title]="'COMMON.MANAGE' | translate" (click)="manageOpportunity()">
+    <ion-icon icon="build"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
