@@ -114,6 +114,25 @@
       </ion-item>
     </ion-reorder-group>
 
+    <ion-list-header>
+      <ion-label>
+        <h2>{{ 'OPPORTUNITIES.OTHER_OPTIONS' | translate }}</h2>
+      </ion-label>
+    </ion-list-header>
+    <ion-item [class.fieldHasError]="hasFieldAnError('contactEmail')">
+      <ion-label position="stacked">{{ 'OPPORTUNITIES.CONTACT_EMAIL' | translate }}</ion-label>
+      <ion-input [(ngModel)]="opportunity.contactEmail" [disabled]="!editMode"></ion-input>
+      <ion-button
+        slot="end"
+        fill="clear"
+        class="ion-margin-top"
+        *ngIf="editMode"
+        (click)="opportunity.contactEmail = app.user.email"
+      >
+        {{ 'OPPORTUNITIES.USE_MINE' | translate }}
+      </ion-button>
+    </ion-item>
+
     <p class="ion-text-center ion-padding-top" *ngIf="!editMode && !opportunity.isArchived()">
       <ion-button
         [color]="opportunity.closedAt ? 'ESNgreen': 'ESNpink'"

@@ -92,6 +92,15 @@
             <ion-button (click)="startApplication()">
               {{ 'OPPORTUNITIES.I_WANT_TO_APPLY' | translate }} <ion-icon icon="sparkles" slot="end"></ion-icon>
             </ion-button>
+            <ion-button
+              fill="clear"
+              color="ESNpink"
+              class="ion-margin-start"
+              *ngIf="opportunity.contactEmail"
+              (click)="sendQuestionAsEmail()"
+            >
+              {{ 'OPPORTUNITIES.I_HAVE_A_QUESTION' | translate }} <ion-icon icon="hand-right" slot="end"></ion-icon>
+            </ion-button>
           </p>
         </ion-list>
 

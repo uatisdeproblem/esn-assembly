@@ -154,4 +154,12 @@ export class OpportunityPage {
   withdrawApplication(): void {
     // @todo
   }
+
+  async sendQuestionAsEmail(): Promise<void> {
+    const emailSubject = encodeURIComponent(
+      this.t._('OPPORTUNITIES.QUESTION_ON_OPPORTUNITY').concat(': ', this.opportunity.name)
+    );
+    const url = `mailto:${this.opportunity.contactEmail}?subject=${emailSubject}`;
+    await this.app.openURL(url);
+  }
 }

@@ -60,6 +60,10 @@ export class Opportunity extends Resource {
    * The current total number of applicants to this opportunity.
    */
   numOfApplications: number;
+  /**
+   * The contact email for questions; if not set, the button won't be enabled.
+   */
+  contactEmail: string;
 
   load(x: any): void {
     super.load(x);
@@ -78,6 +82,7 @@ export class Opportunity extends Resource {
     this.attachments = this.cleanArray(x.attachments, a => new Attachment(a));
     this.expectedAttachments = this.cleanArray(x.expectedAttachments, ea => new OpportunityApplicationAttachment(ea));
     this.numOfApplications = this.clean(x.numOfApplications, Number, 0);
+    this.contactEmail = this.clean(x.contactEmail, String);
   }
 
   safeLoad(newData: any, safeData: any): void {

@@ -544,6 +544,11 @@
     "YOU_HAVE_APPLIED": "You have applied to this opportunity!",
     "WITHDRAW_APPLICATION": "Withdraw application",
     "YOUR_APPLICATION": "Your application",
-    "EDIT_APPLICATION": "Edit application"
+    "EDIT_APPLICATION": "Edit application",
+    "I_HAVE_A_QUESTION": "I have a question",
+    "CONTACT_EMAIL": "Contact email for questions",
+    "OTHER_OPTIONS": "Other options",
+    "USE_MINE": "Use mine",
+    "QUESTION_ON_OPPORTUNITY": "Question on opportunity"
   }
 }
