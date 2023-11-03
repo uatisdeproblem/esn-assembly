@@ -34,16 +34,25 @@ export class ConfigurationsPage implements OnInit {
     this.configurations = await this._configurations.get();
   }
 
-  async addAdministrator(): Promise<void> {
+  addAdministrator(): void {
+    this.addUserToList('administratorsIds', 'ADD_ADMINISTRATOR');
+  }
+  addOpportunitiesManager(): void {
+    this.addUserToList('opportunitiesManagersIds', 'ADD_OPPORTUNITIES_MANAGER');
+  }
+  addBannedUser(): void {
+    this.addUserToList('bannedUsersIds', 'ADD_BANNED_USER');
+  }
+  private async addUserToList(listKey: string, translationKey: string): Promise<void> {
     const doAdd = async ({ userId }): Promise<void> => {
       if (!userId) return;
       const newConfigurations = new Configurations(this.configurations);
-      newConfigurations.administratorsIds.push(userId);
+      newConfigurations[listKey].push(userId);
       await this.updateConfigurations(newConfigurations);
     };
 
-    const header = this.t._('CONFIGURATIONS.ADD_ADMINISTRATOR');
-    const message = this.t._('CONFIGURATIONS.ADMINISTRATORS_I');
+    const header = this.t._('CONFIGURATIONS.'.concat(translationKey));
+    const message = this.t._('CONFIGURATIONS.ADD_USERS_BY_THEIR_USERNAME');
     const inputs: any = [{ name: 'userId', type: 'text' }];
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
@@ -53,10 +62,20 @@ export class ConfigurationsPage implements OnInit {
     const alert = await this.alertCtrl.create({ header, message, inputs, buttons });
     await alert.present();
   }
-  async removeAdministratorById(userId: string): Promise<void> {
+
+  removeAdministratorById(userId: string): void {
+    this.removeUserFromListById(userId, 'administratorsIds');
+  }
+  removeOpportunitiesManagerById(userId: string): void {
+    this.removeUserFromListById(userId, 'opportunitiesManagersIds');
+  }
+  removeBannedUserById(userId: string): void {
+    this.removeUserFromListById(userId, 'bannedUsersIds');
+  }
+  private async removeUserFromListById(userId: string, listKey: string): Promise<void> {
     const doRemove = async (): Promise<void> => {
       const newConfigurations = new Configurations(this.configurations);
-      newConfigurations.administratorsIds.splice(newConfigurations.administratorsIds.indexOf(userId), 1);
+      newConfigurations[listKey].splice(newConfigurations[listKey].indexOf(userId), 1);
       await this.updateConfigurations(newConfigurations);
     };
 
@@ -68,40 +87,7 @@ export class ConfigurationsPage implements OnInit {
     const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();
   }
-  async addBannedUser(): Promise<void> {
-    const doAdd = async ({ userId }): Promise<void> => {
-      if (!userId) return;
-      const newConfigurations = new Configurations(this.configurations);
-      newConfigurations.bannedUsersIds.push(userId);
-      await this.updateConfigurations(newConfigurations);
-    };
 
-    const header = this.t._('CONFIGURATIONS.ADD_BANNED_USER');
-    const message = this.t._('CONFIGURATIONS.BANNED_USERS_I');
-    const inputs: any = [{ name: 'userId', type: 'text' }];
-    const buttons = [
-      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.ADD'), handler: doAdd }
-    ];
-
-    const alert = await this.alertCtrl.create({ header, message, inputs, buttons });
-    await alert.present();
-  }
-  async removeBannedUserById(userId: string): Promise<void> {
-    const doRemove = async (): Promise<void> => {
-      const newConfigurations = new Configurations(this.configurations);
-      newConfigurations.bannedUsersIds.splice(newConfigurations.bannedUsersIds.indexOf(userId), 1);
-      await this.updateConfigurations(newConfigurations);
-    };
-
-    const header = this.t._('COMMON.ARE_YOU_SURE');
-    const buttons = [
-      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.REMOVE'), handler: doRemove }
-    ];
-    const alert = await this.alertCtrl.create({ header, buttons });
-    alert.present();
-  }
   private async updateConfigurations(newConfigurations: Configurations): Promise<void> {
     try {
       await this.loading.show();

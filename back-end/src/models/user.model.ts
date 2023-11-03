@@ -82,6 +82,11 @@ export class User extends Resource {
    * A change in this permission will require a new sign-in to take full place.
    */
   isAdministrator: boolean;
+  /**
+   * Whether the user can manage opportunities, based on the platform's configurations.
+   * A change in this permission will require a new sign-in to take full place.
+   */
+  canManageOpportunities: boolean;
 
   /**
    * Whether the user has one of the allowed roles.
@@ -113,11 +118,11 @@ export class User extends Resource {
     this.country = this.clean(x.country, String);
     this.avatarURL = this.clean(x.avatarURL, String);
     this.isAdministrator = this.clean(x.isAdministrator, Boolean);
+    this.canManageOpportunities = this.clean(x.canManageOpportunities, Boolean);
   }
 
   /**
    * Get a string representing the ESN Section and Country of the subject.
-   * @todo to solve a known error from ESN Accounts: the Country isn't returned correctly.
    */
   getSectionCountry(): string {
     if (this.country === this.section) return this.section;

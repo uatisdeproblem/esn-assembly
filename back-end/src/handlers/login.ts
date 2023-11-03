@@ -63,7 +63,7 @@ class Login extends ResourceController {
       const attributes = data['cas:attributes'][0];
       const userId = String(data['cas:user'][0]).toLowerCase();
 
-      const { administratorsIds } = new Configurations(
+      const { administratorsIds, opportunitiesManagersIds } = new Configurations(
         await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
       );
 
@@ -77,7 +77,8 @@ class Login extends ResourceController {
         section: attributes['cas:section'][0],
         country: attributes['cas:country'][0],
         avatarURL: attributes['cas:picture'][0],
-        isAdministrator: administratorsIds.includes(userId)
+        isAdministrator: administratorsIds.includes(userId),
+        canManageOpportunities: administratorsIds.includes(userId) ?? opportunitiesManagersIds.includes(userId)
       });
       this.logger.info('ESN Accounts login', user);
 

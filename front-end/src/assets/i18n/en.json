@@ -246,9 +246,18 @@
     "ENTITIES_I": "Manage the general entities of the platform.",
     "CATEGORIES": "Categories",
     "EVENTS": "Events",
+    "ADD_USERS_BY_THEIR_USERNAME": "Add users by their ESN Accounts username.",
     "ADMINISTRATORS": "Administrators",
-    "ADMINISTRATORS_I": "Add administrators by their ESN Accounts username.",
+    "ADMINISTRATORS_I": "Users in this list can manage the whole platform.",
     "ADD_ADMINISTRATOR": "Add administrator",
+    "OPPORTUNITIES_MANAGERS": "Opportunities managers",
+    "OPPORTUNITIES_MANAGERS_I": "Users in this lists can open and manage opportunities.",
+    "ADD_OPPORTUNITIES_MANAGER": "Add opportunities manager",
+    "NO_USERS_ADDED": "No users added",
+    "BANNED_USERS": "Banned users",
+    "BANNED_USERS_I": "Users in this list won't be able to add questions, messages, etc.",
+    "ADD_BANNED_USER": "Ban user",
+    "NO_BANNED_USERS": "Luckily, no banned users so far.",
     "EMAIL_TEMPLATES": "Email templates",
     "EMAIL_TEMPLATES_I": "Set the templates for the following notification emails.",
     "EMAIL_TEMPLATES_TYPES": {
@@ -258,12 +267,7 @@
     "GIVE_BADGES": "Give badges",
     "GIVE_BADGES_I": "Badges are usually earned through automatic actions, but here you can force them.",
     "GIVE_A_BADGE": "Give a badge",
-    "USER_ID": "User ID (ESN Accounts)",
-    "BANNED_USERS": "Banned users",
-    "BANNED_USERS_I": "Ban users by their ESN Accounts username.",
-    "BANNED_USERS_II": "Users in this list won't be able to add questions, messages, etc.",
-    "ADD_BANNED_USER": "Ban user",
-    "NO_BANNED_USERS": "Luckily, no banned users so far."
+    "USER_ID": "User ID (ESN Accounts)"
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",

@@ -1874,7 +1874,7 @@ paths:
           $ref: '#/components/responses/Opportunities'
     post:
       summary: Insert a new opportunity
-      description: Requires to be Administrator
+      description: Requires permissions to manage opportunities
       tags: [Opportunities]
       security:
         - AuthFunction: []
@@ -1891,6 +1891,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     patch:
       summary: Actions on the opportunity
+      description: Requires permissions to manage opportunities
       tags: [Opportunities]
       security:
         - AuthFunction: []
@@ -1925,17 +1926,12 @@ paths:
           required: true
           schema:
             type: string
-        - name: archived
-          in: query
-          description: Whether to filter based on the archivation status
-          schema:
-            type: boolean
       responses:
         200:
           $ref: '#/components/responses/Opportunity'
     put:
       summary: Edit an opportunity
-      description: Requires to be Administrator
+      description: Requires permissions to manage opportunities
       tags: [Opportunities]
       security:
         - AuthFunction: []
@@ -1959,7 +1955,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     delete:
       summary: Delete an opportunity
-      description: Requires to be Administrator
+      description: Requires permissions to manage opportunities
       tags: [Opportunities]
       security:
         - AuthFunction: []
@@ -1977,6 +1973,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     patch:
       summary: Actions on an opportunity
+      description: Requires permissions to manage opportunities
       tags: [Opportunities]
       security:
         - AuthFunction: []

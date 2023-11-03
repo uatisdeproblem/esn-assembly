@@ -10,7 +10,7 @@
     />
     <ion-label class="ion-text-wrap">
       {{ opportunity.name }}
-      <p *ngIf="app.user.isAdministrator">
+      <p *ngIf="app.user.canManageOpportunities">
         {{ opportunity.numOfApplications }} {{ 'OPPORTUNITIES.APPLICATIONS' | translate | lowercase }}
       </p>
     </ion-label>
@@ -37,7 +37,9 @@
     <ion-col [sizeLg]="7" [sizeXl]="6">{{ 'OPPORTUNITIES.OPPORTUNITY' | translate }}</ion-col>
     <ion-col [sizeLg]="3" [sizeXl]="2">{{ 'OPPORTUNITIES.STATUS' | translate }}</ion-col>
     <ion-col [sizeLg]="2">
-      <ion-text *ngIf="app.user.isAdministrator">{{ 'OPPORTUNITIES.APPLICATIONS' | translate }}</ion-text>
+      <ion-text *ngIf="app.user.canManageOpportunities">
+        {{ 'OPPORTUNITIES.APPLICATIONS' | translate }}
+      </ion-text>
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="2">{{ 'OPPORTUNITIES.CREATED_AT' | translate }}</ion-col>
   </ion-row>
@@ -61,7 +63,9 @@
       </ng-container>
     </ion-col>
     <ion-col [sizeLg]="2">
-      <ion-text *ngIf="app.user.isAdministrator">{{ opportunity.numOfApplications }}</ion-text>
+      <ion-text *ngIf="app.user.canManageOpportunities">
+        {{ opportunity.numOfApplications }}
+      </ion-text>
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="2">
       {{ opportunity.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}

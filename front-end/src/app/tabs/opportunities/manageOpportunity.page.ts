@@ -39,7 +39,7 @@ export class ManageOpportunityPage {
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
-    if (!this.app.user.isAdministrator) return this.app.closePage('COMMON.UNAUTHORIZED');
+    if (!this.app.user.canManageOpportunities) return this.app.closePage('COMMON.UNAUTHORIZED');
 
     console.log(this.opportunityId);
 

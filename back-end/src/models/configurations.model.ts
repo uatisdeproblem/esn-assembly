@@ -13,6 +13,10 @@ export class Configurations extends Resource {
    */
   administratorsIds: string[];
   /**
+   * The IDs of the users that can open and manage opportunities.
+   */
+  opportunitiesManagersIds: string[];
+  /**
    * The IDs of the users banned; these users won't be able to add new contents (questions, messages, etc.).
    * Note: it's not a data model by itself becase we hope this list will always stay empty/short.
    */
@@ -22,6 +26,7 @@ export class Configurations extends Resource {
     super.load(x);
     this.PK = this.clean(x.PK, String);
     this.administratorsIds = this.cleanArray(x.administratorsIds, String).map(x => x.toLowerCase());
+    this.opportunitiesManagersIds = this.cleanArray(x.opportunitiesManagersIds, String).map(x => x.toLowerCase());
     this.bannedUsersIds = this.cleanArray(x.bannedUsersIds, String).map(x => x.toLowerCase());
   }
 
