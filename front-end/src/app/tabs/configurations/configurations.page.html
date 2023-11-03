@@ -41,6 +41,12 @@
     <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.ANSWERS)">
       <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.ANSWERS' | translate }}</ion-label>
     </ion-item>
+    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_APPROVED)">
+      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_APPROVED' | translate }}</ion-label>
+    </ion-item>
+    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_REJECTED)">
+      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_REJECTED' | translate }}</ion-label>
+    </ion-item>
     <ion-list-header class="ion-padding-top">
       <ion-label>
         <h2>{{ 'CONFIGURATIONS.ADMINISTRATORS' | translate }}</h2>

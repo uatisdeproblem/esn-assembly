@@ -3,8 +3,10 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { isEmpty } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
-import { ConfigurationsService, EmailTemplates } from '../configurations.service';
+import { ConfigurationsService } from '../configurations.service';
 import { AppService } from '@app/app.service';
+
+import { EmailTemplates } from '@models/configurations.model';
 
 @Component({
   selector: 'app-email-template',
@@ -41,7 +43,9 @@ export class EmailTemplateComponent implements OnInit {
       { code: 'user', description: this.t._('EMAIL_TEMPLATE.VARIABLES.USER') },
       { code: 'topic', description: this.t._('EMAIL_TEMPLATE.VARIABLES.TOPIC') },
       { code: 'question', description: this.t._('EMAIL_TEMPLATE.VARIABLES.QUESTION') },
-      { code: 'url', description: this.t._('EMAIL_TEMPLATE.VARIABLES.URL') }
+      { code: 'opportunity', description: this.t._('EMAIL_TEMPLATE.VARIABLES.OPPORTUNITY') },
+      { code: 'url', description: this.t._('EMAIL_TEMPLATE.VARIABLES.URL') },
+      { code: 'message', description: this.t._('EMAIL_TEMPLATE.VARIABLES.MESSAGE') }
     ];
   }
 

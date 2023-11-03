@@ -41,3 +41,13 @@ export class Configurations extends Resource {
     return e;
   }
 }
+
+/**
+ * The possible email templates.
+ */
+export enum EmailTemplates {
+  QUESTIONS = 'QUESTIONS',
+  ANSWERS = 'ANSWERS',
+  APPLICATION_APPROVED = 'APPLICATION_APPROVED',
+  APPLICATION_REJECTED = 'APPLICATION_REJECTED'
+}

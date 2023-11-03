@@ -110,20 +110,19 @@ paths:
                 action:
                   type: string
                   enum:
-                    - GET_EMAIL_TEMPLATE_QUESTIONS
-                    - GET_EMAIL_TEMPLATE_ANSWERS
-                    - SET_EMAIL_TEMPLATE_QUESTIONS
-                    - SET_EMAIL_TEMPLATE_ANSWERS
-                    - RESET_EMAIL_TEMPLATE_QUESTIONS
-                    - RESET_EMAIL_TEMPLATE_ANSWERS
-                    - TEST_EMAIL_TEMPLATE_QUESTIONS
-                    - TEST_EMAIL_TEMPLATE_ANSWERS
+                    - GET_EMAIL_TEMPLATE
+                    - SET_EMAIL_TEMPLATE
+                    - RESET_EMAIL_TEMPLATE
+                    - TEST_EMAIL_TEMPLATE
+                template:
+                  type: string
+                  description: (GET_EMAIL_TEMPLATE, SET_EMAIL_TEMPLATE, RESET_EMAIL_TEMPLATE, TEST_EMAIL_TEMPLATE)
                 subject:
                   type: string
-                  description: (SET_EMAIL_TEMPLATE_QUESTIONS, SET_EMAIL_TEMPLATE_ANSWERS)
+                  description: (SET_EMAIL_TEMPLATE)
                 content:
                   type: string
-                  description: (SET_EMAIL_TEMPLATE_QUESTIONS, SET_EMAIL_TEMPLATE_ANSWERS)
+                  description: (SET_EMAIL_TEMPLATE)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'

@@ -79,12 +79,12 @@
             </ion-label>
           </ion-list-header>
           <ion-item>
-            <ion-note slot="start">#1</ion-note>
+            <ion-note slot="start" style="padding-top: 16px">#1</ion-note>
             <ion-label class="ion-text-wrap">{{ 'OPPORTUNITIES.A_BRIEF_MOTIVATION' | translate }}</ion-label>
             <ion-badge color="danger">{{ 'OPPORTUNITIES.REQUIRED' | translate }}</ion-badge>
           </ion-item>
           <ion-item *ngFor="let att of opportunity.expectedAttachments; let index = index">
-            <ion-note slot="start">#{{ index + 2 }}</ion-note>
+            <ion-note slot="start" style="padding-top: 16px">#{{ index + 2 }}</ion-note>
             <ion-label class="ion-text-wrap">{{ att.name }}</ion-label>
             <ion-badge color="danger" *ngIf="att.required">{{ 'OPPORTUNITIES.REQUIRED' | translate }}</ion-badge>
           </ion-item>
@@ -111,10 +111,15 @@
             </ion-card-header>
           </ion-card>
           <ion-card color="light">
-            <ion-card-header>
-              <ion-card-title class="ion-text-center ion-margin-top">
+            <ion-card-header class="ion-text-center">
+              <ion-card-title class="ion-margin-top">
                 {{ 'OPPORTUNITIES.YOUR_APPLICATION' | translate }}
               </ion-card-title>
+              <ion-card-subtitle *ngIf="application.getStatus()">
+                <ion-badge [color]="getApplicationColorByStatus(application)">
+                  {{ getApplicationLabelByStatus(application) }}
+                </ion-badge>
+              </ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
               <app-subject color="light" lines="none" [subject]="application.subject"></app-subject>
@@ -135,8 +140,12 @@
               <ion-row class="ion-margin">
                 <ion-col>
                   <ion-button color="medium" size="small" fill="clear" (click)="editApplication()">
-                    <ion-icon icon="pencil" slot="end"></ion-icon>
-                    {{ 'OPPORTUNITIES.EDIT_APPLICATION' | translate }}
+                    <ion-icon
+                      [icon]="application.getStatus() === ApplicationStatuses.REJECTED  ? 'bandage' : 'pencil'"
+                      slot="end"
+                    ></ion-icon>
+                    {{ (application.getStatus() === ApplicationStatuses.REJECTED ? 'OPPORTUNITIES.FIX_APPLICATION' :
+                    'OPPORTUNITIES.EDIT_APPLICATION') | translate }}
                   </ion-button>
                 </ion-col>
                 <ion-col class="ion-text-right">
@@ -239,6 +248,34 @@
             </ion-card-content>
           </ion-card>
         </div>
+
+        <ion-list
+          class="aList ion-padding-bottom"
+          *ngIf="!writingApplication && app.user.canManageOpportunities && applications"
+        >
+          <ion-list-header>
+            <ion-label class="ion-margin-start">
+              <h2>{{ 'OPPORTUNITIES.APPLICATIONS' | translate }} ({{ applications.length }})</h2>
+              <p>{{ 'OPPORTUNITIES.REVIEW_PENDING_APPLICATIONS' | translate }}</p>
+            </ion-label>
+          </ion-list-header>
+          <ion-item class="noElements" *ngIf="!applications.length">
+            <ion-label>{{ 'OPPORTUNITIES.NO_APPLICATIONS_YET' | translate }}</ion-label>
+          </ion-item>
+          <ion-item *ngFor="let apl of applications; let index = index" button detail (click)="openApplication(apl)">
+            <ion-note slot="start" style="padding-top: 24px">#{{ index + 1 }}</ion-note>
+            <ion-label>
+              {{ apl.subject.name }}
+              <p>{{ apl.subject.getSectionCountry() }}</p>
+            </ion-label>
+            <ion-badge slot="end" [color]="getApplicationColorByStatus(apl)">
+              {{ getApplicationLabelByStatus(apl)}}
+            </ion-badge>
+            <ion-note slot="end" style="padding-top: 24px" class="ion-hide-sm-down">
+              {{ apl.createdAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+            </ion-note>
+          </ion-item>
+        </ion-list>
       </ion-col>
     </ion-row>
   </ion-grid>

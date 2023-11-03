@@ -35,6 +35,14 @@ export class Application extends Resource {
    * The attachments to the application, based on the expected attachments.
    */
   attachments: Record<string, Attachment>;
+  /**
+   * The timestamp when the application was approved by a manager (if so).
+   */
+  approvedAt?: epochISOString;
+  /**
+   * The timestamp when the application was rejected by a manager (if so).
+   */
+  rejectedAt?: epochISOString;
 
   load(x: any): void {
     super.load(x);
@@ -46,6 +54,8 @@ export class Application extends Resource {
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     this.attachments = {};
     if (x.attachments) for (const name in x.attachments) this.attachments[name] = new Attachment(x.attachments[name]);
+    if (x.approvedAt) this.approvedAt = this.clean(x.approvedAt, d => new Date(d).toISOString());
+    if (x.rejectedAt) this.rejectedAt = this.clean(x.rejectedAt, d => new Date(d).toISOString());
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -55,6 +65,8 @@ export class Application extends Resource {
     this.subject = safeData.subject;
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
+    if (safeData.approvedAt) this.approvedAt = safeData.approvedAt;
+    if (safeData.rejectedAt) this.rejectedAt = safeData.rejectedAt;
   }
 
   validate(opportunity: Opportunity): string[] {
@@ -68,4 +80,22 @@ export class Application extends Resource {
       });
     return e;
   }
+
+  /**
+   * Get the status of an application.
+   */
+  getStatus(): ApplicationStatuses {
+    if (this.approvedAt) return ApplicationStatuses.APPROVED;
+    else if (this.rejectedAt) return ApplicationStatuses.REJECTED;
+    else return ApplicationStatuses.PENDING;
+  }
+}
+
+/**
+ * The possible statuses for an application.
+ */
+export enum ApplicationStatuses {
+  REJECTED = -1,
+  PENDING = 0,
+  APPROVED = 1
 }

@@ -12,7 +12,7 @@ import { AttachmentsService } from 'src/app/common/attachments.service';
 import { environment as env } from '@env';
 import { Opportunity } from '@models/opportunity.model';
 import { dateStringIsPast, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
-import { Application } from '@models/application.model';
+import { Application, ApplicationStatuses } from '@models/application.model';
 import { Subject } from '@models/subject.model';
 
 @Component({
@@ -35,6 +35,9 @@ export class OpportunityPage {
   errors = new Set<string>();
   attachmentUploadErros: Record<string, Error> = {};
   writingApplication = false;
+  ApplicationStatuses = ApplicationStatuses;
+
+  applications: Application[] = [];
 
   constructor(
     private loading: IDEALoadingService,
@@ -142,6 +145,7 @@ export class OpportunityPage {
     this.message.success('OPPORTUNITIES.APPLICATION_RECEIVED');
     this.application.applicationId = '123'; // @todo
     this.writingApplication = false;
+    this.applications = [this.application];
     this.content.scrollToTop(500);
   }
   hasFieldAnError(field: string): boolean {
@@ -161,5 +165,22 @@ export class OpportunityPage {
     );
     const url = `mailto:${this.opportunity.contactEmail}?subject=${emailSubject}`;
     await this.app.openURL(url);
+  }
+
+  getApplicationColorByStatus(application: Application): string {
+    const status = application.getStatus();
+    if (status === ApplicationStatuses.APPROVED) return 'ESNgreen';
+    else if (status === ApplicationStatuses.REJECTED) return 'danger';
+    else return 'medium';
+  }
+  getApplicationLabelByStatus(application: Application): string {
+    const status = application.getStatus();
+    if (status === ApplicationStatuses.APPROVED) return this.t._('OPPORTUNITIES.APPLICATION_STATUSES.APPROVED');
+    else if (status === ApplicationStatuses.REJECTED) return this.t._('OPPORTUNITIES.APPLICATION_STATUSES.REJECTED');
+    else return this.t._('OPPORTUNITIES.APPLICATION_STATUSES.PENDING');
+  }
+
+  openApplication(application: Application): void {
+    // @todo modale con approve e reject
   }
 }

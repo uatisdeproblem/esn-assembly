@@ -6,9 +6,9 @@ import { EmailTemplateComponent } from './emailTemplate/emailTemplate.component'
 import { GiveBadgesComponent } from './badges/giveBadges.component';
 
 import { AppService } from '@app/app.service';
-import { ConfigurationsService, EmailTemplates } from './configurations.service';
+import { ConfigurationsService } from './configurations.service';
 
-import { Configurations } from '@models/configurations.model';
+import { Configurations, EmailTemplates } from '@models/configurations.model';
 import { cleanESNAccountsIdForURL } from '@models/utils';
 
 @Component({

@@ -261,7 +261,9 @@
     "EMAIL_TEMPLATES_I": "Set the templates for the following notification emails.",
     "EMAIL_TEMPLATES_TYPES": {
       "QUESTIONS": "New questions in a topic",
-      "ANSWERS": "New answers to a question"
+      "ANSWERS": "New answers to a question",
+      "APPLICATION_APPROVED": "Application to opportunity is valid",
+      "APPLICATION_REJECTED": "Application to opportunity is rejected"
     },
     "GIVE_BADGES": "Give badges",
     "GIVE_BADGES_I": "Badges are usually earned through automatic actions, but here you can force them.",
@@ -395,7 +397,9 @@
       "USER": "The full name of the user target of the notification",
       "TOPIC": "The title of the topic",
       "QUESTION": "The summary of the question",
-      "URL": "The link to the question"
+      "OPPORTUNITY": "The name of the opportunity",
+      "URL": "The link to the question",
+      "MESSAGE": "The additional custom message"
     }
   },
   "STATISTICS": {
@@ -545,10 +549,18 @@
     "WITHDRAW_APPLICATION": "Withdraw application",
     "YOUR_APPLICATION": "Your application",
     "EDIT_APPLICATION": "Edit application",
+    "FIX_APPLICATION": "Fix application",
     "I_HAVE_A_QUESTION": "I have a question",
     "CONTACT_EMAIL": "Contact email for questions",
     "OTHER_OPTIONS": "Other options",
     "USE_MINE": "Use mine",
-    "QUESTION_ON_OPPORTUNITY": "Question on opportunity"
+    "QUESTION_ON_OPPORTUNITY": "Question on opportunity",
+    "APPLICATION_STATUSES": {
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "PENDING": "Pending"
+    },
+    "NO_APPLICATIONS_YET": "No applications yet",
+    "REVIEW_PENDING_APPLICATIONS": "Make sure to review pending application, to let applicants know everything is ok."
   }
 }
