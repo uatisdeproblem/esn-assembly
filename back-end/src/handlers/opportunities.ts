@@ -56,10 +56,12 @@ class OpportunitiesRC extends ResourceController {
 
     if (!this.galaxyUser.canManageOpportunities) opportunities = opportunities.filter(x => !x.isDraft());
 
-    if (this.queryParams.archived !== undefined) {
-      const archived = this.queryParams.archived !== 'false';
-      opportunities = opportunities.filter(x => (archived ? x.isArchived() : !x.isArchived()));
-    }
+    opportunities = opportunities.filter(x =>
+      this.queryParams.archivedFromYear
+        ? x.isArchived() && x.yearOfCreation === Number(this.queryParams.archivedFromYear)
+        : !x.isArchived()
+    );
+
     opportunities = opportunities.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
 
     await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.OPPORTUNITIES);
@@ -85,6 +87,8 @@ class OpportunitiesRC extends ResourceController {
 
     this.opportunity = new Opportunity(this.body);
     this.opportunity.opportunityId = await ddb.IUNID(PROJECT);
+    this.opportunity.createdAt = new Date().toISOString();
+    this.opportunity.yearOfCreation = new Date(this.opportunity.createdAt).getFullYear();
 
     await this.putSafeResource({ noOverwrite: true });
 

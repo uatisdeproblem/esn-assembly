@@ -136,7 +136,6 @@
     "TAP_TO_ADD_SUBJECT": "Tap to add a subject...",
     "NO_CONTENT": "No content",
     "MAKE_A_QUESTION": "Ask a question",
-    "ARCHIVED": "Archived",
     "ROLES_ALLOWED_TO_MAKE_QUESTIONS": "ESN Accounts roles allowed to ask questions",
     "NO_ROLES_RESTRICTIONS": "Any user can ask question",
     "DEADLINES": "Deadlines",
@@ -521,6 +520,7 @@
     "APPLICATIONS": "Applications",
     "DRAFT": "Draft",
     "OPEN_UNTIL": "Open until",
-    "NO_CONTENT": "No content"
+    "NO_CONTENT": "No content",
+    "YEAR": "Year"
   }
 }

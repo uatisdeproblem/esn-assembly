@@ -23,6 +23,10 @@ export class Opportunity extends Resource {
    */
   createdAt: epochISOString;
   /**
+   * The creation year. To use in indexes for archive queries.
+   */
+  yearOfCreation: number;
+  /**
    * The timestamp of last update.
    */
   updatedAt?: epochISOString;
@@ -63,6 +67,7 @@ export class Opportunity extends Resource {
     this.name = this.clean(x.name, String);
     this.content = this.clean(x.content, String);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
+    this.yearOfCreation = new Date(this.createdAt).getFullYear();
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     if (x.publishedSince) this.publishedSince = this.clean(x.publishedSince, d => new Date(d).toISOString());
     else delete this.publishedSince;
@@ -79,6 +84,7 @@ export class Opportunity extends Resource {
     super.safeLoad(newData, safeData);
     this.opportunityId = safeData.opportunityId;
     this.createdAt = safeData.createdAt;
+    this.yearOfCreation = safeData.yearOfCreation;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     if (safeData.closedAt) this.closedAt = safeData.closedAt;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;

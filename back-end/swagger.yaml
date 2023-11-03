@@ -1864,11 +1864,11 @@ paths:
       security:
         - AuthFunction: []
       parameters:
-        - name: archived
+        - name: archivedFromYear
           in: query
-          description: Whether to get archived opportunities instead of active ones
+          description: Whether to get archived opportunities of a specified year, instead of active ones
           schema:
-            type: boolean
+            type: number
       responses:
         200:
           $ref: '#/components/responses/Opportunities'

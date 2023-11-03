@@ -7,6 +7,7 @@ import { Opportunity } from '@models/opportunity.model';
 export class OpportunitiesService {
   private opportunities: Opportunity[];
   private archivedOpportunities: Opportunity[];
+  private archivedFromYearPreviouslySelected: number = null;
 
   /**
    * The number of opportunities to consider for the pagination, when active.
@@ -86,8 +87,9 @@ export class OpportunitiesService {
   /**
    * Load the archived opportunities from the back-end.
    */
-  private async loadArchivedList(): Promise<void> {
-    const params = { archived: true };
+  private async loadArchivedList(year: number): Promise<void> {
+    this.archivedFromYearPreviouslySelected = year;
+    const params = { archivedFromYear: year };
     const opportunities: Opportunity[] = await this.api.getResource('opportunities', { params });
     this.archivedOpportunities = opportunities.map(x => new Opportunity(x));
   }
@@ -95,7 +97,8 @@ export class OpportunitiesService {
    * Get (and optionally filter) the list of archived opportunities.
    * Note: it's a slice of the array.
    */
-  async getArchivedList(
+  async getArchivedListFromYear(
+    year: number,
     options: {
       force?: boolean;
       withPagination?: boolean;
@@ -103,7 +106,8 @@ export class OpportunitiesService {
       sortBy?: OpportunitiesSortBy;
     } = { sortBy: OpportunitiesSortBy.CREATED_DATE_DESC }
   ): Promise<Opportunity[]> {
-    if (!this.archivedOpportunities || options.force) await this.loadArchivedList();
+    if (!this.archivedOpportunities || options.force || year !== this.archivedFromYearPreviouslySelected)
+      await this.loadArchivedList(year);
     if (!this.archivedOpportunities) return null;
 
     let filteredList = this.archivedOpportunities.slice();

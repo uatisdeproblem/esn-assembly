@@ -25,7 +25,7 @@
               <ion-badge *ngIf="!topic.isDraft()" [color]="topic.closedAt ? 'danger' : 'success'">
                 {{ 'TOPICS.STATUSES.' + (topic.closedAt ? 'CLOSED' : 'OPEN') | translate }}
               </ion-badge>
-              <ion-badge color="warning" *ngIf="topic.isArchived()">{{ 'TOPICS.ARCHIVED' | translate }}</ion-badge>
+              <ion-badge color="warning" *ngIf="topic.isArchived()">{{ 'COMMON.ARCHIVED' | translate }}</ion-badge>
             </p>
           </ion-card-header>
           <ion-card-content>

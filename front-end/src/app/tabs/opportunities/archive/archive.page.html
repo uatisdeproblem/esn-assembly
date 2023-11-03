@@ -17,6 +17,13 @@
       </ion-item>
     </ion-buttons>
     <ion-buttons slot="end">
+      <ion-item lines="none" color="ideaToolbar">
+        <ion-select interface="popover" [(ngModel)]="archivedFromYear" (ionChange)="filter()">
+          <ion-select-option *ngFor="let year of years" [value]="year">
+            {{ 'OPPORTUNITIES.YEAR' | translate }}: {{ year }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-item lines="none" color="ideaToolbar" class="ion-hide-md-down">
         <ion-select interface="popover" [(ngModel)]="sortBy" (ionChange)="filter()">
           <ion-select-option *ngFor="let sortBy of OpportunitiesSortBy | keyvalue" [value]="sortBy.key">
