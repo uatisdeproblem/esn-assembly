@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AlertController, IonInfiniteScroll, IonRefresher, PopoverController } from '@ionic/angular';
 import { toCanvas } from 'qrcode';
 import { Attachment } from 'idea-toolbox';
@@ -61,7 +61,6 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   hasUserUpvotedMessage: Record<string, boolean> = {};
 
   constructor(
-    private cd: ChangeDetectorRef,
     private alertCtrl: AlertController,
     private actionsCtrl: IDEAActionSheetController,
     private popoverCtrl: PopoverController,

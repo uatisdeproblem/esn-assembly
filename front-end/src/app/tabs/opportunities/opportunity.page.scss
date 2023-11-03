@@ -1,3 +1,12 @@
+app-html-editor {
+  --app-html-editor-margin: 16px 2px;
+  --app-html-editor-padding: 20px 16px;
+  --app-html-editor-background-color: var(--ion-color-white-tint);
+  --app-html-editor-box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px;
+  --app-html-editor-border-radius: 8px;
+  --app-html-editor-color: var(--ion-color-step-800);
+}
+
 ion-card.opportunityCard {
   @media screen and (max-width: 991px) {
     margin: 0;
@@ -19,6 +28,7 @@ ion-card.opportunityCard {
   }
 
   ion-list.aList {
+    padding-top: 0;
     ion-list-header ion-label h2 {
       margin-bottom: 0;
     }
@@ -47,11 +57,14 @@ ion-card.opportunityCard {
   }
 }
 
-app-html-editor {
-  --app-html-editor-margin: 16px 2px;
-  --app-html-editor-padding: 20px 16px;
-  --app-html-editor-background-color: var(--ion-color-white-tint);
-  --app-html-editor-box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px;
-  --app-html-editor-border-radius: 8px;
-  --app-html-editor-color: var(--ion-color-step-800);
+ion-list.aList {
+  ion-item ion-note[slot='start'] {
+    padding-top: 16px;
+  }
+}
+
+ion-card.applicationCard {
+  ion-item[color='white'] {
+    border-radius: 4px;
+  }
 }

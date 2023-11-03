@@ -55,7 +55,7 @@ export class Opportunity extends Resource {
   /**
    * The list of the expected attachments.
    */
-  expectedAttachments: string[];
+  expectedAttachments: OpportunityApplicationAttachment[];
   /**
    * The current total number of applicants to this opportunity.
    */
@@ -76,7 +76,7 @@ export class Opportunity extends Resource {
     if (x.closedAt) this.closedAt = this.clean(x.closedAt, d => new Date(d).toISOString());
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.attachments = this.cleanArray(x.attachments, a => new Attachment(a));
-    this.expectedAttachments = this.cleanArray(x.expectedAttachments, String);
+    this.expectedAttachments = this.cleanArray(x.expectedAttachments, ea => new OpportunityApplicationAttachment(ea));
     this.numOfApplications = this.clean(x.numOfApplications, Number, 0);
   }
 
@@ -119,5 +119,24 @@ export class Opportunity extends Resource {
    */
   isArchived(): boolean {
     return !!this.archivedAt;
+  }
+}
+
+/**
+ * The expected attachments for the application to an opportunity.
+ */
+export class OpportunityApplicationAttachment extends Resource {
+  /**
+   * The attachment name.
+   */
+  name: string;
+  /**
+   * Whether the attachment is required (or optional).
+   */
+  required: boolean;
+
+  load(x: any): void {
+    this.name = this.clean(x.name, String);
+    this.required = this.clean(x.required, Boolean, false);
   }
 }

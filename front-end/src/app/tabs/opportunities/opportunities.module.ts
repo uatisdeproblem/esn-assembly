@@ -10,9 +10,10 @@ import { ManageOpportunityPage } from './manageOpportunity.page';
 import { OpportunityPage } from './opportunity.page';
 
 import { OpportunityModule } from './opportunity.module';
-import { EditModeButtonsModule } from 'src/app/common/editModeButtons.module';
-import { AttachmentsModule } from 'src/app/common/attachments.module';
-import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
+import { EditModeButtonsModule } from '@app/common/editModeButtons.module';
+import { AttachmentsModule } from '@app/common/attachments.module';
+import { HTMLEditorModule } from '@app/common/htmlEditor.module';
+import { SubjectModule } from '@app/common/subject.module';
 import { StatisticsModule } from '@app/common/statistics.module';
 
 @NgModule({
@@ -27,6 +28,7 @@ import { StatisticsModule } from '@app/common/statistics.module';
     EditModeButtonsModule,
     AttachmentsModule,
     HTMLEditorModule,
+    SubjectModule,
     StatisticsModule
   ],
   declarations: [OpportunitiesPage, ManageOpportunityPage, OpportunityPage]

@@ -7,6 +7,8 @@ import { AttachmentsService } from './attachments.service';
 
 import { environment as env } from '@env';
 
+export const ACCEPTED_ATTACHMENTS_FORMATS = ['image/*', '.pdf', '.doc', '.docx', '.xls', '.xlsx'];
+
 @Component({
   selector: 'app-attachments',
   templateUrl: 'attachments.component.html',
@@ -24,7 +26,7 @@ export class AttachmentsComponent {
 
   uploadErrors: UploadError[] = [];
 
-  acceptedAttachmentsFormats = ['image/*', '.pdf', '.doc', '.docx', '.xls', '.xlsx'].join(',');
+  acceptedAttachmentsFormats = ACCEPTED_ATTACHMENTS_FORMATS.join(',');
 
   constructor(
     private loading: IDEALoadingService,
@@ -93,7 +95,7 @@ export class AttachmentsComponent {
   }
 }
 
-const bytesToMegaBytes = (bytes: number): number => bytes / 1024 ** 2;
+export const bytesToMegaBytes = (bytes: number): number => bytes / 1024 ** 2;
 
 interface UploadError {
   file: string;

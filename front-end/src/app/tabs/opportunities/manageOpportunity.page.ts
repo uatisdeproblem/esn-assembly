@@ -6,7 +6,7 @@ import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from 
 import { AppService } from '@app/app.service';
 import { OpportunitiesService } from './opportunities.service';
 
-import { Opportunity } from '@models/opportunity.model';
+import { Opportunity, OpportunityApplicationAttachment } from '@models/opportunity.model';
 import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
@@ -68,6 +68,29 @@ export class ManageOpportunityPage {
 
   shouldResetDeadlineForApplications(): void {
     if (!this.hasDeadline) this.opportunity.willCloseAt = null;
+  }
+
+  async addExpectedAttachment(): Promise<void> {
+    const doAdd = ({ name }): void => {
+      if (!name) return;
+      this.opportunity.expectedAttachments.push(new OpportunityApplicationAttachment({ name }));
+    };
+
+    const header = this.t._('OPPORTUNITIES.EXPECTED_ATTACHMENT_NAME');
+    const inputs: any = [{ name: 'name', type: 'text' }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.ADD'), handler: doAdd }
+    ];
+
+    const alert = await this.alertCtrl.create({ header, inputs, buttons });
+    alert.present();
+  }
+  removeExpectedAttachment(expectedAttachment: OpportunityApplicationAttachment): void {
+    this.opportunity.expectedAttachments.splice(this.opportunity.expectedAttachments.indexOf(expectedAttachment), 1);
+  }
+  reorderExpectedAttachments({ detail }): void {
+    this.opportunity.expectedAttachments = detail.complete(this.opportunity.expectedAttachments);
   }
 
   async save(): Promise<void> {

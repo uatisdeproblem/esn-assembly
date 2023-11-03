@@ -78,11 +78,43 @@
     ></app-html-editor>
 
     <ion-list-header>
-      <ion-label><h2>{{ 'OPPORTUNITIES.ATTACHMENTS' | translate }}</h2> </ion-label>
+      <ion-label>
+        <h2>{{ 'OPPORTUNITIES.ATTACHMENTS' | translate }}</h2>
+        <p>{{ 'OPPORTUNITIES.ATTACHMENTS_I' | translate }}</p>
+      </ion-label>
     </ion-list-header>
     <app-attachments lines="inset" [attachments]="opportunity.attachments" [editMode]="!!editMode"></app-attachments>
 
-    <p class="ion-text-center" *ngIf="!editMode && !opportunity.isArchived()">
+    <ion-list-header>
+      <ion-label>
+        <h2>{{ 'OPPORTUNITIES.EXPECTED_ATTACHMENTS' | translate }}</h2>
+        <p>{{ 'OPPORTUNITIES.EXPECTED_ATTACHMENTS_I' | translate }}</p>
+      </ion-label>
+      <ion-button *ngIf="editMode" (click)="addExpectedAttachment()">{{ 'COMMON.ADD' | translate }}</ion-button>
+    </ion-list-header>
+    <ion-item class="noElements" *ngIf="!opportunity.expectedAttachments.length">
+      <ion-label>{{ 'ATTACHMENTS.NO_ATTACHMENTS' | translate }}</ion-label>
+    </ion-item>
+    <ion-reorder-group [disabled]="!editMode" (ionItemReorder)="reorderExpectedAttachments($event)">
+      <ion-item *ngFor="let att of opportunity.expectedAttachments">
+        <ion-reorder slot="start" *ngIf="editMode"></ion-reorder>
+        <ion-label>{{ att.name }}</ion-label>
+        <ion-button
+          slot="end"
+          fill="clear"
+          [disabled]="!editMode"
+          [color]="att.required ? 'danger': 'dark'"
+          (click)="att.required = !att.required"
+        >
+          {{ (att.required ? 'OPPORTUNITIES.REQUIRED' : 'OPPORTUNITIES.OPTIONAL') | translate }}
+        </ion-button>
+        <ion-button slot="end" fill="clear" color="danger" *ngIf="editMode" (click)="removeExpectedAttachment(att)">
+          <ion-icon icon="trash" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-reorder-group>
+
+    <p class="ion-text-center ion-padding-top" *ngIf="!editMode && !opportunity.isArchived()">
       <ion-button
         [color]="opportunity.closedAt ? 'ESNgreen': 'ESNpink'"
         (click)="manageOpportunityStatus(!!opportunity.closedAt)"
