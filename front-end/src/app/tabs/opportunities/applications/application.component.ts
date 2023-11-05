@@ -56,7 +56,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
       <ion-badge slot="end" [color]="getApplicationColorByStatus(application)">
         {{ getApplicationLabelByStatus(application) }}
       </ion-badge>
-      <ion-note slot="end" class="ion-hide-sm-down">
+      <ion-note slot="end" class="ion-hide-lg-down">
         {{ application.createdAt | date : 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
       </ion-note>
     </ion-item>

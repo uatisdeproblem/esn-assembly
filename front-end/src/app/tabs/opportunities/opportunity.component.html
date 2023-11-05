@@ -10,8 +10,9 @@
     />
     <ion-label class="ion-text-wrap">
       {{ opportunity.name }}
-      <p *ngIf="opportunity.canUserManage(app.user)">
-        {{ opportunity.numOfApplications }} {{ 'OPPORTUNITIES.APPLICATIONS' | translate | lowercase }}
+      <p *ngIf="!opportunity.isClosed() && opportunity.willCloseAt">
+        {{ 'OPPORTUNITIES.WILL_CLOSE_AT' | translate }}:
+        {{ opportunity.willCloseAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
       </p>
     </ion-label>
     <ng-container *ngIf="!opportunity.isArchived()">
@@ -36,11 +37,7 @@
   <ion-row class="ion-align-items-center headerRow" *ngIf="header">
     <ion-col [sizeLg]="7" [sizeXl]="6">{{ 'OPPORTUNITIES.OPPORTUNITY' | translate }}</ion-col>
     <ion-col [sizeLg]="3" [sizeXl]="2">{{ 'OPPORTUNITIES.STATUS' | translate }}</ion-col>
-    <ion-col [sizeLg]="2">
-      <ion-text *ngIf="app.user.canManageOpportunities">
-        {{ 'OPPORTUNITIES.APPLICATIONS' | translate }}
-      </ion-text>
-    </ion-col>
+    <ion-col [sizeLg]="2">{{ 'OPPORTUNITIES.WILL_CLOSE_AT' | translate }}</ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="2">{{ 'OPPORTUNITIES.CREATED_AT' | translate }}</ion-col>
   </ion-row>
   <ion-row class="ion-align-items-center row tappable" *ngIf="!header && opportunity" (click)="select.emit()">
@@ -63,7 +60,7 @@
       </ng-container>
     </ion-col>
     <ion-col [sizeLg]="2">
-      {{ app.user.canManageOpportunities ? opportunity.numOfApplications : '' }}
+      {{ opportunity.willCloseAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="2">
       {{ opportunity.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}

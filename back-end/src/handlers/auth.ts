@@ -81,7 +81,7 @@ const verifyUserPermissions = async (user: User): Promise<void> => {
     await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
   );
   user.isAdministrator = administratorsIds.includes(user.userId);
-  user.canManageOpportunities = user.isAdministrator ?? opportunitiesManagersIds.includes(user.userId);
+  user.canManageOpportunities = user.isAdministrator || opportunitiesManagersIds.includes(user.userId);
 };
 
 const getPolicyDocumentToAllowWebSocketRequest = (methodArn: string, allow: boolean): any => {

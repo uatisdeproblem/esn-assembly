@@ -78,7 +78,7 @@ class Login extends ResourceController {
         country: attributes['cas:country'][0],
         avatarURL: attributes['cas:picture'][0],
         isAdministrator: administratorsIds.includes(userId),
-        canManageOpportunities: administratorsIds.includes(userId) ?? opportunitiesManagersIds.includes(userId)
+        canManageOpportunities: administratorsIds.includes(userId) || opportunitiesManagersIds.includes(userId)
       });
       this.logger.info('ESN Accounts login', user);
 
