@@ -1,5 +1,6 @@
 import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 
+import { User } from './user.model';
 import { FAVORITE_TIMEZONE, dateStringIsFuture, dateStringIsPast } from './favoriteTimezone.const';
 
 /**
@@ -64,6 +65,10 @@ export class Opportunity extends Resource {
    * The contact email for questions; if not set, the button won't be enabled.
    */
   contactEmail: string;
+  /**
+   * The IDs of the users that can manage this specific opportunity, extending the ones set in the Configurations.
+   */
+  additionalManagersIds: string[];
 
   load(x: any): void {
     super.load(x);
@@ -83,6 +88,7 @@ export class Opportunity extends Resource {
     this.expectedAttachments = this.cleanArray(x.expectedAttachments, ea => new OpportunityApplicationAttachment(ea));
     this.numOfApplications = this.clean(x.numOfApplications, Number, 0);
     this.contactEmail = this.clean(x.contactEmail, String);
+    this.additionalManagersIds = this.cleanArray(x.additionalManagersIds, String).map(x => x.toLowerCase());
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -124,6 +130,13 @@ export class Opportunity extends Resource {
    */
   isArchived(): boolean {
     return !!this.archivedAt;
+  }
+
+  /**
+   * Whether the user can manage the opportunity.
+   */
+  canUserManage(user: User): boolean {
+    return user.canManageOpportunities || this.additionalManagersIds.includes(user.userId);
   }
 }
 

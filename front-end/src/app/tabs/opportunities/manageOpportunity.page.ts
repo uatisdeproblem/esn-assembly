@@ -39,18 +39,16 @@ export class ManageOpportunityPage {
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
-    if (!this.app.user.canManageOpportunities) return this.app.closePage('COMMON.UNAUTHORIZED');
-
-    console.log(this.opportunityId);
-
     try {
       await this.loading.show();
 
       if (this.opportunityId !== 'new') {
         this.opportunity = await this._opportunities.getById(this.opportunityId);
+        if (!this.opportunity.canUserManage(this.app.user)) return this.app.closePage('COMMON.UNAUTHORIZED');
         this.setUIHelpersForComplexFields();
         this.editMode = UXMode.VIEW;
       } else {
+        if (!this.app.user.canManageOpportunities) return this.app.closePage('COMMON.UNAUTHORIZED');
         this.opportunity = new Opportunity();
         this.editMode = UXMode.INSERT;
       }
@@ -91,6 +89,30 @@ export class ManageOpportunityPage {
   }
   reorderExpectedAttachments({ detail }): void {
     this.opportunity.expectedAttachments = detail.complete(this.opportunity.expectedAttachments);
+  }
+
+  async addOpportunityManager(): Promise<void> {
+    const doAdd = async ({ userId }): Promise<void> => {
+      if (!userId) return;
+      userId = userId.toLowerCase();
+      if (this.opportunity.additionalManagersIds.includes(userId)) return;
+      this.opportunity.additionalManagersIds.push(userId);
+    };
+
+    const header = this.t._('OPPORTUNITIES.ADD_ADDITIONAL_MANAGER');
+    const message = this.t._('CONFIGURATIONS.ADD_USERS_BY_THEIR_USERNAME');
+    const inputs: any = [{ name: 'userId', type: 'text' }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.ADD'), handler: doAdd }
+    ];
+
+    const alert = await this.alertCtrl.create({ header, message, inputs, buttons });
+    await alert.present();
+  }
+  async removeOpportunityManagerById(userId: string): Promise<void> {
+    const index = this.opportunity.additionalManagersIds.indexOf(userId);
+    if (index !== -1) this.opportunity.additionalManagersIds.splice(index, 1);
   }
 
   async save(): Promise<void> {

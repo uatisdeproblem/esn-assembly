@@ -5,7 +5,6 @@ import { AppService } from '@app/app.service';
 import { BadgesService } from './badges/badges.service';
 
 import { environment as env } from '@env';
-import { cleanESNAccountsIdForURL } from '@models/utils';
 import { UserBadge } from '@models/userBadge.model';
 
 @Component({
@@ -21,11 +20,6 @@ export class ProfilePage {
   constructor(private t: IDEATranslationsService, public _badges: BadgesService, public app: AppService) {}
   async ionViewDidEnter(): Promise<void> {
     this.badges = await this._badges.getList({ force: true });
-  }
-
-  async openESNAccount(): Promise<void> {
-    const url = 'https://accounts.esn.org/user/'.concat(cleanESNAccountsIdForURL(this.app.user.userId));
-    await this.app.openURL(url);
   }
 
   async sendFeedback(): Promise<void> {

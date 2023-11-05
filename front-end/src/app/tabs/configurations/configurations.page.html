@@ -59,7 +59,7 @@
     </ion-item>
     <ion-item *ngFor="let administratorId of configurations?.administratorsIds">
       <ion-label>{{ administratorId }}</ion-label>
-      <ion-button fill="clear" color="medium" slot="end" (click)="openUserProfileById(administratorId)">
+      <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(administratorId)">
         <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
       </ion-button>
       <ion-button
@@ -90,7 +90,7 @@
     </ion-item>
     <ion-item *ngFor="let managerId of configurations?.opportunitiesManagersIds">
       <ion-label>{{ managerId }}</ion-label>
-      <ion-button fill="clear" color="medium" slot="end" (click)="openUserProfileById(managerId)">
+      <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(managerId)">
         <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
       </ion-button>
       <ion-button fill="clear" color="danger" slot="end" (click)="removeOpportunitiesManagerById(managerId)">
@@ -112,7 +112,7 @@
     </ion-item>
     <ion-item *ngFor="let userId of configurations?.bannedUsersIds">
       <ion-label>{{ userId }}</ion-label>
-      <ion-button fill="clear" color="medium" slot="end" (click)="openUserProfileById(userId)">
+      <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(userId)">
         <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
       </ion-button>
       <ion-button fill="clear" color="danger" slot="end" (click)="removeBannedUserById(userId)">

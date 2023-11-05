@@ -63,7 +63,7 @@ class ApplicationsRC extends ResourceController {
       throw new RCError('Application not found');
     }
 
-    if (!this.galaxyUser.canManageOpportunities && this.application.userId !== this.galaxyUser.userId)
+    if (!this.opportunity.canUserManage(this.galaxyUser) && this.application.userId !== this.galaxyUser.userId)
       throw new RCError('Unauthorized');
   }
 
@@ -75,7 +75,7 @@ class ApplicationsRC extends ResourceController {
     });
     applications = applications.map(x => new Application(x));
 
-    if (!this.galaxyUser.canManageOpportunities) applications.filter(x => x.userId === this.galaxyUser.userId);
+    if (!this.opportunity.canUserManage(this.galaxyUser)) applications.filter(x => x.userId === this.galaxyUser.userId);
 
     return applications.sort((a, b): number => b.createdAt.localeCompare(a.createdAt));
   }
@@ -128,10 +128,11 @@ class ApplicationsRC extends ResourceController {
 
   protected async putResource(): Promise<Application> {
     if (this.opportunity.isArchived()) throw new RCError('Opportunity is archived');
-    if (!this.galaxyUser.canManageOpportunities && this.opportunity.isClosed())
-      throw new Error('Opportunity is closed');
-    if (!this.galaxyUser.canManageOpportunities && this.application.getStatus() !== ApplicationStatuses.REJECTED)
-      throw new Error('Only rejected applications can be fixed');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) {
+      if (this.opportunity.isClosed()) throw new Error('Opportunity is closed');
+      if (this.application.getStatus() !== ApplicationStatuses.REJECTED)
+        throw new Error('Only rejected applications can be fixed');
+    }
 
     const oldApplication = new Application(this.application);
     this.application.safeLoad(this.body, oldApplication);
@@ -160,7 +161,7 @@ class ApplicationsRC extends ResourceController {
     if (!attachment || !attachment.attachmentId.startsWith(ATTACHMENTS_PREFIX)) throw new RCError('Not found');
 
     // further permissions check to access private attachment
-    const userId = this.galaxyUser.canManageOpportunities ? this.application.userId : this.galaxyUser.userId;
+    const userId = this.opportunity.canUserManage(this.galaxyUser) ? this.application.userId : this.galaxyUser.userId;
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachment.attachmentId}-${userId}`;
     return await s3.signedURLGet(S3_BUCKET_MEDIA, key);
@@ -168,7 +169,7 @@ class ApplicationsRC extends ResourceController {
 
   protected async deleteResource(): Promise<void> {
     if (this.opportunity.isArchived()) throw new RCError('Opportunity is archived');
-    if (!this.galaxyUser.canManageOpportunities && this.opportunity.isClosed())
+    if (!this.opportunity.canUserManage(this.galaxyUser) && this.opportunity.isClosed())
       throw new Error('Opportunity is closed');
 
     await ddb.delete({

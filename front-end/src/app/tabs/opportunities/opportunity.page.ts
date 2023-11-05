@@ -106,7 +106,7 @@ export class OpportunityPage {
 
     try {
       if (bytesToMegaBytes(file.size) > env.idea.app.maxFileUploadSizeMB)
-        throw new Error(this.t._('ATTACHMENTS.FILE_IS_TOO_BIG'));
+        throw new Error(this.t._('ATTACHMENTS.FILE_IS_TOO_BIG', { maxSize: env.idea.app.maxFileUploadSizeMB }));
       attachment.attachmentId = await this._applications.uploadAttachment(this.opportunity, file);
       this.attachmentUploadErros[expectedAttachmentName] = null;
     } catch (err) {

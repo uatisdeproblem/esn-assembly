@@ -296,7 +296,7 @@
     "TAP_TO_ADD_ATTACHMENT": "Tap to attach a document...",
     "TAP_TO_ADD_ATTACHMENT_I": "The preferred format is images or PDF documents. Max size of 50MB per attachment.",
     "UPLOADING": "Uploading...",
-    "FILE_IS_TOO_BIG": "The file is too big",
+    "FILE_IS_TOO_BIG": "The file is too big (max: {{maxSize}} MB)",
     "NO_ATTACHMENTS": "No attachments"
   },
   "SUBJECTS": {
@@ -562,6 +562,11 @@
     },
     "NO_APPLICATIONS_YET": "No applications yet",
     "REVIEW_PENDING_APPLICATIONS": "Make sure to review pending application, to let applicants know everything is ok.",
-    "IS_YOUR_APPLICATION_READY": "Is your application ready?"
+    "IS_YOUR_APPLICATION_READY": "Is your application ready?",
+    "ADDITIONAL_MANAGERS": "Additional opportunity managers",
+    "ADDITIONAL_MANAGERS_I": "Users in this lists can manage this specific opportunity.",
+    "ADDITIONAL_MANAGERS_II": "The users set in the Configurations can also manage the opportunity.",
+    "ADD_ADDITIONAL_MANAGER": "Add opportunity manager",
+    "NO_ADDITIONA_MANAGERS": "No additional user set."
   }
 }

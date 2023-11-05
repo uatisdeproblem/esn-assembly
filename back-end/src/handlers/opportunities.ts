@@ -49,7 +49,7 @@ class OpportunitiesRC extends ResourceController {
     let opportunities: Opportunity[] = await ddb.scan({ TableName: DDB_TABLES.opportunities });
     opportunities = opportunities.map(x => new Opportunity(x));
 
-    if (!this.galaxyUser.canManageOpportunities) opportunities = opportunities.filter(x => !x.isDraft());
+    opportunities = opportunities.filter(x => !x.isDraft() || x.canUserManage(this.galaxyUser));
 
     opportunities = opportunities.filter(x =>
       this.queryParams.archivedFromYear
@@ -91,7 +91,8 @@ class OpportunitiesRC extends ResourceController {
   }
 
   protected async getResource(): Promise<Opportunity> {
-    if (this.opportunity.isDraft() && !this.galaxyUser.canManageOpportunities) throw new RCError('Unauthorized');
+    if (this.opportunity.isDraft() && !this.opportunity.canUserManage(this.galaxyUser))
+      throw new RCError('Unauthorized');
 
     await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.OPPORTUNITIES, this.resourceId);
 
@@ -99,7 +100,7 @@ class OpportunitiesRC extends ResourceController {
   }
 
   protected async putResource(): Promise<Opportunity> {
-    if (!this.galaxyUser.canManageOpportunities) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     const oldOpportunity = new Opportunity(this.opportunity);
     this.opportunity.safeLoad(this.body, oldOpportunity);
@@ -122,7 +123,7 @@ class OpportunitiesRC extends ResourceController {
     }
   }
   private async manageStatus(open: boolean): Promise<Opportunity> {
-    if (!this.galaxyUser.canManageOpportunities) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     if (open) delete this.opportunity.closedAt;
     else this.opportunity.closedAt = new Date().toISOString();
@@ -131,7 +132,7 @@ class OpportunitiesRC extends ResourceController {
     return this.opportunity;
   }
   private async manageArchive(archive: boolean): Promise<Opportunity> {
-    if (!this.galaxyUser.canManageOpportunities) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     if (archive) {
       this.opportunity.archivedAt = new Date().toISOString();
@@ -143,7 +144,7 @@ class OpportunitiesRC extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.canManageOpportunities) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.opportunities, Key: { opportunityId: this.opportunity.opportunityId } });
   }

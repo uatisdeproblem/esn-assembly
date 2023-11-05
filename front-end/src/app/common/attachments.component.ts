@@ -64,7 +64,7 @@ export class AttachmentsComponent {
 
     try {
       if (bytesToMegaBytes(file.size) > env.idea.app.maxFileUploadSizeMB)
-        throw new Error(this.t._('ATTACHMENTS.FILE_IS_TOO_BIG'));
+        throw new Error(this.t._('ATTACHMENTS.FILE_IS_TOO_BIG', { maxSize: env.idea.app.maxFileUploadSizeMB }));
       attachment.attachmentId = await this._attachments.upload(file);
     } catch (err) {
       this.uploadErrors.push({ file: name, error: err.message });

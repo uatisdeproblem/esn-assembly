@@ -9,7 +9,6 @@ import { AppService } from '@app/app.service';
 import { ConfigurationsService } from './configurations.service';
 
 import { Configurations, EmailTemplates } from '@models/configurations.model';
-import { cleanESNAccountsIdForURL } from '@models/utils';
 
 @Component({
   selector: 'configurations',
@@ -98,11 +97,6 @@ export class ConfigurationsPage implements OnInit {
     } finally {
       this.loading.hide();
     }
-  }
-
-  async openUserProfileById(userId: string): Promise<void> {
-    const url = 'https://accounts.esn.org/user/'.concat(cleanESNAccountsIdForURL(userId));
-    await this.app.openURL(url);
   }
 
   async openTemplateEmailModal(template: EmailTemplates): Promise<void> {
