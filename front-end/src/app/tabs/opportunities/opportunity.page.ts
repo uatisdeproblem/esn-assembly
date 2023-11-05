@@ -1,9 +1,10 @@
 import { Component, Input, ViewChild } from '@angular/core';
-import { AlertController, IonContent, IonRefresher } from '@ionic/angular';
+import { AlertController, IonContent, IonRefresher, ModalController } from '@ionic/angular';
 import { Attachment, epochISOString } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { ACCEPTED_ATTACHMENTS_FORMATS, bytesToMegaBytes } from '@app/common/attachments.component';
+import { ReviewApplicationStandaloneComponent } from './applications/reviewApplication.component';
 
 import { AppService } from '@app/app.service';
 import { OpportunitiesService } from './opportunities.service';
@@ -40,6 +41,7 @@ export class OpportunityPage {
 
   constructor(
     private alertCtrl: AlertController,
+    private modalCtrl: ModalController,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
@@ -162,7 +164,7 @@ export class OpportunityPage {
     const message = this.t._('OPPORTUNITIES.IS_YOUR_APPLICATION_READY');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.SEND'), role: 'destructive', handler: doSend }
+      { text: this.t._('COMMON.SEND'), handler: doSend }
     ];
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
@@ -205,7 +207,20 @@ export class OpportunityPage {
     await this.app.openURL(url);
   }
 
-  reviewApplication(application: Application): void {
-    // @todo modale con approve e reject
+  getApplicationColorByStatus(application: Application): string {
+    const status = application.getStatus();
+    if (status === ApplicationStatuses.APPROVED) return 'ESNgreen';
+    else if (status === ApplicationStatuses.REJECTED) return 'danger';
+    else return 'medium';
+  }
+  async reviewApplication(application: Application): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ReviewApplicationStandaloneComponent,
+      componentProps: { opportunity: this.opportunity, application }
+    });
+    modal.onDidDismiss().then((): void => {
+      // @todo
+    });
+    modal.present();
   }
 }

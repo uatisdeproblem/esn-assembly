@@ -11,6 +11,7 @@ import { OpportunityPage } from './opportunity.page';
 
 import { OpportunityModule } from './opportunity.module';
 import { ApplicationStandaloneComponent } from './applications/application.component';
+import { ReviewApplicationStandaloneComponent } from './applications/reviewApplication.component';
 import { EditModeButtonsModule } from '@app/common/editModeButtons.module';
 import { AttachmentsModule } from '@app/common/attachments.module';
 import { HTMLEditorModule } from '@app/common/htmlEditor.module';
@@ -27,6 +28,7 @@ import { StatisticsModule } from '@app/common/statistics.module';
     OpportunitiesRoutingModule,
     OpportunityModule,
     ApplicationStandaloneComponent,
+    ReviewApplicationStandaloneComponent,
     EditModeButtonsModule,
     AttachmentsModule,
     HTMLEditorModule,

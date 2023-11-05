@@ -110,4 +110,13 @@ export class ApplicationsService {
     const { url } = await this.api.patchResource(path, { body });
     return url;
   }
+
+  /**
+   * Review the application.
+   */
+  async review(application: Application, approve: boolean, message: string): Promise<Application> {
+    const path = ['opportunities', application.opportunityId, 'applications', application.applicationId];
+    const body = { action: approve ? 'REVIEW_APPROVE' : 'REVIEW_REJECT', message };
+    return new Application(await this.api.patchResource(path, { body }));
+  }
 }

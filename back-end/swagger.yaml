@@ -2078,7 +2078,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     patch:
       summary: Actions on the application
-      description: Requires permissions to manage opportunities or to be the creator
+      description: Permissions depend on the action
       tags: [Applications]
       security:
         - AuthFunction: []
@@ -2104,10 +2104,13 @@ paths:
               properties:
                 action:
                   type: string
-                  enum: [GET_ATTACHMENT_DOWNLOAD_URL]
+                  enum: [GET_ATTACHMENT_DOWNLOAD_URL, REVIEW_APPROVE, REVIEW_REJECT]
                 name:
                   type: string
                   description: (GET_ATTACHMENT_DOWNLOAD_URL)
+                message:
+                  type: string
+                  description: (REVIEW_APPROVE, REVIEW_REJECT)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'

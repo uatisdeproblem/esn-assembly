@@ -2,8 +2,10 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
+import { DynamoDB, RCError, ResourceController, S3, SES } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
+
+import { isEmailInBlockList } from './sesNotifications';
 
 import { Application, ApplicationStatuses } from '../models/application.model';
 import { Opportunity } from '../models/opportunity.model';
@@ -25,6 +27,17 @@ const ATTACHMENTS_PREFIX = PROJECT.concat('-application-attachment');
 const S3_BUCKET_MEDIA = process.env.S3_BUCKET_MEDIA;
 const S3_ATTACHMENTS_FOLDER = process.env.S3_ATTACHMENTS_FOLDER;
 const s3 = new S3();
+
+const STAGE = process.env.STAGE;
+const DOMAIN_URL = STAGE === 'prod' ? 'ga.esn.org' : 'dev.esn-ga.link';
+const OPPORTUNITY_BASE_URL = `https://${DOMAIN_URL}/t/opportunities/`;
+const SES_CONFIG = {
+  sourceName: 'ESN General Assembly app',
+  source: process.env.SES_SOURCE_ADDRESS,
+  sourceArn: process.env.SES_IDENTITY_ARN,
+  region: process.env.SES_REGION
+};
+const ses = new SES();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new ApplicationsRC(ev, cb).handleRequest();
 
@@ -148,10 +161,14 @@ class ApplicationsRC extends ResourceController {
     return this.application;
   }
 
-  protected async patchResource(): Promise<SignedURL> {
+  protected async patchResource(): Promise<SignedURL | Application> {
     switch (this.body.action) {
       case 'GET_ATTACHMENT_DOWNLOAD_URL':
         return await this.getSignedURLToDownloadAttachmentByExpectedName(this.body.name);
+      case 'REVIEW_APPROVE':
+        return await this.reviewApplication(true, this.body.message);
+      case 'REVIEW_REJECT':
+        return await this.reviewApplication(false, this.body.message);
       default:
         throw new RCError('Unsupported action');
     }
@@ -165,6 +182,47 @@ class ApplicationsRC extends ResourceController {
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachment.attachmentId}-${userId}`;
     return await s3.signedURLGet(S3_BUCKET_MEDIA, key);
+  }
+  private async reviewApplication(approve: boolean, message: string): Promise<Application> {
+    if (this.opportunity.isArchived()) throw new RCError('Opportunity is archived');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new Error('Unauthorized');
+
+    const now = new Date().toISOString();
+    if (approve) {
+      this.application.approvedAt = now;
+      delete this.application.rejectedAt;
+    } else {
+      this.application.rejectedAt = now;
+      delete this.application.approvedAt;
+    }
+    this.application.reviewMessage = message;
+
+    await ddb.update({
+      TableName: DDB_TABLES.applications,
+      Key: { opportunityId: this.application.opportunityId, applicationId: this.application.applicationId },
+      ExpressionAttributeNames: {
+        '#reviewedAt': approve ? 'approvedAt' : 'rejectedAt',
+        '#oldReview': approve ? 'rejectedAt' : 'approvedAt'
+      },
+      UpdateExpression: 'SET #reviewedAt = :now, reviewMessage = :message REMOVE #oldReview',
+      ExpressionAttributeValues: { ':now': now, ':message': message }
+    });
+
+    await this.sendNotificationToApplicantUser(approve, message);
+
+    return this.application;
+  }
+  private async sendNotificationToApplicantUser(approved: boolean, message: string): Promise<void> {
+    const { email } = this.application.subject;
+    const template = approved ? `notify-application-approved-${STAGE}` : `notify-application-rejected-${STAGE}`;
+    const templateData = {
+      user: this.application.subject.name,
+      opportunity: this.opportunity.name,
+      url: OPPORTUNITY_BASE_URL.concat(this.opportunity.opportunityId),
+      message
+    };
+    if (!(await isEmailInBlockList(email)))
+      await ses.sendTemplatedEmail({ toAddresses: [email], template, templateData }, SES_CONFIG);
   }
 
   protected async deleteResource(): Promise<void> {

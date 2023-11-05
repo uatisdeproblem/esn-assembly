@@ -105,12 +105,18 @@
         </ion-list>
 
         <ng-container *ngIf="userApplication && !writingApplication">
-          <ion-card color="ESNgreen">
+          <ion-card [color]="getApplicationColorByStatus(userApplication)">
             <ion-card-header>
               <ion-label><h2>{{ 'OPPORTUNITIES.YOU_HAVE_APPLIED' | translate }}</h2></ion-label>
             </ion-card-header>
+            <ion-card-content
+              *ngIf="userApplication.reviewMessage && userApplication.getStatus() !== ApplicationStatuses.PENDING"
+            >
+              <ion-card-subtitle>{{ 'OPPORTUNITIES.REVIEWER_LEFT_MESSAGE' | translate }}:</ion-card-subtitle>
+              {{ userApplication.reviewMessage }}
+            </ion-card-content>
           </ion-card>
-          <app-application color="light" [application]="userApplication" [card]="true" />
+          <app-application color="white" [application]="userApplication" [card]="true" />
           <ion-row class="ion-margin ion-align-items-center" *ngIf="!opportunity.isClosed()">
             <ion-col *ngIf="userApplication.getStatus() === ApplicationStatuses.REJECTED">
               <ion-button (click)="fixUserApplication()">

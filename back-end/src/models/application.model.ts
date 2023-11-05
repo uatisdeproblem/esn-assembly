@@ -47,6 +47,10 @@ export class Application extends Resource {
    * The timestamp when the application was rejected by a manager (if so).
    */
   rejectedAt?: epochISOString;
+  /**
+   * A message left together with the review (approval/rejection).
+   */
+  reviewMessage?: string;
 
   load(x: any): void {
     super.load(x);
@@ -63,6 +67,8 @@ export class Application extends Resource {
     else delete this.approvedAt;
     if (x.rejectedAt) this.rejectedAt = this.clean(x.rejectedAt, d => new Date(d).toISOString());
     else delete this.rejectedAt;
+    if (x.reviewMessage) this.reviewMessage = this.clean(x.reviewMessage, String);
+    else delete this.reviewMessage;
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -75,6 +81,7 @@ export class Application extends Resource {
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     if (safeData.approvedAt) this.approvedAt = safeData.approvedAt;
     if (safeData.rejectedAt) this.rejectedAt = safeData.rejectedAt;
+    if (safeData.reviewMessage) this.reviewMessage = safeData.reviewMessage;
   }
 
   validate(opportunity: Opportunity): string[] {
