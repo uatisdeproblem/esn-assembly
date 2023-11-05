@@ -5,7 +5,7 @@ import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from 
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
-import { AttachmentsService } from 'src/app/common/attachments.service';
+import { PublicAttachmentsService } from 'src/app/common/attachments.service';
 import { QuestionsService } from './questions/questions.service';
 import { UserDraftsService } from './drafts/drafts.service';
 
@@ -46,7 +46,7 @@ export class StandardTopicPage {
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
     private _topics: TopicsService,
-    private _attachments: AttachmentsService,
+    private _attachments: PublicAttachmentsService,
     private _questions: QuestionsService,
     private _drafts: UserDraftsService,
     public app: AppService

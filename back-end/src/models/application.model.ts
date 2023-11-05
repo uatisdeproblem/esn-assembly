@@ -16,6 +16,10 @@ export class Application extends Resource {
    */
   applicationId: string;
   /**
+   * The ID of user applying.
+   */
+  userId: string;
+  /**
    * The user applying.
    */
   subject: Subject;
@@ -48,6 +52,7 @@ export class Application extends Resource {
     super.load(x);
     this.opportunityId = this.clean(x.opportunityId, String);
     this.applicationId = this.clean(x.applicationId, String);
+    this.userId = this.clean(x.userId, String);
     this.subject = new Subject(x.subject);
     this.motivation = this.clean(x.motivation, String);
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
@@ -55,13 +60,16 @@ export class Application extends Resource {
     this.attachments = {};
     if (x.attachments) for (const name in x.attachments) this.attachments[name] = new Attachment(x.attachments[name]);
     if (x.approvedAt) this.approvedAt = this.clean(x.approvedAt, d => new Date(d).toISOString());
+    else delete this.approvedAt;
     if (x.rejectedAt) this.rejectedAt = this.clean(x.rejectedAt, d => new Date(d).toISOString());
+    else delete this.rejectedAt;
   }
 
   safeLoad(newData: any, safeData: any): void {
     super.safeLoad(newData, safeData);
     this.opportunityId = safeData.opportunityId;
     this.applicationId = safeData.applicationId;
+    this.userId = safeData.userId;
     this.subject = safeData.subject;
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;

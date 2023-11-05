@@ -544,11 +544,11 @@
     "SHOW_CONTENT": "Show full content",
     "HIDE_CONTENT": "Hide full content",
     "LET_START": "Let's get started!",
-    "APPLICATION_RECEIVED": "Amazing! Application received!",
+    "APPLICATION_SENT": "Amazing! Application sent!",
     "YOU_HAVE_APPLIED": "You have applied to this opportunity!",
     "WITHDRAW_APPLICATION": "Withdraw application",
+    "WITHDRAW_APPLICATION_I": "You will be able to apply again as long as the opportunity is open.",
     "YOUR_APPLICATION": "Your application",
-    "EDIT_APPLICATION": "Edit application",
     "FIX_APPLICATION": "Fix application",
     "I_HAVE_A_QUESTION": "I have a question",
     "CONTACT_EMAIL": "Contact email for questions",
@@ -561,6 +561,7 @@
       "PENDING": "Pending"
     },
     "NO_APPLICATIONS_YET": "No applications yet",
-    "REVIEW_PENDING_APPLICATIONS": "Make sure to review pending application, to let applicants know everything is ok."
+    "REVIEW_PENDING_APPLICATIONS": "Make sure to review pending application, to let applicants know everything is ok.",
+    "IS_YOUR_APPLICATION_READY": "Is your application ready?"
   }
 }

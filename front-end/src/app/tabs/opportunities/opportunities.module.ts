@@ -10,6 +10,7 @@ import { ManageOpportunityPage } from './manageOpportunity.page';
 import { OpportunityPage } from './opportunity.page';
 
 import { OpportunityModule } from './opportunity.module';
+import { ApplicationStandaloneComponent } from './applications/application.component';
 import { EditModeButtonsModule } from '@app/common/editModeButtons.module';
 import { AttachmentsModule } from '@app/common/attachments.module';
 import { HTMLEditorModule } from '@app/common/htmlEditor.module';
@@ -25,6 +26,7 @@ import { StatisticsModule } from '@app/common/statistics.module';
     IDEADateTimeModule,
     OpportunitiesRoutingModule,
     OpportunityModule,
+    ApplicationStandaloneComponent,
     EditModeButtonsModule,
     AttachmentsModule,
     HTMLEditorModule,

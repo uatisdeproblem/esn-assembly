@@ -51,6 +51,8 @@ tags:
     description: The drafts of the users for questions and answers
   - name: Opportunities
     description: The platform's opportunities to which users can apply to
+  - name: Applications
+    description: The user applications to the opportunities
 
 paths:
   /login:
@@ -377,6 +379,30 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /public-attachments:
+    patch:
+      summary: Actions on the public attachments
+      tags: [Configurations]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_ATTACHMENT_UPLOAD_URL, GET_ATTACHMENT_DOWNLOAD_URL]
+                attachmentId:
+                  type: string
+                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /topics:
     get:
       summary: Get the topics
@@ -407,29 +433,6 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/Topic'
-        400:
-          $ref: '#/components/responses/BadParameters'
-    patch:
-      summary: Actions on the topics
-      tags: [Topics]
-      security:
-        - AuthFunction: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                action:
-                  type: string
-                  enum: [GET_ATTACHMENT_UPLOAD_URL, GET_ATTACHMENT_DOWNLOAD_URL]
-                attachmentId:
-                  type: string
-                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
-      responses:
-        200:
-          $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
   /topics/{topicId}:
@@ -1888,30 +1891,6 @@ paths:
           $ref: '#/components/responses/Opportunity'
         400:
           $ref: '#/components/responses/BadParameters'
-    patch:
-      summary: Actions on the opportunity
-      description: Requires permissions to manage opportunities
-      tags: [Opportunities]
-      security:
-        - AuthFunction: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                action:
-                  type: string
-                  enum: [GET_ATTACHMENT_UPLOAD_URL, GET_ATTACHMENT_DOWNLOAD_URL]
-                attachmentId:
-                  type: string
-                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
-      responses:
-        200:
-          $ref: '#/components/responses/OperationCompleted'
-        400:
-          $ref: '#/components/responses/BadParameters'
   /opportunities/{opportunityId}:
     get:
       summary: Get an opportunity's detail
@@ -1998,6 +1977,166 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /opportunities/{opportunityId}/applications:
+    get:
+      summary: Get the applications to an opportunity
+      description: Users that can manage the opportunity will see every application, whereas normal users only theirs
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Application'
+    post:
+      summary: Application of the user to an opportunity
+      description: Each user can apply only once
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        200:
+          $ref: '#/components/responses/Application'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on the applications
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_ATTACHMENT_UPLOAD_URL]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /opportunities/{opportunityId}/applications/{applicationId}:
+    put:
+      summary: Fix the rejected application to an opportunity
+      description: Requires permissions to manage opportunities or to be the creator
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        200:
+          $ref: '#/components/responses/Application'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on the application
+      description: Requires permissions to manage opportunities or to be the creator
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_ATTACHMENT_DOWNLOAD_URL]
+                name:
+                  type: string
+                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Withdraw/delete the application to an opportunity
+      description: Requires permissions to manage opportunities or to be the creator
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -2044,6 +2183,9 @@ components:
       type: object
       additionalProperties: {}
     Opportunity:
+      type: object
+      additionalProperties: {}
+    Application:
       type: object
       additionalProperties: {}
 
@@ -2265,6 +2407,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Opportunity'
+    Application:
+      description: An application to an opportunity
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Application'
+    Applications:
+      description: The applications to an opportunity
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Application'
     BadParameters:
       description: Bad input parameters
       content:

@@ -3,7 +3,7 @@ import { Attachment } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '../app.service';
-import { AttachmentsService } from './attachments.service';
+import { PublicAttachmentsService } from './attachments.service';
 
 import { environment as env } from '@env';
 
@@ -31,7 +31,7 @@ export class AttachmentsComponent {
   constructor(
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
-    private _attachments: AttachmentsService,
+    private _attachments: PublicAttachmentsService,
     public app: AppService,
     public t: IDEATranslationsService
   ) {}
