@@ -35,7 +35,7 @@ const authorizeHTTPApi = async (
   const user = await verifyTokenAndGetESNAccountsUser(authorization);
 
   if (user) {
-    if (user.isAdministrator) user.isAdministrator = await verifyIfUserIsStillAnAdministratorById(user.userId);
+    if (user.isAdministrator || user.canManageOpportunities) await verifyUserPermissions(user);
     result.context = { principalId: user.userId, user };
     result.isAuthorized = true;
   }
@@ -50,7 +50,7 @@ const authorizeWebSocketApi = async (event: any): Promise<WebSocketAuthResult> =
   const result: WebSocketAuthResult = {};
 
   if (user) {
-    if (user.isAdministrator) user.isAdministrator = await verifyIfUserIsStillAnAdministratorById(user.userId);
+    if (user.isAdministrator || user.canManageOpportunities) await verifyUserPermissions(user);
     result.principalId = user.userId;
   }
 
@@ -76,11 +76,12 @@ const verifyTokenAndGetESNAccountsUser = async (token: string): Promise<User> =>
     return null;
   }
 };
-const verifyIfUserIsStillAnAdministratorById = async (userId: string): Promise<boolean> => {
-  const { administratorsIds } = new Configurations(
+const verifyUserPermissions = async (user: User): Promise<void> => {
+  const { administratorsIds, opportunitiesManagersIds } = new Configurations(
     await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
   );
-  return administratorsIds.includes(userId);
+  user.isAdministrator = administratorsIds.includes(user.userId);
+  user.canManageOpportunities = user.isAdministrator || opportunitiesManagersIds.includes(user.userId);
 };
 
 const getPolicyDocumentToAllowWebSocketRequest = (methodArn: string, allow: boolean): any => {

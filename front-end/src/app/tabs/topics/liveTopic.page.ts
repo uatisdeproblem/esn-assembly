@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AlertController, IonInfiniteScroll, IonRefresher, PopoverController } from '@ionic/angular';
 import { toCanvas } from 'qrcode';
 import { Attachment } from 'idea-toolbox';
@@ -14,7 +14,7 @@ import { SubjectsReactionsComponent } from '@app/common/subjectsReactions.compon
 
 import { AppService } from '@app/app.service';
 import { TopicsService } from './topics.service';
-import { AttachmentsService } from '@app/common/attachments.service';
+import { PublicAttachmentsService } from '@app/common/attachments.service';
 import { MessagesService, MessagesSortBy } from './messages/messages.service';
 import { ConfigurationsService } from '../configurations/configurations.service';
 
@@ -61,7 +61,6 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   hasUserUpvotedMessage: Record<string, boolean> = {};
 
   constructor(
-    private cd: ChangeDetectorRef,
     private alertCtrl: AlertController,
     private actionsCtrl: IDEAActionSheetController,
     private popoverCtrl: PopoverController,
@@ -70,7 +69,7 @@ export class LiveTopicPage implements OnInit, OnDestroy {
     private t: IDEATranslationsService,
     private webSocket: IDEAWebSocketApiService,
     private _topics: TopicsService,
-    private _attachments: AttachmentsService,
+    private _attachments: PublicAttachmentsService,
     private _messages: MessagesService,
     private _configurations: ConfigurationsService,
     public app: AppService

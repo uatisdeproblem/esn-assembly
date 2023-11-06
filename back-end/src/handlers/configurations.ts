@@ -4,7 +4,7 @@
 
 import { DynamoDB, GetObjectTypes, RCError, ResourceController, S3, SES } from 'idea-aws';
 
-import { Configurations } from '../models/configurations.model';
+import { Configurations, EmailTemplates } from '../models/configurations.model';
 import { User } from '../models/user.model';
 
 ///
@@ -25,7 +25,9 @@ const SES_CONFIG = {
 };
 const TEST_EMAIL_EXAMPLE_TOPIC = 'Amazing candidacy';
 const TEST_EMAIL_EXAMPLE_QUESTION = 'An awesome question';
+const TEST_EMAIL_EXAMPLE_OPPORTUNITY = 'An incredible opportunity';
 const TEST_EMAIL_EXAMPLE_URL = BASE_URL;
+const TEST_EMAIL_EXAMPLE_MESSAGE = 'A custom message';
 const ses = new SES();
 
 const s3 = new S3();
@@ -76,71 +78,83 @@ class ConfigurationsRC extends ResourceController {
 
   protected async patchResources(): Promise<{ subject: string; content: string } | void> {
     switch (this.body.action) {
-      case 'GET_EMAIL_TEMPLATE_QUESTIONS':
-        return await this.getEmailTemplate('notify-new-question');
-      case 'SET_EMAIL_TEMPLATE_QUESTIONS':
-        return await this.setEmailTemplate('notify-new-question', this.body.subject, this.body.content);
-      case 'RESET_EMAIL_TEMPLATE_QUESTIONS':
-        return await this.resetEmailTemplate('notify-new-question');
-      case 'TEST_EMAIL_TEMPLATE_QUESTIONS':
-        return await this.testEmailTemplate('notify-new-question');
-      case 'GET_EMAIL_TEMPLATE_ANSWERS':
-        return await this.getEmailTemplate('notify-new-answer');
-      case 'SET_EMAIL_TEMPLATE_ANSWERS':
-        return await this.setEmailTemplate('notify-new-answer', this.body.subject, this.body.content);
-      case 'RESET_EMAIL_TEMPLATE_ANSWERS':
-        return await this.resetEmailTemplate('notify-new-answer');
-      case 'TEST_EMAIL_TEMPLATE_ANSWERS':
-        return await this.testEmailTemplate('notify-new-answer');
+      case 'GET_EMAIL_TEMPLATE':
+        return await this.getEmailTemplate(this.body.template);
+      case 'SET_EMAIL_TEMPLATE':
+        return await this.setEmailTemplate(this.body.template, this.body.subject, this.body.content);
+      case 'RESET_EMAIL_TEMPLATE':
+        return await this.resetEmailTemplate(this.body.template);
+      case 'TEST_EMAIL_TEMPLATE':
+        return await this.testEmailTemplate(this.body.template);
       default:
         throw new RCError('Unsupported action');
     }
   }
-  private async getEmailTemplate(emailTemplate: string): Promise<{ subject: string; content: string }> {
-    try {
-      const template = await ses.getTemplate(`${emailTemplate}-${STAGE}`);
-      return { subject: template.Subject, content: template.Html };
-    } catch (error) {
-      throw new RCError('Template not found');
+  private getSESTemplateName(emailTemplate: EmailTemplates): string {
+    switch (emailTemplate) {
+      case EmailTemplates.QUESTIONS:
+        return 'notify-new-question';
+      case EmailTemplates.ANSWERS:
+        return 'notify-new-answer';
+      case EmailTemplates.APPLICATION_APPROVED:
+        return 'notify-application-approved';
+      case EmailTemplates.APPLICATION_REJECTED:
+        return 'notify-application-rejected';
+      default:
+        throw new RCError("Template doesn't exist");
     }
   }
-  private async setEmailTemplate(emailTemplate: string, subject: string, content: string): Promise<void> {
+  private async getEmailTemplate(emailTemplate: EmailTemplates): Promise<{ subject: string; content: string }> {
+    const templateName = this.getSESTemplateName(emailTemplate);
+    try {
+      const template = await ses.getTemplate(`${templateName}-${STAGE}`);
+      return { subject: template.Subject, content: template.Html };
+    } catch (error) {
+      await this.resetEmailTemplate(emailTemplate); // creation
+      const template = await ses.getTemplate(`${templateName}-${STAGE}`);
+      return { subject: template.Subject, content: template.Html };
+    }
+  }
+  private async setEmailTemplate(emailTemplate: EmailTemplates, subject: string, content: string): Promise<void> {
     if (!subject) throw new RCError('Missing subject');
     if (!content) throw new RCError('Missing content');
 
-    await ses.setTemplate(`${emailTemplate}-${STAGE}`, subject, content, true);
+    const templateName = this.getSESTemplateName(emailTemplate);
+    await ses.setTemplate(`${templateName}-${STAGE}`, subject, content, true);
   }
-  private async testEmailTemplate(emailTemplate: string): Promise<void> {
+  private async testEmailTemplate(emailTemplate: EmailTemplates): Promise<void> {
     const toAddresses = [this.galaxyUser.email];
-    const template = `${emailTemplate}-${STAGE}`;
+    const templateName = this.getSESTemplateName(emailTemplate);
     const templateData = {
       user: `${this.galaxyUser.firstName} ${this.galaxyUser.lastName}`,
       topic: TEST_EMAIL_EXAMPLE_TOPIC,
       question: TEST_EMAIL_EXAMPLE_QUESTION,
-      url: TEST_EMAIL_EXAMPLE_URL
+      opportunity: TEST_EMAIL_EXAMPLE_OPPORTUNITY,
+      url: TEST_EMAIL_EXAMPLE_URL,
+      message: TEST_EMAIL_EXAMPLE_MESSAGE
     };
 
     try {
-      await ses.testTemplate(template, templateData);
+      await ses.testTemplate(`${templateName}-${STAGE}`, templateData);
     } catch (error) {
-      this.logger.warn('Elaborating template', error, { template });
+      this.logger.warn('Elaborating template', error, { template: `${templateName}-${STAGE}` });
       throw new RCError('Bad template');
     }
 
     try {
-      await ses.sendTemplatedEmail({ toAddresses, template, templateData }, SES_CONFIG);
+      await ses.sendTemplatedEmail({ toAddresses, template: `${templateName}-${STAGE}`, templateData }, SES_CONFIG);
     } catch (error) {
-      this.logger.warn('Sending template', error, { template });
+      this.logger.warn('Sending template', error, { template: `${templateName}-${STAGE}` });
       throw new RCError('Sending failed');
     }
   }
-  private async resetEmailTemplate(emailTemplate: string): Promise<void> {
-    const subject = `${emailTemplate}-${STAGE}`;
+  private async resetEmailTemplate(emailTemplate: EmailTemplates): Promise<void> {
+    const templateName = this.getSESTemplateName(emailTemplate);
     const content = (await s3.getObject({
       bucket: S3_BUCKET_MEDIA,
-      key: S3_ASSETS_FOLDER.concat('/', emailTemplate, '.hbs'),
+      key: S3_ASSETS_FOLDER.concat('/', templateName, '.hbs'),
       type: GetObjectTypes.TEXT
     })) as string;
-    await ses.setTemplate(`${emailTemplate}-${STAGE}`, subject, content, true);
+    await ses.setTemplate(`${templateName}-${STAGE}`, templateName, content, true);
   }
 }

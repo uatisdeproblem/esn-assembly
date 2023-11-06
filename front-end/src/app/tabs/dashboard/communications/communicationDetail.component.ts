@@ -66,11 +66,7 @@ import { Communication } from '@models/communication.model';
     `
       app-html-editor {
         --app-html-editor-margin: 10px 2px;
-        --app-html-editor-padding: 20px 16px;
         --app-html-editor-background-color: var(--ion-color-light);
-        --app-html-editor-box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px;
-        --app-html-editor-border-radius: 8px;
-        --app-html-editor-color: var(--ion-color-step-800);
       }
     `
   ]

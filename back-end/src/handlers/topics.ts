@@ -2,8 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
-import { SignedURL } from 'idea-toolbox';
+import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { addBadgeToUser } from './badges';
 import { addStatisticEntry } from './statistics';
@@ -30,10 +29,6 @@ const DDB_TABLES = {
   messagesUpvotes: process.env.DDB_TABLE_messagesUpvotes
 };
 const ddb = new DynamoDB();
-
-const S3_BUCKET_MEDIA = process.env.S3_BUCKET_MEDIA;
-const S3_ATTACHMENTS_FOLDER = process.env.S3_ATTACHMENTS_FOLDER;
-const s3 = new S3();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new Topics(ev, cb).handleRequest();
 
@@ -121,35 +116,6 @@ class Topics extends ResourceController {
     for (const user of userSubjects) await addBadgeToUser(ddb, user.id, Badges.RISING_STAR);
 
     return this.topic;
-  }
-
-  protected async patchResources(): Promise<SignedURL> {
-    switch (this.body.action) {
-      case 'GET_ATTACHMENT_UPLOAD_URL':
-        return await this.getSignedURLToUploadAttachment();
-      case 'GET_ATTACHMENT_DOWNLOAD_URL':
-        return await this.getSignedURLToDownloadAttachment();
-      default:
-        throw new RCError('Unsupported action');
-    }
-  }
-  private async getSignedURLToUploadAttachment(): Promise<SignedURL> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
-
-    const attachmentId = await ddb.IUNID(PROJECT.concat('-attachment'));
-
-    const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}.png`;
-    const signedURL = await s3.signedURLPut(S3_BUCKET_MEDIA, key);
-    signedURL.id = attachmentId;
-
-    return signedURL;
-  }
-  private async getSignedURLToDownloadAttachment(): Promise<SignedURL> {
-    const { attachmentId } = this.body;
-    if (!attachmentId) throw new RCError('Missing attachment ID');
-
-    const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}.png`;
-    return await s3.signedURLGet(S3_BUCKET_MEDIA, key);
   }
 
   protected async getResource(): Promise<Topic> {

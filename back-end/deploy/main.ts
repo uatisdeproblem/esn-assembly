@@ -22,6 +22,7 @@ const apiResources: ResourceController[] = [
   { name: 'media', paths: ['/media'] },
   { name: 'categories', paths: ['/categories', '/categories/{categoryId}'] },
   { name: 'events', paths: ['/events', '/events/{eventId}'] },
+  { name: 'publicAttachments', paths: ['/public-attachments'] },
   { name: 'topics', paths: ['/topics', '/topics/{topicId}'] },
   { name: 'relatedTopics', paths: ['/topics/{topicId}/related', '/topics/{topicId}/related/{relatedId}'] },
   { name: 'questions', paths: ['/topics/{topicId}/questions', '/topics/{topicId}/questions/{questionId}'] },
@@ -59,7 +60,15 @@ const apiResources: ResourceController[] = [
   { name: 'scheduledOps' },
   { name: 'sesNotifications' },
   { name: 'statistics', paths: ['/statistics'] },
-  { name: 'userDrafts', paths: ['/drafts', '/drafts/{draftId}'] }
+  { name: 'userDrafts', paths: ['/drafts', '/drafts/{draftId}'] },
+  { name: 'opportunities', paths: ['/opportunities', '/opportunities/{opportunityId}'] },
+  {
+    name: 'applications',
+    paths: [
+      '/opportunities/{opportunityId}/applications',
+      '/opportunities/{opportunityId}/applications/{applicationId}'
+    ]
+  }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
@@ -178,6 +187,21 @@ const tables: { [tableName: string]: DDBTable } = {
     PK: { name: 'userId', type: DDB.AttributeType.STRING },
     SK: { name: 'draftId', type: DDB.AttributeType.STRING },
     expiresAtField: 'expiresAt'
+  },
+  opportunities: {
+    PK: { name: 'opportunityId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'opportunityId-willCloseAt-index',
+        partitionKey: { name: 'opportunityId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'willCloseAt', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.KEYS_ONLY
+      }
+    ]
+  },
+  applications: {
+    PK: { name: 'opportunityId', type: DDB.AttributeType.STRING },
+    SK: { name: 'applicationId', type: DDB.AttributeType.STRING }
   }
 };
 

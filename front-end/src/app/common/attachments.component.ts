@@ -3,9 +3,11 @@ import { Attachment } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '../app.service';
-import { AttachmentsService } from './attachments.service';
+import { PublicAttachmentsService } from './attachments.service';
 
 import { environment as env } from '@env';
+
+export const ACCEPTED_ATTACHMENTS_FORMATS = ['image/*', '.pdf', '.doc', '.docx', '.xls', '.xlsx'];
 
 @Component({
   selector: 'app-attachments',
@@ -24,12 +26,12 @@ export class AttachmentsComponent {
 
   uploadErrors: UploadError[] = [];
 
-  acceptedAttachmentsFormats = ['image/*', '.pdf', '.doc', '.docx', '.xls', '.xlsx'].join(',');
+  acceptedAttachmentsFormats = ACCEPTED_ATTACHMENTS_FORMATS.join(',');
 
   constructor(
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
-    private _attachments: AttachmentsService,
+    private _attachments: PublicAttachmentsService,
     public app: AppService,
     public t: IDEATranslationsService
   ) {}
@@ -62,7 +64,7 @@ export class AttachmentsComponent {
 
     try {
       if (bytesToMegaBytes(file.size) > env.idea.app.maxFileUploadSizeMB)
-        throw new Error(this.t._('ATTACHMENTS.FILE_IS_TOO_BIG'));
+        throw new Error(this.t._('ATTACHMENTS.FILE_IS_TOO_BIG', { maxSize: env.idea.app.maxFileUploadSizeMB }));
       attachment.attachmentId = await this._attachments.upload(file);
     } catch (err) {
       this.uploadErrors.push({ file: name, error: err.message });
@@ -93,7 +95,7 @@ export class AttachmentsComponent {
   }
 }
 
-const bytesToMegaBytes = (bytes: number): number => bytes / 1024 ** 2;
+export const bytesToMegaBytes = (bytes: number): number => bytes / 1024 ** 2;
 
 interface UploadError {
   file: string;

@@ -1,0 +1,70 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.closePage()">
+        <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'ARCHIVE.OPPORTUNITIES_ARCHIVE' | translate }}</ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="filtersBar" color="ideaToolbar">
+    <ion-buttons slot="start" *ngIf="!app.isInMobileMode()">
+      <ion-item lines="none" class="ion-no-padding" color="ideaToolbar">
+        <ion-button slot="start" (click)="app.closePage()">
+          <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+        </ion-button>
+        <ion-label><b>{{ 'ARCHIVE.OPPORTUNITIES_ARCHIVE' | translate }}</b></ion-label>
+      </ion-item>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-item lines="none" color="ideaToolbar">
+        <ion-select interface="popover" [(ngModel)]="archivedFromYear" (ionChange)="filter()">
+          <ion-select-option *ngFor="let year of years" [value]="year">
+            {{ 'OPPORTUNITIES.YEAR' | translate }}: {{ year }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-md-down">
+        <ion-select interface="popover" [(ngModel)]="sortBy" (ionChange)="filter()">
+          <ion-select-option *ngFor="let sortBy of OpportunitiesSortBy | keyvalue" [value]="sortBy.key">
+            {{ 'OPPORTUNITIES.SORT_BY' | translate }} {{ ('OPPORTUNITIES.SORT_BY_OPTIONS.' + sortBy.key) | translate |
+            lowercase }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-button fill="solid" color="ESNpink" (click)="search()">
+        <ng-container *ngIf="!app.isInMobileMode()">{{ 'COMMON.SEARCH' | translate }}</ng-container>
+        <ion-icon name="search" [slot]="app.isInMobileMode() ? 'icon-only' : 'end'"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list class="aList">
+    <ion-item lines="full" class="ion-text-center noElements" *ngIf="!opportunities">
+      <ion-label class="ion-text-wrap">{{ 'ARCHIVE.CHOOSE_FILTERS_AND_SEARCH' | translate }}</ion-label>
+    </ion-item>
+    <ion-item lines="full" class="ion-text-center noElements" *ngIf="opportunities && !opportunities.length">
+      <ion-label class="ion-text-wrap">{{ 'ARCHIVE.NO_ELEMENT_FOUND_WITH_FILTERS' | translate }}</ion-label>
+    </ion-item>
+    <ng-container *ngIf="app.isInMobileMode()">
+      <app-opportunity
+        *ngFor="let opportunity of opportunities"
+        [opportunity]="opportunity"
+        (select)="openOpportunity(opportunity)"
+      />
+    </ng-container>
+    <ion-grid *ngIf="!app.isInMobileMode()">
+      <app-opportunity *ngIf="opportunities?.length" [row]="true" [header]="true" />
+      <app-opportunity
+        *ngFor="let opportunity of opportunities"
+        [opportunity]="opportunity"
+        [row]="true"
+        (select)="openOpportunity(opportunity)"
+      />
+    </ion-grid>
+    <ion-infinite-scroll (ionInfinite)="filter(false, $event.target)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-list>
+</ion-content>

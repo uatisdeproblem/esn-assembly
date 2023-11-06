@@ -18,6 +18,11 @@ const routes: Routes = [
         loadChildren: (): Promise<any> => import('./topics/topics.module').then(m => m.TopicsModule)
       },
       {
+        path: 'opportunities',
+        loadChildren: (): Promise<any> =>
+          import('./opportunities/opportunities.module').then(m => m.OpportunitiesModule)
+      },
+      {
         path: 'profile',
         loadChildren: (): Promise<any> => import('./profile/profile.module').then(m => m.ProfileModule)
       },

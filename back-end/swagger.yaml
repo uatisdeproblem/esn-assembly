@@ -49,6 +49,10 @@ tags:
     description: General statistics on the use of the app
   - name: Drafts
     description: The drafts of the users for questions and answers
+  - name: Opportunities
+    description: The platform's opportunities to which users can apply to
+  - name: Applications
+    description: The user applications to the opportunities
 
 paths:
   /login:
@@ -108,20 +112,19 @@ paths:
                 action:
                   type: string
                   enum:
-                    - GET_EMAIL_TEMPLATE_QUESTIONS
-                    - GET_EMAIL_TEMPLATE_ANSWERS
-                    - SET_EMAIL_TEMPLATE_QUESTIONS
-                    - SET_EMAIL_TEMPLATE_ANSWERS
-                    - RESET_EMAIL_TEMPLATE_QUESTIONS
-                    - RESET_EMAIL_TEMPLATE_ANSWERS
-                    - TEST_EMAIL_TEMPLATE_QUESTIONS
-                    - TEST_EMAIL_TEMPLATE_ANSWERS
+                    - GET_EMAIL_TEMPLATE
+                    - SET_EMAIL_TEMPLATE
+                    - RESET_EMAIL_TEMPLATE
+                    - TEST_EMAIL_TEMPLATE
+                template:
+                  type: string
+                  description: (GET_EMAIL_TEMPLATE, SET_EMAIL_TEMPLATE, RESET_EMAIL_TEMPLATE, TEST_EMAIL_TEMPLATE)
                 subject:
                   type: string
-                  description: (SET_EMAIL_TEMPLATE_QUESTIONS, SET_EMAIL_TEMPLATE_ANSWERS)
+                  description: (SET_EMAIL_TEMPLATE)
                 content:
                   type: string
-                  description: (SET_EMAIL_TEMPLATE_QUESTIONS, SET_EMAIL_TEMPLATE_ANSWERS)
+                  description: (SET_EMAIL_TEMPLATE)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
@@ -376,6 +379,30 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /public-attachments:
+    patch:
+      summary: Actions on the public attachments
+      tags: [Configurations]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_ATTACHMENT_UPLOAD_URL, GET_ATTACHMENT_DOWNLOAD_URL]
+                attachmentId:
+                  type: string
+                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /topics:
     get:
       summary: Get the topics
@@ -406,29 +433,6 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/Topic'
-        400:
-          $ref: '#/components/responses/BadParameters'
-    patch:
-      summary: Actions on the topics
-      tags: [Topics]
-      security:
-        - AuthFunction: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                action:
-                  type: string
-                  enum: [GET_ATTACHMENT_UPLOAD_URL, GET_ATTACHMENT_DOWNLOAD_URL]
-                attachmentId:
-                  type: string
-                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
-      responses:
-        200:
-          $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
   /topics/{topicId}:
@@ -1855,6 +1859,287 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /opportunities:
+    get:
+      summary: Get the opportunities
+      tags: [Opportunities]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: archivedFromYear
+          in: query
+          description: Whether to get archived opportunities of a specified year, instead of active ones
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: '#/components/responses/Opportunities'
+    post:
+      summary: Insert a new opportunity
+      description: Requires permissions to manage opportunities
+      tags: [Opportunities]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Opportunity'
+      responses:
+        200:
+          $ref: '#/components/responses/Opportunity'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /opportunities/{opportunityId}:
+    get:
+      summary: Get an opportunity's detail
+      tags: [Opportunities]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Opportunity'
+    put:
+      summary: Edit an opportunity
+      description: Requires permissions to manage the opportunity
+      tags: [Opportunities]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Opportunity'
+      responses:
+        200:
+          $ref: '#/components/responses/Opportunity'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete an opportunity
+      description: Requires permissions to manage the opportunity
+      tags: [Opportunities]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on an opportunity
+      description: Requires permissions to manage the opportunity
+      tags: [Opportunities]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [OPEN, CLOSE, ARCHIVE, UNARCHIVE]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /opportunities/{opportunityId}/applications:
+    get:
+      summary: Get the applications to an opportunity
+      description: Users that can manage the opportunity will see every application, whereas normal users only theirs
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Applications'
+    post:
+      summary: Application of the user to an opportunity
+      description: Each user can apply only once
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        200:
+          $ref: '#/components/responses/Application'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on the applications
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_ATTACHMENT_UPLOAD_URL]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /opportunities/{opportunityId}/applications/{applicationId}:
+    put:
+      summary: Fix the rejected application to an opportunity
+      description: Requires permissions to manage the opportunity or to be the creator
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        200:
+          $ref: '#/components/responses/Application'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on the application
+      description: Permissions depend on the action
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [GET_ATTACHMENT_DOWNLOAD_URL, REVIEW_APPROVE, REVIEW_REJECT]
+                name:
+                  type: string
+                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
+                message:
+                  type: string
+                  description: (REVIEW_APPROVE, REVIEW_REJECT)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Withdraw/delete the application to an opportunity
+      description: Requires permissions to manage the opportunity or to be the creator
+      tags: [Applications]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: opportunityId
+          in: path
+          description: Opportunity ID
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -1898,6 +2183,12 @@ components:
       type: object
       additionalProperties: {}
     Draft:
+      type: object
+      additionalProperties: {}
+    Opportunity:
+      type: object
+      additionalProperties: {}
+    Application:
       type: object
       additionalProperties: {}
 
@@ -2104,6 +2395,36 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Draft'
+    Opportunity:
+      description: An opportunity
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Opportunity'
+    Opportunities:
+      description: The opportunities
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Opportunity'
+    Application:
+      description: An application to an opportunity
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Application'
+    Applications:
+      description: The applications to an opportunity
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Application'
     BadParameters:
       description: Bad input parameters
       content:

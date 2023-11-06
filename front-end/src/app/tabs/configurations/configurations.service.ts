@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { Configurations } from '@models/configurations.model';
+import { Configurations, EmailTemplates } from '@models/configurations.model';
 
 @Injectable({ providedIn: 'root' })
 export class ConfigurationsService {
@@ -34,36 +34,28 @@ export class ConfigurationsService {
    * Set a new email template.
    */
   async setEmailTemplate(template: EmailTemplates, subject: string, content: string): Promise<void> {
-    const action = 'SET_EMAIL_TEMPLATE_'.concat(template);
-    await this.api.patchResource('configurations', { body: { action, subject, content } });
+    const action = 'SET_EMAIL_TEMPLATE';
+    await this.api.patchResource('configurations', { body: { action, template, subject, content } });
   }
   /**
    * Reset the email template.
    */
   async resetEmailTemplate(template: EmailTemplates): Promise<void> {
-    const action = 'RESET_EMAIL_TEMPLATE_'.concat(template);
-    await this.api.patchResource('configurations', { body: { action } });
+    const action = 'RESET_EMAIL_TEMPLATE';
+    await this.api.patchResource('configurations', { body: { action, template } });
   }
   /**
    * Get the email template.
    */
   async getEmailTemplate(template: EmailTemplates): Promise<{ subject: string; content: string }> {
-    const action = 'GET_EMAIL_TEMPLATE_'.concat(template);
-    return await this.api.patchResource('configurations', { body: { action } });
+    const action = 'GET_EMAIL_TEMPLATE';
+    return await this.api.patchResource('configurations', { body: { action, template } });
   }
   /**
    * Test the email template.
    */
   async testEmaiTemplate(template: EmailTemplates): Promise<void> {
-    const action = 'TEST_EMAIL_TEMPLATE_'.concat(template);
-    return await this.api.patchResource('configurations', { body: { action } });
+    const action = 'TEST_EMAIL_TEMPLATE';
+    return await this.api.patchResource('configurations', { body: { action, template } });
   }
-}
-
-/**
- * The possible email templates.
- */
-export enum EmailTemplates {
-  QUESTIONS = 'QUESTIONS',
-  ANSWERS = 'ANSWERS'
 }

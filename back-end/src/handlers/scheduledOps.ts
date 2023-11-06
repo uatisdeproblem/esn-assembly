@@ -10,7 +10,7 @@ import { dateStringIsPast, FAVORITE_TIMEZONE } from '../models/favoriteTimezone.
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const DDB_TABLES = { topics: process.env.DDB_TABLE_topics };
+const DDB_TABLES = { topics: process.env.DDB_TABLE_topics, opportunities: process.env.DDB_TABLE_opportunities };
 const ddb = new DynamoDB();
 
 export const handler = async (ev: any, _: any, cb: any): Promise<void> =>
@@ -19,7 +19,7 @@ export const handler = async (ev: any, _: any, cb: any): Promise<void> =>
 class ScheduledOps extends GenericController {
   async handleRequest(): Promise<void> {
     try {
-      await this.closeTopicsWithPastDeadline();
+      await Promise.all([this.closeTopicsWithPastDeadline(), this.closeOpportunitiesWithPastDeadline()]);
       this.done(null);
     } catch (error) {
       this.logger.error('Failed scheduled ops', error);
@@ -40,6 +40,26 @@ class ScheduledOps extends GenericController {
         });
       } catch (error) {
         this.logger.warn('Topic NOT closed', error, topic);
+      }
+    }
+  }
+  private async closeOpportunitiesWithPastDeadline(): Promise<void> {
+    const opportunities = await ddb.scan({
+      TableName: DDB_TABLES.opportunities,
+      IndexName: 'opportunityId-willCloseAt-index'
+    });
+    const opportunitiesToClose = opportunities.filter(x => dateStringIsPast(x.willCloseAt, FAVORITE_TIMEZONE));
+
+    for (const opportunity of opportunitiesToClose) {
+      try {
+        await ddb.update({
+          TableName: DDB_TABLES.opportunities,
+          Key: { opportunityId: opportunity.opportunityId },
+          UpdateExpression: 'SET closedAt = :deadline REMOVE willCloseAt',
+          ExpressionAttributeValues: { ':deadline': opportunity.willCloseAt }
+        });
+      } catch (error) {
+        this.logger.warn('Opportunity NOT closed', error, opportunity);
       }
     }
   }

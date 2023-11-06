@@ -1,0 +1,76 @@
+<ng-container *ngIf="!row">
+  <ion-item *ngIf="opportunity" button (click)="select.emit()">
+    <app-statistics-button
+      slot="start"
+      class="ion-hide-sm-down"
+      *ngIf="app.user.isAdministrator"
+      [entityType]="SET.OPPORTUNITIES"
+      [entityId]="opportunity.opportunityId"
+      [title]="opportunity.name"
+    />
+    <ion-label class="ion-text-wrap">
+      {{ opportunity.name }}
+      <p *ngIf="!opportunity.isClosed() && opportunity.willCloseAt">
+        {{ 'OPPORTUNITIES.WILL_CLOSE_AT' | translate }}:
+        {{ opportunity.willCloseAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
+      </p>
+    </ion-label>
+    <ng-container *ngIf="!opportunity.isArchived()">
+      <ion-badge slot="end" *ngIf="opportunity.isDraft()" color="medium">
+        {{ 'OPPORTUNITIES.DRAFT' | translate }}
+      </ion-badge>
+      <ion-badge slot="end" *ngIf="!opportunity.isDraft()" [color]="opportunity.closedAt ? 'danger' : 'success'">
+        {{ 'OPPORTUNITIES.STATUSES.' + (opportunity.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+      </ion-badge>
+    </ng-container>
+  </ion-item>
+  <!-- skeleton -->
+  <ion-item *ngIf="!opportunity">
+    <ion-label>
+      <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      <p><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></p>
+    </ion-label>
+  </ion-item>
+</ng-container>
+<!-- row -->
+<ng-container *ngIf="row">
+  <ion-row class="ion-align-items-center headerRow" *ngIf="header">
+    <ion-col [sizeLg]="7" [sizeXl]="6">{{ 'OPPORTUNITIES.OPPORTUNITY' | translate }}</ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2">{{ 'OPPORTUNITIES.STATUS' | translate }}</ion-col>
+    <ion-col [sizeLg]="2">{{ 'OPPORTUNITIES.WILL_CLOSE_AT' | translate }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="2">{{ 'OPPORTUNITIES.CREATED_AT' | translate }}</ion-col>
+  </ion-row>
+  <ion-row class="ion-align-items-center row tappable" *ngIf="!header && opportunity" (click)="select.emit()">
+    <ion-col [sizeLg]="7" [sizeXl]="6">
+      <app-statistics-button
+        style="vertical-align: super"
+        *ngIf="app.user.isAdministrator"
+        [entityType]="SET.OPPORTUNITIES"
+        [entityId]="opportunity.opportunityId"
+        [title]="opportunity.name"
+      />
+      <b>{{ opportunity.name }}</b>
+    </ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2">
+      <ng-container *ngIf="!opportunity.isArchived()">
+        <ion-badge *ngIf="opportunity.isDraft()" color="medium">{{ 'OPPORTUNITIES.DRAFT' | translate }}</ion-badge>
+        <ion-badge *ngIf="!opportunity.isDraft()" [color]="opportunity.closedAt ? 'danger' : 'success'">
+          {{ 'OPPORTUNITIES.STATUSES.' + (opportunity.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+        </ion-badge>
+      </ng-container>
+    </ion-col>
+    <ion-col [sizeLg]="2">
+      {{ opportunity.willCloseAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
+    </ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="2">
+      {{ opportunity.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
+    </ion-col>
+  </ion-row>
+  <!-- skeleton -->
+  <ion-row class="ion-align-items-center row" *ngIf="!header && !opportunity">
+    <ion-col [sizeLg]="7" [sizeXl]="6"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeLg]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+  </ion-row>
+</ng-container>

@@ -46,7 +46,7 @@
     <ion-list-header>
       <ion-label><h2>{{ 'COMMON.ACTIONS' | translate }}</h2></ion-label>
     </ion-list-header>
-    <ion-item button (click)="openESNAccount()">
+    <ion-item button (click)="app.openUserProfileById(app.user.userId)">
       <ion-icon name="person-outline" slot="start"></ion-icon>
       <ion-label>{{ 'PROFILE.MANAGE_ON_ESN_ACCOUNTS' | translate }}</ion-label>
     </ion-item>

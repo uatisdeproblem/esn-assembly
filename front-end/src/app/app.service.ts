@@ -12,6 +12,7 @@ import {
 
 import { environment as env } from '@env';
 import { User } from '@models/user.model';
+import { cleanESNAccountsIdForURL } from '@models/utils';
 
 /**
  * The base URLs where the thumbnails are located.
@@ -208,6 +209,13 @@ export class AppService {
   async openURL(url: string): Promise<void> {
     const windowName = this.platform.is('ios') ? '_parent' : '_blank';
     await Browser.open({ url, windowName });
+  }
+  /**
+   * Open a user profile on ESN Accounts by its ID.
+   */
+  async openUserProfileById(userId: string): Promise<void> {
+    const url = 'https://accounts.esn.org/user/'.concat(cleanESNAccountsIdForURL(userId));
+    await this.openURL(url);
   }
 
   /**

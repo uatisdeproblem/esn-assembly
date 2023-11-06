@@ -6,7 +6,6 @@ import { AppService } from '@app/app.service';
 import { BadgesService } from '../../profile/badges/badges.service';
 
 import { Badges, UserBadge } from '@models/userBadge.model';
-import { cleanESNAccountsIdForURL } from '@models/utils';
 
 @Component({
   selector: 'app-give-badges',
@@ -91,11 +90,6 @@ export class GiveBadgesComponent {
 
     const alert = await this.alertCtrl.create({ header, subHeader, inputs, buttons });
     alert.present();
-  }
-
-  async openESNAccountOfUserId(userId: string): Promise<void> {
-    const url = 'https://accounts.esn.org/user/'.concat(cleanESNAccountsIdForURL(userId));
-    await this.app.openURL(url);
   }
 
   close(): void {

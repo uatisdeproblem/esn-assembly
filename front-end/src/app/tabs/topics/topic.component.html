@@ -71,6 +71,7 @@
         icon="ellipse"
         color="ESNpink"
         style="vertical-align: middle"
+        class="ion-margin-end"
         *ngIf="!topic.isClosed() && topic.type === TopicTypes.LIVE"
         [title]="'TOPICS.LIVE_NOW' | translate"
       />

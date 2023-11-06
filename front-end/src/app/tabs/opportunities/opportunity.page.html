@@ -1,0 +1,254 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.closePage()">
+        <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-grid class="ion-no-padding" *ngIf="opportunity">
+    <ion-row>
+      <ion-col [size]="12" [sizeLg]="6">
+        <ion-card color="white" class="opportunityCard">
+          <ion-card-header>
+            <ion-card-title>{{ opportunity.name }}</ion-card-title>
+            <p class="badges">
+              <ion-badge *ngIf="opportunity.isDraft()" color="medium">
+                {{ 'OPPORTUNITIES.DRAFT' | translate }}
+              </ion-badge>
+              <ion-badge *ngIf="!opportunity.isDraft()" [color]="opportunity.closedAt ? 'danger' : 'success'">
+                {{ 'OPPORTUNITIES.STATUSES.' + (opportunity.closedAt ? 'CLOSED' : 'OPEN') | translate }}
+              </ion-badge>
+              <ion-badge color="warning" *ngIf="opportunity.isArchived()">
+                {{ 'COMMON.ARCHIVED' | translate }}
+              </ion-badge>
+            </p>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list class="aList" lines="none">
+              <ion-row *ngIf="!opportunity.isClosed() && opportunity.willCloseAt">
+                <ion-col>
+                  <ion-item class="ion-text-center importantDate">
+                    <ion-label>
+                      <p>{{ 'OPPORTUNITIES.OPEN_UNTIL' | translate }}</p>
+                      {{ opportunity.willCloseAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+                      <p>{{ FAVORITE_TIMEZONE }}</p>
+                    </ion-label>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ng-container *ngIf="opportunity.content">
+                <ion-button fill="clear" color="medium" expand="full" (click)="showContent = !showContent">
+                  {{ (showContent ? 'OPPORTUNITIES.HIDE_CONTENT': 'OPPORTUNITIES.SHOW_CONTENT') | translate }}
+                  <ion-icon [icon]="showContent ? 'eye-off': 'eye'" slot="end"></ion-icon>
+                </ion-button>
+                <app-html-editor
+                  *ngIf="showContent"
+                  [content]="opportunity.content"
+                  [editMode]="false"
+                ></app-html-editor>
+              </ng-container>
+              <ion-item
+                lines="inset"
+                class="attachment"
+                *ngFor="let attachment of opportunity.attachments; let first = first"
+                [class.ion-margin-top]="first"
+                button
+                (click)="downloadOpportunityAttachment(attachment)"
+              >
+                <ion-icon name="attach" slot="start"></ion-icon>
+                <ion-label class="ion-text-wrap">{{ attachment.name }}.{{ attachment.format }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col [size]="12" [sizeLg]="6">
+        <ion-list class="aList ion-padding-bottom" *ngIf="applications && !userApplication && !opportunity.isClosed()">
+          <ion-list-header>
+            <ion-label class="ion-margin-start">
+              <h2>{{ 'OPPORTUNITIES.DO_YOU_WANT_TO_APPLY' | translate }}</h2>
+              <p>{{ 'OPPORTUNITIES.DO_YOU_WANT_TO_APPLY_I' | translate }}</p>
+              <p>{{ 'OPPORTUNITIES.DO_YOU_WANT_TO_APPLY_II' | translate }}</p>
+            </ion-label>
+          </ion-list-header>
+          <ion-item>
+            <ion-note slot="start" class="ion-padding-top">#1</ion-note>
+            <ion-label class="ion-text-wrap">{{ 'OPPORTUNITIES.A_BRIEF_MOTIVATION' | translate }}</ion-label>
+            <ion-badge color="danger">{{ 'OPPORTUNITIES.REQUIRED' | translate }}</ion-badge>
+          </ion-item>
+          <ion-item *ngFor="let att of opportunity.expectedAttachments; let index = index">
+            <ion-note slot="start" class="ion-padding-top">#{{ index + 2 }}</ion-note>
+            <ion-label class="ion-text-wrap">{{ att.name }}</ion-label>
+            <ion-badge color="danger" *ngIf="att.required">{{ 'OPPORTUNITIES.REQUIRED' | translate }}</ion-badge>
+          </ion-item>
+          <p class="ion-text-center">
+            <ion-button class="ion-margin-top" (click)="startApplication()">
+              {{ 'OPPORTUNITIES.I_WANT_TO_APPLY' | translate }} <ion-icon icon="sparkles" slot="end"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              color="ESNpink"
+              class="ion-margin-top ion-margin-start"
+              *ngIf="opportunity.contactEmail"
+              (click)="sendQuestionAsEmail()"
+            >
+              {{ 'OPPORTUNITIES.I_HAVE_A_QUESTION' | translate }} <ion-icon icon="hand-right" slot="end"></ion-icon>
+            </ion-button>
+          </p>
+        </ion-list>
+
+        <ng-container *ngIf="userApplication && !writingApplication">
+          <ion-card [color]="getApplicationColorByStatus(userApplication)">
+            <ion-card-header>
+              <ion-label><h2>{{ 'OPPORTUNITIES.YOU_HAVE_APPLIED' | translate }}</h2></ion-label>
+            </ion-card-header>
+            <ion-card-content
+              *ngIf="userApplication.reviewMessage && userApplication.getStatus() !== ApplicationStatuses.PENDING"
+            >
+              <ion-card-subtitle>{{ 'OPPORTUNITIES.REVIEWER_LEFT_MESSAGE' | translate }}:</ion-card-subtitle>
+              {{ userApplication.reviewMessage }}
+            </ion-card-content>
+          </ion-card>
+          <app-application color="white" [application]="userApplication" [card]="true" />
+          <ion-row class="ion-margin ion-align-items-center" *ngIf="!opportunity.isClosed()">
+            <ion-col *ngIf="userApplication.getStatus() === ApplicationStatuses.REJECTED">
+              <ion-button (click)="fixUserApplication()">
+                {{ 'OPPORTUNITIES.FIX_APPLICATION' | translate }} <ion-icon icon="bandage" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col class="ion-text-right">
+              <ion-button color="danger" size="small" (click)="withdrawUserApplication()">
+                <ion-icon icon="arrow-undo-outline" slot="start"></ion-icon>
+                {{ 'OPPORTUNITIES.WITHDRAW_APPLICATION' | translate }}
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ng-container>
+
+        <div class="ion-padding-bottom" *ngIf="userApplication && writingApplication">
+          <p>
+            <ion-button color="medium" fill="clear" (click)="cancelApplication()">
+              <ion-icon icon="close" slot="start"></ion-icon>
+              {{ 'OPPORTUNITIES.NOT_READY_YET' | translate }}
+            </ion-button>
+          </p>
+          <ion-card color="primary" class="writingApplicationCard">
+            <ion-card-content>
+              <ion-item lines="none" color="primary">
+                <ion-label class="ion-text-wrap">
+                  <b>{{ 'OPPORTUNITIES.LET_START' | translate }}</b>
+                </ion-label>
+              </ion-item>
+              <app-subject color="white" [subject]="userApplication.subject"></app-subject>
+              <ion-item
+                lines="none"
+                color="primary"
+                class="ion-margin-top"
+                [class.fieldHasError]="hasFieldAnError('motivation')"
+              >
+                <ion-label class="ion-text-wrap">
+                  <b>{{ 'OPPORTUNITIES.A_BRIEF_MOTIVATION' | translate }}</b>
+                  <p>{{ 'OPPORTUNITIES.A_BRIEF_MOTIVATION_I' | translate }}</p>
+                </ion-label>
+              </ion-item>
+              <app-html-editor [(content)]="userApplication.motivation" [editMode]="true"></app-html-editor>
+              <ng-container *ngFor="let att of opportunity.expectedAttachments; let index = index">
+                <ion-item lines="none" color="primary" class="ion-margin-top">
+                  <ion-label class="ion-text-wrap">
+                    <b>{{ att.name }}</b>
+                    <p>{{ (att.required ? 'OPPORTUNITIES.REQUIRED' : 'OPPORTUNITIES.OPTIONAL') | translate }}.</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item
+                  color="white"
+                  button
+                  [class.fieldHasError]="hasFieldAnError('attachments[' + att.name + ']')"
+                  (click)="browseFilesForInputId('attachmentPicker-' + index)"
+                >
+                  <input
+                    type="file"
+                    multiple
+                    style="display: none"
+                    [id]="'attachmentPicker-' + index"
+                    [accept]="acceptedAttachmentsFormats"
+                    (change)="addAttachment($event, att.name)"
+                  />
+                  <ion-spinner
+                    size="small"
+                    color="medium"
+                    slot="start"
+                    *ngIf="userApplication.attachments[att.name] && !userApplication.attachments[att.name].attachmentId"
+                    [title]="'ATTACHMENTS.UPLOADING' | translate"
+                  ></ion-spinner>
+                  <ion-label class="ion-text-wrap">
+                    <ion-text color="medium" *ngIf="!userApplication.attachments[att.name]">
+                      {{ 'OPPORTUNITIES.TAP_TO_UPLOAD_ATTACHMENT' | translate }}
+                    </ion-text>
+                    <ion-text *ngIf="userApplication.attachments[att.name]">
+                      {{ userApplication.attachments[att.name].name }}.{{ userApplication.attachments[att.name].format
+                      }}
+                    </ion-text>
+                    <p *ngIf="attachmentUploadErros[att.name]">
+                      <ion-text color="danger">{{ attachmentUploadErros[att.name] }}</ion-text>
+                    </p>
+                  </ion-label>
+                  <ion-button
+                    slot="end"
+                    color="danger"
+                    fill="clear"
+                    *ngIf="userApplication.attachments[att.name]"
+                    (click)="removeAttachmentByExpectedName(att.name, $event)"
+                  >
+                    <ion-icon icon="trash" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-item>
+              </ng-container>
+              <p class="ion-padding ion-text-center">
+                <ion-button fill="clear" [color]="app.isInDarkMode() ? 'dark' : 'white'" (click)="sendApplication()">
+                  {{ 'OPPORTUNITIES.APPLY_FOR_THIS_OPPORTUNITY' | translate }}
+                  <ion-icon icon="send" slot="end"></ion-icon>
+                </ion-button>
+              </p>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
+        <ion-list class="aList ion-padding-bottom" *ngIf="!writingApplication && opportunity.canUserManage(app.user)">
+          <ion-list-header>
+            <ion-label class="ion-margin-start">
+              <h2>{{ 'OPPORTUNITIES.APPLICATIONS' | translate }} ({{ applications?.length ?? '...' }})</h2>
+              <p>{{ 'OPPORTUNITIES.REVIEW_PENDING_APPLICATIONS' | translate }}</p>
+            </ion-label>
+          </ion-list-header>
+          <ion-item *ngIf="!applications">
+            <ion-label>
+              <ion-skeleton-text animated></ion-skeleton-text>
+              <p><ion-skeleton-text animated></ion-skeleton-text></p>
+            </ion-label>
+          </ion-item>
+          <ion-item class="noElements" *ngIf="applications && !applications.length">
+            <ion-label>{{ 'OPPORTUNITIES.NO_APPLICATIONS_YET' | translate }}</ion-label>
+          </ion-item>
+          <app-application
+            *ngFor="let apl of applications; let index = index"
+            [application]="apl"
+            [index]="applications.length - index - 1"
+            (select)="reviewApplication(apl)"
+          />
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="opportunity?.canUserManage(app.user)">
+  <ion-fab-button color="ESNgreen" size="small" [title]="'COMMON.MANAGE' | translate" (click)="manageOpportunity()">
+    <ion-icon icon="build"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

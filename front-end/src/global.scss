@@ -179,6 +179,7 @@ ion-badge {
 }
 .angular-editor-textarea {
   border-color: var(--ion-color-light-shade) !important;
+  color: var(--ion-color-white-contrast) !important;
 }
 .angular-editor-toolbar {
   background-color: var(--ion-color-light) !important;
@@ -186,7 +187,7 @@ ion-badge {
 .angular-editor-button {
   background-color: var(--ion-color-white) !important;
   border-color: var(--ion-color-light) !important;
-  color: var(--ion-text-color) !important;
+  color: var(--ion-color-white-contrast) !important;
 }
 div.internalPSpacing p {
   // needs to be global to work (angular editor)
@@ -210,4 +211,13 @@ ion-modal {
   ion-header ion-toolbar ion-title {
     font-size: 1.1em;
   }
+}
+
+app-html-editor {
+  --app-html-editor-margin: 16px 2px;
+  --app-html-editor-padding: 20px 16px;
+  --app-html-editor-background-color: var(--ion-color-white-tint);
+  --app-html-editor-box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px;
+  --app-html-editor-border-radius: 8px;
+  --app-html-editor-color: var(--ion-color-step-800);
 }
