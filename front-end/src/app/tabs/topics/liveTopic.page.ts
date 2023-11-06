@@ -100,7 +100,7 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   private async loadResources(): Promise<void> {
     this.topic = await this._topics.getById(this.topicId);
     [, this.relatedTopics, this.hasUserUpvotedMessage] = await Promise.all([
-      this._messages.getListOfTopic(this.topic),
+      this._messages.getListOfTopic(this.topic, { force: true }),
       this._topics.getRelated(this.topic),
       this._topics.userMessagesUpvotesForTopic(this.topic)
     ]);

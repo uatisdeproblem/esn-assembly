@@ -53,7 +53,7 @@
                 <ion-col>
                   <ion-item class="ion-text-right importantDate">
                     <ion-label>
-                      <p>{{ 'TOPICS.SHOULD_BE_LIVE_ON' | translate }}</p>
+                      <p>{{ 'TOPICS.EXPECTED_LIVE_TIME' | translate }}</p>
                       {{ topic.shouldBeLiveAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
                       <p>{{ FAVORITE_TIMEZONE }}</p>
                     </ion-label>
@@ -413,11 +413,11 @@
     </ion-row>
   </ion-grid>
 </ion-content>
-<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
   <ion-fab-button
     color="ESNgreen"
     size="small"
-    *ngIf="!fullScreen"
+    *ngIf="app.user.isAdministrator && !fullScreen"
     [title]="'COMMON.MANAGE' | translate"
     (click)="manageTopic()"
   >

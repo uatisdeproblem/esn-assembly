@@ -168,6 +168,7 @@
     "SHOULD_BE_LIVE_ON": "It should be live on",
     "SHOULD_BE_LIVE_ON_I": "Based on the agenda, choose the forecasted date and time for the topic to go live.",
     "SHOULD_BE_LIVE_ON_II": "Note: this setting doesn't automatically open the topic.",
+    "EXPECTED_LIVE_TIME": "Expected live time",
     "QUESTIONS_MUST_BE_SIGNED": "Questions must be signed (can't be anonymous)",
     "ENABLE_APPRECIATIONS": "Enable appreciations",
     "FILL_WITH_ME": "Fill with my user",
@@ -443,7 +444,7 @@
     "DELETE_DRAFT": "Delete draft"
   },
   "MESSAGES": {
-    "ASK_A_QUESTION": "Ask a question",
+    "ASK_A_QUESTION": "Ask a question / intervene",
     "WRITE_AN_APPRECIATION": "Write an appreciation",
     "QUESTION_SUMMARY_I": "What is your question about?",
     "QUESTION_SUMMARY_II": "A brief title to help people quickly understand what is about.",
