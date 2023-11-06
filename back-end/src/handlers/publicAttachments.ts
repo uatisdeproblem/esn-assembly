@@ -44,8 +44,6 @@ class PublicAttachmentsRC extends ResourceController {
     }
   }
   private async getSignedURLToUploadAttachment(): Promise<SignedURL> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
-
     const attachmentId = await ddb.IUNID(ATTACHMENTS_PREFIX);
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}`;

@@ -20,7 +20,7 @@ export class OpportunitiesService {
    * Load the active opportunities from the back-end.
    */
   private async loadActiveList(): Promise<void> {
-    const opportunities: Opportunity[] = await this.api.getResource('opportunities', { params: { archived: false } });
+    const opportunities: Opportunity[] = await this.api.getResource('opportunities');
     this.opportunities = opportunities.map(x => new Opportunity(x));
   }
   /**
@@ -172,14 +172,14 @@ export class OpportunitiesService {
     await this.api.patchResource(['opportunities', opportunity.opportunityId], { body: { action: 'OPEN' } });
   }
   /**
-   * Close a Opportunity.
+   * Close an opportunity.
    */
   async close(opportunity: Opportunity): Promise<void> {
     await this.api.patchResource(['opportunities', opportunity.opportunityId], { body: { action: 'CLOSE' } });
   }
 
   /**
-   * Archive a Opportunity.
+   * Archive an opportunity.
    */
   async archive(opportunity: Opportunity): Promise<void> {
     await this.api.patchResource(['opportunities', opportunity.opportunityId], { body: { action: 'ARCHIVE' } });

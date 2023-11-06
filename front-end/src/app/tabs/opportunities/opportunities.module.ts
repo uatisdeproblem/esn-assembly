@@ -12,11 +12,11 @@ import { OpportunityPage } from './opportunity.page';
 import { OpportunityModule } from './opportunity.module';
 import { ApplicationStandaloneComponent } from './applications/application.component';
 import { ReviewApplicationStandaloneComponent } from './applications/reviewApplication.component';
-import { EditModeButtonsModule } from '@app/common/editModeButtons.module';
-import { AttachmentsModule } from '@app/common/attachments.module';
-import { HTMLEditorModule } from '@app/common/htmlEditor.module';
-import { SubjectModule } from '@app/common/subject.module';
-import { StatisticsModule } from '@app/common/statistics.module';
+import { EditModeButtonsModule } from '@common/editModeButtons.module';
+import { AttachmentsModule } from '@common/attachments.module';
+import { HTMLEditorModule } from '@common/htmlEditor.module';
+import { SubjectModule } from '@common/subject.module';
+import { StatisticsModule } from '@common/statistics.module';
 
 @NgModule({
   imports: [

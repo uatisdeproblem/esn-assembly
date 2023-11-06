@@ -33,7 +33,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
         </ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
-        <app-subject [color]="color" lines="none" [subject]="application.subject"></app-subject>
+        <app-subject lines="none" [color]="color" [subject]="application.subject"></app-subject>
         <app-html-editor [content]="application.motivation" [editMode]="false"></app-html-editor>
         <ion-item
           *ngFor="let att of application.attachments | keyvalue"
@@ -54,7 +54,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
         <p>{{ application.subject.getSectionCountry() }}</p>
       </ion-label>
       <ion-badge slot="end" [color]="getApplicationColorByStatus(application)">
-        {{ getApplicationLabelByStatus(application) }}
+        {{ getApplicationLabelByStatus(application, true) }}
       </ion-badge>
       <ion-note slot="end" class="ion-hide-xl-down">
         {{ application.createdAt | date : 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
@@ -95,7 +95,7 @@ export class ApplicationStandaloneComponent {
    */
   @Input() editMode = false;
   /**
-   * Trigger when the open button is clicked.
+   * Trigger when the component is selected.
    */
   @Output() select = new EventEmitter<void>();
 
@@ -116,11 +116,13 @@ export class ApplicationStandaloneComponent {
     else if (status === ApplicationStatuses.REJECTED) return 'danger';
     else return 'medium';
   }
-  getApplicationLabelByStatus(application: Application): string {
+  getApplicationLabelByStatus(application: Application, short = false): string {
     const status = application.getStatus();
-    if (status === ApplicationStatuses.APPROVED) return this.t._('OPPORTUNITIES.APPLICATION_STATUSES.APPROVED');
-    else if (status === ApplicationStatuses.REJECTED) return this.t._('OPPORTUNITIES.APPLICATION_STATUSES.REJECTED');
-    else return this.t._('OPPORTUNITIES.APPLICATION_STATUSES.PENDING');
+    let str: string;
+    if (status === ApplicationStatuses.APPROVED) str = this.t._('OPPORTUNITIES.APPLICATION_STATUSES.APPROVED');
+    else if (status === ApplicationStatuses.REJECTED) str = this.t._('OPPORTUNITIES.APPLICATION_STATUSES.REJECTED');
+    else str = this.t._('OPPORTUNITIES.APPLICATION_STATUSES.PENDING');
+    return short ? str.slice(0, 1) : str;
   }
 
   async downloadApplicationAttachment(expectedName: string): Promise<void> {

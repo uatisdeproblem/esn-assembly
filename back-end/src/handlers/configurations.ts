@@ -137,7 +137,7 @@ class ConfigurationsRC extends ResourceController {
     try {
       await ses.testTemplate(`${templateName}-${STAGE}`, templateData);
     } catch (error) {
-      this.logger.warn('Elaborating template', error, { template: templateName });
+      this.logger.warn('Elaborating template', error, { template: `${templateName}-${STAGE}` });
       throw new RCError('Bad template');
     }
 

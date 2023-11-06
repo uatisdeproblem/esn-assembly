@@ -160,13 +160,12 @@ export class OpportunityPage {
       }
     };
 
-    const header = this.t._('COMMON.ARE_YOU_SURE');
-    const message = this.t._('OPPORTUNITIES.IS_YOUR_APPLICATION_READY');
+    const header = this.t._('OPPORTUNITIES.IS_YOUR_APPLICATION_READY');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
       { text: this.t._('COMMON.SEND'), handler: doSend }
     ];
-    const alert = await this.alertCtrl.create({ header, message, buttons });
+    const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();
   }
   hasFieldAnError(field: string): boolean {
@@ -200,6 +199,7 @@ export class OpportunityPage {
   }
 
   async sendQuestionAsEmail(): Promise<void> {
+    if (!this.opportunity.contactEmail) return;
     const emailSubject = encodeURIComponent(
       this.t._('OPPORTUNITIES.QUESTION_ON_OPPORTUNITY').concat(': ', this.opportunity.name)
     );
@@ -217,9 +217,6 @@ export class OpportunityPage {
     const modal = await this.modalCtrl.create({
       component: ReviewApplicationStandaloneComponent,
       componentProps: { opportunity: this.opportunity, application }
-    });
-    modal.onDidDismiss().then((): void => {
-      // @todo
     });
     modal.present();
   }

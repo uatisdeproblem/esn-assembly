@@ -398,7 +398,7 @@
       "TOPIC": "The title of the topic",
       "QUESTION": "The summary of the question",
       "OPPORTUNITY": "The name of the opportunity",
-      "URL": "The link to the question",
+      "URL": "The link to the question/topic/opportunity/etc.",
       "MESSAGE": "The additional custom message"
     }
   },

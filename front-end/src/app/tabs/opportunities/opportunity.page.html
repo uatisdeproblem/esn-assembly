@@ -32,8 +32,8 @@
           </ion-card-header>
           <ion-card-content>
             <ion-list class="aList" lines="none">
-              <ion-row *ngIf="!opportunity.isClosed()">
-                <ion-col *ngIf="opportunity.willCloseAt">
+              <ion-row *ngIf="!opportunity.isClosed() && opportunity.willCloseAt">
+                <ion-col>
                   <ion-item class="ion-text-center importantDate">
                     <ion-label>
                       <p>{{ 'OPPORTUNITIES.OPEN_UNTIL' | translate }}</p>
@@ -79,12 +79,12 @@
             </ion-label>
           </ion-list-header>
           <ion-item>
-            <ion-note slot="start" style="padding-top: 16px">#1</ion-note>
+            <ion-note slot="start" class="ion-padding-top">#1</ion-note>
             <ion-label class="ion-text-wrap">{{ 'OPPORTUNITIES.A_BRIEF_MOTIVATION' | translate }}</ion-label>
             <ion-badge color="danger">{{ 'OPPORTUNITIES.REQUIRED' | translate }}</ion-badge>
           </ion-item>
           <ion-item *ngFor="let att of opportunity.expectedAttachments; let index = index">
-            <ion-note slot="start" style="padding-top: 16px">#{{ index + 2 }}</ion-note>
+            <ion-note slot="start" class="ion-padding-top">#{{ index + 2 }}</ion-note>
             <ion-label class="ion-text-wrap">{{ att.name }}</ion-label>
             <ion-badge color="danger" *ngIf="att.required">{{ 'OPPORTUNITIES.REQUIRED' | translate }}</ion-badge>
           </ion-item>
@@ -141,7 +141,7 @@
           </p>
           <ion-card color="primary" class="writingApplicationCard">
             <ion-card-content>
-              <ion-item lines="none" color="primary" [class.fieldHasError]="hasFieldAnError('summary')">
+              <ion-item lines="none" color="primary">
                 <ion-label class="ion-text-wrap">
                   <b>{{ 'OPPORTUNITIES.LET_START' | translate }}</b>
                 </ion-label>

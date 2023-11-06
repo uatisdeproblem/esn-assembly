@@ -123,7 +123,6 @@ class ApplicationsRC extends ResourceController {
     this.application.applicationId = await ddb.IUNID(PROJECT);
     this.application.userId = this.galaxyUser.userId;
     this.application.subject = Subject.fromUser(this.galaxyUser);
-    this.application.createdAt = new Date().toISOString();
 
     const errors = this.application.validate(this.opportunity);
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
@@ -214,6 +213,7 @@ class ApplicationsRC extends ResourceController {
   }
   private async sendNotificationToApplicantUser(approved: boolean, message: string): Promise<void> {
     const { email } = this.application.subject;
+    if (!email) return;
     const template = approved ? `notify-application-approved-${STAGE}` : `notify-application-rejected-${STAGE}`;
     const templateData = {
       user: this.application.subject.name,

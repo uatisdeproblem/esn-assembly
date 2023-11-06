@@ -1909,7 +1909,7 @@ paths:
           $ref: '#/components/responses/Opportunity'
     put:
       summary: Edit an opportunity
-      description: Requires permissions to manage opportunities
+      description: Requires permissions to manage the opportunity
       tags: [Opportunities]
       security:
         - AuthFunction: []
@@ -1933,7 +1933,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     delete:
       summary: Delete an opportunity
-      description: Requires permissions to manage opportunities
+      description: Requires permissions to manage the opportunity
       tags: [Opportunities]
       security:
         - AuthFunction: []
@@ -1951,7 +1951,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     patch:
       summary: Actions on an opportunity
-      description: Requires permissions to manage opportunities
+      description: Requires permissions to manage the opportunity
       tags: [Opportunities]
       security:
         - AuthFunction: []
@@ -1993,7 +1993,7 @@ paths:
             type: string
       responses:
         200:
-          $ref: '#/components/responses/Application'
+          $ref: '#/components/responses/Applications'
     post:
       summary: Application of the user to an opportunity
       description: Each user can apply only once
@@ -2048,7 +2048,7 @@ paths:
   /opportunities/{opportunityId}/applications/{applicationId}:
     put:
       summary: Fix the rejected application to an opportunity
-      description: Requires permissions to manage opportunities or to be the creator
+      description: Requires permissions to manage the opportunity or to be the creator
       tags: [Applications]
       security:
         - AuthFunction: []
@@ -2118,7 +2118,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     delete:
       summary: Withdraw/delete the application to an opportunity
-      description: Requires permissions to manage opportunities or to be the creator
+      description: Requires permissions to manage the opportunity or to be the creator
       tags: [Applications]
       security:
         - AuthFunction: []
