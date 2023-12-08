@@ -104,7 +104,7 @@ export class StandardTopicPage {
   async filterQuestions(search = '', scrollToNextPage?: IonInfiniteScroll, force = false): Promise<void> {
     let startPaginationAfterId = null;
     if (scrollToNextPage && this.questions?.length)
-      startPaginationAfterId = this.questions[this.questions.length - 1].topicId;
+      startPaginationAfterId = this.questions[this.questions.length - 1].questionId;
 
     this.questions = await this._questions.getListOfTopic(this.topic, {
       force,
