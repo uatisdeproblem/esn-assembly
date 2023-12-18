@@ -16,7 +16,7 @@
           <b *ngIf="title">{{ title }}</b>
           <p *ngIf="statistic?.timePoints.length">
             {{ 'STATISTICS.SINCE' | translate | lowercase }}
-            <ion-badge color="ESNpink">{{ getFirstDateOfStatistic() | date : 'dd MMM YYYY' }}</ion-badge>
+            <ion-badge color="ESNpink">{{ getFirstDateOfStatistic() | dateTz }}</ion-badge>
             {{ 'STATISTICS.TO' | translate | lowercase }}
             <ion-badge color="ESNpink">
               {{ 'STATISTICS.TODAY' | translate | lowercase }}

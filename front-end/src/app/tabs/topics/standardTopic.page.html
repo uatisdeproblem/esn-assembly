@@ -41,7 +41,7 @@
                   <ion-item class="ion-text-right importantDate">
                     <ion-label>
                       <p>{{ 'TOPICS.QUESTIONS_UNTIL' | translate }}</p>
-                      {{ topic.willCloseAt | date: 'MMM d, y - H:mm' : app.configurations.timezone }}
+                      {{ topic.willCloseAt | dateTz: 'datetime' }}
                       <p>{{ app.configurations.timezone }}</p>
                     </ion-label>
                     <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
@@ -51,7 +51,7 @@
                   <ion-item class="ion-text-right importantDate">
                     <ion-label>
                       <p>{{ 'TOPICS.ANSWERS_UNTIL' | translate }}</p>
-                      {{ topic.acceptAnswersUntil | date: 'MMM d, y - H:mm' : app.configurations.timezone }}
+                      {{ topic.acceptAnswersUntil | dateTz: 'datetime' }}
                       <p>{{ app.configurations.timezone }}</p>
                     </ion-label>
                     <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>

@@ -25,6 +25,8 @@ export class ConfigurationsPage implements OnInit {
   EmailTemplates = EmailTemplates;
   UODP = UsersOriginDisplayOptions;
 
+  timezones = (Intl as any).supportedValuesOf('timeZone');
+
   constructor(
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,

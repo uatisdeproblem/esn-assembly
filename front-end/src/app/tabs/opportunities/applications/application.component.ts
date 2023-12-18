@@ -11,6 +11,7 @@ import {
 
 import { SubjectModule } from '@common/subject.module';
 import { HTMLEditorModule } from '@common/htmlEditor.module';
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { AppService } from '@app/app.service';
 import { ApplicationsService } from './applications.service';
@@ -19,7 +20,15 @@ import { Application, ApplicationStatuses } from '@models/application.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, SubjectModule, HTMLEditorModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    IDEATranslationsModule,
+    SubjectModule,
+    HTMLEditorModule,
+    AppDateTimezonePipe
+  ],
   selector: 'app-application',
   template: `
     <ion-card *ngIf="card" [color]="color">
@@ -56,7 +65,7 @@ import { Application, ApplicationStatuses } from '@models/application.model';
         {{ getApplicationLabelByStatus(application, true) }}
       </ion-badge>
       <ion-note slot="end" class="ion-hide-xl-down">
-        {{ application.createdAt | date : 'MMM d, y - H:mm' : app.configurations.timezone }}
+        {{ application.createdAt | dateTz : 'datetime' }}
       </ion-note>
     </ion-item>
   `,

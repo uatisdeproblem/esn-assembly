@@ -37,7 +37,7 @@
                   <ion-item class="ion-text-center importantDate">
                     <ion-label>
                       <p>{{ 'OPPORTUNITIES.OPEN_UNTIL' | translate }}</p>
-                      {{ opportunity.willCloseAt | date: 'MMM d, y - H:mm' : app.configurations.timezone }}
+                      {{ opportunity.willCloseAt | dateTz: 'datetime' }}
                       <p>{{ app.configurations.timezone }}</p>
                     </ion-label>
                   </ion-item>

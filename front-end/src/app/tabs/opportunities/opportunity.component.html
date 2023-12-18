@@ -12,7 +12,7 @@
       {{ opportunity.name }}
       <p *ngIf="!opportunity.isClosed() && opportunity.willCloseAt">
         {{ 'OPPORTUNITIES.WILL_CLOSE_AT' | translate }}:
-        {{ opportunity.willCloseAt | date : 'mediumDate' : app.configurations.timezone }}
+        {{ opportunity.willCloseAt | dateTz }}
       </p>
     </ion-label>
     <ng-container *ngIf="!opportunity.isArchived()">
@@ -60,10 +60,10 @@
       </ng-container>
     </ion-col>
     <ion-col [sizeLg]="2">
-      {{ opportunity.willCloseAt | date : 'mediumDate' : app.configurations.timezone }}
+      {{ opportunity.willCloseAt | dateTz }}
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="2">
-      {{ opportunity.createdAt | date : 'mediumDate' : app.configurations.timezone }}
+      {{ opportunity.createdAt | dateTz }}
     </ion-col>
   </ion-row>
   <!-- skeleton -->

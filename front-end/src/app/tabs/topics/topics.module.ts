@@ -11,6 +11,7 @@ import { HTMLEditorModule } from '@common/htmlEditor.module';
 import { EventsPickerComponent } from '@common/eventsPicker.component';
 import { CategoriesPickerComponent } from '@common/categoriesPicker.component';
 import { StatisticsModule } from '@common/statistics.module';
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { TopicsRoutingModule } from './topics.routing.module';
 import { TopicsPage } from './topics.page';
@@ -38,7 +39,8 @@ import { QuestionModule } from './questions/question.module';
     HTMLEditorModule,
     EventsPickerComponent,
     CategoriesPickerComponent,
-    StatisticsModule
+    StatisticsModule,
+    AppDateTimezonePipe
   ],
   declarations: [TopicsPage, StandardTopicPage, LiveTopicPage, ManageTopicPage]
 })

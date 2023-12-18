@@ -3,11 +3,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+
 import { Communication } from '@models/communication.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule],
+  imports: [CommonModule, IonicModule, IDEATranslationsModule, AppDateTimezonePipe],
   selector: 'app-communication',
   template: `
     <ion-card [color]="color" *ngIf="!communication">
@@ -23,7 +25,7 @@ import { Communication } from '@models/communication.model';
     <ion-card *ngIf="communication" [color]="color" [button]="button" (click)="select.emit()">
       <ion-img *ngIf="communication.imageURL" [src]="communication.imageURL"></ion-img>
       <ion-card-header>
-        <ion-card-subtitle>{{ communication.date | dateLocale }}</ion-card-subtitle>
+        <ion-card-subtitle>{{ communication.date | dateTz }}</ion-card-subtitle>
         <ion-card-title>
           <ion-text color="medium" style="font-weight: 600">
             {{ communication.event?.name }}

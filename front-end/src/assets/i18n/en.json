@@ -196,7 +196,7 @@
   },
   "DASHBOARD": {
     "NEWS": "News",
-    "NEWS_I": "Bulletin board from the GA Chairing Team.",
+    "NEWS_I": "Bulletin board from the administrators.",
     "NEXT_DEADLINES": "Next deadlines",
     "NEXT_DEADLINES_I": "Deadlines in the upcoming {{days}} days.",
     "DEADLINES": "Deadlines",
@@ -285,6 +285,8 @@
     "APP_LOGO_DARK_I": "This logo will be used in the login page and everywhere in the app (dark mode).",
     "RESET_APP_LOGO": "Reset app logo",
     "RESET_APP_LOGO_I": "This will reset the app logo to the default one.",
+    "TIMEZONE_OF_REFERENCE": "Timezone of reference",
+    "TIMEZONE_OF_REFERENCE_I": "This timezone will be used to display dates and deadlines.",
     "PAGE_SECTIONS": {
       "CONTENTS": "Contents",
       "USERS": "Users",

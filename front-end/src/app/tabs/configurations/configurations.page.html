@@ -93,6 +93,18 @@
           translate
         />
       </ion-item>
+      <ion-item>
+        <ion-label position="stacked">{{ 'CONFIGURATIONS.TIMEZONE_OF_REFERENCE' | translate }}</ion-label>
+        <ion-select interface="popover" [(ngModel)]="configurations.timezone" (ionChange)="updateConfigurations()">
+          <ion-select-option *ngFor="let timezone of timezones" [value]="timezone">{{ timezone }}</ion-select-option>
+        </ion-select>
+        <idea-show-hint-button
+          slot="start"
+          class="ion-margin-top"
+          hint="CONFIGURATIONS.TIMEZONE_OF_REFERENCE"
+          translate
+        />
+      </ion-item>
     </ion-list>
 
     <ion-list class="aList" *ngIf="pageSection === PageSections.USERS">

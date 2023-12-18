@@ -4,13 +4,15 @@ import { IonicModule } from '@ionic/angular';
 import { isToday, isTomorrow } from 'date-fns';
 import { IDEATranslationsModule, IDEATranslationsService } from '@idea-ionic/common';
 
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+
 import { AppService } from '@app/app.service';
 
 import { Deadline } from '@models/deadline.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule],
+  imports: [CommonModule, IonicModule, IDEATranslationsModule, AppDateTimezonePipe],
   selector: 'app-deadline',
   template: `
     <ion-item [color]="color" *ngIf="!deadline">
@@ -34,7 +36,7 @@ import { Deadline } from '@models/deadline.model';
       <ion-badge slot="end" mode="ios" *ngIf="deadline.action" [color]="deadline.actionColor">
         {{ deadline.action }}
       </ion-badge>
-      <ion-badge class="deadlineTime" slot="end">{{ deadline.at | dateLocale : 'HH:mm' }}</ion-badge>
+      <ion-badge class="deadlineTime" slot="end">{{ deadline.at | dateTz : 'time' }}</ion-badge>
       <ng-content></ng-content>
     </ion-item>
   `,

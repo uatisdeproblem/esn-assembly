@@ -3,13 +3,14 @@ import { Component, Input } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
-import { HTMLEditorModule } from '@app/common/htmlEditor.module';
+import { HTMLEditorModule } from '@common/htmlEditor.module';
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { Communication } from '@models/communication.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule, HTMLEditorModule],
+  imports: [CommonModule, IonicModule, IDEATranslationsModule, HTMLEditorModule, AppDateTimezonePipe],
   selector: 'app-communication-detail',
   template: `
     <ion-header class="ion-no-border">
@@ -24,7 +25,7 @@ import { Communication } from '@models/communication.model';
     <ion-content color="white">
       <ion-card color="white">
         <ion-card-header>
-          <ion-card-subtitle>{{ communication.date | dateLocale }}</ion-card-subtitle>
+          <ion-card-subtitle>{{ communication.date | dateTz }}</ion-card-subtitle>
           <ion-card-title>
             <ion-text color="medium" style="font-weight: 600">
               {{ communication.event?.name }}
