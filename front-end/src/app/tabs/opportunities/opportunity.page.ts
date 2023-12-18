@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { AlertController, IonContent, IonRefresher, ModalController } from '@ionic/angular';
-import { Attachment, epochISOString } from 'idea-toolbox';
+import { Attachment } from 'idea-toolbox';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { ACCEPTED_ATTACHMENTS_FORMATS, bytesToMegaBytes } from '@app/common/attachments.component';
@@ -13,7 +13,6 @@ import { PublicAttachmentsService } from '@app/common/attachments.service';
 
 import { environment as env } from '@env';
 import { Opportunity } from '@models/opportunity.model';
-import { dateStringIsPast, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { Application, ApplicationStatuses } from '@models/application.model';
 import { Subject } from '@models/subject.model';
 
@@ -28,7 +27,6 @@ export class OpportunityPage {
   showContent = true;
 
   @ViewChild(IonContent) content: IonContent;
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   applications: Application[];
 
@@ -87,10 +85,6 @@ export class OpportunityPage {
     } finally {
       this.loading.hide();
     }
-  }
-
-  dateStringIsPast(dateString: epochISOString): boolean {
-    return dateStringIsPast(dateString, FAVORITE_TIMEZONE);
   }
 
   browseFilesForInputId(id: string): void {

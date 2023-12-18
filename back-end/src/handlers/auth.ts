@@ -13,7 +13,6 @@ import { Configurations } from '../models/configurations.model';
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const PROJECT = process.env.PROJECT;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
@@ -78,7 +77,7 @@ const verifyTokenAndGetESNAccountsUser = async (token: string): Promise<User> =>
 };
 const verifyUserPermissions = async (user: User): Promise<void> => {
   const { administratorsIds, opportunitiesManagersIds } = new Configurations(
-    await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+    await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
   );
   user.isAdministrator = administratorsIds.includes(user.userId);
   user.canManageOpportunities = user.isAdministrator || opportunitiesManagersIds.includes(user.userId);

@@ -6,9 +6,10 @@ import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { StatisticsButtonComponent, StatisticsComponent } from './statistics.component';
+import { AppDateTimezonePipe } from './dateTimezone.pipe';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, AppDateTimezonePipe],
   declarations: [StatisticsComponent, StatisticsButtonComponent],
   exports: [StatisticsComponent, StatisticsButtonComponent]
 })

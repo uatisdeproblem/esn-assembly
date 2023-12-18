@@ -2,7 +2,6 @@ import { epochISOString, Resource } from 'idea-toolbox';
 
 import { Topic } from './topic.model';
 import { Subject } from './subject.model';
-import { FAVORITE_TIMEZONE, getDateStringInFavoriteTimezone } from './favoriteTimezone.const';
 
 /**
  * A message (question or appreciation) in a live topic.
@@ -13,7 +12,7 @@ export class Message extends Resource {
    */
   topicId: string;
   /**
-   * The ID of the message: the concatenation of the timestamp (timezone-independent) of creation and `userId`.
+   * The ID of the message: the concatenation of the timestamp of creation and `userId`.
    */
   messageId: string;
   /**
@@ -48,8 +47,7 @@ export class Message extends Resource {
   completedAt?: epochISOString;
 
   static getPK(userId: string): string {
-    const timestamp = getDateStringInFavoriteTimezone(new Date(), FAVORITE_TIMEZONE, true);
-    return [timestamp, userId].join('_');
+    return [new Date().toISOString(), userId].join('_');
   }
 
   load(x: any): void {

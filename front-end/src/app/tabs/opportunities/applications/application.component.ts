@@ -11,16 +11,24 @@ import {
 
 import { SubjectModule } from '@common/subject.module';
 import { HTMLEditorModule } from '@common/htmlEditor.module';
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { AppService } from '@app/app.service';
 import { ApplicationsService } from './applications.service';
 
 import { Application, ApplicationStatuses } from '@models/application.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, SubjectModule, HTMLEditorModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    IDEATranslationsModule,
+    SubjectModule,
+    HTMLEditorModule,
+    AppDateTimezonePipe
+  ],
   selector: 'app-application',
   template: `
     <ion-card *ngIf="card" [color]="color">
@@ -51,13 +59,13 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
       <ion-note slot="start">#{{ index + 1 }}</ion-note>
       <ion-label class="ion-text-wrap">
         {{ application.subject.name }}
-        <p>{{ application.subject.getSectionCountry() }}</p>
+        <p>{{ application.subject.getOrigin() }}</p>
       </ion-label>
       <ion-badge slot="end" [color]="getApplicationColorByStatus(application)">
         {{ getApplicationLabelByStatus(application, true) }}
       </ion-badge>
       <ion-note slot="end" class="ion-hide-xl-down">
-        {{ application.createdAt | date : 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+        {{ application.createdAt | dateTz : 'datetime' }}
       </ion-note>
     </ion-item>
   `,
@@ -100,7 +108,6 @@ export class ApplicationStandaloneComponent {
   @Output() select = new EventEmitter<void>();
 
   ApplicationStatuses = ApplicationStatuses;
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   constructor(
     private loading: IDEALoadingService,

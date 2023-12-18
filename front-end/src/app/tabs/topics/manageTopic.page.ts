@@ -11,7 +11,6 @@ import { MediaService } from '@app/common/media.service';
 import { Topic, TopicTypes } from '@models/topic.model';
 import { Subject, SubjectTypes } from '@models/subject.model';
 import { UserRoles } from '@models/user.model';
-import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'manage-topic',
@@ -29,7 +28,6 @@ export class ManageTopicPage {
 
   hasDeadlineForQuestions = false;
   hasDeadlineForAnswers = false;
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   TopicTypes = TopicTypes;
   SubjectTypes = SubjectTypes;
@@ -270,8 +268,7 @@ export class ManageTopicPage {
     this.hasDeadlineForQuestions = !!this.topic.willCloseAt;
     this.hasDeadlineForAnswers = !!this.topic.acceptAnswersUntil;
     if (this.topic.publishedSince) {
-      if (dateStringIsFuture(this.topic.publishedSince, FAVORITE_TIMEZONE))
-        this.publishingOption = PublishingOptions.SCHEDULE;
+      if (this.topic.publishedSince > new Date().toISOString()) this.publishingOption = PublishingOptions.SCHEDULE;
       else this.publishingOption = PublishingOptions.PUBLISH;
     } else this.publishingOption = PublishingOptions.DRAFT;
   }

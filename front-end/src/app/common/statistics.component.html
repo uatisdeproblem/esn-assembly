@@ -16,7 +16,7 @@
           <b *ngIf="title">{{ title }}</b>
           <p *ngIf="statistic?.timePoints.length">
             {{ 'STATISTICS.SINCE' | translate | lowercase }}
-            <ion-badge color="ESNpink">{{ getFirstDateOfStatistic() | date : 'dd MMM YYYY' }}</ion-badge>
+            <ion-badge color="ESNpink">{{ getFirstDateOfStatistic() | dateTz }}</ion-badge>
             {{ 'STATISTICS.TO' | translate | lowercase }}
             <ion-badge color="ESNpink">
               {{ 'STATISTICS.TODAY' | translate | lowercase }}
@@ -31,6 +31,10 @@
         <ion-chip slot="end" disabled>
           <ion-icon name="person"></ion-icon>
           <ion-label>{{ statistic.totals.users }}</ion-label>
+        </ion-chip>
+        <ion-chip slot="end" disabled>
+          <ion-icon name="home"></ion-icon>
+          <ion-label>{{ statistic.totals.sections }}</ion-label>
         </ion-chip>
         <ion-chip slot="end" disabled>
           <ion-icon name="earth"></ion-icon>
@@ -83,14 +87,17 @@
       <ion-select
         interface="popover"
         [label]="('STATISTICS.GROUP_BY' | translate) + ':'"
-        [(ngModel)]="groupByCountry"
+        [(ngModel)]="groupBy"
         (ionChange)="buildChart()"
       >
-        <ion-select-option [value]="false">
+        <ion-select-option [value]="null">
           {{ 'STATISTICS.GROUP_BYS.NONE' | translate }}
         </ion-select-option>
-        <ion-select-option [value]="true">
+        <ion-select-option value="country">
           {{ 'STATISTICS.GROUP_BYS.COUNTRY' | translate }}
+        </ion-select-option>
+        <ion-select-option value="section">
+          {{ 'STATISTICS.GROUP_BYS.SECTION' | translate }}
         </ion-select-option>
       </ion-select>
     </ion-item>

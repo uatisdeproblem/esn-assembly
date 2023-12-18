@@ -45,7 +45,7 @@ export class StatisticsButtonComponent {
   /**
    * Whether to group the statistic per ESN country.
    */
-  @Input() groupByCountry = false;
+  @Input() groupBy: 'country' | 'section' | null = null;
   /**
    * The type of chart to display.
    */
@@ -68,7 +68,7 @@ export class StatisticsButtonComponent {
       entityId: this.entityId,
       period: this.period,
       granularity: this.granularity,
-      groupByCountry: this.groupByCountry,
+      groupBy: this.groupBy,
       chartType: this.chartType,
       title: this.title
     };
@@ -88,7 +88,7 @@ export class StatisticsComponent implements OnInit {
   @Input({ required: true }) entityId: string | null;
   @Input({ required: true }) period: StatisticPeriods;
   @Input({ required: true }) granularity: StatisticGranularities;
-  @Input({ required: true }) groupByCountry: boolean;
+  @Input({ required: true }) groupBy: 'country' | 'section' | null;
   @Input({ required: true }) chartType: 'bar' | 'line';
   @Input({ required: true }) title: string | null;
 
@@ -145,16 +145,20 @@ export class StatisticsComponent implements OnInit {
       )
     );
 
-    if (this.groupByCountry) {
-      Object.entries(this.statistic.details).forEach(([country, data]): number =>
+    if (this.groupBy === 'country') {
+      Object.entries(this.statistic.byCountry).forEach(([country, data]): number =>
         datasets.push({ label: country, data })
+      );
+    } else if (this.groupBy === 'section') {
+      Object.entries(this.statistic.bySection).forEach(([section, data]): number =>
+        datasets.push({ label: section, data })
       );
     } else {
       const data = [];
-      Object.values(this.statistic.details).forEach(valuesOfCountry =>
+      Object.values(this.statistic.byCountry).forEach(valuesOfCountry =>
         valuesOfCountry.forEach((value, index): void => (data[index] = (data[index] ?? 0) + value))
       );
-      datasets.push({ label: this.t._('STATISTICS.ALL_COUNTRIES'), data });
+      datasets.push({ label: this.t._('STATISTICS.ALL_USERS'), data });
     }
 
     const chartCanvas = document.getElementById('theChart') as HTMLCanvasElement;
@@ -166,8 +170,8 @@ export class StatisticsComponent implements OnInit {
         layout: { padding: 20 },
         plugins: { colors: { enabled: true }, tooltip: {}, legend: {} },
         scales: {
-          x: { stacked: this.chartType === 'bar' && this.groupByCountry },
-          y: { stacked: this.chartType === 'bar' && this.groupByCountry, ticks: { precision: 0 } }
+          x: { stacked: this.chartType === 'bar' && !!this.groupBy },
+          y: { stacked: this.chartType === 'bar' && !!this.groupBy, ticks: { precision: 0 } }
         }
       }
     });

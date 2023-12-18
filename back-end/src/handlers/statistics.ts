@@ -57,7 +57,8 @@ class StatisticsRC extends ResourceController {
       KeyConditionExpression: 'PK = :pk AND SK BETWEEN :since AND :to',
       ExpressionAttributeValues: { ':pk': pk, ':since': since, ':to': to }
     });
-    const countries = Array.from(new Set(statisticEntries.map(x => x.country)));
+    const countries = Array.from(new Set(statisticEntries.map(x => x.country).filter(x => x)));
+    const sections = Array.from(new Set(statisticEntries.map(x => x.section).filter(x => x)));
 
     const granularity = Object.keys(StatisticGranularities).includes(this.queryParams.granularity)
       ? this.queryParams.granularity
@@ -68,39 +69,51 @@ class StatisticsRC extends ResourceController {
       entityType: this.queryParams.entityType,
       entityId: this.queryParams.entityId,
       timePoints,
-      totals: { countries: 0, users: 0 },
-      details: {}
+      totals: { countries: 0, sections: 0, users: 0 },
+      byCountry: {},
+      bySection: {}
     };
 
     const countriesDistinct = new Set<string>();
+    const sectionsDistinct = new Set<string>();
     const usersDistinct = new Set<string>();
 
     const usersPresenceInTimePoint = new Set<string>();
     const countryValueInTimePoint = new Map<string, number>();
+    const sectionValueInTimePoint = new Map<string, number>();
 
     timePoints.forEach(timePoint => {
       const entriesInTimePoint = statisticEntries.filter(x => StatisticEntry.getTimestamp(x).startsWith(timePoint));
       entriesInTimePoint.forEach(entry => {
-        const countryUser = [entry.country, StatisticEntry.getUserHash(entry)].join('###');
-        usersPresenceInTimePoint.add(countryUser);
+        const countrySectionUser = [entry.country, entry.section, StatisticEntry.getUserHash(entry)].join('###');
+        usersPresenceInTimePoint.add(countrySectionUser);
       });
-      Array.from(usersPresenceInTimePoint).forEach(countryUser => {
-        const [country, user] = countryUser.split('###');
+      Array.from(usersPresenceInTimePoint).forEach(countrySectionUser => {
+        const [country, section, user] = countrySectionUser.split('###');
         countriesDistinct.add(country);
+        sectionsDistinct.add(section);
         usersDistinct.add(user);
         const currentCountryValue = countryValueInTimePoint.get(country) ?? 0;
         countryValueInTimePoint.set(country, currentCountryValue + 1);
+        const currentSectionValue = sectionValueInTimePoint.get(section) ?? 0;
+        sectionValueInTimePoint.set(section, currentSectionValue + 1);
       });
       countries.forEach(country => {
-        if (!statistic.details[country]) statistic.details[country] = [];
-        statistic.details[country].push(countryValueInTimePoint.get(country) ?? 0);
+        if (!statistic.byCountry[country]) statistic.byCountry[country] = [];
+        statistic.byCountry[country].push(countryValueInTimePoint.get(country) ?? 0);
+      });
+      sections.forEach(section => {
+        if (!statistic.bySection[section]) statistic.bySection[section] = [];
+        statistic.bySection[section].push(sectionValueInTimePoint.get(section) ?? 0);
       });
 
       usersPresenceInTimePoint.clear();
       countryValueInTimePoint.clear();
+      sectionValueInTimePoint.clear();
     });
 
     statistic.totals.countries = countriesDistinct.size;
+    statistic.totals.sections = sectionsDistinct.size;
     statistic.totals.users = usersDistinct.size;
 
     return statistic;
@@ -137,7 +150,7 @@ class StatisticsRC extends ResourceController {
  * Add an entry to the statistics.
  */
 export const addStatisticEntry = async (
-  user: { userId: string; country: string },
+  user: { userId: string; country: string; section: string },
   entityType: StatisticEntityTypes,
   entityId?: string
 ): Promise<void> => {
@@ -145,6 +158,7 @@ export const addStatisticEntry = async (
     PK: StatisticEntry.getPK(entityType, entityId),
     SK: StatisticEntry.getSK(user.userId),
     country: user.country,
+    section: user.section,
     expiresAt: getExpiresAtAddingYearsAndMonths(3, 1)
   });
   await ddb.put({ TableName: DDB_TABLES.statistics, Item: statistic });

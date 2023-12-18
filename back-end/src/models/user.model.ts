@@ -1,5 +1,7 @@
 import { Resource } from 'idea-toolbox';
 
+import { UsersOriginDisplayOptions } from './configurations.model';
+
 /**
  * The list of interesting roles on which to assign permissions in the platform.
  */
@@ -122,10 +124,24 @@ export class User extends Resource {
   }
 
   /**
-   * Get a string representing the ESN Section and Country of the subject.
+   * Get a string representing the origin of the user.
    */
-  getSectionCountry(): string {
-    if (this.country === this.section) return this.section;
-    return [this.country, this.section].filter(x => x).join(' - ');
+  getOrigin(displayOption: UsersOriginDisplayOptions = UsersOriginDisplayOptions.BOTH): string {
+    return getUserOrigin(this, displayOption);
   }
 }
+
+/**
+ * Get a string representing the origin of a user.
+ */
+export const getUserOrigin = (
+  user: { country?: string; section?: string },
+  displayOption: UsersOriginDisplayOptions
+): string => {
+  if (displayOption === UsersOriginDisplayOptions.COUNTRY) return user.country;
+  if (displayOption === UsersOriginDisplayOptions.SECTION) return user.section;
+  if (displayOption === UsersOriginDisplayOptions.BOTH) {
+    if (user.country === user.section) return user.section;
+    return [user.country, user.section].filter(x => x).join(' - ');
+  } else return null;
+};

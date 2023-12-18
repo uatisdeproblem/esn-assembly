@@ -27,7 +27,7 @@
         <ion-text class="ion-padding-start" *ngIf="topic.type === TopicTypes.LIVE">
           <b *ngIf="!topic.isClosed()">{{ 'TOPICS.LIVE_NOW' | translate }}</b>
           <ng-container *ngIf="topic.isClosed() && topic.isLiveTodayOrInFuture()">
-            {{ 'TOPICS.LIVE_ON' | translate }} {{ topic.shouldBeLiveAt | date : 'MMM dd' }}
+            {{ 'TOPICS.LIVE_ON' | translate }} {{ topic.shouldBeLiveAt | dateTz }}
           </ng-container>
           <ng-container *ngIf="topic.isClosed() && !topic.isLiveTodayOrInFuture()">-</ng-container>
         </ion-text>
@@ -103,7 +103,7 @@
       <ion-text *ngIf="topic.type === TopicTypes.LIVE">
         <b *ngIf="!topic.isClosed()">{{ 'TOPICS.LIVE_NOW' | translate }}</b>
         <ng-container *ngIf="topic.isClosed() && topic.isLiveTodayOrInFuture()">
-          {{ 'TOPICS.LIVE_ON' | translate }} {{ topic.shouldBeLiveAt | date : 'MMM dd' }}
+          {{ 'TOPICS.LIVE_ON' | translate }} {{ topic.shouldBeLiveAt | dateTz }}
         </ng-container>
         <ng-container *ngIf="topic.isClosed() && !topic.isLiveTodayOrInFuture()">-</ng-container>
       </ion-text>
@@ -117,7 +117,7 @@
       </ng-container>
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="1">
-      {{ topic.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
+      {{ topic.createdAt | dateTz }}
     </ion-col>
   </ion-row>
   <!-- skeleton -->

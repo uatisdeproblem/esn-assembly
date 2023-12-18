@@ -12,10 +12,10 @@ import {
 
 import { EventsPickerComponent } from 'src/app/common/eventsPicker.component';
 
+import { AppService } from '@app/app.service';
 import { DeadlinesService } from './deadlines.service';
 
 import { Deadline } from '@models/deadline.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   standalone: true,
@@ -83,7 +83,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
         <ion-item-divider>
           <ion-label class="ion-text-wrap ion-padding-start">
             <p>
-              <i>{{ 'DEADLINES.DATES_I' | translate : { timezone: FAVORITE_TIMEZONE } }}</i>
+              <i>{{ 'DEADLINES.DATES_I' | translate : { timezone: app.configurations.timezone } }}</i>
             </p>
           </ion-label>
         </ion-item-divider>
@@ -104,7 +104,6 @@ export class ManageDeadlineComponent {
 
   errors = new Set<string>();
 
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
   COLORS = [
     'primary',
     'secondary',
@@ -128,7 +127,8 @@ export class ManageDeadlineComponent {
     private t: IDEATranslationsService,
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
-    private _deadlines: DeadlinesService
+    private _deadlines: DeadlinesService,
+    public app: AppService
   ) {}
 
   hasFieldAnError(field: string): boolean {

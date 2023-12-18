@@ -9,7 +9,8 @@ import { QuestionComponent } from './question.component';
 
 import { SubjectModule } from '@common/subject.module';
 import { MessageBubbleModule } from '@common/messageBubble.module';
-import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
+import { HTMLEditorModule } from '@common/htmlEditor.module';
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { HTMLEditorModule } from 'src/app/common/htmlEditor.module';
     IDEATranslationsModule,
     SubjectModule,
     MessageBubbleModule,
-    HTMLEditorModule
+    HTMLEditorModule,
+    AppDateTimezonePipe
   ],
   declarations: [QuestionSummaryComponent, QuestionComponent],
   exports: [QuestionSummaryComponent, QuestionComponent]

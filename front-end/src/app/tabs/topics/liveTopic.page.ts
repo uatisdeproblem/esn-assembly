@@ -22,7 +22,6 @@ import { environment as env } from '@env';
 import { Topic, TopicTypes } from '@models/topic.model';
 import { Message, MessageTypes } from '@models/message.model';
 import { Subject } from '@models/subject.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 
 @Component({
@@ -46,8 +45,6 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   MessagesSortBy = MessagesSortBy;
   newMessage: Message;
   errors = new Set<string>();
-
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   relatedTopics: Topic[];
 

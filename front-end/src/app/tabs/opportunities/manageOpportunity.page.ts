@@ -7,7 +7,6 @@ import { AppService } from '@app/app.service';
 import { OpportunitiesService } from './opportunities.service';
 
 import { Opportunity, OpportunityApplicationAttachment } from '@models/opportunity.model';
-import { dateStringIsFuture, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'manage-opportunity',
@@ -24,7 +23,6 @@ export class ManageOpportunityPage {
   entityBeforeChange: Opportunity;
 
   hasDeadline = false;
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   publishingOption = PublishingOptions.DRAFT;
   PublishingOptions = PublishingOptions;
@@ -221,7 +219,7 @@ export class ManageOpportunityPage {
   private setUIHelpersForComplexFields(): void {
     this.hasDeadline = !!this.opportunity.willCloseAt;
     if (this.opportunity.publishedSince) {
-      if (dateStringIsFuture(this.opportunity.publishedSince, FAVORITE_TIMEZONE))
+      if (this.opportunity.publishedSince > new Date().toISOString())
         this.publishingOption = PublishingOptions.SCHEDULE;
       else this.publishingOption = PublishingOptions.PUBLISH;
     } else this.publishingOption = PublishingOptions.DRAFT;

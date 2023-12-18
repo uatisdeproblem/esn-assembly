@@ -34,7 +34,7 @@
             />
             <ion-label
               class="ion-text-wrap"
-              [innerHTML]="'DASHBOARD.STATISTICS_RECAP' | translate: { days: Periods.ONE_MONTH, users: statistic.totals.users, countries: statistic.totals.countries }"
+              [innerHTML]="'DASHBOARD.STATISTICS_RECAP' | translate: { days: Periods.ONE_MONTH, users: statistic.totals.users, countries: statistic.totals.countries, sections: statistic.totals.sections }"
             ></ion-label>
           </ion-item>
           <ion-item color="white" lines="none" *ngIf="!statistic">
@@ -93,7 +93,7 @@
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEXT_DEADLINES' | translate }}</h1>
               <ng-container *ngIf="!editMode">
                 <p>{{ 'DASHBOARD.NEXT_DEADLINES_I' | translate: { days: NEXT_DEADLINES_NUM_DAYS } }}</p>
-                <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+                <p>{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate: { timezone: app.configurations.timezone } }}</p>
               </ng-container>
             </ion-label>
             <ion-button *ngIf="!editMode" (click)="openAllDeadlines()">

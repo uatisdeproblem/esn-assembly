@@ -1,7 +1,7 @@
 openapi: 3.0.3
 
 info:
-  title: ESN General Assembly app
+  title: ESN Assembly app
   version: 1.6.0
   contact:
     name: Matteo Carbone
@@ -73,10 +73,7 @@ paths:
   /configurations:
     get:
       summary: Get the platform's configurations
-      description: Requires to be Administrator
       tags: [Configurations]
-      security:
-        - AuthFunction: []
       responses:
         200:
           $ref: '#/components/responses/Configurations'
@@ -99,6 +96,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     patch:
       summary: Set specific configurations
+      description: Requires to be Administrator
       tags: [Configurations]
       security:
         - AuthFunction: []

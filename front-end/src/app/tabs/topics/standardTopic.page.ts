@@ -12,7 +12,6 @@ import { UserDraftsService } from './drafts/drafts.service';
 import { Topic, TopicTypes } from '@models/topic.model';
 import { Question } from '@models/question.model';
 import { Subject } from '@models/subject.model';
-import { dateStringIsPast, FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { UserDraft } from '@models/userDraft.model';
 
 @Component({
@@ -32,8 +31,6 @@ export class StandardTopicPage {
 
   @ViewChild('searchbar') searchbar: IonSearchbar;
   @ViewChild(IonContent) content: IonContent;
-
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   relatedTopics: Topic[];
 
@@ -235,7 +232,7 @@ export class StandardTopicPage {
     this.app.goToInTabs(['topics', topic.topicId, topic.type === TopicTypes.LIVE ? 'live' : 'standard']);
   }
 
-  dateStringIsPast(dateString: epochISOString): boolean {
-    return dateStringIsPast(dateString, FAVORITE_TIMEZONE);
+  isPast(dateString: epochISOString): boolean {
+    return dateString < new Date().toISOString();
   }
 }

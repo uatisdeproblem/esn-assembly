@@ -5,7 +5,7 @@
         <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+    <ion-title>{{ app.configurations.appTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -37,8 +37,8 @@
                   <ion-item class="ion-text-center importantDate">
                     <ion-label>
                       <p>{{ 'OPPORTUNITIES.OPEN_UNTIL' | translate }}</p>
-                      {{ opportunity.willCloseAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
-                      <p>{{ FAVORITE_TIMEZONE }}</p>
+                      {{ opportunity.willCloseAt | dateTz: 'datetime' }}
+                      <p>{{ app.configurations.timezone }}</p>
                     </ion-label>
                   </ion-item>
                 </ion-col>

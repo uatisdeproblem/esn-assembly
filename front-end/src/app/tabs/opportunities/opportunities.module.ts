@@ -17,6 +17,7 @@ import { AttachmentsModule } from '@common/attachments.module';
 import { HTMLEditorModule } from '@common/htmlEditor.module';
 import { SubjectModule } from '@common/subject.module';
 import { StatisticsModule } from '@common/statistics.module';
+import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
 
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import { StatisticsModule } from '@common/statistics.module';
     AttachmentsModule,
     HTMLEditorModule,
     SubjectModule,
-    StatisticsModule
+    StatisticsModule,
+    AppDateTimezonePipe
   ],
   declarations: [OpportunitiesPage, ManageOpportunityPage, OpportunityPage]
 })

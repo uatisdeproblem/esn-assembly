@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { PopoverController } from '@ionic/angular';
 
+import { AppService } from '@app/app.service';
 import { BadgesService } from './badges.service';
 
 import { UserBadge } from '@models/userBadge.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'user-badge',
@@ -17,9 +17,7 @@ export class UserBadgeComponent implements OnInit {
    */
   @Input() userBadge: UserBadge;
 
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
-
-  constructor(private popoverCtrl: PopoverController, public _badges: BadgesService) {}
+  constructor(private popoverCtrl: PopoverController, public _badges: BadgesService, public app: AppService) {}
   async ngOnInit(): Promise<void> {
     await this._badges.getById(this.userBadge.badge);
   }

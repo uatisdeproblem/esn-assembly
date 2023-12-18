@@ -1,0 +1,16 @@
+ion-segment {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  ion-segment-button {
+    text-transform: none;
+    letter-spacing: normal;
+  }
+}
+
+ion-item idea-show-hint-button[slot='start'] {
+  margin-right: 16px;
+}

@@ -19,7 +19,6 @@ const JWT_EXPIRE_TIME = '1 day';
 
 const APP_URL = process.env.STAGE === 'prod' ? 'https://ga.esn.org' : 'https://dev.esn-ga.link';
 
-const PROJECT = process.env.PROJECT;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
@@ -64,7 +63,7 @@ class Login extends ResourceController {
       const userId = String(data['cas:user'][0]).toLowerCase();
 
       const { administratorsIds, opportunitiesManagersIds } = new Configurations(
-        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
       );
 
       const user = new User({

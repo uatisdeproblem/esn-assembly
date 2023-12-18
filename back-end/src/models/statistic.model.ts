@@ -17,6 +17,10 @@ export class StatisticEntry extends Resource {
    */
   country: string;
   /**
+   * The ESN section of the user who generated the statistic entry.
+   */
+  section: string;
+  /**
    * The timestamp (in seconds) of when the statistic entry will expire.
    */
   expiresAt: number;
@@ -50,6 +54,7 @@ export class StatisticEntry extends Resource {
     this.PK = this.clean(x.PK, String);
     this.SK = this.clean(x.SK, String);
     this.country = this.clean(x.country, String);
+    this.section = this.clean(x.section, String);
     this.expiresAt = this.clean(x.expiresAt, Number);
   }
 }
@@ -72,8 +77,9 @@ export interface Statistic {
   entityType: StatisticEntityTypes;
   entityId?: string;
   timePoints: string[];
-  totals: { countries: number; users: number };
-  details: { [country: string]: number[] };
+  totals: { countries: number; sections: number; users: number };
+  byCountry: { [country: string]: number[] };
+  bySection: { [section: string]: number[] };
 }
 
 /**

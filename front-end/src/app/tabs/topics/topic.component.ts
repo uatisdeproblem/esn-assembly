@@ -4,7 +4,6 @@ import { AppService } from '@app/app.service';
 
 import { Topic, TopicTypes } from '@models/topic.model';
 import { SubjectTypes } from '@models/subject.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { StatisticEntityTypes } from '@models/statistic.model';
 
 @Component({
@@ -32,7 +31,6 @@ export class TopicComponent {
 
   TopicTypes = TopicTypes;
   SubjectTypes = SubjectTypes;
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   SET = StatisticEntityTypes;
 

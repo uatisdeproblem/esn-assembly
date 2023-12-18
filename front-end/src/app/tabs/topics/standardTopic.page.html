@@ -5,7 +5,7 @@
         <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+    <ion-title>{{ app.configurations.appTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -41,18 +41,18 @@
                   <ion-item class="ion-text-right importantDate">
                     <ion-label>
                       <p>{{ 'TOPICS.QUESTIONS_UNTIL' | translate }}</p>
-                      {{ topic.willCloseAt | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
-                      <p>{{ FAVORITE_TIMEZONE }}</p>
+                      {{ topic.willCloseAt | dateTz: 'datetime' }}
+                      <p>{{ app.configurations.timezone }}</p>
                     </ion-label>
                     <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
                   </ion-item>
                 </ion-col>
-                <ion-col *ngIf="topic.acceptAnswersUntil && !dateStringIsPast(topic.acceptAnswersUntil)">
+                <ion-col *ngIf="topic.acceptAnswersUntil && !isPast(topic.acceptAnswersUntil)">
                   <ion-item class="ion-text-right importantDate">
                     <ion-label>
                       <p>{{ 'TOPICS.ANSWERS_UNTIL' | translate }}</p>
-                      {{ topic.acceptAnswersUntil | date: 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
-                      <p>{{ FAVORITE_TIMEZONE }}</p>
+                      {{ topic.acceptAnswersUntil | dateTz: 'datetime' }}
+                      <p>{{ app.configurations.timezone }}</p>
                     </ion-label>
                     <ion-icon icon="hourglass-outline" slot="end" size="small"></ion-icon>
                   </ion-item>

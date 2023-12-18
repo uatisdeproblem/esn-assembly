@@ -12,7 +12,7 @@
       <b>{{ question.creator.name }}</b>
       <br />
       {{ 'QUESTIONS.ON' | translate | lowercase }}
-      {{ question.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
+      {{ question.createdAt | dateTz }}
     </p>
   </ion-label>
   <div slot="end" class="ion-text-center questionStats" [class.mobile]="app.isInMobileMode()">

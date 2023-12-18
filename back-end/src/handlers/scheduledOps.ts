@@ -4,8 +4,6 @@
 
 import { DynamoDB, GenericController, RCError } from 'idea-aws';
 
-import { dateStringIsPast, FAVORITE_TIMEZONE } from '../models/favoriteTimezone.const';
-
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
@@ -27,8 +25,9 @@ class ScheduledOps extends GenericController {
     }
   }
   private async closeTopicsWithPastDeadline(): Promise<void> {
+    const now = new Date().toISOString();
     const topics = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-willCloseAt-index' });
-    const topicsToClose = topics.filter(t => dateStringIsPast(t.willCloseAt, FAVORITE_TIMEZONE));
+    const topicsToClose = topics.filter(t => t.willCloseAt < now);
 
     for (const topic of topicsToClose) {
       try {
@@ -44,11 +43,12 @@ class ScheduledOps extends GenericController {
     }
   }
   private async closeOpportunitiesWithPastDeadline(): Promise<void> {
+    const now = new Date().toISOString();
     const opportunities = await ddb.scan({
       TableName: DDB_TABLES.opportunities,
       IndexName: 'opportunityId-willCloseAt-index'
     });
-    const opportunitiesToClose = opportunities.filter(x => dateStringIsPast(x.willCloseAt, FAVORITE_TIMEZONE));
+    const opportunitiesToClose = opportunities.filter(x => x.willCloseAt < now);
 
     for (const opportunity of opportunitiesToClose) {
       try {

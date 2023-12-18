@@ -1,7 +1,6 @@
 import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 
 import { User } from './user.model';
-import { FAVORITE_TIMEZONE, dateStringIsFuture, dateStringIsPast } from './favoriteTimezone.const';
 
 /**
  * An opportunity (open call) to which users can apply to.
@@ -115,7 +114,7 @@ export class Opportunity extends Resource {
    * Whether the opportunity is a draft (hence visible only to administrators); otherwise, it's considered published.
    */
   isDraft(): boolean {
-    return !this.publishedSince || dateStringIsFuture(this.publishedSince, FAVORITE_TIMEZONE);
+    return !this.publishedSince || this.publishedSince > new Date().toISOString();
   }
 
   /**
@@ -123,7 +122,7 @@ export class Opportunity extends Resource {
    */
   isClosed(): boolean {
     if (this.isArchived()) return true;
-    return !!this.closedAt || (this.willCloseAt && dateStringIsPast(this.willCloseAt, FAVORITE_TIMEZONE));
+    return !!this.closedAt || (this.willCloseAt && this.willCloseAt < new Date().toISOString());
   }
   /**
    * Whether the opportunity is archived.

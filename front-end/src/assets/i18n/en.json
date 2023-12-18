@@ -1,6 +1,5 @@
 {
   "COMMON": {
-    "APP_NAME": "General Assembly app",
     "VERSION": "Version {{v}}",
     "ARE_YOU_SURE": "Are you sure?",
     "ACTION_IS_IRREVERSIBLE": "The action is irreversible",
@@ -82,7 +81,6 @@
     "EN": "English"
   },
   "AUTH": {
-    "TITLE": "General Assembly app",
     "SUBTITLE": "Erasmus Student Network",
     "LOGIN_WITH_ESN_ACCOUNTS": "Sign in with ESN Accounts"
   },
@@ -198,14 +196,14 @@
   },
   "DASHBOARD": {
     "NEWS": "News",
-    "NEWS_I": "Bulletin board from the GA Chairing Team.",
+    "NEWS_I": "Bulletin board from the administrators.",
     "NEXT_DEADLINES": "Next deadlines",
     "NEXT_DEADLINES_I": "Deadlines in the upcoming {{days}} days.",
     "DEADLINES": "Deadlines",
     "SEE_ALL_DEADLINES": "See all",
     "USEFUL_LINKS": "Useful links",
     "USEFUL_LINKS_I": "Access more information through these sources.",
-    "STATISTICS_RECAP": "In the last {{days}} days, we had <b>{{users}}</b> visiting users from <b>{{countries}}</b> ESN countries.",
+    "STATISTICS_RECAP": "In the last {{days}} days, we had <b>{{users}}</b> visiting users from <b>{{countries}}</b> ESN countries and <b>{{sections}}</b> ESN sections.",
     "STATISTICS_APP_ACCESS": "App access"
   },
   "COMMUNICATIONS": {
@@ -269,7 +267,32 @@
     "GIVE_BADGES": "Give badges",
     "GIVE_BADGES_I": "Badges are usually earned through automatic actions, but here you can force them.",
     "GIVE_A_BADGE": "Give a badge",
-    "USER_ID": "User ID (ESN Accounts)"
+    "USER_ID": "User ID (ESN Accounts)",
+    "DISPLAY_OPTIONS": "Display options",
+    "DISPLAY_OPTIONS_I": "Personalise the interface the following options.",
+    "ORIGIN_DISPLAY_PREFERENCE": "Users origin display preference",
+    "ORIGIN_DISPLAY_PREFERENCE_I": "When displaying the general data of a user (e.g. in questions), this is the origin information you want to show.",
+    "ORIGIN_DISPLAY_PREFERENCES": {
+      "SECTION": "ESN section",
+      "COUNTRY": "ESN country",
+      "BOTH": "Both"
+    },
+    "APP_TITLE": "App title",
+    "APP_TITLE_I": "This name will be used in the login page and everywhere in the app.",
+    "APP_LOGO_LIGHT": "App logo (default)",
+    "APP_LOGO_LIGHT_I": "This logo will be used in the login page and everywhere in the app (light mode, default).",
+    "APP_LOGO_DARK": "App logo (dark mode)",
+    "APP_LOGO_DARK_I": "This logo will be used in the login page and everywhere in the app (dark mode).",
+    "RESET_APP_LOGO": "Reset app logo",
+    "RESET_APP_LOGO_I": "This will reset the app logo to the default one.",
+    "TIMEZONE_OF_REFERENCE": "Timezone of reference",
+    "TIMEZONE_OF_REFERENCE_I": "This timezone will be used to display dates and deadlines.",
+    "PAGE_SECTIONS": {
+      "CONTENTS": "Contents",
+      "USERS": "Users",
+      "TEMPLATES": "Templates",
+      "OPTIONS": "Options"
+    }
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",
@@ -415,7 +438,8 @@
     "GROUP_BY": "Group by",
     "GROUP_BYS": {
       "NONE": "None",
-      "COUNTRY": "ESN country"
+      "COUNTRY": "ESN country",
+      "SECTION": "ESN section"
     },
     "TODAY": "Today",
     "GRANULARITY": "Granularity",
@@ -433,7 +457,7 @@
       "ONE_WEEK": "One week",
       "TODAY": "Today"
     },
-    "ALL_COUNTRIES": "All countries",
+    "ALL_USERS": "All users",
     "TOTALS": "Totals"
   },
   "DRAFTS": {
