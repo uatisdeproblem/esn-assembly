@@ -13,7 +13,7 @@
     <p class="ion-text-center ion-padding-bottom">
       <ion-badge color="light">
         {{ 'PROFILE.BADGE_EARNED' | translate }}:
-        {{ userBadge.earnedAt | date : 'd MMM yyyy' : FAVORITE_TIMEZONE }}
+        {{ userBadge.earnedAt | date : 'd MMM yyyy' : app.configurations.timezone }}
       </ion-badge>
     </p>
     <p class="ion-text-center">

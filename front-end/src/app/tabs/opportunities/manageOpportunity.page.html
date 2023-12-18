@@ -21,7 +21,7 @@
     <ion-list-header>
       <ion-label>
         <h2>{{ 'OPPORTUNITIES.PUBLISHING_OPTIONS' | translate }}</h2>
-        <p>{{ 'OPPORTUNITIES.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+        <p>{{ 'OPPORTUNITIES.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: app.configurations.timezone} }}</p>
       </ion-label>
     </ion-list-header>
     <ion-radio-group [(ngModel)]="publishingOption" (ionBlur)="handleChangeOfPublishingOption()">
@@ -43,7 +43,7 @@
     <ion-list-header>
       <ion-label>
         <h2>{{ 'OPPORTUNITIES.DEADLINES' | translate }}</h2>
-        <p>{{ 'OPPORTUNITIES.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: FAVORITE_TIMEZONE } }}</p>
+        <p>{{ 'OPPORTUNITIES.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: app.configurations.timezone} }}</p>
       </ion-label>
     </ion-list-header>
     <ion-item>

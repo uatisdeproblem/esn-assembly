@@ -2,7 +2,6 @@ import { Attachment, epochISOString, Resource } from 'idea-toolbox';
 
 import { TopicCategoryAttached } from './category.model';
 import { GAEventAttached } from './event.model';
-import { FAVORITE_TIMEZONE, dateStringIsFuture, dateStringIsPast, dateStringIsToday } from './favoriteTimezone.const';
 import { Subject } from './subject.model';
 import { User, UserRoles } from './user.model';
 
@@ -184,7 +183,7 @@ export class Topic extends Resource {
   canUserAnswerStandardQuestions(user: User, excludeAdmin = false): boolean {
     if (this.type !== TopicTypes.STANDARD) return false;
 
-    const timeCheck = !this.acceptAnswersUntil || dateStringIsFuture(this.acceptAnswersUntil, FAVORITE_TIMEZONE);
+    const timeCheck = !this.acceptAnswersUntil || this.acceptAnswersUntil > new Date().toISOString();
     const adminCheck = user.isAdministrator && !excludeAdmin;
     const subjectCheck = this.subjects.some(s => s.id === user.userId);
     return !this.isArchived() && timeCheck && (adminCheck || subjectCheck);
@@ -194,7 +193,7 @@ export class Topic extends Resource {
    * Whether the topic is a draft (hence visible only to administrators); otherwise, it's considered published.
    */
   isDraft(): boolean {
-    return !this.publishedSince || dateStringIsFuture(this.publishedSince, FAVORITE_TIMEZONE);
+    return !this.publishedSince || this.publishedSince > new Date().toISOString();
   }
 
   /**
@@ -202,7 +201,7 @@ export class Topic extends Resource {
    */
   isClosed(): boolean {
     if (this.isArchived()) return true;
-    return !!this.closedAt || (this.willCloseAt && dateStringIsPast(this.willCloseAt, FAVORITE_TIMEZONE));
+    return !!this.closedAt || (this.willCloseAt && this.willCloseAt < new Date().toISOString());
   }
   /**
    * Whether the topic is archived.
@@ -217,11 +216,7 @@ export class Topic extends Resource {
    */
   isLiveTodayOrInFuture(): boolean {
     if (this.type !== TopicTypes.LIVE) return false;
-    return (
-      this.shouldBeLiveAt &&
-      (dateStringIsFuture(this.shouldBeLiveAt, FAVORITE_TIMEZONE) ||
-        dateStringIsToday(this.shouldBeLiveAt, FAVORITE_TIMEZONE))
-    );
+    return this.shouldBeLiveAt && this.shouldBeLiveAt.slice(0, 10) >= new Date().toISOString().slice(0, 10);
   }
 }
 

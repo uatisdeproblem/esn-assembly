@@ -16,7 +16,6 @@ import { AppService } from '@app/app.service';
 import { ApplicationsService } from './applications.service';
 
 import { Application, ApplicationStatuses } from '@models/application.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   standalone: true,
@@ -57,7 +56,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
         {{ getApplicationLabelByStatus(application, true) }}
       </ion-badge>
       <ion-note slot="end" class="ion-hide-xl-down">
-        {{ application.createdAt | date : 'MMM d, y - H:mm' : FAVORITE_TIMEZONE }}
+        {{ application.createdAt | date : 'MMM d, y - H:mm' : app.configurations.timezone }}
       </ion-note>
     </ion-item>
   `,
@@ -100,7 +99,6 @@ export class ApplicationStandaloneComponent {
   @Output() select = new EventEmitter<void>();
 
   ApplicationStatuses = ApplicationStatuses;
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   constructor(
     private loading: IDEALoadingService,

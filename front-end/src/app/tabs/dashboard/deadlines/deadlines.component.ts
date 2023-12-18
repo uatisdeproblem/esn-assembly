@@ -6,10 +6,10 @@ import { IDEATranslationsModule } from '@idea-ionic/common';
 import { DeadlineComponent } from './deadline.component';
 import { ManageDeadlineComponent } from './manageDeadline.component';
 
+import { AppService } from '@app/app.service';
 import { DeadlinesService } from './deadlines.service';
 
 import { Deadline } from '@models/deadline.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   standalone: true,
@@ -30,7 +30,9 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
         <ion-list-header>
           <ion-label>
             <h1>{{ 'DEADLINES.DEADLINES' | translate }}</h1>
-            <p *ngIf="!editMode">{{ 'DEADLINES.DEADLINES_TIMEZONE' | translate : { timezone: FAVORITE_TIMEZONE } }}</p>
+            <p *ngIf="!editMode">
+              {{ 'DEADLINES.DEADLINES_TIMEZONE' | translate : { timezone: app.configurations.timezone } }}
+            </p>
           </ion-label>
           <ion-button color="ESNgreen" *ngIf="editMode" (click)="addDeadline()">
             {{ 'COMMON.ADD' | translate }}
@@ -73,9 +75,7 @@ export class DeadlinesComponent {
    */
   @Input() editMode = false;
 
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
-
-  constructor(private modalCtrl: ModalController, private _deadlines: DeadlinesService) {}
+  constructor(private modalCtrl: ModalController, private _deadlines: DeadlinesService, public app: AppService) {}
 
   close(): void {
     this.modalCtrl.dismiss();

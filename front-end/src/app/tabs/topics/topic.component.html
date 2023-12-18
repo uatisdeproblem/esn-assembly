@@ -117,7 +117,7 @@
       </ng-container>
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="1">
-      {{ topic.createdAt | date : 'mediumDate' : FAVORITE_TIMEZONE }}
+      {{ topic.createdAt | date : 'mediumDate' : app.configurations.timezone }}
     </ion-col>
   </ion-row>
   <!-- skeleton -->

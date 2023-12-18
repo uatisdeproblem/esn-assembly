@@ -3,7 +3,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppService } from '@app/app.service';
 
 import { Opportunity } from '@models/opportunity.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { StatisticEntityTypes } from '@models/statistic.model';
 
 @Component({
@@ -28,8 +27,6 @@ export class OpportunityComponent {
    * Trigger when a opportunity is selected.
    */
   @Output() select = new EventEmitter<void>();
-
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   SET = StatisticEntityTypes;
 

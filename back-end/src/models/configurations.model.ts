@@ -1,5 +1,7 @@
 import { Resource } from 'idea-toolbox';
 
+export const DEFAULT_TIMEZONE = 'Europe/Brussels';
+
 /**
  * The platform's configuations.
  */
@@ -40,6 +42,10 @@ export class Configurations extends Resource {
    * The name/title of the platform.
    */
   appTitle: string;
+  /**
+   * The timezone to use for dates and deadlines.
+   */
+  timezone: string;
 
   load(x: any): void {
     super.load(x);
@@ -51,6 +57,7 @@ export class Configurations extends Resource {
     this.appLogoURL = this.clean(x.appLogoURL, String);
     this.appLogoURLDarkMode = this.clean(x.appLogoURLDarkMode, String);
     this.appTitle = this.clean(x.appTitle, String);
+    this.timezone = this.clean(x.timezone, String, DEFAULT_TIMEZONE);
   }
 
   safeLoad(newData: any, safeData: any): void {

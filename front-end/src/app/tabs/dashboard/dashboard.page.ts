@@ -18,7 +18,6 @@ import { StatisticsService } from '@app/common/statistics.service';
 import { Communication } from '@models/communication.model';
 import { Deadline } from '@models/deadline.model';
 import { UsefulLink } from '@models/usefulLink.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 import { Statistic, StatisticEntityTypes, StatisticGranularities } from '@models/statistic.model';
 
 /**
@@ -40,7 +39,6 @@ export class DashboardPage implements OnInit {
   segment = MobileSegments.NEWS;
   MobileSegments = MobileSegments;
 
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
   NEXT_DEADLINES_NUM_DAYS = NEXT_DEADLINES_NUM_DAYS;
 
   editMode = false;

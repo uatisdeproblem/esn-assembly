@@ -3,7 +3,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppService } from '@app/app.service';
 
 import { Question } from '@models/question.model';
-import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
 
 @Component({
   selector: 'app-question-summary',
@@ -23,8 +22,6 @@ export class QuestionSummaryComponent {
    * Trigger when a question is selected.
    */
   @Output() select = new EventEmitter<void>();
-
-  FAVORITE_TIMEZONE = FAVORITE_TIMEZONE;
 
   constructor(public app: AppService) {}
 }
