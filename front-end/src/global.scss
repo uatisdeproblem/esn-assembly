@@ -221,3 +221,10 @@ app-html-editor {
   --app-html-editor-border-radius: 8px;
   --app-html-editor-color: var(--ion-color-step-800);
 }
+
+.selectableAlert .alert-message {
+  -webkit-user-select: all !important;
+  -moz-user-select: all !important;
+  -ms-user-select: all !important;
+  user-select: all !important;
+}

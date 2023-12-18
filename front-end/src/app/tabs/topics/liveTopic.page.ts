@@ -315,7 +315,7 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   }
   private async readMessageFullText(message: Message): Promise<void> {
     const buttons = [{ text: this.t._('COMMON.CLOSE') }];
-    const alert = await this.alertCtrl.create({ message: message.text, buttons });
+    const alert = await this.alertCtrl.create({ message: message.text, buttons, cssClass: 'selectableAlert' });
     alert.present();
   }
   private openUserProfile(creator: Subject): void {
