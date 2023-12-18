@@ -8,13 +8,7 @@ info:
     email: email@matteocarbone.com
     url: https://matteocarbone.com
 
-servers:
-  - url: https://api.esn-ga.link/{environment}
-    variables:
-      environment:
-        enum: [dev, prod]
-        default: dev
-        description: The API stage
+# servers: [url: https://api.esn-ga.link/dev]
 
 externalDocs:
   description: Models documentation
