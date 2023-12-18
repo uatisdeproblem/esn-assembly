@@ -151,7 +151,7 @@ export class Topic extends Resource {
     if (!Object.values(TopicTypes).includes(this.type)) e.push('type');
     if (this.iE(this.event?.eventId)) e.push('event');
     if (this.iE(this.category?.categoryId)) e.push('category');
-    if (this.iE(this.subjects)) e.push('subjects');
+    if (this.type === TopicTypes.STANDARD && this.iE(this.subjects)) e.push('subjects');
     this.subjects.forEach((s, index): void => s.validate().forEach(ea => e.push(`subjects[${index}].${ea}`)));
     if (this.publishedSince && this.iE(this.publishedSince, 'date')) e.push('publishedSince');
     if (this.willCloseAt && (this.iE(this.willCloseAt, 'date') || this.willCloseAt < new Date().toISOString()))
