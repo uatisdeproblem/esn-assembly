@@ -47,7 +47,7 @@ export interface Parameters {
   /**
    * The custom front-end certificate ARN to use, to support alternative domains.
    */
-  frontEndCertificateARN: string;
+  frontEndCertificateARN?: string;
 }
 
 export interface Stage {

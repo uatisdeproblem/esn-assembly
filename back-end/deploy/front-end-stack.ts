@@ -13,7 +13,7 @@ export interface FrontEndProps extends cdk.StackProps {
   stage: string;
   domain: string;
   alternativeDomains?: string[];
-  certificateARN: string;
+  certificateARN?: string;
 }
 
 export class FrontEndStack extends cdk.Stack {
@@ -35,7 +35,13 @@ export class FrontEndStack extends cdk.Stack {
       domainName: props.domain.split('.').slice(-2).join('.')
     });
 
-    const certificate = ACM.Certificate.fromCertificateArn(this, 'CloudFrontCertificate', props.certificateARN);
+    const certificate = props.certificateARN
+      ? ACM.Certificate.fromCertificateArn(this, 'CloudFrontCertificate', props.certificateARN)
+      : new ACM.DnsValidatedCertificate(this, 'Certificate', {
+          domainName: props.domain,
+          hostedZone: zone,
+          region: 'us-east-1'
+        });
 
     const frontEndDistributionOAI = new CloudFront.OriginAccessIdentity(this, 'DistributionOAI', {
       comment: `OAI for https://${props.domain}`
