@@ -46,6 +46,14 @@
         <idea-show-hint-button slot="start" class="ion-margin-top" hint="CONFIGURATIONS.APP_TITLE" translate />
       </ion-item>
       <ion-item>
+        <ion-label position="stacked">{{ 'CONFIGURATIONS.SUPPORT_EMAIL' | translate }}</ion-label>
+        <ion-input readonly [(ngModel)]="configurations.supportEmail"></ion-input>
+        <ion-button slot="end" fill="clear" color="medium" class="ion-margin-top" (click)="changeSupportEmail()">
+          <ion-icon icon="pencil" slot="icon-only" />
+        </ion-button>
+        <idea-show-hint-button slot="start" class="ion-margin-top" hint="CONFIGURATIONS.SUPPORT_EMAIL" translate />
+      </ion-item>
+      <ion-item>
         <ion-label>{{ 'CONFIGURATIONS.APP_LOGO_LIGHT' | translate }}</ion-label>
         <ion-avatar slot="end"><ion-img [src]="configurations.appLogoURL ?? app.getIcon()" /></ion-avatar>
         <input #appLogoInput type="file" accept="image/*" style="display: none" (change)="uploadAppLogo($event)" />

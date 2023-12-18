@@ -27,9 +27,13 @@ export class Configurations extends Resource {
   bannedUsersIds: string[];
 
   /**
-   * When displaying a user, which information to show.
+   * The name/title of the platform.
    */
-  usersOriginDisplay: UsersOriginDisplayOptions;
+  appTitle: string;
+  /**
+   * A contact email to reach if support is needed by users.
+   */
+  supportEmail: string;
   /**
    * The logo of the platform (in light mode); if not specified, the default logo is shown.
    */
@@ -39,13 +43,13 @@ export class Configurations extends Resource {
    */
   appLogoURLDarkMode: string;
   /**
-   * The name/title of the platform.
-   */
-  appTitle: string;
-  /**
    * The timezone to use for dates and deadlines.
    */
   timezone: string;
+  /**
+   * When displaying a user, which information to show.
+   */
+  usersOriginDisplay: UsersOriginDisplayOptions;
 
   load(x: any): void {
     super.load(x);
@@ -53,11 +57,12 @@ export class Configurations extends Resource {
     this.opportunitiesManagersIds = this.cleanArray(x.opportunitiesManagersIds, String).map(x => x.toLowerCase());
     this.bannedUsersIds = this.cleanArray(x.bannedUsersIds, String).map(x => x.toLowerCase());
 
-    this.usersOriginDisplay = this.clean(x.usersOriginDisplay, String, UsersOriginDisplayOptions.SECTION);
+    this.appTitle = this.clean(x.appTitle, String);
+    this.supportEmail = this.clean(x.supportEmail, String);
     this.appLogoURL = this.clean(x.appLogoURL, String);
     this.appLogoURLDarkMode = this.clean(x.appLogoURLDarkMode, String);
-    this.appTitle = this.clean(x.appTitle, String);
     this.timezone = this.clean(x.timezone, String, DEFAULT_TIMEZONE);
+    this.usersOriginDisplay = this.clean(x.usersOriginDisplay, String, UsersOriginDisplayOptions.SECTION);
   }
 
   safeLoad(newData: any, safeData: any): void {

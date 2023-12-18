@@ -24,7 +24,7 @@ export class ProfilePage {
 
   async sendFeedback(): Promise<void> {
     const emailSubject = encodeURIComponent(this.t._('PROFILE.FEEDBACK_EMAIL_SUBJECT'));
-    const url = `mailto:${env.idea.app.supportEmail}?subject=${emailSubject}`;
+    const url = `mailto:${this.app.configurations.supportEmail}?subject=${emailSubject}`;
     await this.app.openURL(url);
   }
 }
