@@ -33,7 +33,6 @@ const ddb = new DynamoDB();
 
 const QUESTION_BASE_URL = `https://${APP_DOMAIN}/t/topics/`;
 const SES_CONFIG = {
-  sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION
@@ -211,8 +210,10 @@ class Questions extends ResourceController {
         question: question.summary,
         url: QUESTION_BASE_URL.concat(topic.topicId)
       };
+      const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
+      const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
       if (!(await isEmailInBlockList(question.creator.email)))
-        await ses.sendTemplatedEmail({ toAddresses: [subject.email], template, templateData }, SES_CONFIG);
+        await ses.sendTemplatedEmail({ toAddresses: [subject.email], template, templateData }, sesConfig);
     }
   }
 

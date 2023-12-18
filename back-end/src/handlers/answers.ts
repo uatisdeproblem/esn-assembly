@@ -11,6 +11,7 @@ import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
 import { User } from '../models/user.model';
 import { Subject } from '../models/subject.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -22,13 +23,13 @@ const APP_DOMAIN = process.env.APP_DOMAIN;
 const DDB_TABLES = {
   questions: process.env.DDB_TABLE_questions,
   topics: process.env.DDB_TABLE_topics,
-  answers: process.env.DDB_TABLE_answers
+  answers: process.env.DDB_TABLE_answers,
+  configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB();
 
 const QUESTION_BASE_URL = `https://${APP_DOMAIN}/t/topics/`;
 const SES_CONFIG = {
-  sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION
@@ -176,7 +177,9 @@ class Answers extends ResourceController {
       question: question.summary,
       url: QUESTION_BASE_URL.concat(topic.topicId)
     };
+    const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
+    const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
     if (!(await isEmailInBlockList(question.creator.email)))
-      await ses.sendTemplatedEmail({ toAddresses: [question.creator.email], template, templateData }, SES_CONFIG);
+      await ses.sendTemplatedEmail({ toAddresses: [question.creator.email], template, templateData }, sesConfig);
   }
 }

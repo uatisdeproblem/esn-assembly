@@ -18,7 +18,6 @@ const ddb = new DynamoDB();
 
 const BASE_URL = 'https://'.concat(APP_DOMAIN);
 const SES_CONFIG = {
-  sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION

@@ -11,6 +11,7 @@ import { Application, ApplicationStatuses } from '../models/application.model';
 import { Opportunity } from '../models/opportunity.model';
 import { User } from '../models/user.model';
 import { Subject } from '../models/subject.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -20,7 +21,8 @@ const PROJECT = process.env.PROJECT;
 const APP_DOMAIN = process.env.APP_DOMAIN;
 const DDB_TABLES = {
   applications: process.env.DDB_TABLE_applications,
-  opportunities: process.env.DDB_TABLE_opportunities
+  opportunities: process.env.DDB_TABLE_opportunities,
+  configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB();
 
@@ -32,7 +34,6 @@ const s3 = new S3();
 const STAGE = process.env.STAGE;
 const OPPORTUNITY_BASE_URL = `https://${APP_DOMAIN}/t/opportunities/`;
 const SES_CONFIG = {
-  sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION
@@ -221,8 +222,10 @@ class ApplicationsRC extends ResourceController {
       url: OPPORTUNITY_BASE_URL.concat(this.opportunity.opportunityId),
       message
     };
+    const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
+    const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
     if (!(await isEmailInBlockList(email)))
-      await ses.sendTemplatedEmail({ toAddresses: [email], template, templateData }, SES_CONFIG);
+      await ses.sendTemplatedEmail({ toAddresses: [email], template, templateData }, sesConfig);
   }
 
   protected async deleteResource(): Promise<void> {
