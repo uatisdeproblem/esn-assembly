@@ -26,15 +26,9 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
 1. Open the project folder in the IDE.
 1. Identify the file `/back-end/deploy/environments.ts` and fix the configuration with your values; explanation:
    - General parameters:
+     - `DOMAIN`: the domain name you purchased/imported earlier. Example: _esn-app.link_.
      - `project`: choose a key to identify the project and its resources; _tip: try not to use a key too simple, to avoid naming-overlapping on global resources._
-     - `awsAccount`: the ID of the chosen AWS account (e.g. _123456789012_).
-     - `awsRegion`: the ID of the chosen AWS region (e.g. _eu-central-1_); all the resources will be deployed there.
-     - `apiDomain`: the domain name for the app's API, based on the domain you purchased/imported earlier. Examples: _api.yourdomain.com_, _api-project.yourdomain.com_, etc.
-     - `mediaDomain`: the domain name where to locate app's media contents, based on the domain you purchased/imported earlier. Examples: _media.yourdomain.com_, _media-project.yourdomain.com_, etc.
-     - `firstAdminEmail`: insert your email address to create the first (admin) user of the app.
-   - Stage parameters; you can create as many enviroments (stages) as you like; a common configuration is with _prod_ and _dev_ stages, but you can also create only a production stage or whatever you like:
-     - `domain`: the domain name where to reach the front-end for this stage, based on the domain you purchased/imported earlier. Examples: _yourdomain.com_, _dev.yourdomain.com_, etc.
-     - `destroyDataOnDelete`: whether to delete the data when the stage is deleted; it should be **true** for _dev_ and **false** for _prod_ stages.
+1. You can create as many enviroments (stages) as you like; a common configuration is with _prod_ and _dev_ stages, but you can also create only a production stage or whatever you like.
 1. From the terminal/prompt, make sure to be in the `/back-end` folder of the project, substitute the STAGE variable (based on the stage/environment you want to deploy) and run:
    ```
    cdk deploy --context stage=STAGE --all --require-approval never --outputs-file output-config.json
@@ -52,7 +46,6 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
      - `CLOUDFRONT_DISTRIBUTION_PROD` (prod)
      - `CLOUDFRONT_DISTRIBUTION_DEV` (dev)
      - `AWS_REGION`
-     - `AWS_PROFILE`: only if you need to use named profiles to identify the AWS account, _i.e. this account is not your default's one_.
 
 1. **Repeat the deployment steps for each of the desired stages (e.g. _prod_, _dev_)**. Note: after you deployed the 2nd, 3rd, etc. stage, you only need to change/set project-specific parameters: the rest of those you've already set during the deployment of the first stage.
 1. Some of the internal features require the sending of email messages. To enable our AWS account to send emails (through the [SES service](https://aws.amazon.com/ses/)), we need to request to AWS to be taken out of the default sandbox of SES. [Read here for more information](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html). To do this, you can start by running the following command in the terminal, then follow AWS instructions (you will receive a follow-up email) accordingly. Basically, you have to prove that you can handle the project's email without generating too much SPAM or receiving too many email bounces.

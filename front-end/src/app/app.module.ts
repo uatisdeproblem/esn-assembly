@@ -18,7 +18,7 @@ import { IDEATranslationsModule, IDEAActionSheetModule } from '@idea-ionic/commo
     BrowserModule,
     IonicModule.forRoot({ mode: 'md' }),
     AppRoutingModule,
-    IonicStorageModule.forRoot({ name: 'esn-ga' }),
+    IonicStorageModule.forRoot({ name: 'esn-assembly' }),
     IDEATranslationsModule,
     IDEAActionSheetModule
   ],

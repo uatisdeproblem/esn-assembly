@@ -10,7 +10,6 @@ const STAGE = 'prod';
  */
 export const environment = {
   idea: {
-    project: 'esn-ga',
     app: {
       version: '1.6.0',
       url: 'https://'.concat(stages[STAGE].domain),

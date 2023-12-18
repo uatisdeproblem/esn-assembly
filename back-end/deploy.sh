@@ -3,7 +3,7 @@
 # project-specific parameters
 PROJECT='esn-ga'
 AWS_REGION='eu-south-1'
-AWS_PROFILE='esn-ga'
+AWS_PROFILE="${PROJECT}"
 
 # other parameters
 ACTION=$1

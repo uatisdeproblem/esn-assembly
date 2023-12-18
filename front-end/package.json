@@ -1,8 +1,8 @@
 {
-  "name": "esn-ga",
+  "name": "esn-assembly",
   "version": "1.6.0",
-  "author": "ITER IDEA",
-  "homepage": "https://iter-idea.com/",
+  "author": "Matteo Carbone",
+  "homepage": "https://matteocarbone.com/",
   "scripts": {
     "ng": "ng",
     "start": "ionic serve --no-open",

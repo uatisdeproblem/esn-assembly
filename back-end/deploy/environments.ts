@@ -1,22 +1,28 @@
+/**
+ * The codename of the project.
+ */
+const PROJECT = 'esn-ga';
+/**
+ * The purchased domain to use.
+ */
+const DOMAIN = 'esn-ga.link';
+
 export const parameters: Parameters = {
-  project: 'esn-ga',
-  awsAccount: '772823474617',
-  awsRegion: 'eu-south-1',
-  apiDomain: 'api.esn-ga.link',
-  webSocketApiDomain: 'socket.esn-ga.link',
-  mediaDomain: 'media.esn-ga.link',
-  firstAdminEmail: 'email@matteocarbone.com',
-  frontEndCertificateARN: 'arn:aws:acm:us-east-1:772823474617:certificate/12d7466b-c989-46ee-86c5-61b2cda3c35c'
+  project: PROJECT,
+  apiDomain: 'api.'.concat(DOMAIN),
+  webSocketApiDomain: 'socket.'.concat(DOMAIN),
+  mediaDomain: 'media.'.concat(DOMAIN),
+  frontEndCertificateARN: 'arn:aws:acm:us-east-1:772823474617:certificate/12d7466b-c989-46ee-86c5-61b2cda3c35c' // @todo to remove in main branch
 };
 
 export const stages: { [stage: string]: Stage } = {
   prod: {
     domain: 'ga.esn.org',
-    alternativeDomains: ['esn-ga.link'],
+    alternativeDomains: [DOMAIN],
     destroyDataOnDelete: false
   },
   dev: {
-    domain: 'dev.esn-ga.link',
+    domain: 'dev.'.concat(DOMAIN),
     destroyDataOnDelete: true
   }
 };
@@ -26,14 +32,6 @@ export interface Parameters {
    * Project key (unique to the AWS account).
    */
   project: string;
-  /**
-   * The AWS account where the cloud resources will be deployed.
-   */
-  awsAccount: string;
-  /**
-   * The AWS region where the cloud resources will be deployed.
-   */
-  awsRegion: string;
   /**
    * HTTP API for each environment will be available at `${apiDomain}/${env.stage}`.
    */
@@ -46,10 +44,6 @@ export interface Parameters {
    * The domain name where to reach the front-end's media files.
    */
   mediaDomain: string;
-  /**
-   * The email address of the first (admin) user.
-   */
-  firstAdminEmail: string;
   /**
    * The custom front-end certificate ARN to use, to support alternative domains.
    */

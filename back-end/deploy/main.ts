@@ -212,7 +212,9 @@ const tables: { [tableName: string]: DDBTable } = {
 const createApp = async (): Promise<void> => {
   const app = new cdk.App({});
 
-  const env = { account: parameters.awsAccount, region: parameters.awsRegion };
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION };
 
   const STAGE = app.node.tryGetContext('stage');
   const STAGE_VARIABLES = (stages as any)[STAGE] as Stage;
@@ -246,8 +248,7 @@ const createApp = async (): Promise<void> => {
   const sesStack = new SESStack(app, `${parameters.project}-ses`, {
     env,
     project: parameters.project,
-    domain: parameters.apiDomain,
-    testEmailAddress: parameters.firstAdminEmail
+    domain: parameters.apiDomain
   });
 
   //
@@ -258,7 +259,6 @@ const createApp = async (): Promise<void> => {
     env,
     project: parameters.project,
     stage: STAGE,
-    firstAdminEmail: parameters.firstAdminEmail,
     apiDomain: parameters.apiDomain,
     apiDefinitionFile: './swagger.yaml',
     webSocketApiDomain: parameters.webSocketApiDomain,
@@ -267,7 +267,7 @@ const createApp = async (): Promise<void> => {
     mediaBucketArn: mediaStack.mediaBucketArn,
     ses: { identityArn: sesStack.identityArn, notificationTopicArn: sesStack.notificationTopicArn },
     removalPolicy: STAGE_VARIABLES.destroyDataOnDelete ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
-    appDomain: STAGE_VARIABLES[STAGE].domain
+    appDomain: STAGE_VARIABLES.domain
   });
   apiStack.addDependency(mediaStack);
   apiStack.addDependency(apiDomainStack);

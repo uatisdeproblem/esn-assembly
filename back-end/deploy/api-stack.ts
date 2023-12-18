@@ -21,7 +21,6 @@ import { DynamoEventSource, SnsEventSource } from 'aws-cdk-lib/aws-lambda-event-
 export interface ApiProps extends cdk.StackProps {
   project: string;
   stage: string;
-  firstAdminEmail: string;
   apiDomain: string;
   apiDefinitionFile: string;
   webSocketApiDomain: string;

@@ -6,7 +6,6 @@
     "compile": "tsc --build",
     "deploy": "cdk deploy",
     "cdk": "cdk",
-    "logs": "sam logs --tail --profile esn-ga --stack-name esn-ga-dev-api",
     "deploy-quick": "npm run compile && cdk --profile esn-ga deploy esn-ga-dev-api --context stage=dev --exclusively --hotswap"
   },
   "dependencies": {

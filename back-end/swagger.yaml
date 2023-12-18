@@ -12,7 +12,7 @@ info:
 
 externalDocs:
   description: Models documentation
-  url: https://github.com/uatisdeproblem/esn-ga/tree/main/back-end/src/models
+  url: https://github.com/uatisdeproblem/esn-assembly/tree/main/back-end/src/models
 
 tags:
   - name: Login
