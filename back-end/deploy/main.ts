@@ -266,7 +266,8 @@ const createApp = async (): Promise<void> => {
     tables,
     mediaBucketArn: mediaStack.mediaBucketArn,
     ses: { identityArn: sesStack.identityArn, notificationTopicArn: sesStack.notificationTopicArn },
-    removalPolicy: STAGE_VARIABLES.destroyDataOnDelete ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN
+    removalPolicy: STAGE_VARIABLES.destroyDataOnDelete ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+    appDomain: STAGE_VARIABLES[STAGE].domain
   });
   apiStack.addDependency(mediaStack);
   apiStack.addDependency(apiDomainStack);

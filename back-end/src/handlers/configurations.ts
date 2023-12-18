@@ -12,10 +12,11 @@ import { User } from '../models/user.model';
 ///
 
 const STAGE = process.env.STAGE;
+const APP_DOMAIN = process.env.APP_DOMAIN;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
-const BASE_URL = STAGE === 'prod' ? 'https://ga.esn.org' : 'https://dev.esn-ga.link';
+const BASE_URL = 'https://'.concat(APP_DOMAIN);
 const SES_CONFIG = {
   sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,

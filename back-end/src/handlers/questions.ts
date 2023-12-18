@@ -21,6 +21,7 @@ import { Configurations } from '../models/configurations.model';
 
 const PROJECT = process.env.PROJECT;
 const STAGE = process.env.STAGE;
+const APP_DOMAIN = process.env.APP_DOMAIN;
 const DDB_TABLES = {
   questions: process.env.DDB_TABLE_questions,
   topics: process.env.DDB_TABLE_topics,
@@ -30,8 +31,7 @@ const DDB_TABLES = {
 };
 const ddb = new DynamoDB();
 
-const DOMAIN_URL = STAGE === 'prod' ? 'ga.esn.org' : 'dev.esn-ga.link';
-const QUESTION_BASE_URL = `https://${DOMAIN_URL}/t/topics/`;
+const QUESTION_BASE_URL = `https://${APP_DOMAIN}/t/topics/`;
 const SES_CONFIG = {
   sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,

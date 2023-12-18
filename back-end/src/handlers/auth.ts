@@ -13,10 +13,11 @@ import { Configurations } from '../models/configurations.model';
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
+const PROJECT = process.env.PROJECT;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
-const PARAMETERS_PATH = '/esn-ga/auth';
+const PARAMETERS_PATH = `/${PROJECT}/auth`;
 const ssm = new SystemsManager();
 
 let JWT_SECRET: string;

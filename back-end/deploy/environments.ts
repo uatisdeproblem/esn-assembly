@@ -11,8 +11,8 @@ export const parameters: Parameters = {
 
 export const stages: { [stage: string]: Stage } = {
   prod: {
-    domain: 'esn-ga.link',
-    alternativeDomains: ['ga.esn.org', 'qa.esn.org'],
+    domain: 'ga.esn.org',
+    alternativeDomains: ['esn-ga.link'],
     destroyDataOnDelete: false
   },
   dev: {

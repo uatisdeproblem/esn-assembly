@@ -17,6 +17,7 @@ import { Subject } from '../models/subject.model';
 ///
 
 const PROJECT = process.env.PROJECT;
+const APP_DOMAIN = process.env.APP_DOMAIN;
 const DDB_TABLES = {
   applications: process.env.DDB_TABLE_applications,
   opportunities: process.env.DDB_TABLE_opportunities
@@ -29,8 +30,7 @@ const S3_ATTACHMENTS_FOLDER = process.env.S3_ATTACHMENTS_FOLDER;
 const s3 = new S3();
 
 const STAGE = process.env.STAGE;
-const DOMAIN_URL = STAGE === 'prod' ? 'ga.esn.org' : 'dev.esn-ga.link';
-const OPPORTUNITY_BASE_URL = `https://${DOMAIN_URL}/t/opportunities/`;
+const OPPORTUNITY_BASE_URL = `https://${APP_DOMAIN}/t/opportunities/`;
 const SES_CONFIG = {
   sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,

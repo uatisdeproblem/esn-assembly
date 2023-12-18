@@ -17,12 +17,14 @@ import { Configurations } from '../models/configurations.model';
 const CAS_URL = 'https://accounts.esn.org/cas';
 const JWT_EXPIRE_TIME = '1 day';
 
-const APP_URL = process.env.STAGE === 'prod' ? 'https://ga.esn.org' : 'https://dev.esn-ga.link';
+const PROJECT = process.env.PROJECT;
+const APP_DOMAIN = process.env.APP_DOMAIN;
+const APP_URL = 'https://'.concat(APP_DOMAIN);
 
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
-const SECRETS_PATH = '/esn-ga/auth';
+const SECRETS_PATH = `/${PROJECT}/auth`;
 const systemsManager = new SystemsManager();
 
 let JWT_SECRET: string;

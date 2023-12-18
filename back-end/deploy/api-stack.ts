@@ -30,6 +30,7 @@ export interface ApiProps extends cdk.StackProps {
   mediaBucketArn: string;
   ses: { identityArn: string; notificationTopicArn: string };
   removalPolicy: RemovalPolicy;
+  appDomain: string;
 }
 export interface ResourceController {
   name: string;
@@ -79,7 +80,8 @@ export class ApiStack extends cdk.Stack {
       resourceControllers: props.resourceControllers,
       defaultLambdaFnProps,
       project: props.project,
-      stage: props.stage
+      stage: props.stage,
+      appDomain: props.appDomain
     });
     this.allowLambdaFunctionsToAccessIDEATablesAndFunctions({ lambdaFunctions: Object.values(lambdaFunctions) });
     this.allowLambdaFunctionsToAccessMediaBucketFoldersAndUploadAssets({
@@ -192,6 +194,7 @@ export class ApiStack extends cdk.Stack {
     resourceControllers: ResourceController[];
     defaultLambdaFnProps: NodejsFunctionProps;
     api: cdk.aws_apigatewayv2.CfnApi;
+    appDomain: string;
   }): {
     lambdaFunctions: { [resourceName: string]: NodejsFunction };
   } {
@@ -249,6 +252,7 @@ export class ApiStack extends cdk.Stack {
       lambdaFn.addEnvironment('PROJECT', params.project);
       lambdaFn.addEnvironment('STAGE', params.stage);
       lambdaFn.addEnvironment('RESOURCE', resource.name);
+      lambdaFn.addEnvironment('APP_DOMAIN', params.appDomain);
 
       lambdaFunctions[resource.name] = lambdaFn;
     });
