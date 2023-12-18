@@ -53,11 +53,6 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
      - `CLOUDFRONT_DISTRIBUTION_DEV` (dev)
      - `AWS_REGION`
      - `AWS_PROFILE`: only if you need to use named profiles to identify the AWS account, _i.e. this account is not your default's one_.
-   - `/front-end/src/environaments/environment.idea.ts`:
-
-     - Reset the `app.bundle`, `app.appleStoreURL`, `app.googleStoreURL` attributes.
-     - Change the `app.url`, `app.mediaURL`, `api.url` attributes with the domains you previously chose.
-     - Set the `cognito` object with the attributes returned in the `output-config.json` file.
 
 1. **Repeat the deployment steps for each of the desired stages (e.g. _prod_, _dev_)**. Note: after you deployed the 2nd, 3rd, etc. stage, you only need to change/set project-specific parameters: the rest of those you've already set during the deployment of the first stage.
 1. Some of the internal features require the sending of email messages. To enable our AWS account to send emails (through the [SES service](https://aws.amazon.com/ses/)), we need to request to AWS to be taken out of the default sandbox of SES. [Read here for more information](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html). To do this, you can start by running the following command in the terminal, then follow AWS instructions (you will receive a follow-up email) accordingly. Basically, you have to prove that you can handle the project's email without generating too much SPAM or receiving too many email bounces.
@@ -71,11 +66,3 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
    --additional-contact-email-addresses YOUR_EMAIL_ADDRESS \
    --contact-language EN
    ```
-
-### Deployment notes
-
-Some of the deployed resources are _stage-independant_ (i.e. they are in common between stages):
-
-- User DB (Cognito).
-- Media Bucket (S3); _note: stages' media resources are organized inside the same bucket in different folders._
-- Map resource (Location Map).
