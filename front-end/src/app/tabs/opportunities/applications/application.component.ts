@@ -51,7 +51,7 @@ import { FAVORITE_TIMEZONE } from '@models/favoriteTimezone.const';
       <ion-note slot="start">#{{ index + 1 }}</ion-note>
       <ion-label class="ion-text-wrap">
         {{ application.subject.name }}
-        <p>{{ application.subject.getSectionCountry() }}</p>
+        <p>{{ application.subject.getOrigin() }}</p>
       </ion-label>
       <ion-badge slot="end" [color]="getApplicationColorByStatus(application)">
         {{ getApplicationLabelByStatus(application, true) }}

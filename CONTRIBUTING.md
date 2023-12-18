@@ -1,6 +1,6 @@
 # Contribute in the development
 
-The main objective of the project is to **further develop and maintain the General Assembly app**.
+The main objective of the project is to **further develop and maintain the Assembly app**.
 
 The app is available through the major desktop and mobile browsers.
 

@@ -11,14 +11,13 @@ import { User } from '../models/user.model';
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const PROJECT = process.env.PROJECT;
 const STAGE = process.env.STAGE;
 const DDB_TABLES = { configurations: process.env.DDB_TABLE_configurations };
 const ddb = new DynamoDB();
 
 const BASE_URL = STAGE === 'prod' ? 'https://ga.esn.org' : 'https://dev.esn-ga.link';
 const SES_CONFIG = {
-  sourceName: 'ESN General Assembly app',
+  sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION
@@ -46,18 +45,18 @@ class ConfigurationsRC extends ResourceController {
 
   constructor(event: any, callback: any) {
     super(event, callback);
-    this.galaxyUser = new User(event.requestContext.authorizer.lambda.user);
+    // GET /configurations is public
+    this.galaxyUser = event.requestContext.authorizer ? new User(event.requestContext.authorizer.lambda.user) : null;
   }
 
   protected async checkAuthBeforeRequest(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
-
     try {
       this.configurations = new Configurations(
-        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
       );
     } catch (err) {
-      throw new RCError('Configurations not found');
+      if (String(err) === 'Error: Not found') this.configurations = new Configurations({ PK: Configurations.PK });
+      else throw new RCError('Error loading configuration');
     }
   }
 
@@ -66,7 +65,9 @@ class ConfigurationsRC extends ResourceController {
   }
 
   protected async putResources(): Promise<Configurations> {
-    this.configurations = new Configurations({ ...this.body, PK: PROJECT });
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+
+    this.configurations = new Configurations({ ...this.body, PK: Configurations.PK });
 
     const errors = this.configurations.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
@@ -77,6 +78,8 @@ class ConfigurationsRC extends ResourceController {
   }
 
   protected async patchResources(): Promise<{ subject: string; content: string } | void> {
+    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+
     switch (this.body.action) {
       case 'GET_EMAIL_TEMPLATE':
         return await this.getEmailTemplate(this.body.template);

@@ -13,6 +13,6 @@
   </ion-avatar>
   <ion-label class="ion-text-wrap">
     {{ subject.name ?? ('COMMON.UNKNOWN' | translate) }}
-    <p *ngIf="size !== 'small' && subject.getSectionCountry()">{{ subject.getSectionCountry() }}</p>
+    <p *ngIf="size !== 'small' && subject.getOrigin()">{{ subject.getOrigin() }}</p>
   </ion-label>
 </ion-item>

@@ -13,6 +13,7 @@ import {
 import { environment as env } from '@env';
 import { User } from '@models/user.model';
 import { cleanESNAccountsIdForURL } from '@models/utils';
+import { Configurations } from '@models/configurations.model';
 
 /**
  * The base URLs where the thumbnails are located.
@@ -43,6 +44,7 @@ export class AppService {
   private darkMode: boolean;
 
   user: User;
+  configurations: Configurations;
 
   constructor(
     private platform: Platform,
@@ -160,7 +162,7 @@ export class AppService {
   async info(): Promise<void> {
     const openPrivacyPolicy = (): Promise<void> => this.openURL(this.t._('IDEA_VARIABLES.PRIVACY_POLICY_URL'));
 
-    const header = this.t._('COMMON.APP_NAME');
+    const header = this.configurations.appTitle;
     const message = this.t._('COMMON.VERSION', { v: env.idea.app.version });
     const buttons = [
       { text: this.t._('IDEA_AUTH.PRIVACY_POLICY'), handler: openPrivacyPolicy },
@@ -200,7 +202,9 @@ export class AppService {
    * Get the app's main icon.
    */
   getIcon(white = false): string {
-    return white ? APP_ICON_WHITE_PATH : APP_ICON_PATH;
+    return white
+      ? this.configurations.appLogoURLDarkMode ?? APP_ICON_WHITE_PATH
+      : this.configurations.appLogoURL ?? APP_ICON_PATH;
   }
 
   /**

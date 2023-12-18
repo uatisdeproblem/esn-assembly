@@ -33,7 +33,7 @@ const ddb = new DynamoDB();
 const DOMAIN_URL = STAGE === 'prod' ? 'ga.esn.org' : 'dev.esn-ga.link';
 const QUESTION_BASE_URL = `https://${DOMAIN_URL}/t/topics/`;
 const SES_CONFIG = {
-  sourceName: 'ESN General Assembly app',
+  sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION
@@ -107,7 +107,7 @@ class Questions extends ResourceController {
     if (!this.topic.canUserInteract(this.galaxyUser)) throw new Error('Not allowed to interact');
 
     const { bannedUsersIds } = new Configurations(
-      await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+      await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
     );
     if (bannedUsersIds.includes(this.galaxyUser.userId)) throw new Error('User is banned');
 

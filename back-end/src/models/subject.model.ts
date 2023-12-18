@@ -1,7 +1,9 @@
 import { Resource } from 'idea-toolbox';
 
-import { User } from './user.model';
 import { cleanESNAccountsIdForURL } from './utils';
+
+import { User, getUserOrigin } from './user.model';
+import { UsersOriginDisplayOptions } from './configurations.model';
 
 /**
  * A user subject to a topic, a questio, an answer, etc..
@@ -102,12 +104,10 @@ export class Subject extends Resource {
   }
 
   /**
-   * Get a string representing the ESN Section and Country of the subject.
-   * @todo to solve a known error from ESN Accounts: the Country isn't returned correctly.
+   * Get a string representing the origin of the subject.
    */
-  getSectionCountry(): string {
-    if (this.country === this.section) return this.section;
-    return [this.country, this.section].filter(x => x).join(' - ');
+  getOrigin(displayOption: UsersOriginDisplayOptions = UsersOriginDisplayOptions.BOTH): string {
+    return getUserOrigin(this, displayOption);
   }
 }
 

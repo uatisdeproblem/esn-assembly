@@ -32,7 +32,7 @@ const STAGE = process.env.STAGE;
 const DOMAIN_URL = STAGE === 'prod' ? 'ga.esn.org' : 'dev.esn-ga.link';
 const OPPORTUNITY_BASE_URL = `https://${DOMAIN_URL}/t/opportunities/`;
 const SES_CONFIG = {
-  sourceName: 'ESN General Assembly app',
+  sourceName: 'ESN Assembly app',
   source: process.env.SES_SOURCE_ADDRESS,
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION

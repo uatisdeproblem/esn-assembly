@@ -1,4 +1,9 @@
 /**
+ * The stage to use for API (and websocket) requests.
+ */
+const STAGE = 'prod';
+
+/**
  * Variables to configure an ITER IDEA's cloud app, together with its inner modules.
  */
 export const environment = {
@@ -15,11 +20,11 @@ export const environment = {
     },
     api: {
       url: 'api.esn-ga.link',
-      stage: 'prod'
+      stage: STAGE
     },
     socket: {
       url: 'socket.esn-ga.link',
-      stage: 'prod'
+      stage: STAGE
     },
     ionicExtraModules: ['common']
   }

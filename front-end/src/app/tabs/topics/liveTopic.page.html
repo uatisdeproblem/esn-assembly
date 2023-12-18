@@ -5,7 +5,7 @@
         <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ 'COMMON.APP_NAME' | translate }}</ion-title>
+    <ion-title>{{ app.configurations.appTitle }}</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -249,7 +249,8 @@
                       <ion-card-title>
                         <ion-icon icon="checkmark-done" class="ion-padding-end" *ngIf="question.completedAt" />
                         <ion-text *ngIf="question.creator">
-                          <b>{{ question.creator.name }}</b> - {{ question.creator.country }}
+                          <b>{{ question.creator.name }}</b> - {{
+                          question.creator.getOrigin(app.configurations.usersOriginDisplay) }}
                         </ion-text>
                         <i *ngIf="!question.creator">{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
                       </ion-card-title>
@@ -355,7 +356,8 @@
                       <ion-card-title>
                         <ion-icon icon="checkmark-done" class="ion-padding-end" *ngIf="appreciation.completedAt" />
                         <ion-text *ngIf="appreciation.creator">
-                          <b>{{ appreciation.creator.name }}</b> - {{ appreciation.creator.country }}
+                          <b>{{ appreciation.creator.name }}</b> - {{
+                          appreciation.creator.getOrigin(app.configurations.usersOriginDisplay) }}
                         </ion-text>
                         <i *ngIf="!appreciation.creator">{{ 'MESSAGES.ANONYMOUS' | translate }}</i>
                       </ion-card-title>

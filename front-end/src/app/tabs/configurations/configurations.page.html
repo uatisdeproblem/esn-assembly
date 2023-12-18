@@ -1,123 +1,203 @@
-<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
-  <ion-toolbar color="ideaToolbar">
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
     <ion-buttons slot="start">
       <ion-img [src]="app.getIcon()"></ion-img>
     </ion-buttons>
     <ion-title>{{ 'TABS.CONFIGURATIONS' | translate }}</ion-title>
   </ion-toolbar>
+  <ion-toolbar color="medium">
+    <ion-segment scrollable="true" [(ngModel)]="pageSection">
+      <ion-segment-button *ngFor="let ps of PageSections | keyvalue" [value]="ps.key">
+        <ion-label>{{ 'CONFIGURATIONS.PAGE_SECTIONS.' + ps.key| translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-list class="aList maxWidthContainer">
-    <ion-list-header>
-      <ion-label>
-        <h2>{{ 'CONFIGURATIONS.ENTITIES' | translate }}</h2>
-        <p>{{ 'CONFIGURATIONS.ENTITIES_I' | translate }}</p></ion-label
+  <div class="maxWidthContainer">
+    <ion-list class="aList" *ngIf="pageSection === PageSections.CONTENTS">
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'CONFIGURATIONS.ENTITIES' | translate }}</h2>
+          <p>{{ 'CONFIGURATIONS.ENTITIES_I' | translate }}</p></ion-label
+        >
+      </ion-list-header>
+      <ion-item button detail (click)="app.goToInTabs(['configurations', 'events'])">
+        <ion-label>{{ 'CONFIGURATIONS.EVENTS' | translate }}</ion-label>
+      </ion-item>
+      <ion-item button detail (click)="app.goToInTabs(['configurations', 'categories'])">
+        <ion-label>{{ 'CONFIGURATIONS.CATEGORIES' | translate }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="aList" *ngIf="pageSection === PageSections.OPTIONS">
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'CONFIGURATIONS.DISPLAY_OPTIONS' | translate }}</h2>
+          <p>{{ 'CONFIGURATIONS.DISPLAY_OPTIONS_I' | translate }}</p></ion-label
+        >
+      </ion-list-header>
+      <ion-item>
+        <ion-label position="stacked">{{ 'CONFIGURATIONS.APP_TITLE' | translate }}</ion-label>
+        <ion-input readonly [(ngModel)]="configurations.appTitle"></ion-input>
+        <ion-button slot="end" fill="clear" color="medium" class="ion-margin-top" (click)="changeAppTitle()">
+          <ion-icon icon="pencil" slot="icon-only" />
+        </ion-button>
+        <idea-show-hint-button slot="start" class="ion-margin-top" hint="CONFIGURATIONS.APP_TITLE" translate />
+      </ion-item>
+      <ion-item>
+        <ion-label>{{ 'CONFIGURATIONS.APP_LOGO_LIGHT' | translate }}</ion-label>
+        <ion-avatar slot="end"><ion-img [src]="configurations.appLogoURL ?? app.getIcon()" /></ion-avatar>
+        <input #appLogoInput type="file" accept="image/*" style="display: none" (change)="uploadAppLogo($event)" />
+        <ion-button slot="end" fill="clear" color="medium" (click)="appLogoInput.click()">
+          <ion-icon icon="cloud-upload-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button slot="end" fill="clear" color="danger" (click)="resetAppLogo()">
+          <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <idea-show-hint-button slot="start" hint="CONFIGURATIONS.APP_LOGO_LIGHT" translate />
+      </ion-item>
+      <ion-item>
+        <ion-label>{{ 'CONFIGURATIONS.APP_LOGO_DARK' | translate }}</ion-label>
+        <ion-avatar slot="end"><ion-img [src]="configurations.appLogoURLDarkMode ?? app.getIcon(true)" /></ion-avatar>
+        <input
+          #appLogoDarkModeInput
+          type="file"
+          accept="image/*"
+          style="display: none"
+          (change)="uploadAppLogo($event, true)"
+        />
+        <ion-button slot="end" fill="clear" color="medium" (click)="appLogoDarkModeInput.click()">
+          <ion-icon icon="cloud-upload-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button slot="end" fill="clear" color="danger" (click)="resetAppLogo(true)">
+          <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <idea-show-hint-button slot="start" hint="CONFIGURATIONS.APP_LOGO_DARK" translate />
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">{{ 'CONFIGURATIONS.ORIGIN_DISPLAY_PREFERENCE' | translate }}</ion-label>
+        <ion-select
+          interface="popover"
+          [(ngModel)]="configurations.usersOriginDisplay"
+          (ionChange)="updateConfigurations()"
+        >
+          <ion-select-option *ngFor="let dp of UODP | keyvalue" [value]="dp.value">
+            {{ 'CONFIGURATIONS.ORIGIN_DISPLAY_PREFERENCES.' + dp.key | translate }}
+          </ion-select-option>
+        </ion-select>
+        <idea-show-hint-button
+          slot="start"
+          class="ion-margin-top"
+          hint="CONFIGURATIONS.ORIGIN_DISPLAY_PREFERENCE"
+          translate
+        />
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="aList" *ngIf="pageSection === PageSections.USERS">
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'CONFIGURATIONS.GIVE_BADGES' | translate }}</h2>
+          <p>{{ 'CONFIGURATIONS.GIVE_BADGES_I' | translate }}</p></ion-label
+        >
+      </ion-list-header>
+      <p class="ion-text-center">
+        <ion-button (click)="openBadgesModal()">{{ 'CONFIGURATIONS.GIVE_A_BADGE' | translate }}</ion-button>
+      </p>
+      <ion-list-header class="ion-padding-top">
+        <ion-label>
+          <h2>{{ 'CONFIGURATIONS.ADMINISTRATORS' | translate }}</h2>
+          <p>{{ 'CONFIGURATIONS.ADMINISTRATORS_I' | translate }}</p>
+        </ion-label>
+        <ion-button (click)="addAdministrator()">{{ 'COMMON.ADD' | translate }}</ion-button>
+      </ion-list-header>
+      <ion-item *ngIf="!configurations">
+        <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
+      </ion-item>
+      <ion-item *ngFor="let administratorId of configurations?.administratorsIds">
+        <ion-label>{{ administratorId }}</ion-label>
+        <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(administratorId)">
+          <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button
+          fill="clear"
+          color="danger"
+          slot="end"
+          *ngIf="configurations.administratorsIds.length > 1"
+          (click)="removeAdministratorById(administratorId)"
+        >
+          <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-list-header class="ion-padding-top">
+        <ion-label>
+          <h2>{{ 'CONFIGURATIONS.OPPORTUNITIES_MANAGERS' | translate }}</h2>
+          <p>{{ 'CONFIGURATIONS.OPPORTUNITIES_MANAGERS_I' | translate }}</p>
+        </ion-label>
+        <ion-button (click)="addOpportunitiesManager()">{{ 'COMMON.ADD' | translate }}</ion-button>
+      </ion-list-header>
+      <ion-item *ngIf="!configurations">
+        <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
+      </ion-item>
+      <ion-item
+        class="noElements"
+        *ngIf="configurations?.opportunitiesManagersIds && !configurations.opportunitiesManagersIds.length"
       >
-    </ion-list-header>
-    <ion-item button detail (click)="app.goToInTabs(['configurations', 'events'])">
-      <ion-label>{{ 'CONFIGURATIONS.EVENTS' | translate }}</ion-label>
-    </ion-item>
-    <ion-item button detail (click)="app.goToInTabs(['configurations', 'categories'])">
-      <ion-label>{{ 'CONFIGURATIONS.CATEGORIES' | translate }}</ion-label>
-    </ion-item>
-    <ion-list-header>
-      <ion-label>
-        <h2>{{ 'CONFIGURATIONS.GIVE_BADGES' | translate }}</h2>
-        <p>{{ 'CONFIGURATIONS.GIVE_BADGES_I' | translate }}</p></ion-label
-      >
-    </ion-list-header>
-    <p class="ion-text-center">
-      <ion-button (click)="openBadgesModal()">{{ 'CONFIGURATIONS.GIVE_A_BADGE' | translate }}</ion-button>
-    </p>
-    <ion-list-header class="ion-padding-top">
-      <ion-label>
-        <h2>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES' | translate }}</h2>
-        <p>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_I' | translate }}</p>
-      </ion-label>
-    </ion-list-header>
-    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.QUESTIONS)">
-      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.QUESTIONS' | translate }}</ion-label>
-    </ion-item>
-    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.ANSWERS)">
-      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.ANSWERS' | translate }}</ion-label>
-    </ion-item>
-    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_APPROVED)">
-      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_APPROVED' | translate }}</ion-label>
-    </ion-item>
-    <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_REJECTED)">
-      <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_REJECTED' | translate }}</ion-label>
-    </ion-item>
-    <ion-list-header class="ion-padding-top">
-      <ion-label>
-        <h2>{{ 'CONFIGURATIONS.ADMINISTRATORS' | translate }}</h2>
-        <p>{{ 'CONFIGURATIONS.ADMINISTRATORS_I' | translate }}</p>
-      </ion-label>
-      <ion-button (click)="addAdministrator()">{{ 'COMMON.ADD' | translate }}</ion-button>
-    </ion-list-header>
-    <ion-item *ngIf="!configurations">
-      <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
-    </ion-item>
-    <ion-item *ngFor="let administratorId of configurations?.administratorsIds">
-      <ion-label>{{ administratorId }}</ion-label>
-      <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(administratorId)">
-        <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button
-        fill="clear"
-        color="danger"
-        slot="end"
-        *ngIf="configurations.administratorsIds.length > 1"
-        (click)="removeAdministratorById(administratorId)"
-      >
-        <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-item>
-    <ion-list-header class="ion-padding-top">
-      <ion-label>
-        <h2>{{ 'CONFIGURATIONS.OPPORTUNITIES_MANAGERS' | translate }}</h2>
-        <p>{{ 'CONFIGURATIONS.OPPORTUNITIES_MANAGERS_I' | translate }}</p>
-      </ion-label>
-      <ion-button (click)="addOpportunitiesManager()">{{ 'COMMON.ADD' | translate }}</ion-button>
-    </ion-list-header>
-    <ion-item *ngIf="!configurations">
-      <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
-    </ion-item>
-    <ion-item
-      class="noElements"
-      *ngIf="configurations?.opportunitiesManagersIds && !configurations.opportunitiesManagersIds.length"
-    >
-      <ion-label>{{ 'CONFIGURATIONS.NO_USERS_ADDED' | translate }}</ion-label>
-    </ion-item>
-    <ion-item *ngFor="let managerId of configurations?.opportunitiesManagersIds">
-      <ion-label>{{ managerId }}</ion-label>
-      <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(managerId)">
-        <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" color="danger" slot="end" (click)="removeOpportunitiesManagerById(managerId)">
-        <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-item>
-    <ion-list-header class="ion-padding-top">
-      <ion-label>
-        <h2>{{ 'CONFIGURATIONS.BANNED_USERS' | translate }}</h2>
-        <p>{{ 'CONFIGURATIONS.BANNED_USERS_I' | translate }}</p>
-      </ion-label>
-      <ion-button (click)="addBannedUser()">{{ 'COMMON.ADD' | translate }}</ion-button>
-    </ion-list-header>
-    <ion-item *ngIf="!configurations">
-      <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
-    </ion-item>
-    <ion-item class="noElements" *ngIf="configurations?.bannedUsersIds && !configurations.bannedUsersIds.length">
-      <ion-label>{{ 'CONFIGURATIONS.NO_BANNED_USERS' | translate }}</ion-label>
-    </ion-item>
-    <ion-item *ngFor="let userId of configurations?.bannedUsersIds">
-      <ion-label>{{ userId }}</ion-label>
-      <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(userId)">
-        <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" color="danger" slot="end" (click)="removeBannedUserById(userId)">
-        <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-item>
-  </ion-list>
+        <ion-label>{{ 'CONFIGURATIONS.NO_USERS_ADDED' | translate }}</ion-label>
+      </ion-item>
+      <ion-item *ngFor="let managerId of configurations?.opportunitiesManagersIds">
+        <ion-label>{{ managerId }}</ion-label>
+        <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(managerId)">
+          <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="danger" slot="end" (click)="removeOpportunitiesManagerById(managerId)">
+          <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-list-header class="ion-padding-top">
+        <ion-label>
+          <h2>{{ 'CONFIGURATIONS.BANNED_USERS' | translate }}</h2>
+          <p>{{ 'CONFIGURATIONS.BANNED_USERS_I' | translate }}</p>
+        </ion-label>
+        <ion-button (click)="addBannedUser()">{{ 'COMMON.ADD' | translate }}</ion-button>
+      </ion-list-header>
+      <ion-item *ngIf="!configurations">
+        <ion-label><ion-skeleton-text animated></ion-skeleton-text></ion-label>
+      </ion-item>
+      <ion-item class="noElements" *ngIf="configurations?.bannedUsersIds && !configurations.bannedUsersIds.length">
+        <ion-label>{{ 'CONFIGURATIONS.NO_BANNED_USERS' | translate }}</ion-label>
+      </ion-item>
+      <ion-item *ngFor="let userId of configurations?.bannedUsersIds">
+        <ion-label>{{ userId }}</ion-label>
+        <ion-button fill="clear" color="medium" slot="end" (click)="app.openUserProfileById(userId)">
+          <ion-icon icon="open-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="danger" slot="end" (click)="removeBannedUserById(userId)">
+          <ion-icon icon="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="aList" *ngIf="pageSection === PageSections.TEMPLATES">
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES' | translate }}</h2>
+          <p>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_I' | translate }}</p>
+        </ion-label>
+      </ion-list-header>
+      <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.QUESTIONS)">
+        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.QUESTIONS' | translate }}</ion-label>
+      </ion-item>
+      <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.ANSWERS)">
+        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.ANSWERS' | translate }}</ion-label>
+      </ion-item>
+      <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_APPROVED)">
+        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_APPROVED' | translate }}</ion-label>
+      </ion-item>
+      <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_REJECTED)">
+        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_REJECTED' | translate }}</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>

@@ -14,7 +14,6 @@ import { Configurations } from '../models/configurations.model';
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const PROJECT = process.env.PROJECT;
 const DDB_TABLES = {
   messages: process.env.DDB_TABLE_messages,
   topics: process.env.DDB_TABLE_topics,
@@ -80,7 +79,7 @@ class MessagesRC extends ResourceController {
     if (!this.topic.canUserInteract(this.galaxyUser)) throw new Error('Not allowed to interact');
 
     const { bannedUsersIds } = new Configurations(
-      await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: PROJECT } })
+      await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
     );
     if (bannedUsersIds.includes(this.galaxyUser.userId)) throw new Error('User is banned');
 

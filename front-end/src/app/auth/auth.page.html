@@ -4,7 +4,7 @@
       <ion-img [src]="app.getIcon()"></ion-img>
       <ion-card-header>
         <ion-card-subtitle>{{ 'AUTH.SUBTITLE' | translate }}</ion-card-subtitle>
-        <ion-card-title>{{ 'AUTH.TITLE' | translate }}</ion-card-title>
+        <ion-card-title>{{ app.configurations.appTitle }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-button (click)="startLoginFlowWithESNAccounts()">

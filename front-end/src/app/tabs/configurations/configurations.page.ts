@@ -7,8 +7,9 @@ import { GiveBadgesComponent } from './badges/giveBadges.component';
 
 import { AppService } from '@app/app.service';
 import { ConfigurationsService } from './configurations.service';
+import { MediaService } from '@app/common/media.service';
 
-import { Configurations, EmailTemplates } from '@models/configurations.model';
+import { Configurations, EmailTemplates, UsersOriginDisplayOptions } from '@models/configurations.model';
 
 @Component({
   selector: 'configurations',
@@ -18,7 +19,11 @@ import { Configurations, EmailTemplates } from '@models/configurations.model';
 export class ConfigurationsPage implements OnInit {
   configurations: Configurations;
 
+  pageSection = PageSections.CONTENTS;
+  PageSections = PageSections;
+
   EmailTemplates = EmailTemplates;
+  UODP = UsersOriginDisplayOptions;
 
   constructor(
     private modalCtrl: ModalController,
@@ -27,6 +32,7 @@ export class ConfigurationsPage implements OnInit {
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
     private _configurations: ConfigurationsService,
+    private _media: MediaService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
@@ -87,10 +93,11 @@ export class ConfigurationsPage implements OnInit {
     alert.present();
   }
 
-  private async updateConfigurations(newConfigurations: Configurations): Promise<void> {
+  async updateConfigurations(newConfigurations: Configurations = this.configurations): Promise<void> {
     try {
       await this.loading.show();
       this.configurations = await this._configurations.update(newConfigurations);
+      this.app.configurations.load(this.configurations);
       this.message.success('COMMON.OPERATION_COMPLETED');
     } catch (error) {
       this.message.error('COMMON.OPERATION_FAILED');
@@ -109,4 +116,63 @@ export class ConfigurationsPage implements OnInit {
     const modal = await this.modalCtrl.create({ component: GiveBadgesComponent });
     await modal.present();
   }
+
+  async changeAppTitle(): Promise<void> {
+    const header = this.t._('CONFIGURATIONS.APP_TITLE');
+    const inputs: any[] = [{ name: 'appTitle', type: 'text', value: this.configurations.appTitle }];
+    const doChange = async ({ appTitle }): Promise<void> => {
+      if (!appTitle) return;
+      const newConfigurations = new Configurations(this.configurations);
+      newConfigurations.appTitle = appTitle;
+      await this.updateConfigurations(newConfigurations);
+    };
+    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const alert = await this.alertCtrl.create({ header, inputs, buttons });
+    await alert.present();
+  }
+  async uploadAppLogo({ target }, darkMode = false): Promise<void> {
+    const file = target.files[0];
+    if (!file) return;
+
+    try {
+      await this.loading.show();
+      const imageURI = await this._media.uploadImage(file);
+      await sleepForNumSeconds(5);
+      const newConfigurations = new Configurations(this.configurations);
+      if (darkMode) newConfigurations.appLogoURLDarkMode = this.app.getImageURLByURI(imageURI);
+      else newConfigurations.appLogoURL = this.app.getImageURLByURI(imageURI);
+      this.updateConfigurations(newConfigurations);
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      if (target) target.value = '';
+      this.loading.hide();
+    }
+  }
+  async resetAppLogo(darkMode = false): Promise<void> {
+    const doReset = async (): Promise<void> => {
+      const newConfigurations = new Configurations(this.configurations);
+      if (darkMode) newConfigurations.appLogoURLDarkMode = null;
+      else newConfigurations.appLogoURL = null;
+      await this.updateConfigurations(newConfigurations);
+    };
+    const header = this.t._('CONFIGURATIONS.RESET_APP_LOGO');
+    const message = this.t._('CONFIGURATIONS.RESET_APP_LOGO_I');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.RESET'), role: 'destructive', handler: doReset }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
+  }
 }
+
+enum PageSections {
+  CONTENTS = 'CONTENTS',
+  USERS = 'USERS',
+  TEMPLATES = 'TEMPLATES',
+  OPTIONS = 'OPTIONS'
+}
+
+const sleepForNumSeconds = (numSeconds = 1): Promise<void> =>
+  new Promise(resolve => setTimeout((): void => resolve(null), 1000 * numSeconds));
