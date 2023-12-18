@@ -203,7 +203,7 @@
     "SEE_ALL_DEADLINES": "See all",
     "USEFUL_LINKS": "Useful links",
     "USEFUL_LINKS_I": "Access more information through these sources.",
-    "STATISTICS_RECAP": "In the last {{days}} days, we had <b>{{users}}</b> visiting users from <b>{{countries}}</b> ESN countries.",
+    "STATISTICS_RECAP": "In the last {{days}} days, we had <b>{{users}}</b> visiting users from <b>{{countries}}</b> ESN countries and <b>{{sections}}</b> ESN sections.",
     "STATISTICS_APP_ACCESS": "App access"
   },
   "COMMUNICATIONS": {
@@ -438,7 +438,8 @@
     "GROUP_BY": "Group by",
     "GROUP_BYS": {
       "NONE": "None",
-      "COUNTRY": "ESN country"
+      "COUNTRY": "ESN country",
+      "SECTION": "ESN section"
     },
     "TODAY": "Today",
     "GRANULARITY": "Granularity",
@@ -456,7 +457,7 @@
       "ONE_WEEK": "One week",
       "TODAY": "Today"
     },
-    "ALL_COUNTRIES": "All countries",
+    "ALL_USERS": "All users",
     "TOTALS": "Totals"
   },
   "DRAFTS": {
