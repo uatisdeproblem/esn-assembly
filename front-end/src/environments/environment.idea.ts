@@ -11,7 +11,7 @@ const STAGE = 'prod';
 export const environment = {
   idea: {
     app: {
-      version: '1.6.0',
+      version: '1.7.0',
       url: 'https://'.concat(stages[STAGE].domain),
       mediaUrl: 'https://'.concat(parameters.mediaDomain),
       maxFileUploadSizeMB: 50
