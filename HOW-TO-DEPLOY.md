@@ -36,6 +36,7 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
 1. Identify the file `/back-end/deploy/environments.ts` and fix the configuration with your values; explanation:
    - `PROJECT`: choose a key to identify the project and its resources. _Tip: try not to use a key too simple, to avoid naming-overlapping on global resources. An optimal name would be something like: esn-italy-assembly_. **Please use only smaller case letters and dashes to avoid uncompatibility issues later on.**
    - `DOMAIN`: the domain name you purchased/imported earlier. Example: _esn-italy-assembly.link_.
+   - `PROD_CUSTOM_DOMAIN`: set it to `null` as for the example in the comment next to the constant.
 1. You can create as many enviroments (stages) as you like; a common (the default) configuration is with _prod_ and _dev_ stages, but you can also create only a production stage or whatever you like.
 1. From the terminal/prompt, make sure to be in the `/back-end` folder of the project, substitute the STAGE variable (based on the stage/environment you want to deploy) and run:
    ```
