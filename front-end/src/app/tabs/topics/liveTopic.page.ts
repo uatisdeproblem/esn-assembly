@@ -101,8 +101,8 @@ export class LiveTopicPage implements OnInit, OnDestroy {
       this._topics.getRelated(this.topic),
       this._topics.userMessagesUpvotesForTopic(this.topic)
     ]);
-    this.showCompletedQuestions = this.topic.isClosed();
-    this.showCompletedAppreciations = this.topic.isClosed();
+    this.showCompletedQuestions = this.topic.isArchived();
+    this.showCompletedAppreciations = this.topic.isArchived();
     await this.filterQuestions();
     await this.filterAppreciations();
   }
