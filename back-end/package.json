@@ -5,8 +5,7 @@
     "lint": "eslint --ext .ts",
     "compile": "tsc --build",
     "deploy": "cdk deploy",
-    "cdk": "cdk",
-    "deploy-quick": "npm run compile && cdk --profile esn-ga deploy esn-ga-dev-api --context stage=dev --exclusively --hotswap"
+    "cdk": "cdk"
   },
   "dependencies": {
     "axios": "^1.4.0",

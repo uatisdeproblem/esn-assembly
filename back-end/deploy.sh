@@ -1,9 +1,8 @@
 #!/bin/bash
 
 # project-specific parameters
+AWS_PROFILE='esn-ga'
 PROJECT='esn-ga'
-AWS_REGION='eu-south-1'
-AWS_PROFILE=${PROJECT}
 
 # other parameters
 ACTION=$1
@@ -35,11 +34,11 @@ then
   exit -1
 fi
 
-# run the deploy-quick script and exit
+# run the deploy-quick script witg AWS CDK and exit
 if [ "${ACTION}" == "quick" ]
 then
-  npm run deploy "${PROJECT}-${STAGE}-api" -- --context stage=${STAGE} --require-approval never \
-    --profile ${AWS_PROFILE}
+  npm run compile && npm run deploy "${PROJECT}-dev-api" \
+    -- --context stage=dev --exclusively --hotswap --profile ${AWS_PROFILE}
   exit 0
 fi
 

@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # project specific parameters
-S3_BUCKET_PROD='esn-ga-prod-front-end'
-S3_BUCKET_DEV='esn-ga-dev-front-end'
-CLOUDFRONT_DISTRIBUTION_PROD='E2FWX60SOS2YXY'
-CLOUDFRONT_DISTRIBUTION_DEV='E1WNG2ZF95YL8E'
 AWS_PROFILE='esn-ga'
+DOMAIN_PROD='esn-ga.link'
+DOMAIN_DEV='dev.esn-ga.link'
 
 # other parameters
 ACTION=$1
@@ -29,16 +27,13 @@ then
   exit -1
 fi
 
-if [ "${ACTION}" == 'dev' ]
+if [ "${ACTION}" == 'prod' ]
 then
-  ENVIRONMENT='DEVELOPMENT'
-  BUCKET="s3://${S3_BUCKET_DEV}"
-  DISTRIBUTION=${CLOUDFRONT_DISTRIBUTION_DEV}
+  DOMAIN=${DOMAIN_PROD}
 else
-  ENVIRONMENT='PRODUCTION'
-  BUCKET="s3://${S3_BUCKET_PROD}"
-  DISTRIBUTION=${CLOUDFRONT_DISTRIBUTION_PROD}
+  DOMAIN=${DOMAIN_DEV}
 fi
+echo -e "${C}Target domain: ${DOMAIN}${NC}"
 
 # install the npm modules
 echo -e "${C}Installing npm modules...${NC}"
@@ -52,9 +47,14 @@ npm run lint ${SRC_FOLDER} 1>/dev/null
 echo -e "${C}Compiling...${NC}"
 ionic build --prod 1>/dev/null
 
+# get the target CloudFront distribution and S3 bucket (from the domain)
+DISTRIBUTION=`aws cloudfront list-distributions --query "DistributionList.Items[*].{Id: Id, Aliases: Aliases.Items[?(@ == '${DOMAIN}')]} | [?Aliases].[Id]" --profile ${AWS_PROFILE} --output text`
+BUCKET=`aws cloudfront get-distribution --id ${DISTRIBUTION} --profile ${AWS_PROFILE} --output text \
+ --query "Distribution.DistributionConfig.Origins.Items[0].DomainName" | cut -d "." -f 1`
+
 # upload the project's files to the S3 bucket
 echo -e "${C}Uploading...${NC}"
-aws s3 sync ./www ${BUCKET} --profile ${AWS_PROFILE} --exclude ".well-known/*" 1>/dev/null
+aws s3 sync ./www s3://${BUCKET} --profile ${AWS_PROFILE} --exclude ".well-known/*" 1>/dev/null
 
 # invalidate old common files from the CloudFront distribution
 echo -e "${C}Cleaning...${NC}"

@@ -12,13 +12,16 @@ export const parameters: Parameters = {
   apiDomain: 'api.'.concat(DOMAIN),
   webSocketApiDomain: 'socket.'.concat(DOMAIN),
   mediaDomain: 'media.'.concat(DOMAIN),
-  frontEndCertificateARN: 'arn:aws:acm:us-east-1:772823474617:certificate/12d7466b-c989-46ee-86c5-61b2cda3c35c' // @todo to remove in main branch
+  frontEndCertificateARN:
+    DOMAIN === 'esn-ga.link'
+      ? 'arn:aws:acm:us-east-1:772823474617:certificate/12d7466b-c989-46ee-86c5-61b2cda3c35c'
+      : undefined
 };
 
 export const stages: { [stage: string]: Stage } = {
   prod: {
-    domain: 'ga.esn.org',
-    alternativeDomains: [DOMAIN],
+    domain: DOMAIN === 'esn-ga.link' ? 'ga.esn.org' : DOMAIN,
+    alternativeDomains: DOMAIN === 'esn-ga.link' ? ['esn-ga.link'] : undefined,
     destroyDataOnDelete: false
   },
   dev: {

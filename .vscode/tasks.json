@@ -25,7 +25,7 @@
     {
       "label": "Quickly deploy Lambda fn source code changed (dev back-end)",
       "type": "shell",
-      "command": "npm run deploy-quick",
+      "command": "./deploy.sh quick",
       "group": "build",
       "options": { "cwd": "back-end" },
       "presentation": {
