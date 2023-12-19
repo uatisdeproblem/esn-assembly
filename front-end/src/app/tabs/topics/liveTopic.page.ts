@@ -398,7 +398,8 @@ export class LiveTopicPage implements OnInit, OnDestroy {
   async enterFullScreen(): Promise<void> {
     this.fullScreen = true;
     setTimeout((): void => {
-      this.generateQRCodeCanvasByURL(env.idea.app.url.concat(`/t/topics/${this.topic.topicId}/live`));
+      const baseURL = window.location.protocol.concat('//', window.location.host);
+      this.generateQRCodeCanvasByURL(baseURL.concat(`/t/topics/${this.topic.topicId}/live`));
     });
   }
   exitFullScreen(): void {
