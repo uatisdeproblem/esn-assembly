@@ -51,7 +51,9 @@ export class FrontEndStack extends cdk.Stack {
       originConfigs: [
         {
           s3OriginSource: { s3BucketSource: frontEndBucket, originAccessIdentity: frontEndDistributionOAI },
-          behaviors: [{ isDefaultBehavior: true }]
+          behaviors: [
+            { isDefaultBehavior: true, defaultTtl: cdk.Duration.days(1), maxTtl: cdk.Duration.days(1), compress: true }
+          ]
         }
       ],
       viewerProtocolPolicy: CloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,

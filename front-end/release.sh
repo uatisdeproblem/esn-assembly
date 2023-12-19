@@ -54,7 +54,7 @@ BUCKET=`aws cloudfront get-distribution --id ${DISTRIBUTION} --profile ${AWS_PRO
 
 # upload the project's files to the S3 bucket
 echo -e "${C}Uploading...${NC}"
-aws s3 sync ./www s3://${BUCKET} --profile ${AWS_PROFILE} --exclude ".well-known/*" 1>/dev/null
+aws s3 sync ./www s3://${BUCKET} --profile ${AWS_PROFILE} --delete --exclude ".well-known/*" 1>/dev/null
 
 # invalidate old common files from the CloudFront distribution
 echo -e "${C}Cleaning...${NC}"
