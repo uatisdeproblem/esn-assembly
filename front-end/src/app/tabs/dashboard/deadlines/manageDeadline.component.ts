@@ -3,14 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { Component, Input } from '@angular/core';
 import { AlertController, IonicModule, ModalController } from '@ionic/angular';
 import {
-  IDEADateTimeModule,
   IDEALoadingService,
   IDEAMessageService,
   IDEATranslationsModule,
   IDEATranslationsService
 } from '@idea-ionic/common';
 
-import { EventsPickerComponent } from 'src/app/common/eventsPicker.component';
+import { EventsPickerComponent } from '@common/eventsPicker.component';
+import { DatetimeWithTimezoneStandaloneComponent } from '@common/datetimeWithTimezone';
 
 import { AppService } from '@app/app.service';
 import { DeadlinesService } from './deadlines.service';
@@ -19,7 +19,14 @@ import { Deadline } from '@models/deadline.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, IDEADateTimeModule, EventsPickerComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    IDEATranslationsModule,
+    EventsPickerComponent,
+    DatetimeWithTimezoneStandaloneComponent
+  ],
   selector: 'app-manage-deadline',
   template: `
     <ion-header class="ion-no-border">
@@ -71,15 +78,12 @@ import { Deadline } from '@models/deadline.model';
           [editMode]="true"
           [(event)]="deadline.event"
         ></app-events-picker>
-        <idea-date-time
-          [(date)]="deadline.at"
-          [useISOFormat]="true"
-          [manualTimePicker]="true"
+        <app-datetime-timezone
           [label]="'DEADLINES.DATE' | translate"
           [obligatory]="true"
-          [hideClearButton]="true"
           [class.fieldHasError]="hasFieldAnError('at')"
-        ></idea-date-time>
+          [(date)]="deadline.at"
+        />
         <ion-item-divider>
           <ion-label class="ion-text-wrap ion-padding-start">
             <p>

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { IDEACheckerModule, IDEADateTimeModule, IDEATranslationsModule } from '@idea-ionic/common';
+import { IDEACheckerModule, IDEATranslationsModule } from '@idea-ionic/common';
 
 import { SubjectModule } from '@common/subject.module';
 import { EditModeButtonsModule } from '@common/editModeButtons.module';
@@ -11,7 +11,8 @@ import { HTMLEditorModule } from '@common/htmlEditor.module';
 import { EventsPickerComponent } from '@common/eventsPicker.component';
 import { CategoriesPickerComponent } from '@common/categoriesPicker.component';
 import { StatisticsModule } from '@common/statistics.module';
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DatetimeWithTimezoneStandaloneComponent } from '@common/datetimeWithTimezone';
 
 import { TopicsRoutingModule } from './topics.routing.module';
 import { TopicsPage } from './topics.page';
@@ -29,7 +30,6 @@ import { QuestionModule } from './questions/question.module';
     IonicModule,
     IDEATranslationsModule,
     IDEACheckerModule,
-    IDEADateTimeModule,
     TopicsRoutingModule,
     TopicModule,
     QuestionModule,
@@ -40,7 +40,8 @@ import { QuestionModule } from './questions/question.module';
     EventsPickerComponent,
     CategoriesPickerComponent,
     StatisticsModule,
-    AppDateTimezonePipe
+    DateTimezonePipe,
+    DatetimeWithTimezoneStandaloneComponent
   ],
   declarations: [TopicsPage, StandardTopicPage, LiveTopicPage, ManageTopicPage]
 })

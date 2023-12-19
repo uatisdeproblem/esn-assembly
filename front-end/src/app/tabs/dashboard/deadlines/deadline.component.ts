@@ -4,7 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { isToday, isTomorrow } from 'date-fns';
 import { IDEATranslationsModule, IDEATranslationsService } from '@idea-ionic/common';
 
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { AppService } from '@app/app.service';
 
@@ -12,7 +12,7 @@ import { Deadline } from '@models/deadline.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule, AppDateTimezonePipe],
+  imports: [CommonModule, IonicModule, IDEATranslationsModule, DateTimezonePipe],
   selector: 'app-deadline',
   template: `
     <ion-item [color]="color" *ngIf="!deadline">

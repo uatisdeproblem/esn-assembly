@@ -7,7 +7,7 @@ import { AppService } from '@app/app.service';
  * Handle dates with the timezone preference loaded from the configurations.
  */
 @Pipe({ name: 'dateTz', pure: false, standalone: true })
-export class AppDateTimezonePipe implements PipeTransform {
+export class DateTimezonePipe implements PipeTransform {
   constructor(private t: IDEATranslationsService, private app: AppService) {}
 
   transform(value: any, pattern: 'date' | 'datetime' | 'time' = 'date'): string | null {

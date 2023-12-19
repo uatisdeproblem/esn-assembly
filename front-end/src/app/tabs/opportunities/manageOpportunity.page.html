@@ -30,16 +30,13 @@
         <ion-label>{{ ('OPPORTUNITIES.PUBLISHING_OPTIONS_.' + option.value) | translate }}</ion-label>
       </ion-item>
     </ion-radio-group>
-    <idea-date-time
+    <app-datetime-timezone
       *ngIf="publishingOption === PublishingOptions.SCHEDULE"
-      [(date)]="opportunity.publishedSince"
-      [useISOFormat]="true"
-      [manualTimePicker]="true"
       [label]="'OPPORTUNITIES.PUBLISH_ON' | translate"
       [disabled]="!editMode"
-      [hideClearButton]="true"
       [class.fieldHasError]="hasFieldAnError('publishedSince')"
-    ></idea-date-time>
+      [(date)]="opportunity.publishedSince"
+    />
     <ion-list-header>
       <ion-label>
         <h2>{{ 'OPPORTUNITIES.DEADLINES' | translate }}</h2>
@@ -55,16 +52,13 @@
       ></ion-checkbox>
       <ion-label>{{ 'OPPORTUNITIES.SET_DEADLINE_APPLICATIONS' | translate }}</ion-label>
     </ion-item>
-    <idea-date-time
+    <app-datetime-timezone
       *ngIf="hasDeadline"
-      [(date)]="opportunity.willCloseAt"
-      [useISOFormat]="true"
-      [manualTimePicker]="true"
       [label]="'OPPORTUNITIES.DEADLINE_APPLICATIONS' | translate"
       [disabled]="!editMode"
-      [hideClearButton]="true"
       [class.fieldHasError]="hasFieldAnError('willCloseAt')"
-    ></idea-date-time>
+      [(date)]="opportunity.willCloseAt"
+    />
     <ion-list-header>
       <ion-label><h2>{{ 'OPPORTUNITIES.CONTENT' | translate }}</h2></ion-label>
     </ion-list-header>

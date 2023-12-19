@@ -4,13 +4,13 @@ import { IonicModule, ModalController } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { HTMLEditorModule } from '@common/htmlEditor.module';
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { Communication } from '@models/communication.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule, HTMLEditorModule, AppDateTimezonePipe],
+  imports: [CommonModule, IonicModule, IDEATranslationsModule, HTMLEditorModule, DateTimezonePipe],
   selector: 'app-communication-detail',
   template: `
     <ion-header class="ion-no-border">

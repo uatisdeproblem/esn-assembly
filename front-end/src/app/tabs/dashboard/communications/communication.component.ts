@@ -3,13 +3,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { Communication } from '@models/communication.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule, AppDateTimezonePipe],
+  imports: [CommonModule, IonicModule, IDEATranslationsModule, DateTimezonePipe],
   selector: 'app-communication',
   template: `
     <ion-card [color]="color" *ngIf="!communication">

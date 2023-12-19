@@ -42,16 +42,13 @@
         <ion-label>{{ ('TOPICS.PUBLISHING_OPTIONS_.' + option.value) | translate }}</ion-label>
       </ion-item>
     </ion-radio-group>
-    <idea-date-time
+    <app-datetime-timezone
       *ngIf="publishingOption === PublishingOptions.SCHEDULE"
       [(date)]="topic.publishedSince"
-      [useISOFormat]="true"
-      [manualTimePicker]="true"
       [label]="'TOPICS.PUBLISH_ON' | translate"
       [disabled]="!editMode"
-      [hideClearButton]="true"
       [class.fieldHasError]="hasFieldAnError('publishedSince')"
-    ></idea-date-time>
+    />
     <ng-container *ngIf="topic.type === TopicTypes.LIVE">
       <ion-list-header>
         <ion-label class="ion-text-wrap">
@@ -59,15 +56,12 @@
           <p>{{ 'TOPICS.SHOULD_BE_LIVE_ON_II' | translate }}</p>
         </ion-label>
       </ion-list-header>
-      <idea-date-time
+      <app-datetime-timezone
         [(date)]="topic.shouldBeLiveAt"
-        [useISOFormat]="true"
-        [manualTimePicker]="true"
         [label]="'TOPICS.SHOULD_BE_LIVE_ON' | translate"
         [disabled]="!editMode"
-        [hideClearButton]="true"
         [class.fieldHasError]="hasFieldAnError('shouldBeLiveAt')"
-      ></idea-date-time>
+      />
       <ion-list-header>
         <ion-label>
           <h2>{{ 'TOPICS.LIVE_OPTIONS' | translate }}</h2>
@@ -99,16 +93,13 @@
         ></ion-checkbox>
         <ion-label>{{ 'TOPICS.SET_DEADLINE_QUESTIONS' | translate }}</ion-label>
       </ion-item>
-      <idea-date-time
+      <app-datetime-timezone
         *ngIf="hasDeadlineForQuestions"
         [(date)]="topic.willCloseAt"
-        [useISOFormat]="true"
-        [manualTimePicker]="true"
         [label]="'TOPICS.DEADLINE_QUESTIONS' | translate"
         [disabled]="!editMode"
-        [hideClearButton]="true"
         [class.fieldHasError]="hasFieldAnError('willCloseAt')"
-      ></idea-date-time>
+      />
       <ion-item>
         <ion-checkbox
           slot="start"
@@ -118,16 +109,13 @@
         ></ion-checkbox>
         <ion-label>{{ 'TOPICS.SET_DEADLINE_ANSWERS' | translate }}</ion-label>
       </ion-item>
-      <idea-date-time
+      <app-datetime-timezone
         *ngIf="hasDeadlineForAnswers"
         [(date)]="topic.acceptAnswersUntil"
-        [useISOFormat]="true"
-        [manualTimePicker]="true"
         [label]="'TOPICS.DEADLINE_ANSWERS' | translate"
         [disabled]="!editMode"
-        [hideClearButton]="true"
         [class.fieldHasError]="hasFieldAnError('acceptAnswersUntil')"
-      ></idea-date-time>
+      />
     </ng-container>
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.CONTENT' | translate }}</h2></ion-label>

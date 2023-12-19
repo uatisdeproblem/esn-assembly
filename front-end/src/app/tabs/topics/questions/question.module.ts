@@ -10,7 +10,7 @@ import { QuestionComponent } from './question.component';
 import { SubjectModule } from '@common/subject.module';
 import { MessageBubbleModule } from '@common/messageBubble.module';
 import { HTMLEditorModule } from '@common/htmlEditor.module';
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 @NgModule({
   imports: [
@@ -21,7 +21,7 @@ import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
     SubjectModule,
     MessageBubbleModule,
     HTMLEditorModule,
-    AppDateTimezonePipe
+    DateTimezonePipe
   ],
   declarations: [QuestionSummaryComponent, QuestionComponent],
   exports: [QuestionSummaryComponent, QuestionComponent]

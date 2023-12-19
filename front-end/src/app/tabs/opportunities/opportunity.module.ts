@@ -5,12 +5,12 @@ import { IonicModule } from '@ionic/angular';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { StatisticsModule } from '@common/statistics.module';
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { OpportunityComponent } from './opportunity.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, StatisticsModule, AppDateTimezonePipe],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, StatisticsModule, DateTimezonePipe],
   declarations: [OpportunityComponent],
   exports: [OpportunityComponent]
 })

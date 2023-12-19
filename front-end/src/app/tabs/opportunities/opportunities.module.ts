@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { IDEADateTimeModule, IDEATranslationsModule } from '@idea-ionic/common';
+import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { OpportunitiesRoutingModule } from './opportunities.routing.module';
 import { OpportunitiesPage } from './opportunities.page';
@@ -17,7 +17,8 @@ import { AttachmentsModule } from '@common/attachments.module';
 import { HTMLEditorModule } from '@common/htmlEditor.module';
 import { SubjectModule } from '@common/subject.module';
 import { StatisticsModule } from '@common/statistics.module';
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DatetimeWithTimezoneStandaloneComponent } from '@common/datetimeWithTimezone';
 
 @NgModule({
   imports: [
@@ -25,7 +26,6 @@ import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
     FormsModule,
     IonicModule,
     IDEATranslationsModule,
-    IDEADateTimeModule,
     OpportunitiesRoutingModule,
     OpportunityModule,
     ApplicationStandaloneComponent,
@@ -35,7 +35,8 @@ import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
     HTMLEditorModule,
     SubjectModule,
     StatisticsModule,
-    AppDateTimezonePipe
+    DateTimezonePipe,
+    DatetimeWithTimezoneStandaloneComponent
   ],
   declarations: [OpportunitiesPage, ManageOpportunityPage, OpportunityPage]
 })

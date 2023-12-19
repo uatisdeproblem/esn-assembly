@@ -11,7 +11,7 @@ import {
 
 import { SubjectModule } from '@common/subject.module';
 import { HTMLEditorModule } from '@common/htmlEditor.module';
-import { AppDateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { AppService } from '@app/app.service';
 import { ApplicationsService } from './applications.service';
@@ -27,7 +27,7 @@ import { Application, ApplicationStatuses } from '@models/application.model';
     IDEATranslationsModule,
     SubjectModule,
     HTMLEditorModule,
-    AppDateTimezonePipe
+    DateTimezonePipe
   ],
   selector: 'app-application',
   template: `
