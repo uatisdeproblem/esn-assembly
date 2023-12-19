@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
     <ion-buttons slot="start">
-      <ion-button (click)="app.closePage()">
+      <ion-button (click)="app.goToInTabs(['opportunities'], { back: true })">
         <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -10,7 +10,7 @@
   <ion-toolbar class="filtersBar" color="ideaToolbar">
     <ion-buttons slot="start" *ngIf="!app.isInMobileMode()">
       <ion-item lines="none" class="ion-no-padding" color="ideaToolbar">
-        <ion-button slot="start" (click)="app.closePage()">
+        <ion-button slot="start" (click)="app.goToInTabs(['opportunities'], { back: true })">
           <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
         </ion-button>
         <ion-label><b>{{ 'ARCHIVE.OPPORTUNITIES_ARCHIVE' | translate }}</b></ion-label>

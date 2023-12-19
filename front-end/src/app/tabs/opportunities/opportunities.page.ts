@@ -33,6 +33,9 @@ export class OpportunitiesPage implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.loadResources();
   }
+  ionViewDidEnter(): void {
+    this.filter(null, null, true);
+  }
   private async loadResources(): Promise<void> {
     this.opportunities = await this._opportunities.getActiveList({ force: true, withPagination: true });
   }
@@ -42,12 +45,13 @@ export class OpportunitiesPage implements OnInit {
     refresh.complete();
   }
 
-  async filter(search = '', scrollToNextPage?: IonInfiniteScroll): Promise<void> {
+  async filter(search = '', scrollToNextPage?: IonInfiniteScroll, force = false): Promise<void> {
     let startPaginationAfterId = null;
     if (scrollToNextPage && this.opportunities?.length)
       startPaginationAfterId = this.opportunities[this.opportunities.length - 1].opportunityId;
 
     this.opportunities = await this._opportunities.getActiveList({
+      force,
       search,
       status: this.filterByStatus,
       withPagination: true,

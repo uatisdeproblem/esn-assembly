@@ -7,7 +7,7 @@
   </ion-toolbar>
   <ion-toolbar color="ideaToolbar">
     <ion-buttons slot="start">
-      <ion-button (click)="app.closePage()">
+      <ion-button (click)="app.goToInTabs(['configurations'], { back: true })">
         <ion-icon name="arrow-back" slot="end"></ion-icon>
       </ion-button>
     </ion-buttons>

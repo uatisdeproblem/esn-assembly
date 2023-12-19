@@ -49,6 +49,9 @@ export class TopicsPage implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.loadResources();
   }
+  ionViewDidEnter(): void {
+    this.filter(null, null, true);
+  }
   private async loadResources(): Promise<void> {
     this.topics = await this._topics.getActiveList({ force: true, withPagination: true });
     [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
@@ -59,11 +62,12 @@ export class TopicsPage implements OnInit {
     refresh.complete();
   }
 
-  async filter(search = '', scrollToNextPage?: IonInfiniteScroll): Promise<void> {
+  async filter(search = '', scrollToNextPage?: IonInfiniteScroll, force = false): Promise<void> {
     let startPaginationAfterId = null;
     if (scrollToNextPage && this.topics?.length) startPaginationAfterId = this.topics[this.topics.length - 1].topicId;
 
     this.topics = await this._topics.getActiveList({
+      force,
       search,
       categoryId: this.filterByCategory,
       eventId: this.filterByEvent,

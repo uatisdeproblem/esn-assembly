@@ -143,7 +143,7 @@ export class ManageOpportunityPage {
         if (open) await this._opportunities.open(this.opportunity);
         else await this._opportunities.close(this.opportunity);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.closePage();
+        this.app.goToInTabs(['opportunities', this.opportunity.opportunityId], { back: true });
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
@@ -165,7 +165,7 @@ export class ManageOpportunityPage {
         if (archive) await this._opportunities.archive(this.opportunity);
         else await this._opportunities.unarchive(this.opportunity);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.closePage();
+        this.app.goToInTabs(['opportunities', this.opportunity.opportunityId], { back: true });
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
@@ -186,7 +186,7 @@ export class ManageOpportunityPage {
         await this.loading.show();
         await this._opportunities.delete(this.opportunity);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.closePage(null, ['']);
+        this.app.goToInTabs(['opportunities'], { back: true });
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
@@ -208,7 +208,7 @@ export class ManageOpportunityPage {
     this.editMode = UXMode.EDIT;
   }
   exitEditMode(): void {
-    if (this.editMode === UXMode.INSERT) this.app.closePage();
+    if (this.editMode === UXMode.INSERT) this.app.goToInTabs(['opportunities'], { back: true });
     else {
       this.opportunity = this.entityBeforeChange;
       this.errors = new Set<string>();

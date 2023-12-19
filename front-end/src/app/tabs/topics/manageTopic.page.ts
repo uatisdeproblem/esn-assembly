@@ -190,7 +190,7 @@ export class ManageTopicPage {
         if (open) await this._topics.open(this.topic);
         else await this._topics.close(this.topic);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.closePage();
+        this.app.goToInTabs(['topics', this.topic.topicId], { back: true });
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
@@ -212,7 +212,7 @@ export class ManageTopicPage {
         if (archive) await this._topics.archive(this.topic);
         else await this._topics.unarchive(this.topic);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.closePage();
+        this.app.goToInTabs(['topics', this.topic.topicId], { back: true });
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
@@ -233,7 +233,7 @@ export class ManageTopicPage {
         await this.loading.show();
         await this._topics.delete(this.topic);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.closePage(null, ['']);
+        this.app.goToInTabs(['topics'], { back: true });
       } catch (error) {
         if (error.message === 'Unlink related topics first') this.message.error('TOPICS.CANT_DELETE_IF_LINKED_ERROR');
         else this.message.error('COMMON.OPERATION_FAILED');
@@ -256,7 +256,7 @@ export class ManageTopicPage {
     this.editMode = UXMode.EDIT;
   }
   exitEditMode(): void {
-    if (this.editMode === UXMode.INSERT) this.app.closePage();
+    if (this.editMode === UXMode.INSERT) this.app.goToInTabs(['topics'], { back: true });
     else {
       this.topic = this.entityBeforeChange;
       this.errors = new Set<string>();

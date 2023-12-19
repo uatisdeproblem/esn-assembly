@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
   <ion-toolbar color="ideaToolbar">
     <ion-buttons slot="start">
-      <ion-button (click)="currentQuestion ? selectQuestion(null) : app.closePage()">
+      <ion-button (click)="currentQuestion ? selectQuestion(null) : app.goToInTabs(['topics'], { back: true })">
         <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
