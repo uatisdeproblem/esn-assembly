@@ -424,10 +424,9 @@
     "DOWNLOAD_TEMPLATE": "Download active template",
     "VARIABLES": {
       "USER": "The full name of the user target of the notification",
-      "TOPIC": "The title of the topic",
-      "QUESTION": "The summary of the question",
-      "OPPORTUNITY": "The name of the opportunity",
-      "URL": "The link to the question/topic/opportunity/etc.",
+      "TITLE": "The title of the topic/opportunity/voting session/etc.",
+      "DETAIL": "The summary of the question/other detail",
+      "URL": "The link to the question/topic/opportunity/voting session/etc.",
       "MESSAGE": "The additional custom message"
     }
   },
