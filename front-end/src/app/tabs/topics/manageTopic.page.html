@@ -9,6 +9,11 @@
 </ion-header>
 <ion-content [class.viewMode]="!editMode">
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
+    <p class="ion-text-end" *ngIf="!editMode && !topic.isArchived()">
+      <ion-button [color]="topic.closedAt ? 'ESNgreen': 'ESNpink'" (click)="manageTopicStatus(!!topic.closedAt)">
+        {{ (topic.closedAt ? 'TOPICS.OPEN_TOPIC' : 'TOPICS.CLOSE_TOPIC') | translate }}
+      </ion-button>
+    </p>
     <ion-list-header>
       <ion-label><h2>{{ 'TOPICS.ATTRIBUTES' | translate }}</h2> </ion-label>
     </ion-list-header>
@@ -251,13 +256,11 @@
       (change)="setRolesAbleToInteractFromChecks()"
     ></idea-checker>
 
-    <p class="ion-text-center" *ngIf="!editMode && !topic.isArchived()">
-      <ion-button [color]="topic.closedAt ? 'ESNgreen': 'ESNpink'" (click)="manageTopicStatus(!!topic.closedAt)">
-        {{ (topic.closedAt ? 'TOPICS.OPEN_TOPIC' : 'TOPICS.CLOSE_TOPIC') | translate }}
-      </ion-button>
-    </p>
-    <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
+    <ion-row class="ion-padding-top ion-margin-top" *ngIf="editMode === UXMode.VIEW">
       <ion-col>
+        <ion-button color="medium" (click)="duplicateTopic()">{{ 'COMMON.DUPLICATE' | translate }}</ion-button>
+      </ion-col>
+      <ion-col class="ion-text-center">
         <ion-button color="warning" (click)="archiveTopic(!topic.isArchived())">
           {{ (topic.isArchived() ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
         </ion-button>

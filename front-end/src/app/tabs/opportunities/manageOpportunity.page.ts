@@ -202,6 +202,9 @@ export class ManageOpportunityPage {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
+  duplicateOpportunity(): void {
+    // @todo
+  }
 
   enterEditMode(): void {
     this.entityBeforeChange = new Opportunity(this.opportunity);

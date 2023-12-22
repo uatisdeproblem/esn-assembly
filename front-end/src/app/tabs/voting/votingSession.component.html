@@ -1,0 +1,66 @@
+<ng-container *ngIf="!row">
+  <ion-item *ngIf="votingSession" button (click)="select.emit()">
+    <ion-label class="ion-text-wrap">
+      <p class="eventName">{{ votingSession.event.name }}</p>
+      {{ votingSession.name }}
+      <p class="itemDetails">
+        <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
+          {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
+        </ion-badge>
+        <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
+          {{ 'VOTING.IN_PROGRESS' | translate }}
+        </ion-badge>
+      </p>
+    </ion-label>
+    <ng-container *ngIf="!votingSession.isArchived()">
+      <ion-badge slot="end" *ngIf="votingSession.isDraft()" color="medium">{{ 'VOTING.DRAFT' | translate }}</ion-badge>
+    </ng-container>
+  </ion-item>
+  <!-- skeleton -->
+  <ion-item *ngIf="!votingSession">
+    <ion-label>
+      <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      <p><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></p>
+    </ion-label>
+  </ion-item>
+</ng-container>
+<!-- row -->
+<ng-container *ngIf="row">
+  <ion-row class="ion-align-items-center headerRow" *ngIf="header">
+    <ion-col [sizeLg]="7" [sizeXl]="6">{{ 'VOTING.VOTING_SESSION' | translate }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeXl]="2">{{ 'VOTING.EVENT' | translate }}</ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2">{{ 'VOTING.TYPE' | translate }}</ion-col>
+    <ion-col [sizeLg]="2" [sizeXl]="1">{{ 'VOTING.STATUS' | translate }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeXl]="1">{{ 'VOTING.CREATED_AT' | translate }}</ion-col>
+  </ion-row>
+  <ion-row class="ion-align-items-center row tappable" *ngIf="!header && votingSession" (click)="select.emit()">
+    <ion-col [sizeLg]="7" [sizeXl]="6">
+      <b>{{ votingSession.name }}</b>
+    </ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeXl]="2">{{ votingSession.event.name }}</ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2">
+      <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
+        {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
+      </ion-badge>
+    </ion-col>
+    <ion-col [sizeLg]="2" [sizeXl]="1">
+      <ng-container *ngIf="!votingSession.isArchived()">
+        <ion-badge *ngIf="votingSession.isDraft()" color="medium">{{ 'VOTING.DRAFT' | translate }}</ion-badge>
+        <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
+          {{ 'VOTING.IN_PROGRESS' | translate }}
+        </ion-badge>
+      </ng-container>
+    </ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeXl]="1">
+      {{ votingSession.createdAt | dateTz }}
+    </ion-col>
+  </ion-row>
+  <!-- skeleton -->
+  <ion-row class="ion-align-items-center row" *ngIf="!header && !votingSession">
+    <ion-col [sizeLg]="7" [sizeXl]="6"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeXl]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="3" [sizeXl]="2"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col [sizeLg]="2" [sizeXl]="1"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeXl]="1"><ion-skeleton-text animated></ion-skeleton-text></ion-col>
+  </ion-row>
+</ng-container>

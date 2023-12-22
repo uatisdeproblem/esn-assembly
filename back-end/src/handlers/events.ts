@@ -12,6 +12,7 @@ import { Topic, StandardTopicQuestionsExportable, TopicTypes } from '../models/t
 import { User } from '../models/user.model';
 import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
+import { VotingSession } from '../models/votingSession.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -22,7 +23,8 @@ const DDB_TABLES = {
   events: process.env.DDB_TABLE_events,
   topics: process.env.DDB_TABLE_topics,
   questions: process.env.DDB_TABLE_questions,
-  answers: process.env.DDB_TABLE_answers
+  answers: process.env.DDB_TABLE_answers,
+  votingSessions: process.env.DDB_TABLE_votingSessions
 };
 const ddb = new DynamoDB();
 
@@ -168,6 +170,13 @@ class GAEvents extends ResourceController {
     const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
     const topicsWithEvent = topics.filter(x => x.event.eventId === this.gaEvent.eventId);
     if (topicsWithEvent.length > 0) throw new RCError('Event is used');
+
+    const votingSessions: VotingSession[] = await ddb.scan({
+      TableName: DDB_TABLES.votingSessions,
+      IndexName: 'sessionId-meta-index'
+    });
+    const votingSessionsWithEvent = votingSessions.filter(x => x.event.eventId === this.gaEvent.eventId);
+    if (votingSessionsWithEvent.length > 0) throw new RCError('Event is used');
 
     await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.gaEvent.eventId } });
   }

@@ -250,6 +250,9 @@ export class ManageTopicPage {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
+  duplicateTopic(): void {
+    // @todo
+  }
 
   enterEditMode(): void {
     this.entityBeforeChange = new Topic(this.topic);

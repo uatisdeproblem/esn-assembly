@@ -47,6 +47,8 @@ tags:
     description: The platform's opportunities to which users can apply to
   - name: Applications
     description: The user applications to the opportunities
+  - name: Voting
+    description: The voting sessions
 
 paths:
   /login:
@@ -2132,6 +2134,134 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
         400:
           $ref: '#/components/responses/BadParameters'
+  /voting-sessions:
+    get:
+      summary: Get the voting sessions
+      tags: [Voting]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: archived
+          in: query
+          description: Whether to get archived voting sessions instead of active ones
+          schema:
+            type: boolean
+      responses:
+        200:
+          $ref: '#/components/responses/VotingSessions'
+    post:
+      summary: Insert a new voting session
+      description: Requires to be Administrator
+      tags: [Voting]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VotingSession'
+      responses:
+        200:
+          $ref: '#/components/responses/VotingSession'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /voting-sessions/{sessionId}:
+    get:
+      summary: Get a voting session
+      tags: [Voting]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: sessionId
+          in: path
+          description: Session ID
+          required: true
+          schema:
+            type: string
+        - name: archived
+          in: query
+          description: Whether to filter based on the archivation status
+          schema:
+            type: boolean
+        - name: eventId
+          in: query
+          description: The event ID to filter
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/VotingSession'
+    put:
+      summary: Edit a voting session
+      description: Requires to be Administrator (or Scrutineer of the session)
+      tags: [Voting]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: sessionId
+          in: path
+          description: Session ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VotingSession'
+      responses:
+        200:
+          $ref: '#/components/responses/VotingSession'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a voting session
+      description: Requires to be Administrator
+      tags: [Voting]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: sessionId
+          in: path
+          description: Session ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on a voting session
+      description: Permissions depend on the ction
+      tags: [Voting]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: sessionId
+          in: path
+          description: Session ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [ARCHIVE, UNARCHIVE]
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
 
 components:
   schemas:
@@ -2181,6 +2311,9 @@ components:
       type: object
       additionalProperties: {}
     Application:
+      type: object
+      additionalProperties: {}
+    VotingSession:
       type: object
       additionalProperties: {}
 
@@ -2417,6 +2550,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Application'
+    VotingSession:
+      description: A voting session
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/VotingSession'
+    VotingSessions:
+      description: The voting sessions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/VotingSession'
     BadParameters:
       description: Bad input parameters
       content:

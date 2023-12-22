@@ -1,0 +1,34 @@
+ion-badge[slot='end'] {
+  margin-left: 12px;
+}
+
+ion-item {
+  p.eventName {
+    padding-top: 4px;
+  }
+  p.itemDetails {
+    padding-top: 6px;
+    padding-bottom: 4px;
+  }
+}
+
+ion-row.headerRow {
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+ion-row.row {
+  font-size: 0.9em;
+  border-bottom: 0.8px solid var(--ion-color-white-tint);
+  b {
+    font-weight: 500;
+  }
+}
+ion-row.row,
+ion-row.headerRow {
+  padding: 10px;
+  ion-badge,
+  ion-avatar {
+    vertical-align: sub;
+  }
+}

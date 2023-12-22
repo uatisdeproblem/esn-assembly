@@ -9,6 +9,14 @@
 </ion-header>
 <ion-content [class.viewMode]="!editMode">
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="opportunity">
+    <p class="ion-text-end" *ngIf="!editMode && !opportunity.isArchived()">
+      <ion-button
+        [color]="opportunity.closedAt ? 'ESNgreen': 'ESNpink'"
+        (click)="manageOpportunityStatus(!!opportunity.closedAt)"
+      >
+        {{ (opportunity.closedAt ? 'OPPORTUNITIES.OPEN_OPPORTUNITY' : 'OPPORTUNITIES.CLOSE_OPPORTUNITY') | translate }}
+      </ion-button>
+    </p>
     <ion-list-header>
       <ion-label><h2>{{ 'OPPORTUNITIES.ATTRIBUTES' | translate }}</h2> </ion-label>
     </ion-list-header>
@@ -154,16 +162,11 @@
       </ion-button>
     </ion-item>
 
-    <p class="ion-text-center ion-padding-top" *ngIf="!editMode && !opportunity.isArchived()">
-      <ion-button
-        [color]="opportunity.closedAt ? 'ESNgreen': 'ESNpink'"
-        (click)="manageOpportunityStatus(!!opportunity.closedAt)"
-      >
-        {{ (opportunity.closedAt ? 'OPPORTUNITIES.OPEN_OPPORTUNITY' : 'OPPORTUNITIES.CLOSE_OPPORTUNITY') | translate }}
-      </ion-button>
-    </p>
-    <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
+    <ion-row class="ion-padding-top ion-margin-top" *ngIf="editMode === UXMode.VIEW">
       <ion-col>
+        <ion-button color="medium" (click)="duplicateOpportunity()">{{ 'COMMON.DUPLICATE' | translate }}</ion-button>
+      </ion-col>
+      <ion-col class="ion-text-center">
         <ion-button color="warning" (click)="archiveOpportunity(!opportunity.isArchived())">
           {{ (opportunity.isArchived() ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
         </ion-button>

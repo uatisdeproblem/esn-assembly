@@ -1,0 +1,56 @@
+<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+  <ion-toolbar color="ideaToolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="app.goToInTabs(['voting'], { back: true })">
+        <ion-icon slot="icon-only" icon="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ app.configurations.appTitle }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-grid class="ion-no-padding" *ngIf="votingSession">
+    <ion-row>
+      <ion-col [size]="12" [sizeLg]="6">
+        <ion-card color="white" class="votingSessionCard">
+          <ion-card-header>
+            <ion-card-subtitle>{{ votingSession.event?.name }}</ion-card-subtitle>
+            <ion-card-title>{{ votingSession.name }}</ion-card-title>
+            <p class="badges">
+              <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
+                {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
+              </ion-badge>
+              <ion-badge color="medium" *ngIf="votingSession.isWeighted">
+                {{ 'VOTING.WEIGHTED_VOTE' | translate }}
+              </ion-badge>
+              <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
+                {{ 'VOTING.IN_PROGRESS' | translate }}
+              </ion-badge>
+              <ion-badge *ngIf="votingSession.isDraft()" color="medium">{{ 'VOTING.DRAFT' | translate }}</ion-badge>
+              <ion-badge color="warning" *ngIf="votingSession.isArchived()">
+                {{ 'COMMON.ARCHIVED' | translate }}
+              </ion-badge>
+            </p>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list class="aList" lines="none">
+              <app-html-editor
+                *ngIf="votingSession.description"
+                [content]="votingSession.description"
+                [editMode]="false"
+              ></app-html-editor>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="votingSession?.canUserManage(app.user)">
+  <ion-fab-button color="ESNgreen" size="small" [title]="'COMMON.MANAGE' | translate" (click)="manageSession()">
+    <ion-icon icon="build"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

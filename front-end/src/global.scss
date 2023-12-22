@@ -31,6 +31,11 @@
 
 @import '../node_modules/@idea-ionic/common/css/global.scss';
 
+@import '../node_modules/@swimlane/ngx-datatable/index.css';
+@import '../node_modules/@swimlane/ngx-datatable/themes/material.scss';
+@import '../node_modules/@swimlane/ngx-datatable/themes/dark.scss';
+@import '../node_modules/@swimlane/ngx-datatable/assets/icons.css';
+
 //
 // PROJECT custom
 //
@@ -232,4 +237,129 @@ app-html-editor {
 ion-item input[type='datetime-local'] {
   border: none;
   margin: 6px 0;
+}
+
+ion-segment[scrollable] {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  ion-segment-button {
+    text-transform: none;
+    letter-spacing: normal;
+  }
+}
+
+//
+// DATATABLE
+//
+
+// stick the footer to the bottom
+.ngx-datatable {
+  position: absolute !important;
+  height: auto !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  > div.visible {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    > datatable-body {
+      flex-basis: 100%;
+    }
+  }
+}
+
+// reduce pager size (60% -> 45%)
+.ngx-datatable .datatable-footer .datatable-pager {
+  flex: 1 1 45% !important;
+}
+
+// not found message padding
+.ngx-datatable .empty-row {
+  padding: 20px;
+}
+
+// theme (customization)
+.ngx-datatable.material,
+.ngx-datatable.dark {
+  background: var(--ion-color-white-shade);
+  color: var(--ion-color-white-contrast);
+  border-color: transparent;
+
+  .datatable-header,
+  .datatable-header .datatable-header-cell,
+  .datatable-footer {
+    background: var(--ion-color-white-shade);
+    color: var(--ion-color-light-contrast);
+  }
+
+  .datatable-body {
+    background: var(--ion-color-white);
+
+    .datatable-body-row {
+      border-top-color: var(--ion-color-light);
+
+      &:hover,
+      &:focus {
+        background-color: var(--ion-color-light) !important;
+      }
+
+      &.active,
+      &.active:hover,
+      &.active:focus,
+      &.active .datatable-row-group,
+      &.active:hover .datatable-row-group,
+      &.active:focus .datatable-row-group {
+        background-color: var(--ion-color-light-tint) !important;
+        color: var(--ion-color-light-contrast) !important;
+      }
+    }
+  }
+  .datatable-footer {
+    .datatable-pager {
+      ul {
+        li {
+          &:not(.disabled) {
+            &.active a,
+            &:hover a {
+              background-color: var(--ion-color-light-tint);
+            }
+          }
+        }
+      }
+      a {
+        color: var(--ion-color-light-contrast);
+      }
+    }
+  }
+  .datatable-summary-row {
+    .datatable-body-row {
+      background-color: var(--ion-color-light);
+      &:hover {
+        background-color: var(--ion-color-light);
+      }
+    }
+  }
+}
+
+// center cell labels and checkboxes vertically (differs based on the theme)
+.ngx-datatable.dark {
+  .datatable-body-cell-label span,
+  .datatable-header-cell span {
+    vertical-align: middle;
+  }
+}
+.ngx-datatable.material {
+  .datatable-header-cell .datatable-checkbox,
+  .datatable-body-cell .datatable-checkbox {
+    top: -2px;
+  }
+  .datatable-body-cell-label span {
+    line-height: 1;
+  }
 }

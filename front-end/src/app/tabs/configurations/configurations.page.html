@@ -102,6 +102,7 @@
         />
       </ion-item>
       <ion-item>
+        <!--@todo convert in idea-select-->
         <ion-label position="stacked">{{ 'CONFIGURATIONS.TIMEZONE_OF_REFERENCE' | translate }}</ion-label>
         <ion-select interface="popover" [(ngModel)]="configurations.timezone" (ionChange)="updateConfigurations()">
           <ion-select-option *ngFor="let timezone of timezones" [value]="timezone">{{ timezone }}</ion-select-option>

@@ -27,6 +27,7 @@
     "@ionic/angular": "^7.4.1",
     "@ionic/storage-angular": "^4.0.0",
     "@kolkov/angular-editor": "^3.0.0-beta.0",
+    "@swimlane/ngx-datatable": "^20.1.0",
     "chart.js": "^4.4.0",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
