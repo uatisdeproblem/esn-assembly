@@ -102,6 +102,10 @@ class ConfigurationsRC extends ResourceController {
         return 'notify-application-approved';
       case EmailTemplates.APPLICATION_REJECTED:
         return 'notify-application-rejected';
+      case EmailTemplates.VOTING_INSTRUCTIONS:
+        return 'notify-voting-instructions';
+      case EmailTemplates.VOTING_CONFIRMATION:
+        return 'notify-voting-confirmation';
       default:
         throw new RCError("Template doesn't exist");
     }

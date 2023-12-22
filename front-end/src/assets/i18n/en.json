@@ -265,7 +265,9 @@
       "QUESTIONS": "New questions in a topic",
       "ANSWERS": "New answers to a question",
       "APPLICATION_APPROVED": "Application to opportunity is valid",
-      "APPLICATION_REJECTED": "Application to opportunity is rejected"
+      "APPLICATION_REJECTED": "Application to opportunity is rejected",
+      "VOTING_INSTRUCTIONS": "Voting instructions",
+      "VOTING_CONFIRMATION": "Confirmation that a vote has been received"
     },
     "GIVE_BADGES": "Give badges",
     "GIVE_BADGES_I": "Badges are usually earned through automatic actions, but here you can force them.",
