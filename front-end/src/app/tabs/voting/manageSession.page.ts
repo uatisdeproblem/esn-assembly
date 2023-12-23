@@ -419,7 +419,7 @@ export class ManageVotingSessionPage {
 
   async startSession(): Promise<void> {
     const session = new VotingSession(this.votingSession);
-    session.inProgressSince = new Date().toISOString();
+    session.startsAt = new Date().toISOString();
 
     this.errors = new Set(session.validate());
     if (this.errors.size) return this.message.warning('COMMON.FORM_HAS_ERROR_TO_CHECK');

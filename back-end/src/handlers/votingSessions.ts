@@ -145,7 +145,7 @@ class VotingSessionsRC extends ResourceController {
   private async startVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
     this.votingSession.endsAt = new Date(endsAt).toISOString();
     this.votingSession.timezone = timezone;
-    this.votingSession.inProgressSince = new Date().toISOString();
+    this.votingSession.startsAt = new Date().toISOString();
 
     const errors = this.votingSession.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);

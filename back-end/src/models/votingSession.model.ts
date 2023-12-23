@@ -50,17 +50,15 @@ export class VotingSession extends Resource {
    */
   scrutineersIds: string[];
   /**
-   * The timestamp since the voting session is in progress.
+   * The timestamp when the voting session started. If not set, or in the future, the session hasn't started yet.
    */
-  inProgressSince: epochISOString;
+  startsAt: epochISOString | null;
   /**
-   * The timestamp of end of the voting session.
-   * Obligatory to put the voting `inProgress`.
+   * The timestamp of end of the voting session. If set and past, the voting session has ended.
    */
   endsAt: epochISOString | null;
   /**
    * A timezone for the timestamps of start and end of the voting session.
-   * Obligatory to put the voting `inProgress`.
    */
   timezone: string;
   /**
@@ -93,11 +91,11 @@ export class VotingSession extends Resource {
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     if (x.publishedSince) this.publishedSince = this.clean(x.publishedSince, d => new Date(d).toISOString());
     else delete this.publishedSince;
-    this.inProgressSince = this.clean(x.inProgressSince, d => new Date(d).toISOString());
+    this.startsAt = this.clean(x.startsAt, d => new Date(d).toISOString());
     this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
     this.timezone = this.clean(x.timezone, String);
     this.scrutineersIds = this.cleanArray(x.scrutineersIds, String).map(x => x.toLowerCase());
-    if (this.inProgressSince) this.resultsArePublished = false;
+    if (!this.startsAt || this.isInProgress()) this.resultsArePublished = false;
     else this.resultsArePublished = this.clean(x.resultsArePublished, Boolean, false);
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b));
@@ -111,6 +109,7 @@ export class VotingSession extends Resource {
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
+    this.startsAt = safeData.startsAt;
     this.resultsArePublished = safeData.resultsArePublished;
   }
 
@@ -120,7 +119,7 @@ export class VotingSession extends Resource {
     this.ballots.forEach((b, i): void => b.validate().forEach(ea => e.push(`ballots[${i}].${ea}`)));
     this.voters.forEach((v, i): void => v.validate(this).forEach(ea => e.push(`voters[${i}].${ea}`)));
 
-    if (checkIfReady || this.isInProgress()) {
+    if (checkIfReady || this.startsAt) {
       if (this.iE(this.publishedSince) || this.publishedSince > new Date().toISOString()) e.push('publishedSince');
       if (this.iE(this.ballots)) e.push('ballots');
       if (this.iE(this.voters)) e.push('voters');
@@ -131,7 +130,7 @@ export class VotingSession extends Resource {
       if (votersNames.length !== new Set(votersNames).size) e.push('voters.duplicatedNames');
       if (votersEmails.length !== new Set(votersEmails).size) e.push('voters.duplicatedEmails');
       if (this.voters.filter(x => !x.email).length) e.push('voters.missingEmails');
-      if (this.isInProgress()) {
+      if (this.startsAt) {
         const tenMinutes = new Date();
         tenMinutes.setMinutes(tenMinutes.getMinutes() + 10);
         if (this.iE(this.endsAt, 'date') || tenMinutes.toISOString() > this.endsAt) e.push('endsAt');
@@ -159,7 +158,13 @@ export class VotingSession extends Resource {
    * Whether the voting session is in progress.
    */
   isInProgress(): boolean {
-    return !!this.inProgressSince;
+    return this.startsAt && this.startsAt < new Date().toISOString() && this.endsAt >= new Date().toISOString();
+  }
+  /**
+   * Whether the voting session has ended.
+   */
+  hasEnded(): boolean {
+    return this.startsAt && this.endsAt < new Date().toISOString();
   }
 
   /**
@@ -258,7 +263,7 @@ export class Voter extends Resource {
     if (this.email && this.iE(this.email, 'email')) e.push('email');
     if (votingSession.isWeighted && (this.voteWeight < 1 || this.voteWeight > 999_999)) e.push('voteWeight');
 
-    if (votingSession.isInProgress()) {
+    if (votingSession.startsAt) {
       if (this.iE(this.email, 'email')) e.push('email');
     }
     return e;

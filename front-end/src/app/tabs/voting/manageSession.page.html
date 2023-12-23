@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <app-edit-mode-buttons
     [title]="'VOTING.MANAGE_SESSION' | translate"
-    [editMode]="!!editMode && (!votingSession || !votingSession.isInProgress())"
+    [editMode]="!!editMode && !votingSession?.startsAt"
     (enter)="enterEditMode()"
     (exit)="exitEditMode()"
     (save)="save()"
@@ -357,12 +357,13 @@
         </ion-col>
       </ion-row>
 
-      <p class="ion-margin-top ion-text-center" *ngIf="!votingSession.isInProgress()">
+      <p class="ion-margin-top ion-text-center" *ngIf="!votingSession.startsAt">
         <ion-button [disabled]="!sessionReady" (click)="startSession()">
           {{ 'VOTING.START_SESSION' | translate }}
         </ion-button>
       </p>
       <p class="ion-margin-top ion-text-center" *ngIf="votingSession.isInProgress()">In progress todo</p>
+      <p class="ion-margin-top ion-text-center" *ngIf="votingSession.hasEnded()">Has ended todo</p>
     </ion-list>
   </ng-container>
 </ion-content>
