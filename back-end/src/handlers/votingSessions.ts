@@ -124,16 +124,20 @@ class VotingSessionsRC extends ResourceController {
   protected async putResource(): Promise<VotingSession> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
+    if (this.votingSession.hasStarted()) throw new RCError("Can't be changed after start");
+
     const oldSession = new VotingSession(this.votingSession);
     this.votingSession.safeLoad(this.body, oldSession);
 
     return await this.putSafeResource({ noOverwrite: false });
   }
 
-  protected async patchResource(): Promise<VotingSession | string[]> {
+  protected async patchResource(): Promise<VotingSession | string[] | VotingTicket[]> {
     switch (this.body.action) {
       case 'START':
         return await this.startVotingSession(this.body.endsAt, this.body.timezone);
+      case 'TICKETS_STATUS':
+        return await this.getVotingSessionTicketsStatus();
       case 'ARCHIVE':
         return await this.manageArchive(true);
       case 'UNARCHIVE':
@@ -143,6 +147,8 @@ class VotingSessionsRC extends ResourceController {
     }
   }
   private async startVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
+    if (this.votingSession.hasStarted()) throw new RCError("Can't be changed after start");
+
     this.votingSession.endsAt = new Date(endsAt).toISOString();
     this.votingSession.timezone = timezone;
     this.votingSession.startsAt = new Date().toISOString();
@@ -193,9 +199,22 @@ class VotingSessionsRC extends ResourceController {
     const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
     await ses.sendTemplatedEmail({ toAddresses: [ticket.voterEmail], template, templateData }, sesConfig);
   }
+  private async getVotingSessionTicketsStatus(): Promise<VotingTicket[]> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.hasStarted()) throw new RCError("Session didn't start yet");
+
+    let votingTickets: VotingTicket[] = await ddb.query({
+      TableName: DDB_TABLES.votingTickets,
+      KeyConditionExpression: 'sessionId = :sessionId',
+      ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
+    });
+    votingTickets = votingTickets.map(x => new VotingTicket(x));
+    votingTickets.forEach(x => delete x.token);
+    return votingTickets;
+  }
   private async manageArchive(archive: boolean): Promise<VotingSession> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
-    if (this.votingSession.isInProgress()) throw new RCError('In progress');
 
     if (archive) {
       this.votingSession.archivedAt = new Date().toISOString();

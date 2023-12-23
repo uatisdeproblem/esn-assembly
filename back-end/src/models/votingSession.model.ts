@@ -95,7 +95,7 @@ export class VotingSession extends Resource {
     this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
     this.timezone = this.clean(x.timezone, String);
     this.scrutineersIds = this.cleanArray(x.scrutineersIds, String).map(x => x.toLowerCase());
-    if (!this.startsAt || this.isInProgress()) this.resultsArePublished = false;
+    if (!this.hasEnded()) this.resultsArePublished = false;
     else this.resultsArePublished = this.clean(x.resultsArePublished, Boolean, false);
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b));
@@ -133,7 +133,8 @@ export class VotingSession extends Resource {
       if (this.startsAt) {
         const tenMinutes = new Date();
         tenMinutes.setMinutes(tenMinutes.getMinutes() + 10);
-        if (this.iE(this.endsAt, 'date') || tenMinutes.toISOString() > this.endsAt) e.push('endsAt');
+        if (this.iE(this.endsAt, 'date') || this.startsAt > this.endsAt || tenMinutes.toISOString() > this.endsAt)
+          e.push('endsAt');
         if (this.iE(this.timezone)) e.push('timezone');
       }
     }
@@ -155,16 +156,22 @@ export class VotingSession extends Resource {
   }
 
   /**
-   * Whether the voting session is in progress.
+   * Whether the voting session has ended. Note: it returns true even if the session ended (but it has started).
    */
-  isInProgress(): boolean {
-    return this.startsAt && this.startsAt < new Date().toISOString() && this.endsAt >= new Date().toISOString();
+  hasStarted(): boolean {
+    return this.startsAt && this.startsAt < new Date().toISOString();
   }
   /**
-   * Whether the voting session has ended.
+   * Whether the voting session has started and ended.
    */
   hasEnded(): boolean {
-    return this.startsAt && this.endsAt < new Date().toISOString();
+    return this.hasStarted() && this.endsAt < new Date().toISOString();
+  }
+  /**
+   * Whether the voting session is in progress (started but not ended).
+   */
+  isInProgress(): boolean {
+    return this.hasStarted() && !this.hasEnded();
   }
 
   /**

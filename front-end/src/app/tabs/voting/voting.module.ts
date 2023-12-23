@@ -17,6 +17,7 @@ import { EditModeButtonsModule } from '@common/editModeButtons.module';
 import { EventsPickerComponent } from '@common/eventsPicker.component';
 import { DatetimeWithTimezoneStandaloneComponent } from '@common/datetimeWithTimezone';
 import { HTMLEditorModule } from '@common/htmlEditor.module';
+import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import { HTMLEditorModule } from '@common/htmlEditor.module';
     EditModeButtonsModule,
     EventsPickerComponent,
     DatetimeWithTimezoneStandaloneComponent,
-    HTMLEditorModule
+    HTMLEditorModule,
+    DateTimezonePipe
   ],
   declarations: [VotingSessionsPage, ManageVotingSessionPage, VotingSessionPage]
 })

@@ -2256,7 +2256,7 @@ paths:
               properties:
                 action:
                   type: string
-                  enum: [START, ARCHIVE, UNARCHIVE]
+                  enum: [START, TICKETS_STATUS, ARCHIVE, UNARCHIVE]
                 endsAt:
                   type: string
                   description: (START)

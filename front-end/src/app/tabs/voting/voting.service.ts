@@ -194,6 +194,16 @@ export class VotingService {
     const body = { votingTicket, submission };
     await this.api.postResource(path, { body });
   }
+
+  /**
+   * Get the status of the voting tickets.
+   */
+  async getVotingTicketsStatus(votingSession: VotingSession): Promise<VotingTicket[]> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'TICKETS_STATUS' };
+    const res: VotingTicket[] = await this.api.patchResource(path, { body });
+    return res.map(x => new VotingTicket(x));
+  }
 }
 
 /**

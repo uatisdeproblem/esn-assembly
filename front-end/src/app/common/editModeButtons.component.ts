@@ -13,6 +13,10 @@ export class EditModeButtonsComponent {
    */
   @Input() editMode = false;
   /**
+   * If set, no buttons are shown.
+   */
+  @Input() noInteraction = false;
+  /**
    * A title to show.
    */
   @Input() title: string;

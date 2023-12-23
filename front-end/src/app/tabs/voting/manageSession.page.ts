@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ColumnMode, DatatableComponent, SelectionType, TableColumn } from '@swimlane/ngx-datatable';
 import { AlertController, IonSearchbar, ModalController } from '@ionic/angular';
@@ -6,7 +6,8 @@ import {
   IDEAActionSheetController,
   IDEALoadingService,
   IDEAMessageService,
-  IDEATranslationsService
+  IDEATranslationsService,
+  IDEAWebSocketApiService
 } from '@idea-ionic/common';
 
 import { ManageBallotStandaloneComponent } from './ballots/manageBallot.component';
@@ -16,13 +17,15 @@ import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
 import { VotingMajorityTypes, VotingBallot, VotingSession, Voter } from '@models/votingSession.model';
+import { VotingTicket } from '@models/votingTicket.model';
+import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 
 @Component({
   selector: 'manage-voting-session',
   templateUrl: 'manageSession.page.html',
   styleUrls: ['manageSession.page.scss']
 })
-export class ManageVotingSessionPage {
+export class ManageVotingSessionPage implements OnDestroy {
   @Input() sessionId = 'new-standard';
   votingSession: VotingSession;
 
@@ -61,6 +64,8 @@ export class ManageVotingSessionPage {
   sessionReady = false;
   timezones = (Intl as any).supportedValuesOf('timeZone');
 
+  votingTickets: VotingTicket[];
+
   constructor(
     private location: Location,
     private alertCtrl: AlertController,
@@ -69,15 +74,22 @@ export class ManageVotingSessionPage {
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private t: IDEATranslationsService,
+    private webSocket: IDEAWebSocketApiService,
     private _voting: VotingService,
     public app: AppService
   ) {}
+  ngOnDestroy(): void {
+    if (this.webSocket) this.webSocket.close();
+  }
   async ionViewWillEnter(): Promise<void> {
     try {
       await this.loading.show();
       if (this.sessionId !== 'new') {
         this.votingSession = await this._voting.getById(this.sessionId);
         if (!this.votingSession.canUserManage(this.app.user)) return this.app.closePage('COMMON.UNAUTHORIZED');
+        if (this.votingSession.hasStarted())
+          this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
+        if (this.votingSession.isInProgress()) this.openWebSocketForVotingTicketsStatus();
         this.setUIHelpersForComplexFields();
         this.editMode = UXMode.VIEW;
       } else {
@@ -133,6 +145,7 @@ export class ManageVotingSessionPage {
         this.errors = new Set<string>();
         this.editMode = UXMode.VIEW;
         this.setUIHelpersForComplexFields();
+        this.filterVoters();
       }
     };
 
@@ -318,38 +331,51 @@ export class ManageVotingSessionPage {
   //
 
   initVotersTable(): void {
-    this.col = [
-      { prop: 'id', name: this.t._('VOTING.VOTER_ID'), maxWidth: 150 },
-      { prop: 'name', name: this.t._('VOTING.VOTER_NAME') },
-      { prop: 'email', name: this.t._('VOTING.VOTER_EMAIL') }
-    ];
+    this.col = [];
+    if (this.votingSession.hasStarted()) {
+      this.col.push({
+        prop: 'id',
+        name: this.t._('VOTING.STARTED_VOTING').split(' ')[0],
+        maxWidth: 100,
+        pipe: { transform: id => (this.votingTickets?.find(v => id === v.voterId).signedInAt ? '✔️' : '') }
+      });
+      this.col.push({
+        prop: 'id',
+        name: this.t._('VOTING.VOTED'),
+        maxWidth: 100,
+        pipe: { transform: id => (this.votingTickets?.find(v => id === v.voterId).votedAt ? '✔️' : '') }
+      });
+    }
+    this.col.push({ prop: 'id', name: this.t._('VOTING.VOTER_ID'), maxWidth: 150 });
+    this.col.push({ prop: 'name', name: this.t._('VOTING.VOTER_NAME') });
+    this.col.push({ prop: 'email', name: this.t._('VOTING.VOTER_EMAIL') });
     if (this.votingSession.isWeighted)
       this.col.push({ prop: 'voteWeight', name: this.t._('VOTING.VOTE_WEIGHT'), maxWidth: 150 });
-    this.filter(this.searchbar?.value);
-    this.setTableHeight();
+    this.filterVoters(this.searchbar?.value);
+    this.setVotersTableHeight();
   }
 
   @HostListener('window:resize', ['$event'])
-  setTableHeight(event?: Event): void {
+  setVotersTableHeight(event?: Event): void {
     const toolbarBottom = document.getElementById('votersTableToolbar')?.getBoundingClientRect().bottom;
     const currentPageHeight = event?.target ? (event.target as Window).innerHeight : window.innerHeight;
     const heightAvailableInPx = currentPageHeight - toolbarBottom - this.headerHeight - this.footerHeight;
     this.limit = Math.floor(heightAvailableInPx / this.rowHeight);
   }
 
-  filter(searchText?: string): void {
+  filterVoters(searchText?: string): void {
     searchText = (searchText ?? '').toLowerCase();
 
     this.filteredVoters = this.votingSession.voters.filter(x =>
       [x.id, x.name, x.email, x.voteWeight].filter(f => f).some(f => String(f).toLowerCase().includes(searchText))
     );
 
-    this.calcFooterTotals();
+    this.calcVotersFooterTotals();
 
     // whenever the filter changes, always go back to the first page
     if (this.table) this.table.offset = 0;
   }
-  calcFooterTotals(): void {
+  calcVotersFooterTotals(): void {
     const votersNames = this.votingSession.voters.map(x => x.name);
     this.numDuplicatedNames = votersNames.length - new Set(votersNames).size;
     const votersEmails = this.votingSession.voters.map(x => x.email).filter(x => x);
@@ -370,7 +396,7 @@ export class ManageVotingSessionPage {
         this.votingSession.voters.splice(this.votingSession.voters.indexOf(voter), 1);
       else if (voter.id !== 'DELETE' && isNew && !this.votingSession.voters.some(x => x.id === voter.id))
         this.votingSession.voters.push(voter);
-      this.filter(this.searchbar?.value);
+      this.filterVoters(this.searchbar?.value);
     });
     modal.present();
   }
@@ -395,7 +421,7 @@ export class ManageVotingSessionPage {
         text: this.t._('VOTING.REMOVE_ALL_VOTERS'),
         icon: 'trash',
         role: 'destructive',
-        handler: (): void => this.removeAllVoters()
+        handler: (): Promise<void> => this.removeAllVoters()
       },
       { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
     ];
@@ -409,8 +435,18 @@ export class ManageVotingSessionPage {
   private exportVoters(): void {
     // @todo
   }
-  private removeAllVoters(): void {
-    // @todo
+  private async removeAllVoters(): Promise<void> {
+    const doRemove = (): void => {
+      this.votingSession.voters = [];
+      this.filterVoters();
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.REMOVE'), handler: doRemove }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
   }
 
   //
@@ -428,8 +464,10 @@ export class ManageVotingSessionPage {
       try {
         await this.loading.show();
         this.votingSession.load(await this._voting.start(session));
-        this.message.success('COMMON.OPERATION_COMPLETED');
-        // @todo improve messaging and consequences
+        this.message.success('VOTING.VOTE_IS_STARTING');
+        this.pageSection = PageSections.ANALYTICS;
+        this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
+        this.openWebSocketForVotingTicketsStatus();
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
@@ -457,6 +495,28 @@ export class ManageVotingSessionPage {
 
     return this.errors.size === 0;
   }
+
+  //
+  // ANALYTICS
+  //
+
+  private openWebSocketForVotingTicketsStatus(): void {
+    if (!this.webSocket.isOpen())
+      this.webSocket.open({
+        openParams: { type: WebSocketConnectionTypes.VOTING_TICKETS, referenceId: this.sessionId },
+        onMessage: message => this.handleMessageFromWebSocket(message)
+      });
+  }
+  private handleMessageFromWebSocket(webSocketMessage: WebSocketMessage): void {
+    const votingTicket = new VotingTicket(webSocketMessage.item);
+    this.votingTickets.find(x => x.voterId === votingTicket.voterId)?.load(votingTicket);
+  }
+  getNumVotersWhoSignedIn(): number {
+    return this.votingTickets.filter(x => x.signedInAt).length;
+  }
+  getNumVotersWhoVoted(): number {
+    return this.votingTickets.filter(x => x.votedAt).length;
+  }
 }
 
 enum UXMode {
@@ -475,5 +535,6 @@ enum PageSections {
   GENERAL = 'GENERAL',
   BALLOTS = 'BALLOTS',
   VOTERS = 'VOTERS',
-  START = 'START'
+  START = 'START',
+  ANALYTICS = 'ANALYTICS'
 }
