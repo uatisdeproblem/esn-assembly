@@ -5,13 +5,18 @@
 import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { VotingSession } from '../models/votingSession.model';
+import { VotingTicket } from '../models/votingTicket.model';
 import { Vote } from '../models/vote.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const DDB_TABLES = { votingSessions: process.env.DDB_TABLE_votingSessions, votes: process.env.DDB_TABLE_votes };
+const DDB_TABLES = {
+  votingSessions: process.env.DDB_TABLE_votingSessions,
+  votingTickets: process.env.DDB_TABLE_votingTickets,
+  votes: process.env.DDB_TABLE_votes
+};
 const ddb = new DynamoDB();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new VoteRC(ev, cb).handleRequest();
@@ -37,51 +42,67 @@ class VoteRC extends ResourceController {
     } catch (err) {
       throw new RCError('Voting session not found');
     }
+
+    if (this.votingSession.endsAt < new Date().toISOString()) throw new RCError('Voting session has ended');
   }
 
-  protected async getResources(): Promise<{ votingSession: VotingSession; vote: Vote }> {
+  protected async getResources(): Promise<{ votingSession: VotingSession; votingTicket: VotingTicket }> {
     const { voterId, token } = this.queryParams;
     const votingTicket = await this.getVotingTicketAndCheckToken(voterId, token);
 
-    if (votingTicket.submittedAt) throw new RCError('Already voted');
+    if (votingTicket.votedAt) throw new RCError('Already voted');
 
     if (!votingTicket.signedInAt) {
       votingTicket.signedInAt = new Date().toISOString();
       await ddb.update({
-        TableName: DDB_TABLES.votes,
+        TableName: DDB_TABLES.votingTickets,
         Key: { sessionId: this.votingSession.sessionId, voterId },
         UpdateExpression: 'SET signedInAt = :at',
         ExpressionAttributeValues: { ':at': votingTicket.signedInAt }
       });
     }
 
-    return { votingSession: this.votingSession, vote: votingTicket };
+    return { votingSession: this.votingSession, votingTicket };
   }
 
   protected async postResources(): Promise<void> {
-    const { voterId, token, submission } = this.body;
+    if (!this.body.votingTicket || !this.body.submission) throw new RCError('Bad request');
+
+    const { voterId, token } = this.body.votingTicket;
     const votingTicket = await this.getVotingTicketAndCheckToken(voterId, token);
 
-    if (votingTicket.submittedAt) throw new RCError('Already voted');
+    if (votingTicket.votedAt) throw new RCError('Already voted');
+    votingTicket.votedAt = new Date().toISOString();
 
-    votingTicket.submittedAt = new Date().toISOString();
-    votingTicket.submission = submission;
-
-    const errors = votingTicket.validate(this.votingSession);
+    const errors = Vote.validate(this.votingSession, this.body.submission);
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
 
-    await ddb.update({
-      TableName: DDB_TABLES.votes,
+    const vote = new Vote({ sessionId: this.votingSession.sessionId });
+    vote.key = await ddb.IUNID(vote.sessionId);
+    vote.submission = this.body.submission;
+    if (!this.votingSession.isSecret) {
+      vote.voterId = votingTicket.voterId;
+      vote.voterName = votingTicket.voterName;
+      vote.voterEmail = votingTicket.voterEmail;
+    }
+
+    const updateVotingTicket = {
+      TableName: DDB_TABLES.votingTickets,
       Key: { sessionId: this.votingSession.sessionId, voterId },
-      UpdateExpression: 'SET submittedAt = :at, submission = :submission',
-      ExpressionAttributeValues: { ':at': votingTicket.submittedAt, ':submission': votingTicket.submission }
-    });
+      UpdateExpression: 'SET votedAt = :at',
+      ExpressionAttributeValues: { ':at': votingTicket.votedAt }
+    };
+    const putVote = { TableName: DDB_TABLES.votes, Item: vote };
+    await ddb.transactWrites([{ Update: updateVotingTicket }, { Put: putVote }]);
   }
 
-  private async getVotingTicketAndCheckToken(voterId: string, token: string): Promise<Vote> {
+  private async getVotingTicketAndCheckToken(voterId: string, token: string): Promise<VotingTicket> {
     try {
-      const votingTicket = new Vote(
-        await ddb.get({ TableName: DDB_TABLES.votes, Key: { sessionId: this.votingSession.sessionId, voterId } })
+      const votingTicket = new VotingTicket(
+        await ddb.get({
+          TableName: DDB_TABLES.votingTickets,
+          Key: { sessionId: this.votingSession.sessionId, voterId }
+        })
       );
       if (votingTicket.token !== token) throw new Error();
       return votingTicket;

@@ -2311,7 +2311,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Vote'
+              type: object
+              properties:
+                votingTicket:
+                  $ref: '#/components/schemas/VotingTicket'
+                submission:
+                  type: array
+                  items:
+                    type: string
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
@@ -2371,7 +2378,7 @@ components:
     VotingSession:
       type: object
       additionalProperties: {}
-    Vote:
+    VotingTicket:
       type: object
       additionalProperties: {}
 
@@ -2623,21 +2630,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/VotingSession'
-    Vote:
-      description: A vote in a voting session
+    VotingTicket:
+      description: A ticket to vote in a session
       content:
         application/json:
           schema:
             type: object
-            $ref: '#/components/schemas/Vote'
-    Votes:
-      description: The votes of a voting sessions
+            $ref: '#/components/schemas/VotingTicket'
+    VotingTickets:
+      description: The tickets for voting in a sessions
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/Vote'
+              $ref: '#/components/schemas/VotingTicket'
     BadParameters:
       description: Bad input parameters
       content:

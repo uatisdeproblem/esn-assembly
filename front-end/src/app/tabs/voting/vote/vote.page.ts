@@ -6,6 +6,7 @@ import { AppService } from '@app/app.service';
 import { VotingService } from '../voting.service';
 
 import { VotingSession } from '@models/votingSession.model';
+import { VotingTicket } from '@models/votingTicket.model';
 import { Vote } from '@models/vote.model';
 
 @Component({
@@ -28,11 +29,12 @@ export class VotePage implements OnInit {
   @Input() ticket: string;
 
   votingSession: VotingSession;
-  vote: Vote;
+  votingTicket: VotingTicket;
 
   errorString: string;
   errors = new Set<string>();
 
+  submission: string[] = [];
   voted = false;
 
   constructor(
@@ -47,12 +49,10 @@ export class VotePage implements OnInit {
       await this.loading.show();
       const res = await this._voting.beginVote(this.sessionId, this.voterId, this.ticket);
       this.votingSession = res.votingSession;
-      this.vote = res.vote;
-      this.vote.submission = [];
+      this.votingTicket = res.votingTicket;
     } catch (error) {
       if (String(error) === 'Error: Already voted') this.errorString = this.t._('VOTING.ALREADY_VOTED');
       else this.errorString = this.t._('VOTING.INVALID_VOTING_LINK');
-      await this.showMessage(this.errorString);
     } finally {
       this.loading.hide();
     }
@@ -69,15 +69,14 @@ export class VotePage implements OnInit {
   }
 
   async submitVote(): Promise<void> {
-    this.errors = new Set(this.vote.validate(this.votingSession));
+    this.errors = new Set(Vote.validate(this.votingSession, this.submission));
     if (this.errors.size) return this.showMessage(this.t._('VOTING.SOME_OF_VOTES_MISSING'));
 
     const doSubmit = async (): Promise<void> => {
       try {
         await this.loading.show();
-        await this._voting.submitVotes(this.votingSession, this.vote);
+        await this._voting.submitVotes(this.votingTicket, this.submission);
         this.voted = true;
-        this.showMessage(this.t._('VOTING.VOTE_RECEIVED'), this.t._('VOTING.THANK_YOU'));
       } catch (error) {
         if (String(error) === 'Error: Already voted') this.showMessage(this.t._('VOTING.ALREADY_VOTED'));
         else this.showMessage(this.t._('VOTING.SUBMISSION_FAILED'));

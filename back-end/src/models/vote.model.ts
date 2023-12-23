@@ -1,9 +1,9 @@
-import { Resource, epochISOString } from 'idea-toolbox';
+import { Resource } from 'idea-toolbox';
 
 import { VotingSession } from './votingSession.model';
 
 /**
- * The vote of a voter in a voting sessions.
+ * The vote of a voter (using a ticket) in a session.
  */
 export class Vote extends Resource {
   /**
@@ -11,62 +11,44 @@ export class Vote extends Resource {
    */
   sessionId: string;
   /**
-   * The ID of the voter.
+   * A unique, random string.
    */
-  voterId: string;
+  key: string;
   /**
-   * An identifiable name for the voter (e.g. ESN country or ESN section).
+   * The ID of the voter. Only if the vote is public.
    */
-  name: string;
+  voterId?: string;
   /**
-   * The email address to which the voting tokens are sent.
+   * The name of the voter. Only if the vote is public.
    */
-  email: string;
+  voterName?: string;
   /**
-   * The token to use for submitting the vote.
+   * The email of the voter. Only if the vote is public.
    */
-  token: string;
-
-  /**
-   * Wether the voting ticket has been received.
-   * @todo improvement: manage with SES bounces?
-   */
-  ticketReceivedAt?: epochISOString;
-  /**
-   * Wether the token has been used to start the vote.
-   */
-  signedInAt?: epochISOString;
-
-  /**
-   * The timestamp when the vote has been submitted (if it happened).
-   */
-  submittedAt?: epochISOString;
+  voterEmail?: string;
   /**
    * The vote for each of the ballots of the voting session.
-   * Set if `submittedAt`.
    */
-  submission?: string[];
+  submission: string[];
 
   load(x: any): void {
     super.load(x);
     this.sessionId = this.clean(x.sessionId, String);
-    this.voterId = this.clean(x.voterId, String);
-    this.name = this.clean(x.name, String);
-    this.email = this.clean(x.email, String);
-    this.token = this.clean(x.token, String);
-
-    if (x.ticketReceivedAt) this.ticketReceivedAt = this.clean(x.ticketReceivedAt, String);
-    if (x.signedInAt) this.signedInAt = this.clean(x.signedInAt, String);
-
-    if (x.submittedAt) this.submittedAt = this.clean(x.submittedAt, String);
-    if (this.submittedAt && x.submission) this.submission = this.cleanArray(x.submission, String);
+    this.key = this.clean(x.key, Number);
+    if (x.voterId) this.voterId = this.clean(x.voterId, String);
+    if (x.voterName) this.voterName = this.clean(x.voterName, String);
+    if (x.voterEmail) this.voterEmail = this.clean(x.voterEmail, String);
+    this.submission = this.cleanArray(x.submission, String);
   }
 
-  validate(votingSession: VotingSession): string[] {
-    const e = super.validate();
-    if (this.iE(this.submission)) e.push('submission');
+  /**
+   * Validate a vode against a voting session.
+   */
+  static validate(votingSession: VotingSession, submission: string[]): string[] {
+    const e = [];
+    if (!Array.isArray(submission)) e.push('submission');
     votingSession.ballots.forEach((b, i): void => {
-      if (this.iE(this.submission[i]) || !b.options.includes(this.submission[i])) e.push(`submission[${i}]`);
+      if (!submission[i] || !b.options.includes(submission[i])) e.push(`submission[${i}]`);
     });
     return e;
   }

@@ -19,13 +19,16 @@
     <ng-container *ngIf="votingSession && !voted">
       <ion-card color="ESNgreen">
         <ion-card-content>
-          {{ 'VOTING.WELCOME' | translate }}, <b>{{ vote.name }}</b> ({{ vote.email }}).
+          {{ 'VOTING.WELCOME' | translate }}, <b>{{ votingTicket.voterName }}</b> ({{ votingTicket.voterEmail }}).
         </ion-card-content>
       </ion-card>
       <ion-list-header>
         <ion-label>
           <h4>{{ 'VOTING.HERE_YOU_CAN_VOTE_FOR' | translate }}:</h4>
           <h1>{{ votingSession.name }}</h1>
+          <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
+            {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
+          </ion-badge>
         </ion-label>
       </ion-list-header>
       <app-html-editor *ngIf="votingSession.description" [(content)]="votingSession.description" [editMode]="false" />
@@ -46,7 +49,7 @@
         </ion-card-header>
         <ion-card-content>
           <ion-item lines="none">
-            <ion-radio-group [(ngModel)]="vote.submission[bIndex]">
+            <ion-radio-group [(ngModel)]="submission[bIndex]">
               <ion-radio labelPlacement="end" justify="start" *ngFor="let option of ballot.options" [value]="option">
                 <span class="ion-text-wrap">{{ option }}</span>
               </ion-radio>

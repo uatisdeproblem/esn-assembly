@@ -217,17 +217,13 @@ const tables: { [tableName: string]: DDBTable } = {
       }
     ]
   },
+  votingTickets: {
+    PK: { name: 'sessionId', type: DDB.AttributeType.STRING },
+    SK: { name: 'voterId', type: DDB.AttributeType.STRING }
+  },
   votes: {
     PK: { name: 'sessionId', type: DDB.AttributeType.STRING },
-    SK: { name: 'voterId', type: DDB.AttributeType.STRING },
-    indexes: [
-      {
-        indexName: 'sessionId-receivedAt-index',
-        partitionKey: { name: 'sessionId', type: DDB.AttributeType.STRING },
-        sortKey: { name: 'receivedAt', type: DDB.AttributeType.STRING },
-        projectionType: DDB.ProjectionType.KEYS_ONLY
-      }
-    ]
+    SK: { name: 'key', type: DDB.AttributeType.STRING }
   }
 };
 

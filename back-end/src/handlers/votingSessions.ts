@@ -8,7 +8,7 @@ import { epochISOString } from 'idea-toolbox';
 import { GAEventAttached } from '../models/event.model';
 import { VotingSession } from '../models/votingSession.model';
 import { User } from '../models/user.model';
-import { Vote } from '../models/vote.model';
+import { VotingTicket } from '../models/votingTicket.model';
 import { Configurations } from '../models/configurations.model';
 
 ///
@@ -20,7 +20,7 @@ const PROJECT = process.env.PROJECT;
 const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
   events: process.env.DDB_TABLE_events,
-  votes: process.env.DDB_TABLE_votes,
+  votingTickets: process.env.DDB_TABLE_votingTickets,
   configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB();
@@ -153,16 +153,16 @@ class VotingSessionsRC extends ResourceController {
     const getSecretToken = (length = 7): string => Math.random().toString(36).slice(-length);
     const votingTickets = this.votingSession.voters.map(
       x =>
-        new Vote({
+        new VotingTicket({
           sessionId: this.votingSession.sessionId,
           voterId: x.id,
-          name: x.name,
-          email: x.email,
+          voterName: x.name,
+          voterEmail: x.email,
           token: getSecretToken()
         })
     );
     try {
-      await ddb.batchPut(DDB_TABLES.votes, votingTickets);
+      await ddb.batchPut(DDB_TABLES.votingTickets, votingTickets);
     } catch (error) {
       this.logger.error('Voting ticket generation', error, { ...this.votingSession });
       throw new RCError('Failed voting ticket generation');
@@ -182,16 +182,16 @@ class VotingSessionsRC extends ResourceController {
 
     return this.votingSession;
   }
-  private async sendVotingTicketToVoter(ticket: Vote): Promise<void> {
+  private async sendVotingTicketToVoter(ticket: VotingTicket): Promise<void> {
     const template = `notify-voting-instructions-${STAGE}`;
     const templateData = {
-      user: ticket.name,
+      user: ticket.voterName,
       title: this.votingSession.name,
       url: `${VOTING_BASE_URL}/${this.votingSession.sessionId}?voterId=${ticket.voterId}&ticket=${ticket.token}`
     };
     const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
     const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
-    await ses.sendTemplatedEmail({ toAddresses: [ticket.email], template, templateData }, sesConfig);
+    await ses.sendTemplatedEmail({ toAddresses: [ticket.voterEmail], template, templateData }, sesConfig);
   }
   private async manageArchive(archive: boolean): Promise<VotingSession> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
