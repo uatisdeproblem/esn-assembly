@@ -2256,7 +2256,62 @@ paths:
               properties:
                 action:
                   type: string
-                  enum: [ARCHIVE, UNARCHIVE]
+                  enum: [START, ARCHIVE, UNARCHIVE]
+                endsAt:
+                  type: string
+                  description: (START)
+                timezone:
+                  type: string
+                  description: (START)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /voting-sessions/{sessionId}/vote:
+    get:
+      summary: Login to a voting session and begin to vote
+      description: The combination of voting ID and token authenticate the request
+      tags: [Voting]
+      parameters:
+        - name: sessionId
+          in: path
+          description: Session ID
+          required: true
+          schema:
+            type: string
+        - name: voterId
+          in: query
+          description: The ID of the voter
+          schema:
+            type: boolean
+        - name: token
+          in: query
+          description: The token for voting
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/VotingSession'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    post:
+      summary: Submit a vote
+      description: The combination of voting ID and token authenticate the request
+      tags: [Voting]
+      parameters:
+        - name: sessionId
+          in: path
+          description: Session ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vote'
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
@@ -2314,6 +2369,9 @@ components:
       type: object
       additionalProperties: {}
     VotingSession:
+      type: object
+      additionalProperties: {}
+    Vote:
       type: object
       additionalProperties: {}
 
@@ -2565,6 +2623,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/VotingSession'
+    Vote:
+      description: A vote in a voting session
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/Vote'
+    Votes:
+      description: The votes of a voting sessions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Vote'
     BadParameters:
       description: Bad input parameters
       content:

@@ -69,7 +69,8 @@ const apiResources: ResourceController[] = [
       '/opportunities/{opportunityId}/applications/{applicationId}'
     ]
   },
-  { name: 'votingSessions', paths: ['/voting-sessions', '/voting-sessions/{sessionId}'] }
+  { name: 'votingSessions', paths: ['/voting-sessions', '/voting-sessions/{sessionId}'] },
+  { name: 'vote', paths: ['/voting-sessions/{sessionId}/vote'] }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
@@ -213,6 +214,18 @@ const tables: { [tableName: string]: DDBTable } = {
         sortKey: { name: 'name', type: DDB.AttributeType.STRING },
         projectionType: DDB.ProjectionType.INCLUDE,
         nonKeyAttributes: ['event']
+      }
+    ]
+  },
+  votes: {
+    PK: { name: 'sessionId', type: DDB.AttributeType.STRING },
+    SK: { name: 'voterId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'sessionId-receivedAt-index',
+        partitionKey: { name: 'sessionId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'receivedAt', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.KEYS_ONLY
       }
     ]
   }

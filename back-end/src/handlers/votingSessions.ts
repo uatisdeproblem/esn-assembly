@@ -2,22 +2,37 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
+import { epochISOString } from 'idea-toolbox';
 
 import { GAEventAttached } from '../models/event.model';
 import { VotingSession } from '../models/votingSession.model';
 import { User } from '../models/user.model';
+import { Vote } from '../models/vote.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
+const STAGE = process.env.STAGE;
 const PROJECT = process.env.PROJECT;
 const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
-  events: process.env.DDB_TABLE_events
+  events: process.env.DDB_TABLE_events,
+  votes: process.env.DDB_TABLE_votes,
+  configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB();
+
+const APP_DOMAIN = process.env.APP_DOMAIN;
+const VOTING_BASE_URL = `https://${APP_DOMAIN}/vote`;
+const SES_CONFIG = {
+  source: process.env.SES_SOURCE_ADDRESS,
+  sourceArn: process.env.SES_IDENTITY_ARN,
+  region: process.env.SES_REGION
+};
+const ses = new SES();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new VotingSessionsRC(ev, cb).handleRequest();
 
@@ -117,6 +132,8 @@ class VotingSessionsRC extends ResourceController {
 
   protected async patchResource(): Promise<VotingSession | string[]> {
     switch (this.body.action) {
+      case 'START':
+        return await this.startVotingSession(this.body.endsAt, this.body.timezone);
       case 'ARCHIVE':
         return await this.manageArchive(true);
       case 'UNARCHIVE':
@@ -124,6 +141,57 @@ class VotingSessionsRC extends ResourceController {
       default:
         throw new RCError('Unsupported action');
     }
+  }
+  private async startVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
+    this.votingSession.endsAt = new Date(endsAt).toISOString();
+    this.votingSession.timezone = timezone;
+    this.votingSession.inProgressSince = new Date().toISOString();
+
+    const errors = this.votingSession.validate();
+    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+
+    const getSecretToken = (length = 7): string => Math.random().toString(36).slice(-length);
+    const votingTickets = this.votingSession.voters.map(
+      x =>
+        new Vote({
+          sessionId: this.votingSession.sessionId,
+          voterId: x.id,
+          name: x.name,
+          email: x.email,
+          token: getSecretToken()
+        })
+    );
+    try {
+      await ddb.batchPut(DDB_TABLES.votes, votingTickets);
+    } catch (error) {
+      this.logger.error('Voting ticket generation', error, { ...this.votingSession });
+      throw new RCError('Failed voting ticket generation');
+    }
+
+    await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
+
+    // note: this architecture could break in case of hundreds of voters
+    for (const votingTicket of votingTickets) {
+      try {
+        await this.sendVotingTicketToVoter(votingTicket);
+      } catch (error) {
+        // @todo improvement: manage with SES bounces?
+        this.logger.warn('Voting ticket failed to send', error, { ...votingTicket });
+      }
+    }
+
+    return this.votingSession;
+  }
+  private async sendVotingTicketToVoter(ticket: Vote): Promise<void> {
+    const template = `notify-voting-instructions-${STAGE}`;
+    const templateData = {
+      user: ticket.name,
+      title: this.votingSession.name,
+      url: `${VOTING_BASE_URL}/${this.votingSession.sessionId}?voterId=${ticket.voterId}&ticket=${ticket.token}`
+    };
+    const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
+    const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
+    await ses.sendTemplatedEmail({ toAddresses: [ticket.email], template, templateData }, sesConfig);
   }
   private async manageArchive(archive: boolean): Promise<VotingSession> {
     if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');

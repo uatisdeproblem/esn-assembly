@@ -76,7 +76,8 @@
     "NOT_SELECTED": "Not selected",
     "MANAGE": "Manage",
     "UNKNOWN": "Unknown",
-    "DUPLICATE": "Duplicate"
+    "DUPLICATE": "Duplicate",
+    "ERROR": "Error"
   },
   "LANGUAGES": {
     "EN": "English"
@@ -713,6 +714,18 @@
     "DURATION": "Duration (minutes)",
     "ENDS_AT": "Ends at",
     "TIMEZONE": "Timezone",
-    "START_SESSION": "Start session"
+    "START_SESSION": "Start session",
+    "START_SESSION_I": "Once the session is started you won't be able to change its configurations and contents anymore.",
+    "ALREADY_VOTED": "This voting link has been already used.",
+    "INVALID_VOTING_LINK": "This voting link is invalid.",
+    "WELCOME": "Welcome",
+    "HERE_YOU_CAN_VOTE_FOR": "Here you can vote for",
+    "SUBMIT_VOTES": "Submit votes",
+    "CANT_CHANGE_SUBMITTED_VOTES": "Once you submit your votes, you won't be able to change them anymore.",
+    "SOME_OF_VOTES_MISSING": "Some of the votes are missing; please check.",
+    "CONFIRM_YOUR_VOTES": "Confirm your votes",
+    "SUBMISSION_FAILED": "Submission failed; please contact an administrator.",
+    "VOTE_RECEIVED": "Vote recieved. You can close this page.",
+    "THANK_YOU": "Thank you!"
   }
 }

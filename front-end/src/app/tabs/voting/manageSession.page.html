@@ -357,11 +357,12 @@
         </ion-col>
       </ion-row>
 
-      <p class="ion-margin-top ion-text-center">
+      <p class="ion-margin-top ion-text-center" *ngIf="!votingSession.isInProgress()">
         <ion-button [disabled]="!sessionReady" (click)="startSession()">
           {{ 'VOTING.START_SESSION' | translate }}
         </ion-button>
       </p>
+      <p class="ion-margin-top ion-text-center" *ngIf="votingSession.isInProgress()">In progress todo</p>
     </ion-list>
   </ng-container>
 </ion-content>

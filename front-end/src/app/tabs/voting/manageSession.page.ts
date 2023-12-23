@@ -420,11 +420,30 @@ export class ManageVotingSessionPage {
   async startSession(): Promise<void> {
     const session = new VotingSession(this.votingSession);
     session.inProgressSince = new Date().toISOString();
+
     this.errors = new Set(session.validate());
     if (this.errors.size) return this.message.warning('COMMON.FORM_HAS_ERROR_TO_CHECK');
 
-    // @todo
-    alert('Ok');
+    const doStart = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        this.votingSession.load(await this._voting.start(session));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        // @todo improve messaging and consequences
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('VOTING.START_SESSION_I');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doStart }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
   }
   canSessionStart(): boolean {
     this.errors = new Set(this.votingSession.validate(true));

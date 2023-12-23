@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
 import { VotingSession } from '@models/votingSession.model';
+import { Vote } from '@models/vote.model';
 
 @Injectable({ providedIn: 'root' })
 export class VotingService {
@@ -162,6 +163,35 @@ export class VotingService {
    */
   async delete(votingSession: VotingSession): Promise<void> {
     await this.api.deleteResource(['voting-sessions', votingSession.sessionId]);
+  }
+
+  /**
+   * Start a voting session.
+   */
+  async start(votingSession: VotingSession): Promise<VotingSession> {
+    const body = { action: 'START', endsAt: votingSession.endsAt, timezone: votingSession.timezone };
+    return new VotingSession(await this.api.patchResource(['voting-sessions', votingSession.sessionId], { body }));
+  }
+
+  /**
+   * Login with a voting ticket and begin a vote.
+   */
+  async beginVote(
+    sessionId: string,
+    voterId: string,
+    token: string
+  ): Promise<{ votingSession: VotingSession; vote: Vote }> {
+    const path = ['voting-sessions', sessionId, 'vote'];
+    const params = { voterId, token };
+    const { votingSession, vote } = await this.api.getResource(path, { params });
+    return { votingSession: new VotingSession(votingSession), vote: new Vote(vote) };
+  }
+  /**
+   * Submit the votes.
+   */
+  async submitVotes(votingSession: VotingSession, vote: Vote): Promise<void> {
+    const path = ['voting-sessions', votingSession.sessionId, 'vote'];
+    await this.api.postResource(path, { body: vote });
   }
 }
 

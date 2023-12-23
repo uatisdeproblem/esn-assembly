@@ -111,6 +111,7 @@ export class VotingSession extends Resource {
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
+    this.resultsArePublished = safeData.resultsArePublished;
   }
 
   validate(checkIfReady = false): string[] {
