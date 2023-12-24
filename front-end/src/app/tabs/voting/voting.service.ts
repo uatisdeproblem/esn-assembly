@@ -3,6 +3,7 @@ import { IDEAApiService } from '@idea-ionic/common';
 
 import { VotingSession } from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
+import { Vote } from '@models/vote.model';
 
 @Injectable({ providedIn: 'root' })
 export class VotingService {
@@ -203,6 +204,32 @@ export class VotingService {
     const body = { action: 'TICKETS_STATUS' };
     const res: VotingTicket[] = await this.api.patchResource(path, { body });
     return res.map(x => new VotingTicket(x));
+  }
+  /**
+   * Check whether the session should be closed early because everyone voted.
+   */
+  async checkWhetherSessionShouldEndEarly(votingSession: VotingSession): Promise<VotingSession> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'CHECK_EARLY_END' };
+    return new VotingSession(await this.api.patchResource(path, { body }));
+  }
+
+  /**
+   * If the user can manage the voting session, can request the results before the votes are published.
+   */
+  async getVotesBeforeTheyArePublished(votingSession: VotingSession): Promise<Vote[]> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'GET_RESULTS' };
+    const res: Vote[] = await this.api.patchResource(path, { body });
+    return res.map(x => new Vote(x));
+  }
+  /**
+   * Publish the results for everyone to see.
+   */
+  async publishVotingResults(votingSession: VotingSession): Promise<VotingSession> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'PUBLISH_RESULTS' };
+    return new VotingSession(await this.api.patchResource(path, { body }));
   }
 }
 

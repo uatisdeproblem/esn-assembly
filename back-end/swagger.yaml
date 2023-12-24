@@ -2216,27 +2216,9 @@ paths:
           $ref: '#/components/responses/VotingSession'
         400:
           $ref: '#/components/responses/BadParameters'
-    delete:
-      summary: Delete a voting session
-      description: Requires to be Administrator
-      tags: [Voting]
-      security:
-        - AuthFunction: []
-      parameters:
-        - name: sessionId
-          in: path
-          description: Session ID
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          $ref: '#/components/responses/OperationCompleted'
-        400:
-          $ref: '#/components/responses/BadParameters'
     patch:
       summary: Actions on a voting session
-      description: Permissions depend on the ction
+      description: Permissions depend on the action
       tags: [Voting]
       security:
         - AuthFunction: []
@@ -2256,13 +2238,31 @@ paths:
               properties:
                 action:
                   type: string
-                  enum: [START, TICKETS_STATUS, ARCHIVE, UNARCHIVE]
+                  enum: [START, TICKETS_STATUS, CHECK_EARLY_END, GET_RESULTS, PUBLISH_RESULTS, ARCHIVE, UNARCHIVE]
                 endsAt:
                   type: string
                   description: (START)
                 timezone:
                   type: string
                   description: (START)
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a voting session
+      description: Requires to be Administrator (or Scrutineer of the session)
+      tags: [Voting]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: sessionId
+          in: path
+          description: Session ID
+          required: true
+          schema:
+            type: string
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'

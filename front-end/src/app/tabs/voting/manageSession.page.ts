@@ -16,7 +16,13 @@ import { ManageVoterStandaloneComponent } from './voters/manageVoter.component';
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
-import { VotingMajorityTypes, VotingBallot, VotingSession, Voter } from '@models/votingSession.model';
+import {
+  VotingMajorityTypes,
+  VotingBallot,
+  VotingSession,
+  Voter,
+  ResultForBallotOption
+} from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 
@@ -65,6 +71,7 @@ export class ManageVotingSessionPage implements OnDestroy {
   timezones = (Intl as any).supportedValuesOf('timeZone');
 
   votingTickets: VotingTicket[];
+  results: ResultForBallotOption[][];
 
   constructor(
     private location: Location,
@@ -87,9 +94,12 @@ export class ManageVotingSessionPage implements OnDestroy {
       if (this.sessionId !== 'new') {
         this.votingSession = await this._voting.getById(this.sessionId);
         if (!this.votingSession.canUserManage(this.app.user)) return this.app.closePage('COMMON.UNAUTHORIZED');
-        if (this.votingSession.hasStarted())
+        if (this.votingSession.hasStarted()) {
           this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
+          if (this.votingSession.isInProgress()) this.checkWhetherSessionShouldEndEarly();
+        }
         if (this.votingSession.isInProgress()) this.openWebSocketForVotingTicketsStatus();
+        if (this.votingSession.results) this.results = this.votingSession.results;
         this.setUIHelpersForComplexFields();
         this.editMode = UXMode.VIEW;
       } else {
@@ -510,12 +520,52 @@ export class ManageVotingSessionPage implements OnDestroy {
   private handleMessageFromWebSocket(webSocketMessage: WebSocketMessage): void {
     const votingTicket = new VotingTicket(webSocketMessage.item);
     this.votingTickets.find(x => x.voterId === votingTicket.voterId)?.load(votingTicket);
+    this.checkWhetherSessionShouldEndEarly();
   }
   getNumVotersWhoSignedIn(): number {
     return this.votingTickets.filter(x => x.signedInAt).length;
   }
   getNumVotersWhoVoted(): number {
     return this.votingTickets.filter(x => x.votedAt).length;
+  }
+  async checkWhetherSessionShouldEndEarly(): Promise<void> {
+    if (!this.votingTickets || !this.votingSession.isInProgress()) return;
+    const everyoneVoted = this.votingTickets.filter(x => x.votedAt).length === this.votingSession.voters.length;
+    if (everyoneVoted)
+      this.votingSession.load(await this._voting.checkWhetherSessionShouldEndEarly(this.votingSession));
+  }
+  async showResults(): Promise<void> {
+    if (!this.votingSession.hasEnded() || this.results) return;
+    try {
+      await this.loading.show();
+      const votes = await this._voting.getVotesBeforeTheyArePublished(this.votingSession);
+      this.results = this.votingSession.generateResults(votes);
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    } finally {
+      this.loading.hide();
+    }
+  }
+  async publishResults(): Promise<void> {
+    const doPublish = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        this.votingSession.load(await this._voting.publishVotingResults(this.votingSession));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('VOTING.PUBLISH_RESULTS_I');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doPublish }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
   }
 }
 

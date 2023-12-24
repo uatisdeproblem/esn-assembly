@@ -29,10 +29,10 @@
               <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
                 {{ 'VOTING.IN_PROGRESS' | translate }}
               </ion-badge>
-              <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.resultsArePublished">
+              <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
                 {{ 'VOTING.ENDED' | translate }}
               </ion-badge>
-              <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.resultsArePublished">
+              <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.results">
                 {{ 'VOTING.RESULTS' | translate }}
               </ion-badge>
               <ion-badge *ngIf="votingSession.isDraft()" color="medium">{{ 'VOTING.DRAFT' | translate }}</ion-badge>
@@ -43,6 +43,28 @@
           </ion-card-header>
           <ion-card-content>
             <ion-list class="aList" lines="none">
+              <ion-item>
+                <ion-icon slot="start" icon="ticket-outline" />
+                <ion-label>
+                  <p>{{ 'VOTING.VOTERS' | translate }}</p>
+                  {{ votingSession.voters.length }}
+                </ion-label>
+              </ion-item>
+              <ion-item *ngIf="votingSession.startsAt">
+                <ion-icon slot="start" icon="play-outline" />
+                <ion-label>
+                  <p>{{ 'VOTING.STARTS_AT' | translate }}</p>
+                  {{ votingSession.startsAt | dateTz: 'datetime' : votingSession.timezone }}, {{ votingSession.timezone
+                  }}
+                </ion-label>
+              </ion-item>
+              <ion-item *ngIf="votingSession.startsAt && votingSession.endsAt">
+                <ion-icon slot="start" icon="stop-outline" />
+                <ion-label>
+                  <p>{{ 'VOTING.ENDS_AT' | translate }}</p>
+                  {{ votingSession.endsAt | dateTz: 'datetime' : votingSession.timezone }}, {{ votingSession.timezone }}
+                </ion-label>
+              </ion-item>
               <app-html-editor
                 *ngIf="votingSession.description"
                 [content]="votingSession.description"
@@ -51,6 +73,78 @@
             </ion-list>
           </ion-card-content>
         </ion-card>
+      </ion-col>
+      <ion-col [size]="12" [sizeLg]="6">
+        <ion-list class="aList">
+          <ion-list-header>
+            <ion-label class="ion-margin-start">
+              <h1>{{ 'VOTING.BALLOTS' | translate }}</h1>
+              <p>{{ 'VOTING.BALLOTS_I' | translate }}</p>
+            </ion-label>
+          </ion-list-header>
+          <ion-item class="noElements" *ngIf="!votingSession.ballots.length">
+            <ion-label class="ion-text-wrap">{{ 'VOTING.NO_BALLOTS_YET' | translate }}</ion-label>
+          </ion-item>
+          <ion-card class="ballotCard" *ngFor="let ballot of votingSession.ballots; let bIndex = index">
+            <ion-card-header>
+              <ion-card-title>{{ ballot.text }}</ion-card-title>
+              <ion-card-subtitle class="tappable" [id]="'majorityTypeInfo-' + bIndex">
+                {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType | translate }} <ion-icon icon="information" />
+              </ion-card-subtitle>
+              <ion-popover [trigger]="'majorityTypeInfo-' + bIndex" triggerAction="click">
+                <ng-template>
+                  <ion-content class="ion-padding">
+                    {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType + '_I' | translate }}
+                  </ion-content>
+                </ng-template>
+              </ion-popover>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-item
+                lines="none"
+                *ngFor="let option of ballot.options; let oIndex = index"
+                [button]="!votingSession.isSecret"
+                [id]="'votersList-' + bIndex + '-' + oIndex"
+              >
+                <ion-badge slot="start" color="light">{{ oIndex + 1 }}</ion-badge>
+                <ion-label class="ion-text-wrap">{{ option }}</ion-label>
+                <ion-badge
+                  slot="end"
+                  style="width: 80px; text-align: right"
+                  color="medium"
+                  *ngIf="votingSession.results"
+                >
+                  {{ votingSession.results[bIndex][oIndex].numVotes }} ({{
+                  (votingSession.results[bIndex][oIndex].numVotes / votingSession.voters.length) | percent }})
+                </ion-badge>
+                <ion-popover
+                  *ngIf="!votingSession.isSecret && votingSession.results"
+                  [trigger]="'votersList-' + bIndex + '-' + oIndex"
+                  triggerAction="click"
+                >
+                  <ng-template>
+                    <ion-content class="ion-padding">
+                      <ion-list>
+                        <ion-list-header>
+                          <ion-label class="ion-margin-bottom">
+                            <h3><b>{{ 'VOTING.VOTERS' | translate }}</b></h3>
+                            <p>{{ option }}</p>
+                          </ion-label>
+                        </ion-list-header>
+                        <ion-item *ngIf="votingSession.results[bIndex][oIndex].numVotes === 0">
+                          <ion-label class="ion-text-wrap"><i>{{ 'VOTING.NO_VOTERS' | translate }}</i></ion-label>
+                        </ion-item>
+                        <ion-item *ngFor="let voter of votingSession.results[bIndex][oIndex].voters">
+                          <ion-label class="ion-text-wrap">{{ voter }}</ion-label>
+                        </ion-item>
+                      </ion-list>
+                    </ion-content>
+                  </ng-template>
+                </ion-popover>
+              </ion-item>
+            </ion-card-content>
+          </ion-card>
+        </ion-list>
       </ion-col>
     </ion-row>
   </ion-grid>

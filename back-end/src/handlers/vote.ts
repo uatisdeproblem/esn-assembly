@@ -17,7 +17,8 @@ const DDB_TABLES = {
   votingTickets: process.env.DDB_TABLE_votingTickets,
   votes: process.env.DDB_TABLE_votes
 };
-const ddb = new DynamoDB();
+const ddb = new DynamoDB({ debug: false });
+process.env.LOG_LEVEL = 'WARN'; // avoid logging the requests, for secrecy
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new VoteRC(ev, cb).handleRequest();
 
@@ -89,6 +90,7 @@ class VoteRC extends ResourceController {
     const updateVotingTicket = {
       TableName: DDB_TABLES.votingTickets,
       Key: { sessionId: this.votingSession.sessionId, voterId },
+      ConditionExpression: 'attribute_not_exists(votedAt)',
       UpdateExpression: 'SET votedAt = :at',
       ExpressionAttributeValues: { ':at': votingTicket.votedAt }
     };

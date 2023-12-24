@@ -10,6 +10,7 @@ import { VotingSession } from '../models/votingSession.model';
 import { User } from '../models/user.model';
 import { VotingTicket } from '../models/votingTicket.model';
 import { Configurations } from '../models/configurations.model';
+import { Vote } from '../models/vote.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -21,6 +22,7 @@ const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
   events: process.env.DDB_TABLE_events,
   votingTickets: process.env.DDB_TABLE_votingTickets,
+  votes: process.env.DDB_TABLE_votes,
   configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB();
@@ -132,12 +134,18 @@ class VotingSessionsRC extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
-  protected async patchResource(): Promise<VotingSession | string[] | VotingTicket[]> {
+  protected async patchResource(): Promise<VotingSession | VotingTicket[] | Vote[]> {
     switch (this.body.action) {
       case 'START':
         return await this.startVotingSession(this.body.endsAt, this.body.timezone);
       case 'TICKETS_STATUS':
         return await this.getVotingSessionTicketsStatus();
+      case 'CHECK_EARLY_END':
+        return await this.checkWhetherSessionShouldEndEarly();
+      case 'GET_RESULTS':
+        return await this.getVotingResults();
+      case 'PUBLISH_RESULTS':
+        return await this.publishVotingResults();
       case 'ARCHIVE':
         return await this.manageArchive(true);
       case 'UNARCHIVE':
@@ -147,6 +155,8 @@ class VotingSessionsRC extends ResourceController {
     }
   }
   private async startVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
     if (this.votingSession.hasStarted()) throw new RCError("Can't be changed after start");
 
     this.votingSession.endsAt = new Date(endsAt).toISOString();
@@ -213,8 +223,62 @@ class VotingSessionsRC extends ResourceController {
     votingTickets.forEach(x => delete x.token);
     return votingTickets;
   }
+  private async checkWhetherSessionShouldEndEarly(): Promise<VotingSession> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.isInProgress()) return this.votingSession;
+
+    const votingTickets = (
+      await ddb.query({
+        TableName: DDB_TABLES.votingTickets,
+        KeyConditionExpression: 'sessionId = :sessionId',
+        ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
+      })
+    ).map(x => new VotingTicket(x));
+
+    const everyoneVoted = votingTickets.filter(x => x.votedAt).length === this.votingSession.voters.length;
+    if (!everyoneVoted) return this.votingSession;
+
+    this.votingSession.endsAt = new Date().toISOString();
+    await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
+    return this.votingSession;
+  }
+  private async getVotingResults(): Promise<Vote[]> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.hasEnded()) throw new RCError('Session has not ended');
+
+    return (
+      await ddb.query({
+        TableName: DDB_TABLES.votes,
+        KeyConditionExpression: 'sessionId = :sessionId',
+        ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
+      })
+    ).map(x => new Vote(x));
+  }
+  private async publishVotingResults(): Promise<VotingSession> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.hasEnded()) throw new RCError('Session has not ended');
+
+    if (this.votingSession.results) throw new RCError('Already public');
+
+    const votes = (
+      await ddb.query({
+        TableName: DDB_TABLES.votes,
+        KeyConditionExpression: 'sessionId = :sessionId',
+        ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
+      })
+    ).map(x => new Vote(x));
+
+    this.votingSession.results = this.votingSession.generateResults(votes);
+
+    await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
+
+    return this.votingSession;
+  }
   private async manageArchive(archive: boolean): Promise<VotingSession> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     if (archive) {
       this.votingSession.archivedAt = new Date().toISOString();
@@ -225,7 +289,7 @@ class VotingSessionsRC extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.votingSessions, Key: { sessionId: this.votingSession.sessionId } });
   }

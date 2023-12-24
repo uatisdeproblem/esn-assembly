@@ -2,6 +2,7 @@ import { epochISOString, Resource } from 'idea-toolbox';
 
 import { GAEventAttached } from './event.model';
 import { User } from './user.model';
+import { Vote } from './vote.model';
 
 /**
  * A session in which users can vote.
@@ -62,9 +63,9 @@ export class VotingSession extends Resource {
    */
   timezone: string;
   /**
-   * Whether the voting session results are considered published and consultable by anyone.
+   * The results of the voting session, in case they are published.
    */
-  resultsArePublished: boolean;
+  results?: ResultForBallotOption[][];
   /**
    * The timestamp when the voting session was archived.
    */
@@ -76,6 +77,7 @@ export class VotingSession extends Resource {
   ballots: VotingBallot[];
   /**
    * The voters for the voting session.
+   * Technical note: the current architecture supports hundreds, maybe a few thousands of voters, no more.
    */
   voters: Voter[];
 
@@ -95,8 +97,8 @@ export class VotingSession extends Resource {
     this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
     this.timezone = this.clean(x.timezone, String);
     this.scrutineersIds = this.cleanArray(x.scrutineersIds, String).map(x => x.toLowerCase());
-    if (!this.hasEnded()) this.resultsArePublished = false;
-    else this.resultsArePublished = this.clean(x.resultsArePublished, Boolean, false);
+    if (!this.hasEnded()) delete this.results;
+    else if (x.results) this.results = x.results;
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
     this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b));
     this.voters = this.cleanArray(x.voters, v => new Voter(v, this));
@@ -110,7 +112,7 @@ export class VotingSession extends Resource {
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
     this.startsAt = safeData.startsAt;
-    this.resultsArePublished = safeData.resultsArePublished;
+    if (safeData.results) this.results = safeData.results;
   }
 
   validate(checkIfReady = false): string[] {
@@ -187,6 +189,27 @@ export class VotingSession extends Resource {
   getTotWeights(): number {
     if (!this.isWeighted) return 1;
     else return this.voters.reduce((tot, acc): number => (tot += acc.voteWeight), 0);
+  }
+
+  /**
+   * Calculate and return the results from the votes of the session.
+   */
+  generateResults(votes: Vote[]): ResultForBallotOption[][] {
+    const results: ResultForBallotOption[][] = [];
+    this.ballots.forEach((ballot, bIndex): void => {
+      results[bIndex] = [];
+      ballot.options.forEach((option, oIndex): void => {
+        results[bIndex][oIndex] = { numVotes: 0, voters: [] };
+        votes.forEach(vote => {
+          const choice = vote.submission[bIndex];
+          if (choice === option) {
+            results[bIndex][oIndex].numVotes++;
+            if (!this.isSecret) results[bIndex][oIndex].voters.push(vote.voterName);
+          }
+        });
+      });
+    });
+    return results;
   }
 }
 
@@ -275,4 +298,12 @@ export class Voter extends Resource {
     }
     return e;
   }
+}
+
+/**
+ * The result of a ballot's option.
+ */
+export interface ResultForBallotOption {
+  numVotes: number;
+  voters: string[];
 }

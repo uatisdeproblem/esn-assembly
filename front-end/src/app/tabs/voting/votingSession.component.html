@@ -1,7 +1,7 @@
 <ng-container *ngIf="!row">
   <ion-item *ngIf="votingSession" button (click)="select.emit()">
     <ion-label class="ion-text-wrap">
-      <p class="eventName">{{ votingSession.event.name }}</p>
+      <p class="eventName">{{ votingSession.event?.name }}</p>
       {{ votingSession.name }}
       <p class="itemDetails">
         <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
@@ -10,10 +10,10 @@
         <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
           {{ 'VOTING.IN_PROGRESS' | translate }}
         </ion-badge>
-        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.resultsArePublished">
+        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
           {{ 'VOTING.ENDED' | translate }}
         </ion-badge>
-        <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.resultsArePublished">
+        <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.results">
           {{ 'VOTING.RESULTS' | translate }}
         </ion-badge>
       </p>
@@ -43,7 +43,7 @@
     <ion-col [sizeLg]="7" [sizeXl]="6">
       <b>{{ votingSession.name }}</b>
     </ion-col>
-    <ion-col class="ion-hide-xl-down" [sizeXl]="2">{{ votingSession.event.name }}</ion-col>
+    <ion-col class="ion-hide-xl-down" [sizeXl]="2">{{ votingSession.event?.name }}</ion-col>
     <ion-col [sizeLg]="3" [sizeXl]="2">
       <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
         {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
@@ -55,10 +55,10 @@
         <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
           {{ 'VOTING.IN_PROGRESS' | translate }}
         </ion-badge>
-        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.resultsArePublished">
+        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
           {{ 'VOTING.ENDED' | translate }}
         </ion-badge>
-        <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.resultsArePublished">
+        <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.results">
           {{ 'VOTING.RESULTS' | translate }}
         </ion-badge>
       </ng-container>
