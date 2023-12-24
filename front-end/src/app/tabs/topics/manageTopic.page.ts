@@ -250,8 +250,17 @@ export class ManageTopicPage {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
-  duplicateTopic(): void {
-    // @todo
+
+  async duplicateTopic(): Promise<void> {
+    const duplicateTopic: Topic = new Topic(this.topic);
+    duplicateTopic.name = `${this.topic.name} - Clone`;
+    try {
+      await this._topics.insert(duplicateTopic);
+      this.message.success('COMMON.OPERATION_COMPLETED');
+      this.app.goToInTabs(['topics'], { back: true });
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    }
   }
 
   enterEditMode(): void {

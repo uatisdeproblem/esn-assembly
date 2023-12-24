@@ -236,8 +236,17 @@ export class ManageVotingSessionPage implements OnDestroy {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
-  duplicateSession(): void {
-    // @todo
+
+  async duplicateSession(): Promise<void> {
+    const duplicateSession: VotingSession = new VotingSession(this.votingSession);
+    duplicateSession.name = `${this.votingSession.name} - Clone`;
+    try {
+      await this._voting.insert(duplicateSession);
+      this.message.success('COMMON.OPERATION_COMPLETED');
+      this.app.goToInTabs(['voting'], { back: true });
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    }
   }
 
   async addScrutineer(): Promise<void> {

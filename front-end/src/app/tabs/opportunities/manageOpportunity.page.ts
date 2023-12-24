@@ -202,8 +202,17 @@ export class ManageOpportunityPage {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
-  duplicateOpportunity(): void {
-    // @todo
+
+  async duplicateOpportunity(): Promise<void> {
+    const duplicateOpportunity: Opportunity= new Opportunity(this.opportunity);
+    duplicateOpportunity.name = `${this.opportunity.name} - Clone`;
+    try {
+      await this._opportunities.insert(duplicateOpportunity);
+      this.message.success('COMMON.OPERATION_COMPLETED');
+      this.app.goToInTabs(['opportunities'], { back: true });
+    } catch (error) {
+      this.message.error('COMMON.OPERATION_FAILED');
+    }
   }
 
   enterEditMode(): void {
