@@ -175,7 +175,7 @@ class GAEvents extends ResourceController {
       TableName: DDB_TABLES.votingSessions,
       IndexName: 'sessionId-meta-index'
     });
-    const votingSessionsWithEvent = votingSessions.filter(x => x.event.eventId === this.gaEvent.eventId);
+    const votingSessionsWithEvent = votingSessions.filter(x => x.event?.eventId === this.gaEvent.eventId);
     if (votingSessionsWithEvent.length > 0) throw new RCError('Event is used');
 
     await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.gaEvent.eventId } });
