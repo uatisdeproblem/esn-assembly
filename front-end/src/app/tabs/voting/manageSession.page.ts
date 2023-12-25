@@ -317,11 +317,6 @@ export class ManageVotingSessionPage implements OnDestroy {
     });
     modal.present();
   }
-  handleBallotReorder({ detail }): void {
-    const toReposition = this.votingSession.ballots.splice(detail.from, 1)[0];
-    this.votingSession.ballots.splice(detail.to, 0, toReposition);
-    detail.complete();
-  }
   async removeBallot(ballot: VotingBallot): Promise<void> {
     const doRemove = (): void => {
       const index = this.votingSession.ballots.indexOf(ballot);

@@ -149,38 +149,12 @@
       <ion-item class="noElements" *ngIf="!votingSession.ballots.length">
         <ion-label class="ion-text-wrap">{{ 'VOTING.NO_BALLOTS_YET' | translate }}</ion-label>
       </ion-item>
-      <ion-reorder-group [disabled]="!editMode" (ionItemReorder)="handleBallotReorder($event)">
-        <ion-card class="ballotCard" *ngFor="let ballot of votingSession.ballots; let bIndex = index">
-          <ion-card-header>
-            <ion-item lines="none" style="--min-height: none" *ngIf="editMode">
-              <ion-button slot="end" fill="clear" color="danger" (click)="removeBallot(ballot)">
-                <ion-icon icon="trash-outline" slot="icon-only" />
-              </ion-button>
-              <ion-button slot="end" fill="clear" (click)="manageBallot(ballot)">
-                <ion-icon icon="pencil" slot="icon-only" />
-              </ion-button>
-              <ion-reorder slot="end" />
-            </ion-item>
-            <ion-card-title>{{ ballot.text }}</ion-card-title>
-            <ion-card-subtitle class="tappable" [id]="'majorityTypeInfo-' + bIndex">
-              {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType | translate }} <ion-icon icon="information" />
-            </ion-card-subtitle>
-            <ion-popover [trigger]="'majorityTypeInfo-' + bIndex" triggerAction="click">
-              <ng-template>
-                <ion-content class="ion-padding">
-                  {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType + '_I' | translate }}
-                </ion-content>
-              </ng-template>
-            </ion-popover>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-item lines="none" *ngFor="let option of ballot.options; let index = index">
-              <ion-badge slot="start" color="light">{{ index + 1 }}</ion-badge>
-              <ion-label class="ion-text-wrap">{{ option }}</ion-label>
-            </ion-item>
-          </ion-card-content>
-        </ion-card>
-      </ion-reorder-group>
+      <app-voting-ballots
+        [votingSession]="votingSession"
+        [showActions]="!!editMode"
+        (remove)="removeBallot($event)"
+        (manage)="manageBallot($event)"
+      />
     </div>
     <ng-container *ngIf="pageSection === PageSections.VOTERS">
       <ion-toolbar id="votersTableToolbar" color="ideaToolbar">
@@ -464,60 +438,7 @@
             {{ 'VOTING.PUBLISH_RESULTS' | translate }} <ion-icon slot="end" icon="share" />
           </ion-button>
         </ion-list-header>
-        <ion-card class="ballotCard" *ngFor="let ballot of votingSession.ballots; let bIndex = index">
-          <ion-card-header>
-            <ion-card-title>{{ ballot.text }}</ion-card-title>
-            <ion-card-subtitle class="tappable" [id]="'majorityTypeInfo-' + bIndex">
-              {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType | translate }} <ion-icon icon="information" />
-            </ion-card-subtitle>
-            <ion-popover [trigger]="'majorityTypeInfo-' + bIndex" triggerAction="click">
-              <ng-template>
-                <ion-content class="ion-padding">
-                  {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType + '_I' | translate }}
-                </ion-content>
-              </ng-template>
-            </ion-popover>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-item
-              lines="none"
-              *ngFor="let option of ballot.options; let oIndex = index"
-              [button]="!votingSession.isSecret"
-              [id]="'votersList-' + bIndex + '-' + oIndex"
-            >
-              <ion-badge slot="start" color="light">{{ oIndex + 1 }}</ion-badge>
-              <ion-label class="ion-text-wrap">{{ option }}</ion-label>
-              <ion-badge slot="end" style="width: 80px; text-align: right" color="medium">
-                {{ results[bIndex][oIndex].numVotes }} ({{ (results[bIndex][oIndex].numVotes /
-                votingSession.voters.length) | percent }})
-              </ion-badge>
-              <ion-popover
-                *ngIf="!votingSession.isSecret"
-                [trigger]="'votersList-' + bIndex + '-' + oIndex"
-                triggerAction="click"
-              >
-                <ng-template>
-                  <ion-content class="ion-padding">
-                    <ion-list>
-                      <ion-list-header>
-                        <ion-label class="ion-margin-bottom">
-                          <h3><b>{{ 'VOTING.VOTERS' | translate }}</b></h3>
-                          <p>{{ option }}</p>
-                        </ion-label>
-                      </ion-list-header>
-                      <ion-item *ngIf="results[bIndex][oIndex].numVotes === 0">
-                        <ion-label class="ion-text-wrap"><i>{{ 'VOTING.NO_VOTERS' | translate }}</i></ion-label>
-                      </ion-item>
-                      <ion-item *ngFor="let voter of results[bIndex][oIndex].voters">
-                        <ion-label class="ion-text-wrap">{{ voter }}</ion-label>
-                      </ion-item>
-                    </ion-list>
-                  </ion-content>
-                </ng-template>
-              </ion-popover>
-            </ion-item>
-          </ion-card-content>
-        </ion-card>
+        <app-voting-ballots [votingSession]="votingSession" [results]="results" />
       </ng-container>
     </ion-list>
   </ng-container>

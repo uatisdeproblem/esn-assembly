@@ -745,6 +745,7 @@
     "RESULTS_ARE_NOT_PUBLISHED_YET": "Results are not published yet.",
     "PUBLISH_RESULTS": "Publish results",
     "PUBLISH_RESULTS_I": "Once the results are published, everyone will be able to see them. You can't go back from this choice.",
-    "NO_VOTERS": "No voters"
+    "NO_VOTERS": "No voters",
+    "VOTERS_FOR": "Voters for"
   }
 }

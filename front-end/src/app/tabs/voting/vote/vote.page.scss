@@ -46,18 +46,11 @@ ion-card.ballotCard {
       font-size: 1.3em;
     }
     ion-card-subtitle {
-      margin-top: 2px;
-      color: var(--ion-color-step-500);
+      margin-top: 4px;
+      color: var(--ion-color-step-400);
     }
   }
-  ion-card-content {
-    ion-item {
-      --min-height: 32px;
-      --padding-start: 8px;
-      ion-radio {
-        margin: 0;
-        font-size: 0.9em;
-      }
-    }
+  ion-card-content ion-radio {
+    font-size: 0.95em;
   }
 }
