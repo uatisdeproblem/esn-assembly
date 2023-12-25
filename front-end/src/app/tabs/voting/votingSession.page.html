@@ -52,7 +52,7 @@
               </ion-item>
               <ion-item *ngIf="votingSession.startsAt">
                 <ion-icon slot="start" icon="play-outline" />
-                <ion-label>
+                <ion-label class="ion-text-wrap">
                   <p>{{ 'VOTING.STARTS_AT' | translate }}</p>
                   {{ votingSession.startsAt | dateTz: 'datetime' : votingSession.timezone }}, {{ votingSession.timezone
                   }}
@@ -60,7 +60,7 @@
               </ion-item>
               <ion-item *ngIf="votingSession.startsAt && votingSession.endsAt">
                 <ion-icon slot="start" icon="stop-outline" />
-                <ion-label>
+                <ion-label class="ion-text-wrap">
                   <p>{{ 'VOTING.ENDS_AT' | translate }}</p>
                   {{ votingSession.endsAt | dateTz: 'datetime' : votingSession.timezone }}, {{ votingSession.timezone }}
                 </ion-label>

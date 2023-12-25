@@ -27,6 +27,10 @@ export class Vote extends Resource {
    */
   voterEmail?: string;
   /**
+   * The weight of the vote, inherited from the voter.
+   */
+  weight: number;
+  /**
    * The vote for each of the ballots of the session.
    */
   submission: string[];
@@ -38,6 +42,7 @@ export class Vote extends Resource {
     if (x.voterId) this.voterId = this.clean(x.voterId, String);
     if (x.voterName) this.voterName = this.clean(x.voterName, String);
     if (x.voterEmail) this.voterEmail = this.clean(x.voterEmail, String);
+    this.weight = this.clean(x.weight, Number);
     this.submission = this.cleanArray(x.submission, String);
   }
 

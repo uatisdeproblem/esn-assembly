@@ -16,13 +16,7 @@ import { ManageVoterStandaloneComponent } from './voters/manageVoter.component';
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
-import {
-  VotingMajorityTypes,
-  VotingBallot,
-  VotingSession,
-  Voter,
-  ResultForBallotOption
-} from '@models/votingSession.model';
+import { VotingMajorityTypes, VotingBallot, VotingSession, Voter, VotingResults } from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 
@@ -68,7 +62,7 @@ export class ManageVotingSessionPage implements OnDestroy {
   timezones = (Intl as any).supportedValuesOf('timeZone');
 
   votingTickets: VotingTicket[];
-  results: ResultForBallotOption[][];
+  results: VotingResults;
 
   constructor(
     private location: Location,
@@ -534,8 +528,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     if (!this.votingSession.hasEnded() || this.results) return;
     try {
       await this.loading.show();
-      const votes = await this._voting.getVotesBeforeTheyArePublished(this.votingSession);
-      this.results = this.votingSession.generateResults(votes);
+      this.results = await this._voting.getVotesBeforeTheyArePublished(this.votingSession);
     } catch (error) {
       this.message.error('COMMON.OPERATION_FAILED');
     } finally {

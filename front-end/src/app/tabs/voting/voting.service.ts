@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { VotingSession } from '@models/votingSession.model';
+import { VotingResults, VotingSession } from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
-import { Vote } from '@models/vote.model';
 
 @Injectable({ providedIn: 'root' })
 export class VotingService {
@@ -219,11 +218,10 @@ export class VotingService {
   /**
    * If the user can manage the voting session, can request the results before the votes are published.
    */
-  async getVotesBeforeTheyArePublished(votingSession: VotingSession): Promise<Vote[]> {
+  async getVotesBeforeTheyArePublished(votingSession: VotingSession): Promise<VotingResults> {
     const path = ['voting-sessions', votingSession.sessionId];
     const body = { action: 'GET_RESULTS' };
-    const res: Vote[] = await this.api.patchResource(path, { body });
-    return res.map(x => new Vote(x));
+    return await this.api.patchResource(path, { body });
   }
   /**
    * Publish the results for everyone to see.

@@ -81,6 +81,7 @@ class VoteRC extends ResourceController {
 
     const vote = new Vote({ sessionId: this.votingSession.sessionId });
     vote.key = await ddb.IUNID(PROJECT.concat('_', vote.sessionId));
+    vote.weight = votingTicket.weight;
     vote.submission = this.body.submission;
     if (!this.votingSession.isSecret) {
       vote.voterId = votingTicket.voterId;

@@ -21,6 +21,11 @@ export class VotingTicket extends Resource {
    */
   voterEmail: string;
   /**
+   * A number with high precision that represents the weight of the voter.
+   * If the vote is not weighted, it equals `1`.
+   */
+  weight: number;
+  /**
    * The token to use for submitting the vote. This attribute is sensitive and should be available only to admins.
    */
   token: string;
@@ -39,6 +44,7 @@ export class VotingTicket extends Resource {
     this.voterId = this.clean(x.voterId, String);
     this.voterName = this.clean(x.voterName, String);
     this.voterEmail = this.clean(x.voterEmail, String)?.toLowerCase();
+    this.weight = this.clean(x.weight, Number);
     this.token = this.clean(x.token, String);
     if (x.signedInAt) this.signedInAt = this.clean(x.signedInAt, String);
     if (x.votedAt) this.votedAt = this.clean(x.votedAt, String);

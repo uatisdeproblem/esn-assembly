@@ -9,6 +9,9 @@ ion-item {
   p.itemDetails {
     padding-top: 6px;
     padding-bottom: 4px;
+    ion-badge {
+      margin-right: 4px;
+    }
   }
 }
 

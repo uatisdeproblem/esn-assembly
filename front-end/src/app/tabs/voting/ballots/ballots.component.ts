@@ -6,7 +6,7 @@ import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 
-import { VotingMajorityTypes, VotingSession, ResultForBallotOption, VotingBallot } from '@models/votingSession.model';
+import { VotingMajorityTypes, VotingSession, VotingBallot, VotingResults } from '@models/votingSession.model';
 
 @Component({
   standalone: true,
@@ -49,7 +49,7 @@ import { VotingMajorityTypes, VotingSession, ResultForBallotOption, VotingBallot
             <ion-badge slot="start" color="light">{{ oIndex + 1 }}</ion-badge>
             <ion-label class="ion-text-wrap">{{ option }}</ion-label>
             <ion-badge *ngIf="results" slot="end" color="medium">
-              {{ results[bIndex][oIndex].numVotes }} - {{ results[bIndex][oIndex].weightedPercentage | percent }}
+              {{ results[bIndex][oIndex].value | percent }}
             </ion-badge>
             <ion-popover
               *ngIf="results && !votingSession.isSecret"
@@ -65,7 +65,7 @@ import { VotingMajorityTypes, VotingSession, ResultForBallotOption, VotingBallot
                         <h3>{{ option }}</h3>
                       </ion-label>
                     </ion-list-header>
-                    <ion-item *ngIf="results[bIndex][oIndex].numVotes === 0">
+                    <ion-item *ngIf="results[bIndex][oIndex].value === 0">
                       <ion-label class="ion-padding-start">
                         <i>{{ 'VOTING.NO_VOTERS' | translate }}</i>
                       </ion-label>
@@ -107,7 +107,7 @@ import { VotingMajorityTypes, VotingSession, ResultForBallotOption, VotingBallot
         font-size: 0.9em;
       }
       ion-item ion-badge[slot='end'] {
-        width: 80px;
+        width: 50px;
         text-align: right;
       }
       ion-label h3 {
@@ -124,7 +124,7 @@ export class BallotsStandaloneComponent {
   /**
    * The results to display; if not set, they are not shown.
    */
-  @Input() results: ResultForBallotOption[][] | null;
+  @Input() results: VotingResults | null;
   /**
    * Whether to display the actions to manage the ballots.
    */

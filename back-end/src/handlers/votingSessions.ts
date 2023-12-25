@@ -6,7 +6,7 @@ import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
 import { epochISOString } from 'idea-toolbox';
 
 import { GAEventAttached } from '../models/event.model';
-import { VotingSession } from '../models/votingSession.model';
+import { VotingResults, VotingSession } from '../models/votingSession.model';
 import { User } from '../models/user.model';
 import { VotingTicket } from '../models/votingTicket.model';
 import { Configurations } from '../models/configurations.model';
@@ -139,7 +139,7 @@ class VotingSessionsRC extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
-  protected async patchResource(): Promise<VotingSession | VotingTicket[] | Vote[]> {
+  protected async patchResource(): Promise<VotingSession | VotingTicket[] | VotingResults> {
     switch (this.body.action) {
       case 'START':
         return await this.startVotingSession(this.body.endsAt, this.body.timezone);
@@ -179,6 +179,7 @@ class VotingSessionsRC extends ResourceController {
           voterId: x.id,
           voterName: x.name,
           voterEmail: x.email,
+          weight: this.votingSession.isWeighted ? x.voteWeight : 1,
           token: getSecretToken()
         })
     );
@@ -249,18 +250,20 @@ class VotingSessionsRC extends ResourceController {
     await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
     return this.votingSession;
   }
-  private async getVotingResults(): Promise<Vote[]> {
+  private async getVotingResults(): Promise<VotingResults> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     if (!this.votingSession.hasEnded()) throw new RCError('Session has not ended');
 
-    return (
+    const votes = (
       await ddb.query({
         TableName: DDB_TABLES.votes,
         KeyConditionExpression: 'sessionId = :sessionId',
         ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
       })
     ).map(x => new Vote(x));
+
+    return this.votingSession.generateResults(votes);
   }
   private async publishVotingResults(): Promise<VotingSession> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');

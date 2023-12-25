@@ -74,7 +74,7 @@ export class VotingSession extends Resource {
   /**
    * The results of the voting session, in case they are published.
    */
-  results?: ResultForBallotOption[][];
+  results?: VotingResults;
   /**
    * The timestamp when the voting session was archived.
    */
@@ -194,24 +194,22 @@ export class VotingSession extends Resource {
   /**
    * Calculate and return the results from the votes of the session.
    */
-  generateResults(votes: Vote[]): ResultForBallotOption[][] {
-    const results: ResultForBallotOption[][] = [];
+  generateResults(votes: Vote[]): VotingResults {
+    const results: VotingResults = [];
 
-    const sumOfWeights = this.getTotWeights();
-    const votersWeights: Record<string, number> = {};
-    this.voters.forEach(
-      voter => (votersWeights[voter.id] = this.isWeighted ? voter.voteWeight / sumOfWeights : 1 / this.voters.length)
-    );
+    const sumOfWeights = votes.reduce((tot, acc): number => (tot += acc.weight), 0);
+    const balancedWeights: Record<string, number> = {};
+    votes.forEach(vote => (balancedWeights[vote.key] = vote.weight / sumOfWeights));
 
     this.ballots.forEach((ballot, bIndex): void => {
       results[bIndex] = [];
       ballot.options.forEach((option, oIndex): void => {
-        results[bIndex][oIndex] = { numVotes: 0, weightedPercentage: 0, voters: [] };
+        results[bIndex][oIndex] = { value: 0 };
+        if (!this.isSecret) results[bIndex][oIndex].voters = [];
         votes.forEach(vote => {
           const choice = vote.submission[bIndex];
           if (choice === option) {
-            results[bIndex][oIndex].numVotes++;
-            results[bIndex][oIndex].weightedPercentage += votersWeights[vote.voterId];
+            results[bIndex][oIndex].value += balancedWeights[vote.key];
             if (!this.isSecret) results[bIndex][oIndex].voters.push(vote.voterName);
           }
         });
@@ -311,8 +309,18 @@ export class Voter extends Resource {
 /**
  * The result of a ballot's option.
  */
-export interface ResultForBallotOption {
-  numVotes: number;
-  weightedPercentage: number;
-  voters: string[];
+export interface VotingResultForBallotOption {
+  /**
+   * The weighted value for the option.
+   */
+  value: number;
+  /**
+   * In case of public voting, the list of voters for the option.
+   */
+  voters?: string[];
 }
+
+/**
+ * The results of a voting session.
+ */
+export type VotingResults = VotingResultForBallotOption[][];
