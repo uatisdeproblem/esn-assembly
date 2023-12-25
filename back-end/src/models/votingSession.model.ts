@@ -51,6 +51,15 @@ export class VotingSession extends Resource {
    */
   scrutineersIds: string[];
   /**
+   * The ballots for the voting session.
+   */
+  ballots: VotingBallot[];
+  /**
+   * The voters for the voting session.
+   * Technical note: the current architecture supports hundreds, maybe a few thousands of voters, no more.
+   */
+  voters: Voter[];
+  /**
    * The timestamp when the voting session started. If not set, or in the future, the session hasn't started yet.
    */
   startsAt: epochISOString | null;
@@ -71,16 +80,6 @@ export class VotingSession extends Resource {
    */
   archivedAt?: epochISOString;
 
-  /**
-   * The ballots for the voting session.
-   */
-  ballots: VotingBallot[];
-  /**
-   * The voters for the voting session.
-   * Technical note: the current architecture supports hundreds, maybe a few thousands of voters, no more.
-   */
-  voters: Voter[];
-
   load(x: any): void {
     super.load(x);
     this.sessionId = this.clean(x.sessionId, String);
@@ -93,6 +92,8 @@ export class VotingSession extends Resource {
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     if (x.publishedSince) this.publishedSince = this.clean(x.publishedSince, d => new Date(d).toISOString());
     else delete this.publishedSince;
+    this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b));
+    this.voters = this.cleanArray(x.voters, v => new Voter(v, this));
     this.startsAt = this.clean(x.startsAt, d => new Date(d).toISOString());
     this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
     this.timezone = this.clean(x.timezone, String);
@@ -100,8 +101,6 @@ export class VotingSession extends Resource {
     if (!this.hasEnded()) delete this.results;
     else if (x.results) this.results = x.results;
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
-    this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b));
-    this.voters = this.cleanArray(x.voters, v => new Voter(v, this));
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -110,9 +109,9 @@ export class VotingSession extends Resource {
     this.isWeighted = safeData.isWeighted;
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
-    if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
     this.startsAt = safeData.startsAt;
     if (safeData.results) this.results = safeData.results;
+    if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
   }
 
   validate(checkIfReady = false): string[] {
@@ -122,12 +121,13 @@ export class VotingSession extends Resource {
     this.voters.forEach((v, i): void => v.validate(this).forEach(ea => e.push(`voters[${i}].${ea}`)));
 
     if (checkIfReady || this.startsAt) {
-      if (this.iE(this.publishedSince) || this.publishedSince > new Date().toISOString()) e.push('publishedSince');
+      if (this.iE(this.publishedSince, 'date') || this.publishedSince > new Date().toISOString())
+        e.push('publishedSince');
       if (this.iE(this.ballots)) e.push('ballots');
       if (this.iE(this.voters)) e.push('voters');
       const votersIds = this.voters.map(x => x.id);
       const votersNames = this.voters.map(x => x.name);
-      const votersEmails = this.voters.map(x => x.email).filter(x => x);
+      const votersEmails = this.voters.map(x => x.email?.toLowerCase()).filter(x => x);
       if (votersIds.length !== new Set(votersIds).size) e.push('voters.duplicatedIds');
       if (votersNames.length !== new Set(votersNames).size) e.push('voters.duplicatedNames');
       if (votersEmails.length !== new Set(votersEmails).size) e.push('voters.duplicatedEmails');
@@ -233,7 +233,7 @@ export class VotingBallot extends Resource {
   load(x: any): void {
     super.load(x);
     this.text = this.clean(x.text, String);
-    this.majorityType = this.clean(x.majorityType, String, VotingMajorityTypes.SIMPLE);
+    this.majorityType = this.clean(x.majorityType, String, VotingMajorityTypes.RELATIVE);
     this.options = this.cleanArray(x.options, String);
   }
 

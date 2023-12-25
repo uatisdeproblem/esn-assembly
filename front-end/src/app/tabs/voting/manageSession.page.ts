@@ -388,7 +388,7 @@ export class ManageVotingSessionPage implements OnDestroy {
   calcVotersFooterTotals(): void {
     const votersNames = this.votingSession.voters.map(x => x.name);
     this.numDuplicatedNames = votersNames.length - new Set(votersNames).size;
-    const votersEmails = this.votingSession.voters.map(x => x.email).filter(x => x);
+    const votersEmails = this.votingSession.voters.map(x => x.email?.toLowerCase()).filter(x => x);
     this.numDuplicatedEmails = votersEmails.length - new Set(votersEmails).size;
     this.missingEmails = this.votingSession.voters.filter(x => !x.email).length;
     this.totalWeights = this.votingSession.getTotWeights();

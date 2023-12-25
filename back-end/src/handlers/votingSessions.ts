@@ -16,13 +16,13 @@ import { Vote } from '../models/vote.model';
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const STAGE = process.env.STAGE;
 const PROJECT = process.env.PROJECT;
+const STAGE = process.env.STAGE;
 const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
-  events: process.env.DDB_TABLE_events,
   votingTickets: process.env.DDB_TABLE_votingTickets,
   votes: process.env.DDB_TABLE_votes,
+  events: process.env.DDB_TABLE_events,
   configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB();
@@ -110,6 +110,11 @@ class VotingSessionsRC extends ResourceController {
 
     this.votingSession = new VotingSession(this.body);
     this.votingSession.sessionId = await ddb.IUNID(PROJECT);
+    this.votingSession.createdAt = new Date().toISOString();
+    delete this.votingSession.startsAt;
+    delete this.votingSession.endsAt;
+    delete this.votingSession.results;
+    delete this.votingSession.archivedAt;
 
     await this.putSafeResource({ noOverwrite: true });
 
@@ -159,9 +164,9 @@ class VotingSessionsRC extends ResourceController {
 
     if (this.votingSession.hasStarted()) throw new RCError("Can't be changed after start");
 
+    this.votingSession.startsAt = new Date().toISOString();
     this.votingSession.endsAt = new Date(endsAt).toISOString();
     this.votingSession.timezone = timezone;
-    this.votingSession.startsAt = new Date().toISOString();
 
     const errors = this.votingSession.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
@@ -191,8 +196,9 @@ class VotingSessionsRC extends ResourceController {
       try {
         await this.sendVotingTicketToVoter(votingTicket);
       } catch (error) {
-        // @todo improvement: manage with SES bounces?
+        // it's ok if one email is not sent/received: we can send it again
         this.logger.warn('Voting ticket failed to send', error, { ...votingTicket });
+        // possible improvement: manage bounces with SES? #53
       }
     }
 
@@ -220,7 +226,7 @@ class VotingSessionsRC extends ResourceController {
       ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
     });
     votingTickets = votingTickets.map(x => new VotingTicket(x));
-    votingTickets.forEach(x => delete x.token);
+    votingTickets.forEach(x => delete x.token); // for security reasons, we don't expose the token
     return votingTickets;
   }
   private async checkWhetherSessionShouldEndEarly(): Promise<VotingSession> {
@@ -274,15 +280,13 @@ class VotingSessionsRC extends ResourceController {
     this.votingSession.results = this.votingSession.generateResults(votes);
 
     await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
-
     return this.votingSession;
   }
   private async manageArchive(archive: boolean): Promise<VotingSession> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
-    if (archive) {
-      this.votingSession.archivedAt = new Date().toISOString();
-    } else delete this.votingSession.archivedAt;
+    if (archive) this.votingSession.archivedAt = new Date().toISOString();
+    else delete this.votingSession.archivedAt;
 
     await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
     return this.votingSession;
@@ -292,5 +296,29 @@ class VotingSessionsRC extends ResourceController {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.votingSessions, Key: { sessionId: this.votingSession.sessionId } });
+
+    try {
+      const votingTickets: VotingTicket[] = await ddb.query({
+        TableName: DDB_TABLES.votingTickets,
+        KeyConditionExpression: 'sessionId = :sessionId',
+        ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId },
+        ProjectionExpression: 'sessionId, voterId'
+      });
+      await ddb.batchDelete(DDB_TABLES.votingTickets, votingTickets);
+    } catch (error) {
+      this.logger.warn('Failed deleting voting tickets', error, { ...this.votingSession });
+    }
+
+    try {
+      const votes: Vote[] = await ddb.query({
+        TableName: DDB_TABLES.votes,
+        KeyConditionExpression: 'sessionId = :sessionId',
+        ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId },
+        ProjectionExpression: 'sessionId, key'
+      });
+      await ddb.batchDelete(DDB_TABLES.votes, votes);
+    } catch (error) {
+      this.logger.warn('Failed deleting votes', error, { ...this.votingSession });
+    }
   }
 }

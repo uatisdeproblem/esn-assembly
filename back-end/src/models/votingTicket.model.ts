@@ -21,14 +21,9 @@ export class VotingTicket extends Resource {
    */
   voterEmail: string;
   /**
-   * The token to use for submitting the vote.
+   * The token to use for submitting the vote. This attribute is sensitive and should be available only to admins.
    */
   token: string;
-  /**
-   * The timestamp when the voting ticket has been received.
-   * @todo improvement: manage with SES bounces?
-   */
-  receivedAt?: epochISOString;
   /**
    * The timestamp when the token has been used to start voting.
    */
@@ -43,9 +38,8 @@ export class VotingTicket extends Resource {
     this.sessionId = this.clean(x.sessionId, String);
     this.voterId = this.clean(x.voterId, String);
     this.voterName = this.clean(x.voterName, String);
-    this.voterEmail = this.clean(x.voterEmail, String);
+    this.voterEmail = this.clean(x.voterEmail, String)?.toLowerCase();
     this.token = this.clean(x.token, String);
-    if (x.receivedAt) this.receivedAt = this.clean(x.receivedAt, String);
     if (x.signedInAt) this.signedInAt = this.clean(x.signedInAt, String);
     if (x.votedAt) this.votedAt = this.clean(x.votedAt, String);
   }

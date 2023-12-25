@@ -143,7 +143,7 @@ class WebSocketStreamController extends StreamController {
     } else if (tableName.endsWith('_messages')) {
       socketMessage = { action, type: WebSocketConnectionTypes.MESSAGES, referenceId: itemKeys.topicId, item };
     } else if (tableName.endsWith('_votingTickets')) {
-      delete item.token;
+      delete item.token; // for security reasons, we don't expose the token
       socketMessage = { action, type: WebSocketConnectionTypes.VOTING_TICKETS, referenceId: itemKeys.sessionId, item };
     }
     return socketMessage;

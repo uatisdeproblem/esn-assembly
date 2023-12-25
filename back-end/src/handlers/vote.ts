@@ -12,6 +12,7 @@ import { Vote } from '../models/vote.model';
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
+const PROJECT = process.env.PROJECT;
 const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
   votingTickets: process.env.DDB_TABLE_votingTickets,
@@ -44,7 +45,7 @@ class VoteRC extends ResourceController {
       throw new RCError('Voting session not found');
     }
 
-    if (this.votingSession.endsAt < new Date().toISOString()) throw new RCError('Voting session has ended');
+    if (!this.votingSession.isInProgress()) throw new RCError('Voting session not in progress');
   }
 
   protected async getResources(): Promise<{ votingSession: VotingSession; votingTicket: VotingTicket }> {
@@ -79,7 +80,7 @@ class VoteRC extends ResourceController {
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
 
     const vote = new Vote({ sessionId: this.votingSession.sessionId });
-    vote.key = await ddb.IUNID(vote.sessionId);
+    vote.key = await ddb.IUNID(PROJECT.concat('_', vote.sessionId));
     vote.submission = this.body.submission;
     if (!this.votingSession.isSecret) {
       vote.voterId = votingTicket.voterId;

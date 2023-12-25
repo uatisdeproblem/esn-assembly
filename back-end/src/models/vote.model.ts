@@ -11,7 +11,7 @@ export class Vote extends Resource {
    */
   sessionId: string;
   /**
-   * A unique, random string.
+   * A unique random string to use as SK.
    */
   key: string;
   /**
@@ -27,14 +27,14 @@ export class Vote extends Resource {
    */
   voterEmail?: string;
   /**
-   * The vote for each of the ballots of the voting session.
+   * The vote for each of the ballots of the session.
    */
   submission: string[];
 
   load(x: any): void {
     super.load(x);
     this.sessionId = this.clean(x.sessionId, String);
-    this.key = this.clean(x.key, Number);
+    this.key = this.clean(x.key, String);
     if (x.voterId) this.voterId = this.clean(x.voterId, String);
     if (x.voterName) this.voterName = this.clean(x.voterName, String);
     if (x.voterEmail) this.voterEmail = this.clean(x.voterEmail, String);
@@ -42,7 +42,7 @@ export class Vote extends Resource {
   }
 
   /**
-   * Validate a vode against a voting session.
+   * Validate a vote against a voting session.
    */
   static validate(votingSession: VotingSession, submission: string[]): string[] {
     const e = [];

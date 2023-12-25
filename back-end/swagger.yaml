@@ -2271,7 +2271,7 @@ paths:
   /voting-sessions/{sessionId}/vote:
     get:
       summary: Login to a voting session and begin to vote
-      description: The combination of voting ID and token authenticate the request
+      description: The combination of voting ID and token authenticates the request
       tags: [Voting]
       parameters:
         - name: sessionId
@@ -2297,7 +2297,7 @@ paths:
           $ref: '#/components/responses/BadParameters'
     post:
       summary: Submit a vote
-      description: The combination of voting ID and token authenticate the request
+      description: The combination of voting ID and token authenticates the request
       tags: [Voting]
       parameters:
         - name: sessionId
