@@ -369,15 +369,15 @@
           />
         </ion-col>
         <ion-col>
-          <ion-item lines="none" [class.fieldHasError]="hasFieldAnError('timezone')">
-            <!--@todo convert in idea-select-->
-            <ion-label position="stacked">{{ 'VOTING.TIMEZONE' | translate }}</ion-label>
-            <ion-select interface="popover" [(ngModel)]="votingSession.timezone">
-              <ion-select-option *ngFor="let timezone of timezones" [value]="timezone">
-                {{ timezone }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
+          <idea-select
+            lines="none"
+            [data]="timezones"
+            [description]="votingSession.timezone"
+            [label]="'VOTING.TIMEZONE' | translate"
+            [hideClearButton]="true"
+            [class.fieldHasError]="hasFieldAnError('timezone')"
+            (select)="votingSession.timezone = $event.value"
+          />
         </ion-col>
       </ion-row>
       <p class="ion-margin-top ion-text-center">
