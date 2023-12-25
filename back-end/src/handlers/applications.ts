@@ -218,7 +218,7 @@ class ApplicationsRC extends ResourceController {
     const template = approved ? `notify-application-approved-${STAGE}` : `notify-application-rejected-${STAGE}`;
     const templateData = {
       user: this.application.subject.name,
-      opportunity: this.opportunity.name,
+      title: this.opportunity.name,
       url: OPPORTUNITY_BASE_URL.concat(this.opportunity.opportunityId),
       message
     };

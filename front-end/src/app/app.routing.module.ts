@@ -15,6 +15,11 @@ const routes: Routes = [
     path: 't',
     loadChildren: (): Promise<any> => import('./tabs/tabs.module').then(m => m.TabsModule),
     canActivate: [initGuard, authGuard]
+  },
+  {
+    path: 'vote',
+    loadChildren: (): Promise<any> => import('./tabs/voting/vote/vote.module').then(m => m.VoteModule),
+    canActivate: [initGuard]
   }
 ];
 

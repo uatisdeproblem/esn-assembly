@@ -51,5 +51,6 @@ export interface WebSocketMessage {
  */
 export enum WebSocketConnectionTypes {
   TOPICS = 'topics',
-  MESSAGES = 'messages'
+  MESSAGES = 'messages',
+  VOTING_TICKETS = 'votingTickets'
 }

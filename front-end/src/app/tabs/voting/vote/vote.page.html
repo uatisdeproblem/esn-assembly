@@ -1,0 +1,72 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar">
+    <ion-title class="ion-text-center">
+      <ion-img [src]="app.getIcon()" />
+      {{ app.configurations.appTitle }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list class="aList maxWidthContainer">
+    <ion-card color="danger" *ngIf="errorString">
+      <ion-card-content><b>{{ 'COMMON.ERROR' | translate }}</b>. {{ errorString }}</ion-card-content>
+    </ion-card>
+    <ion-card color="success" *ngIf="voted">
+      <ion-card-content>
+        <b>{{ 'VOTING.THANK_YOU' | translate }}</b> {{ 'VOTING.VOTE_RECEIVED' | translate }}
+      </ion-card-content>
+    </ion-card>
+    <ng-container *ngIf="votingSession && !voted">
+      <ion-card color="ESNgreen">
+        <ion-card-content>
+          {{ 'VOTING.WELCOME' | translate }}, <b>{{ votingTicket.voterName }}</b> ({{ votingTicket.voterEmail }}).
+        </ion-card-content>
+      </ion-card>
+      <ion-list-header>
+        <ion-label>
+          <h4>{{ 'VOTING.HERE_YOU_CAN_VOTE_FOR' | translate }}:</h4>
+          <h1>{{ votingSession.name }}</h1>
+          <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
+            {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
+          </ion-badge>
+        </ion-label>
+      </ion-list-header>
+      <app-html-editor *ngIf="votingSession.description" [(content)]="votingSession.description" [editMode]="false" />
+      <hr />
+      <ion-card color="white" class="ballotCard" *ngFor="let ballot of votingSession.ballots; let bIndex = index">
+        <ion-card-header [class.fieldHasError]="hasFieldAnError('submission['+ bIndex + ']')">
+          <ion-card-title>{{ ballot.text }}</ion-card-title>
+          <ion-card-subtitle class="tappable" [id]="'majorityTypeInfo-' + bIndex">
+            {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType | translate }} <ion-icon icon="information" />
+          </ion-card-subtitle>
+          <ion-popover [trigger]="'majorityTypeInfo-' + bIndex" triggerAction="click">
+            <ng-template>
+              <ion-content class="ion-padding">
+                <p style="font-size: 0.9em">{{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType + '_I' | translate }}</p>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item lines="none">
+            <ion-radio-group [(ngModel)]="submission[bIndex]">
+              <ion-radio labelPlacement="end" justify="start" *ngFor="let option of ballot.options" [value]="option">
+                <span class="ion-text-wrap">{{ option }}</span>
+              </ion-radio>
+            </ion-radio-group>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+      <hr />
+      <ion-card color="light">
+        <ion-card-content>{{ 'VOTING.CANT_CHANGE_SUBMITTED_VOTES' | translate }}</ion-card-content>
+      </ion-card>
+      <p class="ion-text-center">
+        <ion-button (click)="submitVote()">
+          {{ 'VOTING.SUBMIT_VOTES' | translate }}
+          <ion-icon name="checkmark-done" slot="end" />
+        </ion-button>
+      </p>
+    </ng-container>
+  </ion-list>
+</ion-content>

@@ -10,11 +10,11 @@ import { AppService } from '@app/app.service';
 export class DateTimezonePipe implements PipeTransform {
   constructor(private t: IDEATranslationsService, private app: AppService) {}
 
-  transform(value: any, pattern: 'date' | 'datetime' | 'time' = 'date'): string | null {
+  transform(value: any, pattern: 'date' | 'datetime' | 'time' = 'date', timezone?: string): string | null {
     if (!value) return null;
     const d = new Date(value);
     const lang = this.t.getCurrentLang();
-    const options = { timeZone: this.app.configurations.timezone };
+    const options = { timeZone: timezone ?? this.app.configurations.timezone };
     if (pattern === 'datetime')
       return d.toLocaleString(lang, {
         ...options,

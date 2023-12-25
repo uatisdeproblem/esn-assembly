@@ -44,6 +44,9 @@ import { Deadline } from '@models/deadline.model';
     `
       ion-badge {
         font-weight: 500;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       ion-item ion-label {
         line-height: 1.1em;

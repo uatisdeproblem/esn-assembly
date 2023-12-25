@@ -23,6 +23,10 @@ const routes: Routes = [
           import('./opportunities/opportunities.module').then(m => m.OpportunitiesModule)
       },
       {
+        path: 'voting',
+        loadChildren: (): Promise<any> => import('./voting/voting.module').then(m => m.VotingModule)
+      },
+      {
         path: 'profile',
         loadChildren: (): Promise<any> => import('./profile/profile.module').then(m => m.ProfileModule)
       },

@@ -82,6 +82,16 @@ export class ApiStack extends cdk.Stack {
       stage: props.stage,
       appDomain: props.appDomain
     });
+    const { lambdaFnWebSocket } = await this.createWebSocketAPIAndStage({
+      stackId: id,
+      project: props.project,
+      stage: props.stage,
+      apiDomain: props.webSocketApiDomain,
+      defaultLambdaFnProps,
+      defaultDDBTableProps,
+      authorizerLambdaFn: lambdaFunctions['auth']
+    });
+    lambdaFunctions['webSocket'] = lambdaFnWebSocket;
     this.allowLambdaFunctionsToAccessIDEATablesAndFunctions({ lambdaFunctions: Object.values(lambdaFunctions) });
     this.allowLambdaFunctionsToAccessMediaBucketFoldersAndUploadAssets({
       stage: props.stage,
@@ -105,10 +115,6 @@ export class ApiStack extends cdk.Stack {
       lambdaFunctions: Object.values(lambdaFunctions)
     });
 
-    //
-    // PROJECT CUSTOM
-    //
-
     if (lambdaFunctions['sesNotifications']) {
       const topic = Topic.fromTopicArn(this, 'SESTopicToHandleSESBounces', props.ses.notificationTopicArn);
       new Subscription(this, 'SESSubscriptionToHandleSESBounces', {
@@ -127,21 +133,14 @@ export class ApiStack extends cdk.Stack {
       rule.addTarget(new LambdaFunctionTarget(lambdaFunctions['scheduledOps']));
     }
 
-    const { lambdaFnWebSocket } = await this.createWebSocketAPIAndStage({
-      stackId: id,
-      project: props.project,
-      stage: props.stage,
-      apiDomain: props.webSocketApiDomain,
-      defaultLambdaFnProps,
-      defaultDDBTableProps,
-      authorizerLambdaFn: lambdaFunctions['auth']
-    });
-    lambdaFnWebSocket.addEventSource(
-      new DynamoEventSource(tables['topics'], { startingPosition: Lambda.StartingPosition.LATEST })
-    );
-    lambdaFnWebSocket.addEventSource(
-      new DynamoEventSource(tables['messages'], { startingPosition: Lambda.StartingPosition.LATEST })
-    );
+    const ddbWebSocketSourceTables = ['topics', 'messages', 'votingTickets'];
+    ddbWebSocketSourceTables
+      .filter(x => tables[x])
+      .forEach(x =>
+        lambdaFnWebSocket.addEventSource(
+          new DynamoEventSource(tables[x], { startingPosition: Lambda.StartingPosition.LATEST })
+        )
+      );
   }
 
   //

@@ -5,7 +5,7 @@
     </ion-button>
   </ion-buttons>
   <ion-title *ngIf="title">{{ title }}</ion-title>
-  <ion-buttons slot="end">
+  <ion-buttons slot="end" *ngIf="!noInteraction">
     <ng-container *ngIf="editMode">
       <ion-button [title]="'COMMON.EXIT_EDIT_MODE' | translate" (click)="exit.emit()">
         <ion-icon slot="icon-only" icon="close-circle"></ion-icon>

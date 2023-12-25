@@ -22,9 +22,8 @@ const SES_CONFIG = {
   sourceArn: process.env.SES_IDENTITY_ARN,
   region: process.env.SES_REGION
 };
-const TEST_EMAIL_EXAMPLE_TOPIC = 'Amazing candidacy';
-const TEST_EMAIL_EXAMPLE_QUESTION = 'An awesome question';
-const TEST_EMAIL_EXAMPLE_OPPORTUNITY = 'An incredible opportunity';
+const TEST_EMAIL_EXAMPLE_TITLE = 'Amazing title';
+const TEST_EMAIL_EXAMPLE_DETAIL = 'An awesome detail';
 const TEST_EMAIL_EXAMPLE_URL = BASE_URL;
 const TEST_EMAIL_EXAMPLE_MESSAGE = 'A custom message';
 const ses = new SES();
@@ -103,6 +102,10 @@ class ConfigurationsRC extends ResourceController {
         return 'notify-application-approved';
       case EmailTemplates.APPLICATION_REJECTED:
         return 'notify-application-rejected';
+      case EmailTemplates.VOTING_INSTRUCTIONS:
+        return 'notify-voting-instructions';
+      case EmailTemplates.VOTING_CONFIRMATION:
+        return 'notify-voting-confirmation';
       default:
         throw new RCError("Template doesn't exist");
     }
@@ -130,9 +133,8 @@ class ConfigurationsRC extends ResourceController {
     const templateName = this.getSESTemplateName(emailTemplate);
     const templateData = {
       user: `${this.galaxyUser.firstName} ${this.galaxyUser.lastName}`,
-      topic: TEST_EMAIL_EXAMPLE_TOPIC,
-      question: TEST_EMAIL_EXAMPLE_QUESTION,
-      opportunity: TEST_EMAIL_EXAMPLE_OPPORTUNITY,
+      title: TEST_EMAIL_EXAMPLE_TITLE,
+      detail: TEST_EMAIL_EXAMPLE_DETAIL,
       url: TEST_EMAIL_EXAMPLE_URL,
       message: TEST_EMAIL_EXAMPLE_MESSAGE
     };
