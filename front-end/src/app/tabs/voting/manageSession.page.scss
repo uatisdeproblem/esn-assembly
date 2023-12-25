@@ -2,6 +2,10 @@ ion-grid {
   background: var(--ion-color-white);
 }
 
+ion-list.aList {
+  padding-bottom: 40px;
+}
+
 ion-card.ballotCard {
   ion-card-header {
     padding-bottom: 8px;
@@ -74,8 +78,4 @@ ion-card.sessionChecklistCard {
       border-bottom-right-radius: 4px;
     }
   }
-}
-
-ion-list.aList {
-  padding-bottom: 40px;
 }

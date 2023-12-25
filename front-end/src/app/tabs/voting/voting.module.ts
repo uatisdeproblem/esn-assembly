@@ -26,6 +26,7 @@ import { DateTimezonePipe } from '@common/dateTimezone.pipe';
     IonicModule,
     NgxDatatableModule,
     IDEATranslationsModule,
+    IDEASelectModule,
     VotingRoutingModule,
     VotingSessionStandaloneComponent,
     ManageBallotStandaloneComponent,
@@ -34,8 +35,7 @@ import { DateTimezonePipe } from '@common/dateTimezone.pipe';
     EventsPickerComponent,
     DatetimeWithTimezoneStandaloneComponent,
     HTMLEditorModule,
-    DateTimezonePipe,
-    IDEASelectModule
+    DateTimezonePipe
   ],
   declarations: [VotingSessionsPage, ManageVotingSessionPage, VotingSessionPage]
 })

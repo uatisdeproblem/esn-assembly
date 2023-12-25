@@ -19,7 +19,7 @@ export class VotingSessionPage {
   constructor(
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
-    private _topics: VotingService,
+    private _voting: VotingService,
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
@@ -33,7 +33,7 @@ export class VotingSessionPage {
     }
   }
   private async loadResources(): Promise<void> {
-    this.votingSession = await this._topics.getById(this.sessionId);
+    this.votingSession = await this._voting.getById(this.sessionId);
   }
   async handleRefresh(refresh: IonRefresher): Promise<void> {
     await this.loadResources();

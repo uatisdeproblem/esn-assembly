@@ -61,13 +61,6 @@ export class VotingArchivePage implements OnInit {
     if (scrollToNextPage) setTimeout((): Promise<void> => scrollToNextPage.complete(), 100);
   }
 
-  private getYearsSince(firstYear: number): number[] {
-    const years: number[] = [];
-    const currentYear = new Date().getFullYear();
-    for (let year = firstYear; year <= currentYear; year++) years.push(year);
-    return years;
-  }
-
   goToVotingSession(votingSession: VotingSession): void {
     this.app.goToInTabs(['voting', votingSession.sessionId]);
   }

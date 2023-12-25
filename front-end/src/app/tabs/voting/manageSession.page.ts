@@ -32,16 +32,13 @@ import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.mo
   styleUrls: ['manageSession.page.scss']
 })
 export class ManageVotingSessionPage implements OnDestroy {
-  @Input() sessionId = 'new-standard';
+  @Input() sessionId = 'new';
   votingSession: VotingSession;
 
   editMode = UXMode.VIEW;
   UXMode = UXMode;
   errors = new Set<string>();
   entityBeforeChange: VotingSession;
-
-  hasDeadlineForQuestions = false;
-  hasDeadlineForAnswers = false;
 
   publishingOption = PublishingOptions.DRAFT;
   PublishingOptions = PublishingOptions;
@@ -96,9 +93,11 @@ export class ManageVotingSessionPage implements OnDestroy {
         if (!this.votingSession.canUserManage(this.app.user)) return this.app.closePage('COMMON.UNAUTHORIZED');
         if (this.votingSession.hasStarted()) {
           this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
-          if (this.votingSession.isInProgress()) this.checkWhetherSessionShouldEndEarly();
+          if (this.votingSession.isInProgress()) {
+            this.checkWhetherSessionShouldEndEarly();
+            this.openWebSocketForVotingTicketsStatus();
+          }
         }
-        if (this.votingSession.isInProgress()) this.openWebSocketForVotingTicketsStatus();
         if (this.votingSession.results) this.results = this.votingSession.results;
         this.setUIHelpersForComplexFields();
         this.editMode = UXMode.VIEW;
@@ -155,7 +154,7 @@ export class ManageVotingSessionPage implements OnDestroy {
         this.errors = new Set<string>();
         this.editMode = UXMode.VIEW;
         this.setUIHelpersForComplexFields();
-        this.filterVoters();
+        this.filterVoters(this.searchbar?.value);
       }
     };
 
@@ -171,6 +170,10 @@ export class ManageVotingSessionPage implements OnDestroy {
     alert.present();
   }
 
+  //
+  // GENERAL
+  //
+
   private setUIHelpersForComplexFields(): void {
     if (this.votingSession.publishedSince) {
       if (this.votingSession.publishedSince > new Date().toISOString())
@@ -178,10 +181,6 @@ export class ManageVotingSessionPage implements OnDestroy {
       else this.publishingOption = PublishingOptions.PUBLISH;
     } else this.publishingOption = PublishingOptions.DRAFT;
   }
-
-  //
-  // GENERAL
-  //
 
   handleChangeOfPublishingOption(): void {
     if (this.publishingOption === PublishingOptions.DRAFT) delete this.votingSession.publishedSince;
@@ -325,7 +324,8 @@ export class ManageVotingSessionPage implements OnDestroy {
   }
   async removeBallot(ballot: VotingBallot): Promise<void> {
     const doRemove = (): void => {
-      this.votingSession.ballots.splice(this.votingSession.ballots.indexOf(ballot), 1);
+      const index = this.votingSession.ballots.indexOf(ballot);
+      if (index !== -1) this.votingSession.ballots.splice(index, 1);
     };
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const buttons = [
@@ -361,6 +361,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     this.col.push({ prop: 'email', name: this.t._('VOTING.VOTER_EMAIL') });
     if (this.votingSession.isWeighted)
       this.col.push({ prop: 'voteWeight', name: this.t._('VOTING.VOTE_WEIGHT'), maxWidth: 150 });
+
     this.filterVoters(this.searchbar?.value);
     this.setVotersTableHeight();
   }
@@ -373,7 +374,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     this.limit = Math.floor(heightAvailableInPx / this.rowHeight);
   }
 
-  filterVoters(searchText?: string): void {
+  filterVoters(searchText?: string, stayInPage = false): void {
     searchText = (searchText ?? '').toLowerCase();
 
     this.filteredVoters = this.votingSession.voters.filter(x =>
@@ -382,8 +383,7 @@ export class ManageVotingSessionPage implements OnDestroy {
 
     this.calcVotersFooterTotals();
 
-    // whenever the filter changes, always go back to the first page
-    if (this.table) this.table.offset = 0;
+    if (this.table && !stayInPage) this.table.offset = 0;
   }
   calcVotersFooterTotals(): void {
     const votersNames = this.votingSession.voters.map(x => x.name);
@@ -402,11 +402,12 @@ export class ManageVotingSessionPage implements OnDestroy {
     modal.onDidDismiss().then(({ data }): void => {
       if (!data) return;
       voter.load(data, this.votingSession);
-      if (voter.id === 'DELETE' && !isNew)
-        this.votingSession.voters.splice(this.votingSession.voters.indexOf(voter), 1);
-      else if (voter.id !== 'DELETE' && isNew && !this.votingSession.voters.some(x => x.id === voter.id))
+      if (voter.id === 'DELETE' && !isNew) {
+        const index = this.votingSession.voters.indexOf(voter);
+        if (index !== -1) this.votingSession.voters.splice(index, 1);
+      } else if (voter.id !== 'DELETE' && isNew && !this.votingSession.voters.some(x => x.id === voter.id))
         this.votingSession.voters.push(voter);
-      this.filterVoters(this.searchbar?.value);
+      this.filterVoters(this.searchbar?.value, true);
     });
     modal.present();
   }
@@ -523,12 +524,12 @@ export class ManageVotingSessionPage implements OnDestroy {
     this.checkWhetherSessionShouldEndEarly();
   }
   getNumVotersWhoSignedIn(): number {
-    return this.votingTickets.filter(x => x.signedInAt).length;
+    return this.votingTickets?.filter(x => x.signedInAt).length;
   }
   getNumVotersWhoVoted(): number {
-    return this.votingTickets.filter(x => x.votedAt).length;
+    return this.votingTickets?.filter(x => x.votedAt).length;
   }
-  async checkWhetherSessionShouldEndEarly(): Promise<void> {
+  private async checkWhetherSessionShouldEndEarly(): Promise<void> {
     if (!this.votingTickets || !this.votingSession.isInProgress()) return;
     const everyoneVoted = this.votingTickets.filter(x => x.votedAt).length === this.votingSession.voters.length;
     if (everyoneVoted)
@@ -551,6 +552,7 @@ export class ManageVotingSessionPage implements OnDestroy {
       try {
         await this.loading.show();
         this.votingSession.load(await this._voting.publishVotingResults(this.votingSession));
+        this.results = this.votingSession.results;
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');

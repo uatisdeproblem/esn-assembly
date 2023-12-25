@@ -17,7 +17,7 @@
       <ion-col [size]="12" [sizeLg]="6">
         <ion-card color="white" class="votingSessionCard">
           <ion-card-header>
-            <ion-card-subtitle>{{ votingSession.event?.name }}</ion-card-subtitle>
+            <ion-card-subtitle *ngIf="votingSession.event">{{ votingSession.event?.name }}</ion-card-subtitle>
             <ion-card-title>{{ votingSession.name }}</ion-card-title>
             <p class="badges">
               <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">

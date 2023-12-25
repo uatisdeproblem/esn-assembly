@@ -3,8 +3,20 @@ ion-title ion-img {
   display: inline-block;
   vertical-align: middle;
 }
+
 ion-content {
   --background: var(--ion-color-white);
+}
+
+hr {
+  clear: both;
+  height: 1px;
+  min-height: 0;
+  margin: 30px auto;
+  padding: 0;
+  border: none;
+  border-top: medium solid rgba(var(--ion-color-medium-rgb), 0.1);
+  width: 100%;
 }
 
 ion-list.aList ion-list-header {
@@ -48,15 +60,4 @@ ion-card.ballotCard {
       }
     }
   }
-}
-
-hr {
-  clear: both;
-  height: 1px;
-  min-height: 0;
-  margin: 30px auto;
-  padding: 0;
-  border: none;
-  border-top: medium solid rgba(var(--ion-color-medium-rgb), 0.1);
-  width: 100%;
 }

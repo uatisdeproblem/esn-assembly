@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
-import { IDEAMessageService, IDEATranslationsModule } from '@idea-ionic/common';
+import { IDEAMessageService, IDEAShowHintButtonModule, IDEATranslationsModule } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 
@@ -10,7 +10,7 @@ import { VotingBallot, VotingMajorityTypes } from '@models/votingSession.model';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, IDEAShowHintButtonModule],
   selector: 'app-manage-ballot',
   template: `
     <ion-header class="ion-no-border">
@@ -45,6 +45,12 @@ import { VotingBallot, VotingMajorityTypes } from '@models/votingSession.model';
               {{ 'VOTING.MAJORITY_TYPES.' + mt.key | translate }}
             </ion-select-option>
           </ion-select>
+          <idea-show-hint-button
+            slot="end"
+            class="ion-margin-top"
+            [hint]="'VOTING.MAJORITY_TYPES.' + ballot.majorityType"
+            translate
+          />
         </ion-item>
         <ion-item-divider [class.fieldHasError]="hasFieldAnError('options')">
           <ion-label>{{ 'VOTING.BALLOT_OPTIONS' | translate }} <ion-text class="obligatoryDot" /></ion-label>

@@ -175,7 +175,8 @@ export class VotingService {
   }
 
   /**
-   * Login with a voting ticket and begin a vote.
+   * Login with a voting ticket and begin to vote.
+   * Note: the combination of voting ID and token authenticates the request.
    */
   async beginVote(
     sessionId: string,
@@ -189,6 +190,7 @@ export class VotingService {
   }
   /**
    * Submit the votes.
+   * Note: the combination of voting ID and token authenticates the request.
    */
   async submitVotes(votingTicket: VotingTicket, submission: string[]): Promise<void> {
     const path = ['voting-sessions', votingTicket.sessionId, 'vote'];

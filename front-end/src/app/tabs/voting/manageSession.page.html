@@ -15,15 +15,13 @@
       <ion-segment-button [value]="PageSections.BALLOTS">
         <ion-label>
           {{ 'VOTING.BALLOTS' | translate }}
-          <ion-text class="smaller" *ngIf="votingSession.ballots.length">
-            ({{ votingSession.ballots.length }})
-          </ion-text>
+          <ion-text class="smaller" *ngIf="votingSession.ballots.length">({{ votingSession.ballots.length }})</ion-text>
         </ion-label>
       </ion-segment-button>
       <ion-segment-button [value]="PageSections.VOTERS">
         <ion-label>
           {{ 'VOTING.VOTERS' | translate }}
-          <ion-text class="smaller" *ngIf="votingSession.voters.length"> ({{ votingSession.voters.length }}) </ion-text>
+          <ion-text class="smaller" *ngIf="votingSession.voters.length">({{ votingSession.voters.length }})</ion-text>
         </ion-label>
       </ion-segment-button>
       <ion-segment-button *ngIf="!editMode && !votingSession.hasStarted()" [value]="PageSections.START">
@@ -56,7 +54,7 @@
         [class.fieldHasError]="hasFieldAnError('event')"
         [editMode]="!!editMode"
         [(event)]="votingSession.event"
-      ></app-events-picker>
+      />
       <ion-item [class.fieldHasError]="hasFieldAnError('isSecret')">
         <ion-checkbox slot="end" [(ngModel)]="votingSession.isSecret" [disabled]="!editMode" />
         <ion-label>{{ 'VOTING.IS_SECRET' | translate }}</ion-label>
@@ -76,7 +74,7 @@
         <ion-label>
           <h2>{{ 'VOTING.PUBLISHING_OPTIONS' | translate }}</h2>
           <p>{{ 'VOTING.PUBLISHING_OPTIONS_I' | translate }}</p>
-          <p>{{ 'VOTING.DATES_IN_FAVORITE_TIMEZONE' | translate: { timezone: app.configurations.timezone } }}</p>
+          <p>{{ 'VOTING.DATES_IN_DEFAULT_TIMEZONE' | translate: { timezone: app.configurations.timezone } }}</p>
         </ion-label>
       </ion-list-header>
       <ion-radio-group [(ngModel)]="publishingOption" (ionBlur)="handleChangeOfPublishingOption()">
@@ -128,7 +126,7 @@
         *ngIf="votingSession.description || editMode"
         [(content)]="votingSession.description"
         [editMode]="!!editMode"
-      ></app-html-editor>
+      />
 
       <ion-row class="ion-padding-top ion-margin-top" *ngIf="editMode === UXMode.VIEW">
         <ion-col>
@@ -195,7 +193,7 @@
       <ngx-datatable
         #votersTable
         class="fullscreen"
-        style="top: 56px"
+        [ngStyle]="{ top: headerHeight + 'px' }"
         [class.material]="!app.isInDarkMode()"
         [class.dark]="app.isInDarkMode()"
         [columns]="col"
@@ -323,7 +321,7 @@
           </ion-item>
         </ion-card-content>
       </ion-card>
-      <ion-list-header>
+      <ion-list-header class="ion-padding-top">
         <ion-label>
           <h2>{{ 'VOTING.SUMMARY' | translate }}</h2>
           <p>{{ 'VOTING.SUMMARY_I' | translate }}</p>

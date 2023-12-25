@@ -34,17 +34,17 @@ import { Voter, VotingSession } from '@models/votingSession.model';
           <ion-label position="stacked">
             {{ 'VOTING.VOTER_ID' | translate }} <ion-text class="obligatoryDot" />
           </ion-label>
-          <ion-input readonly [value]="voter.id"></ion-input>
+          <ion-input readonly [value]="voter.id" />
         </ion-item>
         <ion-item [class.fieldHasError]="hasFieldAnError('name')">
           <ion-label position="stacked">
             {{ 'VOTING.VOTER_NAME' | translate }} <ion-text class="obligatoryDot" />
           </ion-label>
-          <ion-input [(ngModel)]="voter.name"></ion-input>
+          <ion-input [(ngModel)]="voter.name" />
         </ion-item>
         <ion-item [class.fieldHasError]="hasFieldAnError('email')">
           <ion-label position="stacked">{{ 'VOTING.VOTER_EMAIL' | translate }}</ion-label>
-          <ion-input type="email" [(ngModel)]="voter.email"></ion-input>
+          <ion-input type="email" [(ngModel)]="voter.email" />
         </ion-item>
         <ion-item *ngIf="votingSession.isWeighted" [class.fieldHasError]="hasFieldAnError('voteWeight')">
           <ion-label position="stacked">
