@@ -49,9 +49,7 @@ import { VotingMajorityTypes, VotingSession, ResultForBallotOption, VotingBallot
             <ion-badge slot="start" color="light">{{ oIndex + 1 }}</ion-badge>
             <ion-label class="ion-text-wrap">{{ option }}</ion-label>
             <ion-badge *ngIf="results" slot="end" color="medium">
-              {{ results[bIndex][oIndex].numVotes }} ({{
-                results[bIndex][oIndex].numVotes / votingSession.voters.length | percent
-              }})
+              {{ results[bIndex][oIndex].numVotes }} - {{ results[bIndex][oIndex].weightedPercentage | percent }}
             </ion-badge>
             <ion-popover
               *ngIf="results && !votingSession.isSecret"

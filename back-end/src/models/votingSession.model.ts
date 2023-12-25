@@ -196,14 +196,22 @@ export class VotingSession extends Resource {
    */
   generateResults(votes: Vote[]): ResultForBallotOption[][] {
     const results: ResultForBallotOption[][] = [];
+
+    const sumOfWeights = this.getTotWeights();
+    const votersWeights: Record<string, number> = {};
+    this.voters.forEach(
+      voter => (votersWeights[voter.id] = this.isWeighted ? voter.voteWeight / sumOfWeights : 1 / this.voters.length)
+    );
+
     this.ballots.forEach((ballot, bIndex): void => {
       results[bIndex] = [];
       ballot.options.forEach((option, oIndex): void => {
-        results[bIndex][oIndex] = { numVotes: 0, voters: [] };
+        results[bIndex][oIndex] = { numVotes: 0, weightedPercentage: 0, voters: [] };
         votes.forEach(vote => {
           const choice = vote.submission[bIndex];
           if (choice === option) {
             results[bIndex][oIndex].numVotes++;
+            results[bIndex][oIndex].weightedPercentage += votersWeights[vote.voterId];
             if (!this.isSecret) results[bIndex][oIndex].voters.push(vote.voterName);
           }
         });
@@ -305,5 +313,6 @@ export class Voter extends Resource {
  */
 export interface ResultForBallotOption {
   numVotes: number;
+  weightedPercentage: number;
   voters: string[];
 }
