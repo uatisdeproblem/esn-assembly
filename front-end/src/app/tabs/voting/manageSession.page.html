@@ -348,12 +348,15 @@
           />
         </ion-col>
         <ion-col>
-          <ion-item lines="none" [class.fieldHasError]="hasFieldAnError('timezone')">
-            <!--@todo convert in idea-select-->
-            <idea-select
-              [data]="timezones" [label]="t.instant('VOTING.TIMEZONE')"
-              (select)="votingSession.timezone = $event.value"/>
-          </ion-item>
+          <idea-select
+            lines="none"
+            [data]="timezones"
+            [description]="votingSession.timezone"
+            [label]="'VOTING.TIMEZONE' | translate"
+            [hideClearButton]="true"
+            [class.fieldHasError]="hasFieldAnError('timezone')"
+            (select)="votingSession.timezone = $event.value"
+          />
         </ion-col>
       </ion-row>
       <p class="ion-margin-top ion-text-center">
