@@ -395,7 +395,7 @@ export class ManageVotingSessionPage implements OnDestroy {
   async manageVoter(voter: Voter, isNew = false): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: ManageVoterStandaloneComponent,
-      componentProps: { voter, votingSession: this.votingSession }
+      componentProps: { voter, votingSession: this.votingSession, editMode: this.editMode }
     });
     modal.onDidDismiss().then(({ data }): void => {
       if (!data) return;

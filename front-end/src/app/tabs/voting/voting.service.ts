@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { VotingSession } from '@models/votingSession.model';
+import { Voter, VotingSession } from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
 import { VotingResults } from '@models/votingResult.model';
 
@@ -222,6 +222,23 @@ export class VotingService {
     const path = ['voting-sessions', votingSession.sessionId];
     const body = { action: 'STOP' };
     return new VotingSession(await this.api.patchResource(path, { body }));
+  }
+  /**
+   * Resend the voting ticket to a voter
+   */
+  async resendVotingTicketToVoter(votingSession: VotingSession, voter: Voter, email: string): Promise<void> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'RESEND_VOTING_LINK', voterId: voter.id, email };
+    await this.api.patchResource(path, { body });
+  }
+  /**
+   * Get the voting token of a voter.
+   */
+  async getVotingTokenOfVoter(votingSession: VotingSession, voter: Voter): Promise<string> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'GET_VOTING_TOKEN', voterId: voter.id };
+    const { token }: VotingTicket = await this.api.patchResource(path, { body });
+    return token;
   }
   /**
    * Check whether the session should be closed early because everyone voted.

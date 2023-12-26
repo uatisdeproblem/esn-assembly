@@ -139,7 +139,7 @@ class VotingSessionsRC extends ResourceController {
     return await this.putSafeResource({ noOverwrite: false });
   }
 
-  protected async patchResource(): Promise<VotingSession | VotingTicket[] | VotingResults> {
+  protected async patchResource(): Promise<VotingSession | VotingTicket[] | VotingResults | VotingTicket | void> {
     switch (this.body.action) {
       case 'START':
         return await this.startVotingSession(this.body.endsAt, this.body.timezone);
@@ -151,6 +151,10 @@ class VotingSessionsRC extends ResourceController {
         return await this.stopVotingSessionPrematurely();
       case 'CHECK_EARLY_END':
         return await this.checkWhetherSessionShouldEndEarly();
+      case 'RESEND_VOTING_LINK':
+        return await this.resendVotingLinkToVoter(this.body.voterId, this.body.email);
+      case 'GET_VOTING_TOKEN':
+        return await this.getVotingTokenOfVoter(this.body.voterId);
       case 'GET_RESULTS':
         return await this.getVotingResults();
       case 'PUBLISH_RESULTS':
@@ -214,7 +218,7 @@ class VotingSessionsRC extends ResourceController {
 
     return this.votingSession;
   }
-  private async sendVotingTicketToVoter(ticket: VotingTicket): Promise<void> {
+  private async sendVotingTicketToVoter(ticket: VotingTicket, email = ticket.voterEmail): Promise<void> {
     const template = `notify-voting-instructions-${STAGE}`;
     const templateData = {
       user: ticket.voterName,
@@ -223,7 +227,7 @@ class VotingSessionsRC extends ResourceController {
     };
     const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
     const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
-    await ses.sendTemplatedEmail({ toAddresses: [ticket.voterEmail], template, templateData }, sesConfig);
+    await ses.sendTemplatedEmail({ toAddresses: [email], template, templateData }, sesConfig);
   }
   private async getVotingSessionTicketsStatus(): Promise<VotingTicket[]> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
@@ -271,6 +275,25 @@ class VotingSessionsRC extends ResourceController {
       ExpressionAttributeValues: { ':endsAt': this.votingSession.endsAt }
     });
     return this.votingSession;
+  }
+  private async resendVotingLinkToVoter(voterId: string, email: string): Promise<void> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+
+    const votingTicket = new VotingTicket(
+      await ddb.get({ TableName: DDB_TABLES.votingTickets, Key: { sessionId: this.votingSession.sessionId, voterId } })
+    );
+    await this.sendVotingTicketToVoter(votingTicket, email);
+  }
+  private async getVotingTokenOfVoter(voterId: string): Promise<VotingTicket> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+
+    return new VotingTicket(
+      await ddb.get({ TableName: DDB_TABLES.votingTickets, Key: { sessionId: this.votingSession.sessionId, voterId } })
+    );
   }
   private async checkWhetherSessionShouldEndEarly(): Promise<VotingSession> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');

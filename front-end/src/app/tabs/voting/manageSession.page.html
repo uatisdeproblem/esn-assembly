@@ -185,7 +185,7 @@
         [selectionType]="selectionType"
         [selectAllRowsOnPage]="false"
         [messages]="{ emptyMessage: 'COMMON.NO_ELEMENT_FOUND' | translate }"
-        (select)="editMode ? manageVoter($event.selected[0]) : null"
+        (select)="manageVoter($event.selected[0])"
       >
         <ngx-datatable-footer>
           <ng-template

@@ -2244,6 +2244,8 @@ paths:
                       TICKETS_STATUS,
                       EXTEND_END,
                       STOP,
+                      RESEND_VOTING_LINK,
+                      GET_VOTING_TOKEN,
                       CHECK_EARLY_END,
                       GET_RESULTS,
                       PUBLISH_RESULTS,
@@ -2256,6 +2258,12 @@ paths:
                 timezone:
                   type: string
                   description: (START, EXTEND_END)
+                voterId:
+                  type: string
+                  description: (RESEND_VOTING_LINK, GET_VOTING_TOKEN)
+                email:
+                  type: string
+                  description: (RESEND_VOTING_LINK)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
