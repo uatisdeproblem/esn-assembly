@@ -17,9 +17,10 @@ import { ManageVoterStandaloneComponent } from './voters/manageVoter.component';
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
-import { VotingMajorityTypes, VotingBallot, VotingSession, Voter, VotingResults } from '@models/votingSession.model';
+import { VotingMajorityTypes, VotingBallot, VotingSession, Voter } from '@models/votingSession.model';
 import { ExportableVotingTicket, VotingTicket } from '@models/votingTicket.model';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
+import { VotingResults } from '@models/votingResult.model';
 
 @Component({
   selector: 'manage-voting-session',

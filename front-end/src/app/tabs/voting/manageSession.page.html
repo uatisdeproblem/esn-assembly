@@ -143,7 +143,7 @@
       </ion-row>
     </ion-list>
     <div class="maxWidthContainer ion-padding-top" *ngIf="pageSection === PageSections.BALLOTS">
-      <p class="ion-text-end ion-margin-end" *ngIf="editMode">
+      <p class="ion-text-end ion-margin-end" *ngIf="editMode && votingSession.ballots.length < 50">
         <ion-button fill="clear" (click)="addBallot()">{{ 'VOTING.ADD_BALLOT' | translate }}</ion-button>
       </p>
       <ion-item class="noElements" *ngIf="!votingSession.ballots.length">
@@ -160,7 +160,9 @@
       <ion-toolbar id="votersTableToolbar" color="ideaToolbar">
         <ion-searchbar #votersSearchbar (ionInput)="filterVoters($event.target.value)" />
         <ion-buttons slot="end" *ngIf="editMode">
-          <ion-button (click)="addVoter()">{{ 'COMMON.ADD' | translate }}</ion-button>
+          <ion-button *ngIf="votingSession.voters.length < 1000" (click)="addVoter()">
+            {{ 'COMMON.ADD' | translate }}
+          </ion-button>
           <ion-button (click)="actionsOnVoters()"><ion-icon icon="ellipsis-horizontal" slot="icon-only" /></ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -446,7 +448,7 @@
             </ion-button>
           </ion-col>
           <ion-col class="ion-text-end" *ngIf="votingTickets?.length">
-            <ion-button color="dark" (click)="downloadVotersAudit()">
+            <ion-button color="medium" (click)="downloadVotersAudit()">
               {{ 'VOTING.DOWNLOAD_VOTERS_AUDIT' | translate }} <ion-icon slot="end" icon="download" />
             </ion-button>
           </ion-col>

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { VotingResults, VotingSession } from '@models/votingSession.model';
+import { VotingSession } from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
+import { VotingResults } from '@models/votingResult.model';
 
 @Injectable({ providedIn: 'root' })
 export class VotingService {
@@ -191,7 +192,7 @@ export class VotingService {
    * Submit the votes.
    * Note: the combination of voting ID and token authenticates the request.
    */
-  async submitVotes(votingTicket: VotingTicket, submission: string[]): Promise<void> {
+  async submitVotes(votingTicket: VotingTicket, submission: number[]): Promise<void> {
     const path = ['voting-sessions', votingTicket.sessionId, 'vote'];
     const body = { votingTicket, submission };
     await this.api.postResource(path, { body });

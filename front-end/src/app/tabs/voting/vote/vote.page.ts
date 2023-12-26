@@ -7,7 +7,6 @@ import { VotingService } from '../voting.service';
 
 import { VotingSession } from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
-import { Vote } from '@models/vote.model';
 
 @Component({
   selector: 'vote',
@@ -34,7 +33,7 @@ export class VotePage implements OnInit {
   errorString: string;
   errors = new Set<string>();
 
-  submission: string[] = [];
+  submission: number[] = [];
   voted = false;
 
   constructor(
@@ -69,7 +68,7 @@ export class VotePage implements OnInit {
   }
 
   async submitVote(): Promise<void> {
-    this.errors = new Set(Vote.validate(this.votingSession, this.submission));
+    this.errors = new Set(this.votingSession.validateVoteSubmission(this.submission));
     if (this.errors.size) return this.showMessage(this.t._('VOTING.SOME_OF_VOTES_MISSING'));
 
     const doSubmit = async (): Promise<void> => {

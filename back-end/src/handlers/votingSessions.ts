@@ -6,11 +6,11 @@ import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
 import { epochISOString } from 'idea-toolbox';
 
 import { GAEventAttached } from '../models/event.model';
-import { VotingResults, VotingSession } from '../models/votingSession.model';
+import { VotingSession } from '../models/votingSession.model';
 import { User } from '../models/user.model';
 import { VotingTicket } from '../models/votingTicket.model';
 import { Configurations } from '../models/configurations.model';
-import { Vote } from '../models/vote.model';
+import { VotingResultForBallotOption, VotingResults } from '../models/votingResult.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -21,7 +21,7 @@ const STAGE = process.env.STAGE;
 const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
   votingTickets: process.env.DDB_TABLE_votingTickets,
-  votes: process.env.DDB_TABLE_votes,
+  votingResults: process.env.DDB_TABLE_votingResults,
   events: process.env.DDB_TABLE_events,
   configurations: process.env.DDB_TABLE_configurations
 };
@@ -171,6 +171,12 @@ class VotingSessionsRC extends ResourceController {
     const errors = this.votingSession.validate();
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
 
+    const sumOfWeights = this.votingSession.getTotWeights();
+    const balancedWeights: Record<string, number> = {};
+    this.votingSession.voters.forEach(
+      voter => (balancedWeights[voter.id] = (this.votingSession.isWeighted ? voter.voteWeight : 1) / sumOfWeights)
+    );
+
     const getSecretToken = (length = 7): string => Math.random().toString(36).slice(-length);
     const votingTickets = this.votingSession.voters.map(
       x =>
@@ -179,7 +185,7 @@ class VotingSessionsRC extends ResourceController {
           voterId: x.id,
           voterName: x.name,
           voterEmail: x.email,
-          weight: this.votingSession.isWeighted ? x.voteWeight : 1,
+          weight: balancedWeights[x.id],
           token: getSecretToken()
         })
     );
@@ -192,7 +198,6 @@ class VotingSessionsRC extends ResourceController {
 
     await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
 
-    // note: this architecture could break in case of hundreds of voters
     for (const votingTicket of votingTickets) {
       try {
         await this.sendVotingTicketToVoter(votingTicket);
@@ -255,32 +260,33 @@ class VotingSessionsRC extends ResourceController {
 
     if (!this.votingSession.hasEnded()) throw new RCError('Session has not ended');
 
-    const votes = (
+    const resultsForBallotOption = (
       await ddb.query({
-        TableName: DDB_TABLES.votes,
+        TableName: DDB_TABLES.votingResults,
         KeyConditionExpression: 'sessionId = :sessionId',
         ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
       })
-    ).map(x => new Vote(x));
+    ).map(x => new VotingResultForBallotOption(x));
 
-    return this.votingSession.generateResults(votes);
+    const votingResult: VotingResults = [];
+    this.votingSession.ballots.forEach((ballot, bIndex): void => {
+      votingResult[bIndex] = ballot.options.map((): { value: number; voters?: string[] } => ({
+        value: 0,
+        voters: this.votingSession.isSecret ? undefined : []
+      }));
+    });
+    resultsForBallotOption.forEach(x => {
+      const { bIndex, oIndex } = x.getIndexesFromSK();
+      votingResult[bIndex][oIndex].value = x.value;
+      if (!this.votingSession.isSecret) votingResult[bIndex][oIndex].voters = x.voters ?? [];
+    });
+
+    return votingResult;
   }
   private async publishVotingResults(): Promise<VotingSession> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
-
-    if (!this.votingSession.hasEnded()) throw new RCError('Session has not ended');
-
     if (this.votingSession.results) throw new RCError('Already public');
 
-    const votes = (
-      await ddb.query({
-        TableName: DDB_TABLES.votes,
-        KeyConditionExpression: 'sessionId = :sessionId',
-        ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId }
-      })
-    ).map(x => new Vote(x));
-
-    this.votingSession.results = this.votingSession.generateResults(votes);
+    this.votingSession.results = await this.getVotingResults();
 
     await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
     return this.votingSession;
@@ -313,15 +319,15 @@ class VotingSessionsRC extends ResourceController {
     }
 
     try {
-      const votes: Vote[] = await ddb.query({
-        TableName: DDB_TABLES.votes,
+      const votingResults: VotingResultForBallotOption[] = await ddb.query({
+        TableName: DDB_TABLES.votingResults,
         KeyConditionExpression: 'sessionId = :sessionId',
         ExpressionAttributeValues: { ':sessionId': this.votingSession.sessionId },
-        ProjectionExpression: 'sessionId, key'
+        ProjectionExpression: 'sessionId, ballotOption'
       });
-      await ddb.batchDelete(DDB_TABLES.votes, votes);
+      await ddb.batchDelete(DDB_TABLES.votingResults, votingResults);
     } catch (error) {
-      this.logger.warn('Failed deleting votes', error, { ...this.votingSession });
+      this.logger.warn('Failed deleting voting results', error, { ...this.votingSession });
     }
   }
 }

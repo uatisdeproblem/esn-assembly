@@ -7,7 +7,8 @@ import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 
-import { VotingMajorityTypes, VotingSession, VotingBallot, VotingResults } from '@models/votingSession.model';
+import { VotingMajorityTypes, VotingSession, VotingBallot } from '@models/votingSession.model';
+import { VotingResults } from '@models/votingResult.model';
 
 @Component({
   standalone: true,
@@ -72,6 +73,9 @@ import { VotingMajorityTypes, VotingSession, VotingBallot, VotingResults } from 
                             <ion-label class="ion-margin-bottom">
                               <p>{{ 'VOTING.VOTERS_FOR' | translate }}</p>
                               <h3>{{ option }}</h3>
+                              <p class="ion-text-end">
+                                <ion-badge color="medium">{{ results[bIndex][oIndex].value }}</ion-badge>
+                              </p>
                             </ion-label>
                           </ion-list-header>
                           <ion-item *ngIf="results[bIndex][oIndex].value === 0">

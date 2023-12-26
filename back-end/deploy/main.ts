@@ -222,9 +222,9 @@ const tables: { [tableName: string]: DDBTable } = {
     SK: { name: 'voterId', type: DDB.AttributeType.STRING },
     stream: DDB.StreamViewType.NEW_AND_OLD_IMAGES
   },
-  votes: {
+  votingResults: {
     PK: { name: 'sessionId', type: DDB.AttributeType.STRING },
-    SK: { name: 'key', type: DDB.AttributeType.STRING }
+    SK: { name: 'ballotOption', type: DDB.AttributeType.STRING }
   }
 };
 

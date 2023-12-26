@@ -2,7 +2,7 @@ import { epochISOString, Resource } from 'idea-toolbox';
 
 import { GAEventAttached } from './event.model';
 import { User } from './user.model';
-import { Vote } from './vote.model';
+import { VotingResults } from './votingResult.model';
 
 /**
  * A session in which users can vote.
@@ -52,11 +52,12 @@ export class VotingSession extends Resource {
   scrutineersIds: string[];
   /**
    * The ballots for the voting session.
+   * Max: 50 ballots. Note: it's a technical limit that shouldn't be raised, to keep the current architecture simple.
    */
   ballots: VotingBallot[];
   /**
    * The voters for the voting session.
-   * Technical note: the current architecture supports hundreds, maybe a few thousands of voters, no more.
+   * Max: 1000 voters. Note: it's a technical limit that shouldn't be raised, to keep the current architecture simple.
    */
   voters: Voter[];
   /**
@@ -92,8 +93,8 @@ export class VotingSession extends Resource {
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     if (x.publishedSince) this.publishedSince = this.clean(x.publishedSince, d => new Date(d).toISOString());
     else delete this.publishedSince;
-    this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b));
-    this.voters = this.cleanArray(x.voters, v => new Voter(v, this));
+    this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b)).slice(0, 50);
+    this.voters = this.cleanArray(x.voters, v => new Voter(v, this)).slice(0, 1000);
     this.startsAt = this.clean(x.startsAt, d => new Date(d).toISOString());
     this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
     this.timezone = this.clean(x.timezone, String);
@@ -118,7 +119,9 @@ export class VotingSession extends Resource {
     const e = super.validate();
     if (this.iE(this.name)) e.push('name');
     this.ballots.forEach((b, i): void => b.validate().forEach(ea => e.push(`ballots[${i}].${ea}`)));
+    if (this.ballots.length > 50) e.push('ballots');
     this.voters.forEach((v, i): void => v.validate(this).forEach(ea => e.push(`voters[${i}].${ea}`)));
+    if (this.voters.length > 1000) e.push('voters');
 
     if (checkIfReady || this.startsAt) {
       if (this.iE(this.publishedSince, 'date') || this.publishedSince > new Date().toISOString())
@@ -187,35 +190,20 @@ export class VotingSession extends Resource {
    * Get the total of the voting weights.
    */
   getTotWeights(): number {
-    if (!this.isWeighted) return 1;
+    if (!this.isWeighted) return this.voters.length;
     else return this.voters.reduce((tot, acc): number => (tot += acc.voteWeight), 0);
   }
 
   /**
-   * Calculate and return the results from the votes of the session.
+   * Validate a vote against the voting session.
    */
-  generateResults(votes: Vote[]): VotingResults {
-    const results: VotingResults = [];
-
-    const sumOfWeights = votes.reduce((tot, acc): number => (tot += acc.weight), 0);
-    const balancedWeights: Record<string, number> = {};
-    votes.forEach(vote => (balancedWeights[vote.key] = vote.weight / sumOfWeights));
-
-    this.ballots.forEach((ballot, bIndex): void => {
-      results[bIndex] = [];
-      ballot.options.forEach((option, oIndex): void => {
-        results[bIndex][oIndex] = { value: 0 };
-        if (!this.isSecret) results[bIndex][oIndex].voters = [];
-        votes.forEach(vote => {
-          const choice = vote.submission[bIndex];
-          if (choice === option) {
-            results[bIndex][oIndex].value += balancedWeights[vote.key];
-            if (!this.isSecret) results[bIndex][oIndex].voters.push(vote.voterName);
-          }
-        });
-      });
+  validateVoteSubmission(submission: number[]): string[] {
+    const e = [];
+    if (!Array.isArray(submission)) e.push('submission');
+    this.ballots.forEach((b, i): void => {
+      if (isNaN(submission[i]) || submission[i] > b.options.length) e.push(`submission[${i}]`);
     });
-    return results;
+    return e;
   }
 }
 
@@ -305,22 +293,3 @@ export class Voter extends Resource {
     return e;
   }
 }
-
-/**
- * The result of a ballot's option.
- */
-export interface VotingResultForBallotOption {
-  /**
-   * The weighted value for the option.
-   */
-  value: number;
-  /**
-   * In case of public voting, the list of voters for the option.
-   */
-  voters?: string[];
-}
-
-/**
- * The results of a voting session.
- */
-export type VotingResults = VotingResultForBallotOption[][];

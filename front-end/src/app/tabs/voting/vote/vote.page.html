@@ -50,7 +50,12 @@
         <ion-card-content>
           <ion-item lines="none">
             <ion-radio-group [(ngModel)]="submission[bIndex]">
-              <ion-radio labelPlacement="end" justify="start" *ngFor="let option of ballot.options" [value]="option">
+              <ion-radio
+                labelPlacement="end"
+                justify="start"
+                *ngFor="let option of ballot.options; let oIndex = index"
+                [value]="oIndex"
+              >
                 <span class="ion-text-wrap">{{ option }}</span>
               </ion-radio>
             </ion-radio-group>

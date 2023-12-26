@@ -6,17 +6,16 @@ import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { VotingSession } from '../models/votingSession.model';
 import { VotingTicket } from '../models/votingTicket.model';
-import { Vote } from '../models/vote.model';
+import { VotingResultForBallotOption } from '../models/votingResult.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
 ///
 
-const PROJECT = process.env.PROJECT;
 const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
   votingTickets: process.env.DDB_TABLE_votingTickets,
-  votes: process.env.DDB_TABLE_votes
+  votingResults: process.env.DDB_TABLE_votingResults
 };
 const ddb = new DynamoDB({ debug: false });
 process.env.LOG_LEVEL = 'WARN'; // avoid logging the requests, for secrecy
@@ -78,18 +77,8 @@ class VoteRC extends ResourceController {
     votingTicket.userAgent = this.event.headers['user-agent'] ?? null;
     votingTicket.ipAddress = this.event.headers['x-forwarded-for'] ?? null;
 
-    const errors = Vote.validate(this.votingSession, this.body.submission);
+    const errors = this.votingSession.validateVoteSubmission(this.body.submission);
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
-
-    const vote = new Vote({ sessionId: this.votingSession.sessionId });
-    vote.key = await ddb.IUNID(PROJECT.concat('_', vote.sessionId));
-    vote.weight = votingTicket.weight;
-    vote.submission = this.body.submission;
-    if (!this.votingSession.isSecret) {
-      vote.voterId = votingTicket.voterId;
-      vote.voterName = votingTicket.voterName;
-      vote.voterEmail = votingTicket.voterEmail;
-    }
 
     const updateVotingTicket = {
       TableName: DDB_TABLES.votingTickets,
@@ -102,8 +91,29 @@ class VoteRC extends ResourceController {
         ':ip': votingTicket.ipAddress
       }
     };
-    const putVote = { TableName: DDB_TABLES.votes, Item: vote };
-    await ddb.transactWrites([{ Update: updateVotingTicket }, { Put: putVote }]);
+    const updateIncrementalResultForBallotOption = this.votingSession.ballots.map((_, bIndex): any => {
+      const updateParams: any = {
+        TableName: DDB_TABLES.votingResults,
+        Key: {
+          sessionId: this.votingSession.sessionId,
+          ballotOption: VotingResultForBallotOption.getSK(bIndex, this.body.submission[bIndex])
+        },
+        ExpressionAttributeNames: { '#v': 'value' },
+        UpdateExpression: 'SET #v = if_not_exists(#v, :zero) + :value',
+        ExpressionAttributeValues: { ':value': votingTicket.weight, ':zero': 0 }
+      };
+      if (!this.votingSession.isSecret) {
+        updateParams.UpdateExpression += ', voters = list_append(if_not_exists(voters, :emptyArr), :voters)';
+        updateParams.ExpressionAttributeValues[':voters'] = [votingTicket.voterName];
+        updateParams.ExpressionAttributeValues[':emptyArr'] = [];
+      }
+      return updateParams;
+    });
+
+    await ddb.transactWrites([
+      { Update: updateVotingTicket },
+      ...updateIncrementalResultForBallotOption.map(x => ({ Update: x }))
+    ]);
   }
 
   private async getVotingTicketAndCheckToken(voterId: string, token: string): Promise<VotingTicket> {

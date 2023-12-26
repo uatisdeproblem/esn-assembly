@@ -22,7 +22,7 @@ export class VotingTicket extends Resource {
   voterEmail: string;
   /**
    * A number with high precision that represents the weight of the voter.
-   * If the vote is not weighted, it equals `1`.
+   * Note: it's balanced based on the sum of the weights of the voters.
    */
   weight: number;
   /**
