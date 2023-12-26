@@ -75,7 +75,7 @@
         </ion-card>
       </ion-col>
       <ion-col [size]="12" [sizeLg]="6">
-        <ion-list class="aList">
+        <ion-list class="aList" style="max-width: 600px">
           <ion-list-header>
             <ion-label class="ion-margin-start">
               <h1>{{ 'VOTING.BALLOTS' | translate }}</h1>
@@ -86,6 +86,11 @@
             <ion-label class="ion-text-wrap">{{ 'VOTING.NO_BALLOTS_YET' | translate }}</ion-label>
           </ion-item>
           <app-voting-ballots [votingSession]="votingSession" [results]="votingSession.results" />
+          <p class="ion-text-center" *ngIf="votingSession.results">
+            <ion-button color="medium" (click)="downloadResults()">
+              {{ 'VOTING.DOWNLOAD_RESULTS' | translate }} <ion-icon slot="end" icon="download" />
+            </ion-button>
+          </p>
         </ion-list>
       </ion-col>
     </ion-row>

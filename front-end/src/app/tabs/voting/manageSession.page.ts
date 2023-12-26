@@ -1,6 +1,7 @@
 import { Component, HostListener, Input, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ColumnMode, DatatableComponent, SelectionType, TableColumn } from '@swimlane/ngx-datatable';
+import { WorkBook, utils, writeFile } from 'xlsx';
 import { AlertController, IonSearchbar, ModalController } from '@ionic/angular';
 import {
   IDEAActionSheetController,
@@ -17,7 +18,7 @@ import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
 import { VotingMajorityTypes, VotingBallot, VotingSession, Voter, VotingResults } from '@models/votingSession.model';
-import { VotingTicket } from '@models/votingTicket.model';
+import { ExportableVotingTicket, VotingTicket } from '@models/votingTicket.model';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 
 @Component({
@@ -556,6 +557,26 @@ export class ManageVotingSessionPage implements OnDestroy {
     ];
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
+  }
+  downloadResults(): void {
+    // @todo use this.results
+    // filename const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+  }
+  downloadVotersAudit(): void {
+    if (!this.votingTickets) return;
+
+    const exportableVotingTickets: ExportableVotingTicket[] = this.votingTickets.map(x => ({
+      Name: x.voterName,
+      'Vote identifier': x.voterId,
+      'IP address': x.ipAddress ?? '-',
+      'User agent': x.userAgent ?? '-',
+      'Vote date/time': x.votedAt ?? '-'
+    }));
+
+    const wb: WorkBook = { SheetNames: [], Sheets: {} };
+    utils.book_append_sheet(wb, utils.json_to_sheet(exportableVotingTickets), '1');
+    const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.VOTERS_AUDIT')}.xlsx`;
+    return writeFile(wb, filename);
   }
 }
 

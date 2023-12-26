@@ -439,6 +439,18 @@
           </ion-button>
         </ion-list-header>
         <app-voting-ballots [votingSession]="votingSession" [results]="results" />
+        <ion-row>
+          <ion-col>
+            <ion-button color="medium" (click)="downloadResults()">
+              {{ 'VOTING.DOWNLOAD_RESULTS' | translate }} <ion-icon slot="end" icon="download" />
+            </ion-button>
+          </ion-col>
+          <ion-col class="ion-text-end" *ngIf="votingTickets?.length">
+            <ion-button color="dark" (click)="downloadVotersAudit()">
+              {{ 'VOTING.DOWNLOAD_VOTERS_AUDIT' | translate }} <ion-icon slot="end" icon="download" />
+            </ion-button>
+          </ion-col>
+        </ion-row>
       </ng-container>
     </ion-list>
   </ng-container>

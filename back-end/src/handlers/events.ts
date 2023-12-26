@@ -130,7 +130,7 @@ class GAEvents extends ResourceController {
     return await s3.createDownloadURLFromData(buffer, {
       bucket: S3_BUCKET_MEDIA,
       prefix: S3_DOWNLOADS_FOLDER,
-      key: `${this.gaEvent.name}.xlsx`,
+      key: `${this.gaEvent.name.replace(/[^\w\s]/g, '')}.xlsx`,
       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
   }

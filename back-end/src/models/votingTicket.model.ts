@@ -60,3 +60,14 @@ export class VotingTicket extends Resource {
     if (x.ipAddress) this.ipAddress = this.clean(x.ipAddress, String);
   }
 }
+
+/**
+ * A flat, exportable version of a voting ticket.
+ */
+export interface ExportableVotingTicket {
+  Name: string;
+  'Vote identifier': string;
+  'IP address': string;
+  'User agent': string;
+  'Vote date/time': string;
+}

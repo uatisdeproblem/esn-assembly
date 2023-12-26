@@ -43,4 +43,9 @@ export class VotingSessionPage {
   manageSession(): void {
     this.app.goToInTabs(['voting', this.votingSession.sessionId, 'manage']);
   }
+
+  downloadResults(): void {
+    // @todo use this.votingSession.results
+    // filename const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+  }
 }
