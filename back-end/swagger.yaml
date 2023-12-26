@@ -2238,13 +2238,24 @@ paths:
               properties:
                 action:
                   type: string
-                  enum: [START, TICKETS_STATUS, CHECK_EARLY_END, GET_RESULTS, PUBLISH_RESULTS, ARCHIVE, UNARCHIVE]
+                  enum:
+                    [
+                      START,
+                      TICKETS_STATUS,
+                      EXTEND_END,
+                      STOP,
+                      CHECK_EARLY_END,
+                      GET_RESULTS,
+                      PUBLISH_RESULTS,
+                      ARCHIVE,
+                      UNARCHIVE
+                    ]
                 endsAt:
                   type: string
-                  description: (START)
+                  description: (START, EXTEND_END)
                 timezone:
                   type: string
-                  description: (START)
+                  description: (START, EXTEND_END)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'

@@ -77,7 +77,8 @@
     "MANAGE": "Manage",
     "UNKNOWN": "Unknown",
     "DUPLICATE": "Duplicate",
-    "ERROR": "Error"
+    "ERROR": "Error",
+    "OR": "Or"
   },
   "LANGUAGES": {
     "EN": "English"
@@ -755,6 +756,11 @@
     "THESE_VOTERS_WONT_RECEIVE_VOTING_LINK": "The following voters won't receive a voting link:",
     "NO_VOTING_MEANS_ABSENT": "No vote means absent",
     "NO_VOTING_MEANS_ABSENT_I": "Without voting link, the voters won't be able to vote. That means they will count as absent.",
-    "OF_WHICH_NUM_WITHOUT_EMAIL": "Of them won't receive a voting link"
+    "OF_WHICH_NUM_WITHOUT_EMAIL": "Of them won't receive a voting link",
+    "ADDITIONAL_CONTROLS": "Additional controls",
+    "ADDITIONAL_CONTROLS_I": "While the session is in progress, you can extend its duration or stop it prematurely.",
+    "EXTEND_DURATION_TO": "Extend duration to",
+    "EXTEND_DURATION": "Extend duration",
+    "STOP_PREMATURELY": "Stop prematurely"
   }
 }

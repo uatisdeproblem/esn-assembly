@@ -145,6 +145,10 @@ class VotingSessionsRC extends ResourceController {
         return await this.startVotingSession(this.body.endsAt, this.body.timezone);
       case 'TICKETS_STATUS':
         return await this.getVotingSessionTicketsStatus();
+      case 'EXTEND_END':
+        return await this.extendEndOfVotingSession(this.body.endsAt, this.body.timezone);
+      case 'STOP':
+        return await this.stopVotingSessionPrematurely();
       case 'CHECK_EARLY_END':
         return await this.checkWhetherSessionShouldEndEarly();
       case 'GET_RESULTS':
@@ -235,6 +239,39 @@ class VotingSessionsRC extends ResourceController {
     votingTickets.forEach(x => delete x.token); // for security reasons, we don't expose the token
     return votingTickets;
   }
+  private async extendEndOfVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+
+    const newEnd = new Date(endsAt).toISOString();
+    if (newEnd < this.votingSession.endsAt) throw new RCError("Can't be lower than previous end");
+    this.votingSession.endsAt = newEnd;
+    this.votingSession.timezone = timezone;
+
+    await ddb.update({
+      TableName: DDB_TABLES.votingSessions,
+      Key: { sessionId: this.votingSession.sessionId },
+      ExpressionAttributeNames: { '#tz': 'timezone' },
+      UpdateExpression: 'SET endsAt = :endsAt, #tz = :timezone',
+      ExpressionAttributeValues: { ':endsAt': this.votingSession.endsAt, ':timezone': this.votingSession.timezone }
+    });
+    return this.votingSession;
+  }
+  private async stopVotingSessionPrematurely(): Promise<VotingSession> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+
+    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+
+    this.votingSession.endsAt = new Date().toISOString();
+    await ddb.update({
+      TableName: DDB_TABLES.votingSessions,
+      Key: { sessionId: this.votingSession.sessionId },
+      UpdateExpression: 'SET endsAt = :endsAt',
+      ExpressionAttributeValues: { ':endsAt': this.votingSession.endsAt }
+    });
+    return this.votingSession;
+  }
   private async checkWhetherSessionShouldEndEarly(): Promise<VotingSession> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
 
@@ -252,7 +289,12 @@ class VotingSessionsRC extends ResourceController {
     if (!everyoneVoted) return this.votingSession;
 
     this.votingSession.endsAt = new Date().toISOString();
-    await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
+    await ddb.update({
+      TableName: DDB_TABLES.votingSessions,
+      Key: { sessionId: this.votingSession.sessionId },
+      UpdateExpression: 'SET endsAt = :endsAt',
+      ExpressionAttributeValues: { ':endsAt': this.votingSession.endsAt }
+    });
     return this.votingSession;
   }
   private async getVotingResults(): Promise<VotingResults> {
@@ -297,7 +339,12 @@ class VotingSessionsRC extends ResourceController {
 
     this.votingSession.results = await this.getVotingResults();
 
-    await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
+    await ddb.update({
+      TableName: DDB_TABLES.votingSessions,
+      Key: { sessionId: this.votingSession.sessionId },
+      UpdateExpression: 'SET results = :results',
+      ExpressionAttributeValues: { ':results': this.votingSession.results }
+    });
     return this.votingSession;
   }
   private async manageArchive(archive: boolean): Promise<VotingSession> {

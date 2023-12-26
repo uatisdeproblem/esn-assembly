@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { ColumnMode, DatatableComponent, SelectionType, TableColumn } from '@swimlane/ngx-datatable';
 import { WorkBook, utils, writeFile } from 'xlsx';
 import { AlertController, IonSearchbar, ModalController } from '@ionic/angular';
+import { epochISOString } from 'idea-toolbox';
 import {
   IDEAActionSheetController,
   IDEALoadingService,
@@ -62,6 +63,8 @@ export class ManageVotingSessionPage implements OnDestroy {
 
   sessionReady = false;
   timezones = (Intl as any).supportedValuesOf('timeZone');
+  extendDurationAt: epochISOString;
+  extendDurationTimezone: string;
 
   votingTickets: VotingTicket[];
   results: VotingResults;
@@ -112,6 +115,10 @@ export class ManageVotingSessionPage implements OnDestroy {
   handleChangePageSection(): void {
     if (this.pageSection === PageSections.VOTERS) setTimeout((): void => this.initVotersTable(), 300);
     if (this.pageSection === PageSections.START) this.sessionReady = this.canSessionStart();
+    if (this.pageSection === PageSections.ANALYTICS) {
+      this.extendDurationAt = this.votingSession.endsAt;
+      this.extendDurationTimezone = this.votingSession.timezone;
+    }
   }
 
   async save(): Promise<void> {
@@ -505,6 +512,64 @@ export class ManageVotingSessionPage implements OnDestroy {
   // ANALYTICS
   //
 
+  async extendDuration(): Promise<void> {
+    if (!this.votingSession.isInProgress()) return;
+
+    this.errors = new Set();
+    if (!this.votingSession.endsAt || this.extendDurationAt < this.votingSession.endsAt)
+      this.errors.add('extendDurationAt');
+    if (!this.votingSession.timezone) this.errors.add('extendDurationTimezone');
+
+    if (this.errors.size) return this.message.warning('COMMON.FORM_HAS_ERROR_TO_CHECK');
+
+    const doExtend = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const session = new VotingSession(this.votingSession);
+        session.endsAt = this.extendDurationAt;
+        session.timezone = this.extendDurationTimezone;
+        this.votingSession.load(await this._voting.extendDuration(session));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
+    const header = this.t._('VOTING.EXTEND_DURATION');
+    const message = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doExtend }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
+  }
+  async stopSessionPrematurely(): Promise<void> {
+    if (!this.votingSession.isInProgress()) return;
+
+    const doEnd = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        this.votingSession.load(await this._voting.stopPrematurely(this.votingSession));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
+    const header = this.t._('VOTING.STOP_PREMATURELY');
+    const message = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doEnd }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
+  }
   private openWebSocketForVotingTicketsStatus(): void {
     if (!this.webSocket.isOpen())
       this.webSocket.open({

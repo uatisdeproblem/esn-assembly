@@ -208,6 +208,22 @@ export class VotingService {
     return res.map(x => new VotingTicket(x));
   }
   /**
+   * Extend the duration of the voting session by setting a new end.
+   */
+  async extendDuration(votingSession: VotingSession): Promise<VotingSession> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'EXTEND_END', endsAt: votingSession.endsAt, timezone: votingSession.timezone };
+    return new VotingSession(await this.api.patchResource(path, { body }));
+  }
+  /**
+   * Stop the current voting session by setting the end time to now.
+   */
+  async stopPrematurely(votingSession: VotingSession): Promise<VotingSession> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = { action: 'STOP' };
+    return new VotingSession(await this.api.patchResource(path, { body }));
+  }
+  /**
    * Check whether the session should be closed early because everyone voted.
    */
   async checkWhetherSessionShouldEndEarly(votingSession: VotingSession): Promise<VotingSession> {

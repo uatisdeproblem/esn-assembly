@@ -290,15 +290,20 @@
           <ion-item>
             <ion-icon
               slot="start"
-              [icon]="getNameOfVotersWithoutEmail().length !== 0 ? 'warning' : 'checkmark'"
-              [color]="getNameOfVotersWithoutEmail().length !== 0 ? 'warning' : 'success'"
+              [icon]="getNameOfVotersWithoutEmail().length ? 'warning' : 'checkmark'"
+              [color]="getNameOfVotersWithoutEmail().length ? 'warning' : 'success'"
             />
             <ion-label class="ion-text-wrap">
-              {{ (getNameOfVotersWithoutEmail().length !== 0 ? 'VOTING.THESE_VOTERS_WONT_RECEIVE_VOTING_LINK' :
+              {{ (getNameOfVotersWithoutEmail().length ? 'VOTING.THESE_VOTERS_WONT_RECEIVE_VOTING_LINK' :
               'VOTING.THERE_ARE_NO_MISSING_VOTERS_EMAILS') | translate }}
               <p>{{ getNameOfVotersWithoutEmail().join(', ') }}</p>
             </ion-label>
-            <idea-show-hint-button slot="end" hint="VOTING.NO_VOTING_MEANS_ABSENT" translate />
+            <idea-show-hint-button
+              slot="end"
+              hint="VOTING.NO_VOTING_MEANS_ABSENT"
+              *ngIf="getNameOfVotersWithoutEmail().length"
+              translate
+            />
           </ion-item>
         </ion-card-content>
       </ion-card>
@@ -433,6 +438,51 @@
           </ion-item>
         </ion-card-content>
       </ion-card>
+      <ion-accordion-group *ngIf="votingSession.isInProgress()">
+        <ion-accordion value="extendDuration" style="background: transparent">
+          <ion-item slot="header" color="transparent" style="--padding-start: 0">
+            <ion-list-header>
+              <ion-label>
+                <h2>{{ 'VOTING.ADDITIONAL_CONTROLS' | translate }}</h2>
+                <p>{{ 'VOTING.ADDITIONAL_CONTROLS_I' | translate }}</p>
+              </ion-label>
+            </ion-list-header>
+          </ion-item>
+          <div slot="content">
+            <ion-row class="ion-align-items-start" style="background-color: var(--ion-color-white)">
+              <ion-col>
+                <app-datetime-timezone
+                  lines="none"
+                  [label]="'VOTING.EXTEND_DURATION_TO' | translate"
+                  [class.fieldHasError]="hasFieldAnError('extendDurationAt')"
+                  [timezone]="extendDurationTimezone"
+                  [(date)]="extendDurationAt"
+                />
+              </ion-col>
+              <ion-col>
+                <idea-select
+                  lines="none"
+                  [data]="timezones"
+                  [description]="extendDurationTimezone"
+                  [label]="'VOTING.TIMEZONE' | translate"
+                  [hideClearButton]="true"
+                  [class.fieldHasError]="hasFieldAnError('extendDurationTimezone')"
+                  (select)="extendDurationTimezone = $event.value"
+                />
+              </ion-col>
+            </ion-row>
+            <p class="ion-text-center ion-padding-top">
+              <ion-button color="danger" (click)="extendDuration()">
+                {{ 'VOTING.EXTEND_DURATION' | translate }} <ion-icon slot="end" icon="play-forward" />
+              </ion-button>
+              <ion-button disabled color="dark" fill="clear">{{ 'COMMON.OR' | translate }}</ion-button>
+              <ion-button color="danger" fill="clear" (click)="stopSessionPrematurely()">
+                {{ 'VOTING.STOP_PREMATURELY' | translate }} <ion-icon slot="end" icon="stop" />
+              </ion-button>
+            </p>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
       <p class="ion-text-center" *ngIf="votingSession.hasEnded()">
         <ion-button *ngIf="!results" (click)="showResults()">
           {{ 'VOTING.SHOW_RESULTS' | translate }} <ion-icon slot="end" icon="eye" />
