@@ -232,7 +232,7 @@
               [icon]="sessionReady ? 'thumbs-up-outline' : 'thumbs-down-outline'"
               [color]="sessionReady ? 'success' : 'danger'"
             />
-            <ion-label>
+            <ion-label class="ion-text-wrap">
               <b>{{ (sessionReady ? 'VOTING.READY_TO_START' : 'VOTING.NOT_READY_TO_START') | translate }}</b>
               <p>{{ 'VOTING.HERE_IS_A_CHECKLIST' | translate }}</p>
             </ion-label>
@@ -384,7 +384,9 @@
         </ion-label>
       </ion-list-header>
       <ion-card>
-        <ion-card-header>
+        <ion-card-header
+          *ngIf="(votingSession.isInProgress() && getNumVotersWhoVoted() !== votingSession.voters.length) || getNumVotersWhoVoted() === votingSession.voters.length"
+        >
           <ion-progress-bar
             *ngIf="votingSession.isInProgress() && getNumVotersWhoVoted() !== votingSession.voters.length"
             [value]="getNumVotersWhoVoted() / votingSession.voters.length"
