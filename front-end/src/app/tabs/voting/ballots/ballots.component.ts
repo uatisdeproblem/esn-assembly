@@ -201,6 +201,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.results || changes.raw) {
       this.charts.forEach(chart => chart?.destroy());
+      this.charts = [];
       // we need to continue refresh the canvas ID because sometimes the chart's canvas doesn't update
       this.chartCanvasBaseId = 'chartBallot-'.concat(Date.now().toString(), '-');
       setTimeout((): void => this.buildCharts(), 300);
@@ -249,11 +250,12 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
   buildCharts(): void {
     if (!this.results) return;
     this.votingSession.ballots.forEach((_, bIndex): void => {
-      const chartCanvas = document.getElementById(this.chartCanvasBaseId + bIndex) as HTMLCanvasElement;
       const labels = this.getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex);
       const data = this.getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex).map((_, oIndex): any =>
         this.getResultOfBallotOptionBasedOnRaw(bIndex, oIndex)
       );
+
+      const chartCanvas = document.getElementById(this.chartCanvasBaseId + bIndex) as HTMLCanvasElement;
       this.charts[bIndex] = new Chart(chartCanvas, {
         type: 'doughnut',
         data: { labels, datasets: [{ data, backgroundColor: this.chartColors }] },
