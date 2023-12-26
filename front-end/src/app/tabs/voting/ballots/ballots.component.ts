@@ -101,9 +101,6 @@ import { VotingMajorityTypes, VotingSession, VotingBallot, VotingResults } from 
   `,
   styles: [
     `
-      ion-card {
-        max-width: 600px;
-      }
       ion-card-header {
         padding-bottom: 8px;
       }
@@ -167,7 +164,7 @@ export class BallotsStandaloneComponent implements OnInit {
 
   MajorityTypes = VotingMajorityTypes;
 
-  charts: Chart[];
+  charts: Chart<'doughnut'>[] = [];
   chartColors = CHART_COLORS;
 
   constructor(public app: AppService) {}
@@ -184,10 +181,11 @@ export class BallotsStandaloneComponent implements OnInit {
   buildCharts(): void {
     if (!this.results) return;
     this.votingSession.ballots.forEach((ballot, bIndex): void => {
+      if (this.charts[bIndex]) this.charts[bIndex].destroy();
       const chartCanvas = document.getElementById('chartBallot-' + bIndex) as HTMLCanvasElement;
       const labels = ballot.options;
       const data = ballot.options.map((_, oIndex): any => this.results[bIndex][oIndex].value);
-      new Chart(chartCanvas, {
+      this.charts[bIndex] = new Chart(chartCanvas, {
         type: 'doughnut',
         data: { labels, datasets: [{ data, backgroundColor: this.chartColors }] },
         options: {
