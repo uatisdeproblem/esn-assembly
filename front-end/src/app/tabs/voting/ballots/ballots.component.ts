@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import Chart from 'chart.js/auto';
 import { IDEATranslationsModule } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
@@ -34,56 +35,75 @@ import { VotingMajorityTypes, VotingSession, VotingBallot, VotingResults } from 
           <ion-popover [trigger]="'majorityTypeInfo-' + bIndex" triggerAction="click">
             <ng-template>
               <ion-content class="ion-padding">
-                <p style="font-size: 0.9em">{{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType + '_I' | translate }}</p>
+                <p style="font-size: 0.9em">
+                  {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType + '_I' | translate }}
+                </p>
               </ion-content>
             </ng-template>
           </ion-popover>
         </ion-card-header>
         <ion-card-content>
-          <ion-item
-            lines="none"
-            *ngFor="let option of ballot.options; let oIndex = index"
-            [button]="results && !votingSession.isSecret"
-            [id]="'votersList-' + bIndex + '-' + oIndex"
-          >
-            <ion-badge slot="start" color="light">{{ oIndex + 1 }}</ion-badge>
-            <ion-label class="ion-text-wrap">{{ option }}</ion-label>
-            <ion-badge *ngIf="results" slot="end" color="medium">
-              {{ results[bIndex][oIndex].value | percent }}
-            </ion-badge>
-            <ion-popover
-              *ngIf="results && !votingSession.isSecret"
-              [trigger]="'votersList-' + bIndex + '-' + oIndex"
-              triggerAction="click"
-            >
-              <ng-template>
-                <ion-content>
-                  <ion-list class="ion-padding">
-                    <ion-list-header>
-                      <ion-label class="ion-margin-bottom">
-                        <p>{{ 'VOTING.VOTERS_FOR' | translate }}</p>
-                        <h3>{{ option }}</h3>
-                      </ion-label>
-                    </ion-list-header>
-                    <ion-item *ngIf="results[bIndex][oIndex].value === 0">
-                      <ion-label class="ion-padding-start">
-                        <i>{{ 'VOTING.NO_VOTERS' | translate }}</i>
-                      </ion-label>
-                    </ion-item>
-                    <ion-item *ngFor="let voter of results[bIndex][oIndex].voters">
-                      <ion-label class="ion-text-wrap ion-padding-start">{{ voter }}</ion-label>
-                    </ion-item>
-                  </ion-list>
-                </ion-content>
-              </ng-template>
-            </ion-popover>
-          </ion-item>
+          <ion-grid class="ion-no-padding">
+            <ion-row class="ion-align-items-center">
+              <ion-col [size]="12" [sizeMd]="results ? 9 : 12">
+                <ion-item
+                  lines="none"
+                  *ngFor="let option of ballot.options; let oIndex = index"
+                  [button]="results && !votingSession.isSecret"
+                  [id]="'votersList-' + bIndex + '-' + oIndex"
+                >
+                  <ion-badge slot="start" color="light" *ngIf="!results">{{ oIndex + 1 }}</ion-badge>
+                  <ion-badge slot="start" style="--background: {{ chartColors[oIndex] }}" *ngIf="results">
+                    &nbsp;
+                  </ion-badge>
+                  <ion-label class="ion-text-wrap">{{ option }}</ion-label>
+                  <ion-badge *ngIf="results" slot="end" color="medium">
+                    {{ results[bIndex][oIndex].value | percent }}
+                  </ion-badge>
+                  <ion-popover
+                    *ngIf="results && !votingSession.isSecret"
+                    [trigger]="'votersList-' + bIndex + '-' + oIndex"
+                    triggerAction="click"
+                  >
+                    <ng-template>
+                      <ion-content>
+                        <ion-list class="ion-padding">
+                          <ion-list-header>
+                            <ion-label class="ion-margin-bottom">
+                              <p>{{ 'VOTING.VOTERS_FOR' | translate }}</p>
+                              <h3>{{ option }}</h3>
+                            </ion-label>
+                          </ion-list-header>
+                          <ion-item *ngIf="results[bIndex][oIndex].value === 0">
+                            <ion-label class="ion-padding-start">
+                              <i>{{ 'VOTING.NO_VOTERS' | translate }}</i>
+                            </ion-label>
+                          </ion-item>
+                          <ion-item *ngFor="let voter of results[bIndex][oIndex].voters">
+                            <ion-label class="ion-text-wrap ion-padding-start">{{ voter }}</ion-label>
+                          </ion-item>
+                        </ion-list>
+                      </ion-content>
+                    </ng-template>
+                  </ion-popover>
+                </ion-item>
+              </ion-col>
+              <ion-col [size]="12" [sizeMd]="3" *ngIf="results">
+                <div class="chartContainer">
+                  <canvas [id]="'chartBallot-' + bIndex"></canvas>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
         </ion-card-content>
       </ion-card>
     </ion-reorder-group>
   `,
   styles: [
     `
+      ion-card {
+        max-width: 600px;
+      }
       ion-card-header {
         padding-bottom: 8px;
       }
@@ -113,10 +133,17 @@ import { VotingMajorityTypes, VotingSession, VotingBallot, VotingResults } from 
       ion-label h3 {
         font-weight: 500;
       }
+      div.chartContainer {
+        height: 120px;
+      }
+      div.chartContainer canvas {
+        width: 100%;
+        margin: 0 auto;
+      }
     `
   ]
 })
-export class BallotsStandaloneComponent {
+export class BallotsStandaloneComponent implements OnInit {
   /**
    * The voting session containing the ballots to display.
    */
@@ -140,11 +167,52 @@ export class BallotsStandaloneComponent {
 
   MajorityTypes = VotingMajorityTypes;
 
+  charts: Chart[];
+  chartColors = CHART_COLORS;
+
   constructor(public app: AppService) {}
+  ngOnInit(): void {
+    if (this.results) setTimeout((): void => this.buildCharts(), 300);
+  }
 
   handleBallotReorder({ detail }): void {
     const toReposition = this.votingSession.ballots.splice(detail.from, 1)[0];
     this.votingSession.ballots.splice(detail.to, 0, toReposition);
     detail.complete();
   }
+
+  buildCharts(): void {
+    if (!this.results) return;
+    this.votingSession.ballots.forEach((ballot, bIndex): void => {
+      const chartCanvas = document.getElementById('chartBallot-' + bIndex) as HTMLCanvasElement;
+      const labels = ballot.options;
+      const data = ballot.options.map((_, oIndex): any => this.results[bIndex][oIndex].value);
+      new Chart(chartCanvas, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data, backgroundColor: this.chartColors }] },
+        options: {
+          layout: { padding: 20 },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: tooltipItem => `${Number(tooltipItem.formattedValue) * 100}%` } }
+          }
+        }
+      });
+    });
+  }
 }
+
+/**
+ * The sorted list of colors to use in the charts.
+ */
+const CHART_COLORS = [
+  '#00a950',
+  '#f53794',
+  '#4dc9f6',
+  '#f67019',
+  '#537bc4',
+  '#acc236',
+  '#166a8f',
+  '#8549ba',
+  '#58595b'
+];
