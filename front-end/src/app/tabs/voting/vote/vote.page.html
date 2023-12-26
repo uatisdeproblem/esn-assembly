@@ -58,6 +58,9 @@
               >
                 <span class="ion-text-wrap">{{ option }}</span>
               </ion-radio>
+              <ion-radio labelPlacement="end" justify="start" [value]="ballot.options.length">
+                <span class="ion-text-wrap">{{ 'VOTING.ABSTAIN' | translate }}</span>
+              </ion-radio>
             </ion-radio-group>
           </ion-item>
         </ion-card-content>

@@ -275,11 +275,11 @@ export class ManageVotingSessionPage implements OnDestroy {
         handler: (): Promise<void> => this.addBallotFromTemplate('blank')
       },
       {
-        text: this.t._('VOTING.BALLOT_TEMPLATES.YES_NO_ABSTAIN'),
+        text: this.t._('VOTING.BALLOT_TEMPLATES.YES_NO'),
         handler: (): Promise<void> => this.addBallotFromTemplate('yes-no')
       },
       {
-        text: this.t._('VOTING.BALLOT_TEMPLATES.CANDIDATES_NONE_ABSTAIN'),
+        text: this.t._('VOTING.BALLOT_TEMPLATES.CANDIDATES_NONE'),
         handler: (): Promise<void> => this.addBallotFromTemplate('candidates')
       },
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' }
@@ -294,17 +294,12 @@ export class ManageVotingSessionPage implements OnDestroy {
       'yes-no': {
         text: this.t._('VOTING.DO_YOU_APPROVE_XYZ'),
         majorityType: VotingMajorityTypes.RELATIVE,
-        options: [this.t._('COMMON.YES'), this.t._('COMMON.NO'), this.t._('VOTING.ABSTAIN')]
+        options: [this.t._('COMMON.YES'), this.t._('COMMON.NO')]
       },
       candidates: {
         text: this.t._('VOTING.WHO_DO_YOU_ELECT_FOR_XYZ'),
         majorityType: VotingMajorityTypes.SIMPLE,
-        options: [
-          this.t._('VOTING.CANDIDATE_A'),
-          this.t._('VOTING.CANDIDATE_B'),
-          this.t._('VOTING.NONE_OF_THE_ABOVE'),
-          this.t._('VOTING.ABSTAIN')
-        ]
+        options: [this.t._('VOTING.CANDIDATE_A'), this.t._('VOTING.CANDIDATE_B'), this.t._('VOTING.NONE_OF_THE_ABOVE')]
       }
     };
     await this.manageBallot(new VotingBallot(templates[template]), true);
@@ -315,6 +310,7 @@ export class ManageVotingSessionPage implements OnDestroy {
       componentProps: { ballot }
     });
     modal.onDidDismiss().then(({ data }): void => {
+      if (!data) return;
       ballot.load(data);
       if (isNew) this.votingSession.ballots.push(ballot);
     });

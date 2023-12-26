@@ -69,6 +69,10 @@ import { VotingBallot, VotingMajorityTypes } from '@models/votingSession.model';
             </ion-button>
           </ion-item>
         </ion-reorder-group>
+        <ion-item>
+          <ion-badge slot="start" color="light">{{ ballot.options.length + 1 }}</ion-badge>
+          <ion-input readonly [value]="'VOTING.ABSTAIN' | translate" />
+        </ion-item>
       </ion-list>
     </ion-content>
   `

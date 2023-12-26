@@ -654,8 +654,8 @@
     "CHOOSE_BALLOT_TEMPLATE": "Choose ballot template",
     "BALLOT_TEMPLATES": {
       "BLANK": "Blank",
-      "YES_NO_ABSTAIN": "Yes, No, Abstain",
-      "CANDIDATES_NONE_ABSTAIN": "A, B, None, Abstain"
+      "YES_NO": "Yes, No, Abstain",
+      "CANDIDATES_NONE": "A, B, None, Abstain"
     },
     "DO_YOU_APPROVE_XYZ": "Do you approve XYZ?",
     "WHO_DO_YOU_ELECT_FOR_XYZ": "Who do you elect for XYZ?",
@@ -714,8 +714,8 @@
     "START_END_INTERVAL_II": "When the session starts, the voters will receive an email containing a link to vote.",
     "START_END_INTERVAL_III": "They will be able to vote until the end of the time you choose here.",
     "DURATION": "Duration (minutes)",
-    "STARTS_AT": "Session starting",
-    "ENDS_AT": "Session ending",
+    "STARTS_AT": "Session start",
+    "ENDS_AT": "Session end",
     "TIMEZONE": "Timezone",
     "START_SESSION": "Start session",
     "START_SESSION_I": "Once the session is started you won't be able to change its configurations and contents anymore.",
@@ -746,7 +746,7 @@
     "RESULTS_ARE_NOT_PUBLISHED_YET": "Results are not published yet.",
     "PUBLISH_RESULTS": "Publish results",
     "PUBLISH_RESULTS_I": "Once the results are published, everyone will be able to see them. You can't go back from this choice.",
-    "NO_VOTERS": "No voters",
+    "NO_ONE": "No one",
     "VOTERS_FOR": "Voters for",
     "DOWNLOAD_RESULTS": "Download results",
     "DOWNLOAD_VOTERS_AUDIT": "Download voters audit",

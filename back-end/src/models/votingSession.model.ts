@@ -213,6 +213,7 @@ export class VotingSession extends Resource {
     const e = [];
     if (!Array.isArray(submission)) e.push('submission');
     this.ballots.forEach((b, i): void => {
+      // note: the last option is always Abstain
       if (isNaN(submission[i]) || submission[i] > b.options.length) e.push(`submission[${i}]`);
     });
     return e;
@@ -243,6 +244,7 @@ export class VotingBallot extends Resource {
   majorityType: VotingMajorityTypes;
   /**
    * The options for the ballot.
+   * The last "virtual" option is always Abstain.
    */
   options: string[];
 

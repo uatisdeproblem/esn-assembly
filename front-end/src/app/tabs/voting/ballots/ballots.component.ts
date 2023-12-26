@@ -49,7 +49,7 @@ import { VotingResults } from '@models/votingResult.model';
               <ion-col [size]="12" [sizeMd]="results ? 9 : 12">
                 <ion-item
                   lines="none"
-                  *ngFor="let option of getOptionsOfBallotIncludingAbsentsByIndex(bIndex); let oIndex = index"
+                  *ngFor="let option of getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex); let oIndex = index"
                   [button]="results && !votingSession.isSecret"
                   [id]="'votersList-' + bIndex + '-' + oIndex"
                 >
@@ -80,7 +80,7 @@ import { VotingResults } from '@models/votingResult.model';
                           </ion-list-header>
                           <ion-item *ngIf="results[bIndex][oIndex].value === 0">
                             <ion-label class="ion-padding-start">
-                              <i>{{ 'VOTING.NO_VOTERS' | translate }}</i>
+                              <i>{{ 'VOTING.NO_ONE' | translate }}</i>
                             </ion-label>
                           </ion-item>
                           <ion-item *ngFor="let voter of results[bIndex][oIndex].voters">
@@ -179,8 +179,8 @@ export class BallotsStandaloneComponent implements OnInit, OnDestroy {
     this.charts.forEach(chart => chart?.destroy());
   }
 
-  getOptionsOfBallotIncludingAbsentsByIndex(bIndex: number): string[] {
-    const options = this.votingSession.ballots[bIndex].options;
+  getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex: number): string[] {
+    const options = [...this.votingSession.ballots[bIndex].options, this.t._('VOTING.ABSTAIN')];
     if (!this.results) return options;
     else return [...options, this.t._('VOTING.ABSENT')];
   }
@@ -196,8 +196,8 @@ export class BallotsStandaloneComponent implements OnInit, OnDestroy {
     this.votingSession.ballots.forEach((_, bIndex): void => {
       if (this.charts[bIndex]) this.charts[bIndex].destroy();
       const chartCanvas = document.getElementById('chartBallot-' + bIndex) as HTMLCanvasElement;
-      const labels = this.getOptionsOfBallotIncludingAbsentsByIndex(bIndex);
-      const data = this.getOptionsOfBallotIncludingAbsentsByIndex(bIndex).map(
+      const labels = this.getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex);
+      const data = this.getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex).map(
         (_, oIndex): any => this.results[bIndex][oIndex].value
       );
       this.charts[bIndex] = new Chart(chartCanvas, {

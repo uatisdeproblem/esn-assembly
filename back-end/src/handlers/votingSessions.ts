@@ -335,7 +335,7 @@ class VotingSessionsRC extends ResourceController {
 
     const votingResults: VotingResults = [];
     this.votingSession.ballots.forEach((ballot, bIndex): void => {
-      votingResults[bIndex] = ballot.options.map((): { value: number; voters?: string[] } => ({
+      votingResults[bIndex] = [...ballot.options, 'Abstain'].map((): { value: number; voters?: string[] } => ({
         value: 0,
         voters: this.votingSession.isSecret ? undefined : []
       }));
