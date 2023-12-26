@@ -75,6 +75,8 @@ class VoteRC extends ResourceController {
 
     if (votingTicket.votedAt) throw new RCError('Already voted');
     votingTicket.votedAt = new Date().toISOString();
+    votingTicket.userAgent = this.event.headers['user-agent'] ?? null;
+    votingTicket.ipAddress = this.event.headers['x-forwarded-for'] ?? null;
 
     const errors = Vote.validate(this.votingSession, this.body.submission);
     if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
@@ -93,8 +95,12 @@ class VoteRC extends ResourceController {
       TableName: DDB_TABLES.votingTickets,
       Key: { sessionId: this.votingSession.sessionId, voterId },
       ConditionExpression: 'attribute_not_exists(votedAt)',
-      UpdateExpression: 'SET votedAt = :at',
-      ExpressionAttributeValues: { ':at': votingTicket.votedAt }
+      UpdateExpression: 'SET votedAt = :at, userAgent = :ua, ipAddress = :ip',
+      ExpressionAttributeValues: {
+        ':at': votingTicket.votedAt,
+        ':ua': votingTicket.userAgent,
+        ':ip': votingTicket.ipAddress
+      }
     };
     const putVote = { TableName: DDB_TABLES.votes, Item: vote };
     await ddb.transactWrites([{ Update: updateVotingTicket }, { Put: putVote }]);

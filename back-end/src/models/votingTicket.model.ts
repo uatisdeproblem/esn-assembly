@@ -37,6 +37,14 @@ export class VotingTicket extends Resource {
    * The timestamp when the vote has been submitted.
    */
   votedAt?: epochISOString;
+  /**
+   * The user agent of the device used at the time of the voting. Used for fraud detection.
+   */
+  userAgent?: string;
+  /**
+   * The IP address of the device used at the time of the voting. Used for fraud detection.
+   */
+  ipAddress?: string;
 
   load(x: any): void {
     super.load(x);
@@ -48,5 +56,7 @@ export class VotingTicket extends Resource {
     this.token = this.clean(x.token, String);
     if (x.signedInAt) this.signedInAt = this.clean(x.signedInAt, String);
     if (x.votedAt) this.votedAt = this.clean(x.votedAt, String);
+    if (x.userAgent) this.userAgent = this.clean(x.userAgent, String);
+    if (x.ipAddress) this.ipAddress = this.clean(x.ipAddress, String);
   }
 }
