@@ -245,7 +245,7 @@
               [icon]="hasFieldAnError('publishedSince') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('publishedSince') ? 'danger' : 'success'"
             />
-            <ion-label>{{ 'VOTING.SESSION_IS_PUBLISHED' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">{{ 'VOTING.SESSION_IS_PUBLISHED' | translate }}</ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
@@ -253,7 +253,7 @@
               [icon]="hasFieldAnError('ballots') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('ballots') ? 'danger' : 'success'"
             />
-            <ion-label>{{ 'VOTING.AT_LEAST_A_BALLOT' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">{{ 'VOTING.AT_LEAST_A_BALLOT' | translate }}</ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
@@ -261,7 +261,7 @@
               [icon]="hasFieldAnError('voters') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('voters') ? 'danger' : 'success'"
             />
-            <ion-label>{{ 'VOTING.AT_LEAST_A_VOTER' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">{{ 'VOTING.AT_LEAST_A_VOTER' | translate }}</ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
@@ -269,7 +269,7 @@
               [icon]="hasFieldAnError('voters.duplicatedIds') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('voters.duplicatedIds') ? 'danger' : 'success'"
             />
-            <ion-label>{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_IDS' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_IDS' | translate }}</ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
@@ -277,7 +277,7 @@
               [icon]="hasFieldAnError('voters.duplicatedNames') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('voters.duplicatedNames') ? 'danger' : 'success'"
             />
-            <ion-label>{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_NAMES' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_NAMES' | translate }}</ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
@@ -285,7 +285,7 @@
               [icon]="hasFieldAnError('voters.duplicatedEmails') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('voters.duplicatedEmails') ? 'danger' : 'success'"
             />
-            <ion-label>{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_EMAILS' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_EMAILS' | translate }}</ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
