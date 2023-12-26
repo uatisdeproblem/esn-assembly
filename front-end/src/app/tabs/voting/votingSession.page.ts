@@ -5,7 +5,7 @@ import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
-import { VotingSession } from '@models/votingSession.model';
+import { Voter, VotingSession } from '@models/votingSession.model';
 
 @Component({
   selector: 'voting-session',
@@ -15,6 +15,8 @@ import { VotingSession } from '@models/votingSession.model';
 export class VotingSessionPage {
   @Input() sessionId: string;
   votingSession: VotingSession;
+
+  absentVoters: Voter[];
 
   constructor(
     private loading: IDEALoadingService,
@@ -34,6 +36,7 @@ export class VotingSessionPage {
   }
   private async loadResources(): Promise<void> {
     this.votingSession = await this._voting.getById(this.sessionId);
+    if (this.votingSession.results) this.absentVoters = this.votingSession.getAbsentVoters();
   }
   async handleRefresh(refresh: IonRefresher): Promise<void> {
     await this.loadResources();
@@ -42,6 +45,10 @@ export class VotingSessionPage {
 
   manageSession(): void {
     this.app.goToInTabs(['voting', this.votingSession.sessionId, 'manage']);
+  }
+
+  wasVoterAbsent(voter: Voter): boolean {
+    return this.absentVoters.some(x => x.id === voter.id);
   }
 
   downloadResults(): void {

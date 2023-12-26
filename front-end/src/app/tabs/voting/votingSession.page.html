@@ -43,13 +43,33 @@
           </ion-card-header>
           <ion-card-content>
             <ion-list class="aList" lines="none">
-              <ion-item>
+              <ion-item *ngIf="votingSession.voters.length">
                 <ion-icon slot="start" icon="ticket-outline" />
                 <ion-label>
                   <p>{{ 'VOTING.VOTERS' | translate }}</p>
                   {{ votingSession.voters.length }}
                 </ion-label>
               </ion-item>
+              <ion-accordion-group *ngIf="votingSession.results">
+                <ion-accordion value="participation">
+                  <ion-item slot="header">
+                    <ion-icon slot="start" icon="golf-outline" />
+                    <ion-label>
+                      <p>{{ 'VOTING.PARTICIPATION' | translate }}</p>
+                      {{ ((votingSession.voters.length - absentVoters.length) / votingSession.voters.length) | percent
+                      }} ({{ votingSession.voters.length - absentVoters.length }})
+                    </ion-label>
+                  </ion-item>
+                  <div class="ion-padding" slot="content">
+                    <ion-item lines="inset" *ngFor="let voter of votingSession.voters">
+                      <ion-label class="ion-text-wrap">{{ voter.name }}</ion-label>
+                      <ion-badge slot="end" color="light" *ngIf="wasVoterAbsent(voter)">
+                        {{ 'VOTING.ABSENT' | translate }}
+                      </ion-badge>
+                    </ion-item>
+                  </div>
+                </ion-accordion>
+              </ion-accordion-group>
               <ion-item *ngIf="votingSession.startsAt">
                 <ion-icon slot="start" icon="play-outline" />
                 <ion-label class="ion-text-wrap">

@@ -77,6 +77,10 @@ export class VotingSession extends Resource {
    */
   results?: VotingResults;
   /**
+   * The list of the names of the voters that voted; i.e., it doesn't include the absents.
+   */
+  participantVoters?: string[];
+  /**
    * The timestamp when the voting session was archived.
    */
   archivedAt?: epochISOString;
@@ -99,8 +103,16 @@ export class VotingSession extends Resource {
     this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
     this.timezone = this.clean(x.timezone, String);
     this.scrutineersIds = this.cleanArray(x.scrutineersIds, String).map(x => x.toLowerCase());
-    if (!this.hasEnded()) delete this.results;
-    else if (x.results) this.results = x.results;
+    if (!this.hasEnded()) {
+      delete this.results;
+      delete this.participantVoters;
+    } else {
+      if (x.results) this.results = x.results;
+      if (x.participantVoters)
+        this.participantVoters = this.cleanArray(x.participantVoters, String)?.sort((a, b): number =>
+          a.localeCompare(b)
+        );
+    }
     if (x.archivedAt) this.archivedAt = this.clean(x.archivedAt, d => new Date(d).toISOString());
   }
 
@@ -112,6 +124,7 @@ export class VotingSession extends Resource {
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     this.startsAt = safeData.startsAt;
     if (safeData.results) this.results = safeData.results;
+    if (safeData.participantVoters) this.participantVoters = safeData.participantVoters;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
   }
 
@@ -134,7 +147,6 @@ export class VotingSession extends Resource {
       if (votersIds.length !== new Set(votersIds).size) e.push('voters.duplicatedIds');
       if (votersNames.length !== new Set(votersNames).size) e.push('voters.duplicatedNames');
       if (votersEmails.length !== new Set(votersEmails).size) e.push('voters.duplicatedEmails');
-      if (this.voters.filter(x => !x.email).length) e.push('voters.missingEmails');
       if (this.startsAt) {
         const tenMinutes = new Date();
         tenMinutes.setMinutes(tenMinutes.getMinutes() + 10);
@@ -205,6 +217,16 @@ export class VotingSession extends Resource {
     });
     return e;
   }
+
+  /**
+   * Get the voters who didn't vote (absent).
+   * Note: either a voter is present for all the ballots or they are absents for all the ballots.
+   */
+  getAbsentVoters(): Voter[] {
+    if (!this.participantVoters) return;
+    const votersPresent = new Set(this.participantVoters);
+    return this.voters.filter(x => !votersPresent.has(x.name)).sort((a, b): number => a.name.localeCompare(b.name));
+  }
 }
 
 /**
@@ -263,6 +285,7 @@ export class Voter extends Resource {
   name: string;
   /**
    * The email address to which the voting tokens will be sent.
+   * If not set, no email will be sent; without a voting link, the voter can't vote and will result absent.
    */
   email: string;
   /**
@@ -286,10 +309,6 @@ export class Voter extends Resource {
     if (this.iE(this.name)) e.push('name');
     if (this.email && this.iE(this.email, 'email')) e.push('email');
     if (votingSession.isWeighted && (this.voteWeight < 1 || this.voteWeight > 999_999)) e.push('voteWeight');
-
-    if (votingSession.startsAt) {
-      if (this.iE(this.email, 'email')) e.push('email');
-    }
     return e;
   }
 }

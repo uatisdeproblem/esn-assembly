@@ -55,7 +55,7 @@ export class ManageVotingSessionPage implements OnDestroy {
   footerHeight = 80;
 
   filteredVoters: Voter[];
-  missingEmails: number;
+  numMissingEmails: number;
   numDuplicatedNames: number;
   numDuplicatedEmails: number;
   totalWeights: number;
@@ -381,7 +381,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     this.numDuplicatedNames = votersNames.length - new Set(votersNames).size;
     const votersEmails = this.votingSession.voters.map(x => x.email?.toLowerCase()).filter(x => x);
     this.numDuplicatedEmails = votersEmails.length - new Set(votersEmails).size;
-    this.missingEmails = this.votingSession.voters.filter(x => !x.email).length;
+    this.numMissingEmails = this.votingSession.voters.filter(x => !x.email).length;
     this.totalWeights = this.votingSession.getTotWeights();
   }
 
@@ -455,6 +455,9 @@ export class ManageVotingSessionPage implements OnDestroy {
   // START
   //
 
+  getNameOfVotersWithoutEmail(): string[] {
+    return this.votingSession.voters.filter(x => !x.email).map(x => x.name);
+  }
   async startSession(): Promise<void> {
     const session = new VotingSession(this.votingSession);
     session.startsAt = new Date().toISOString();

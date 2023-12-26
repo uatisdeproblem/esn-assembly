@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import Chart from 'chart.js/auto';
-import { IDEATranslationsModule } from '@idea-ionic/common';
+import { IDEATranslationsModule, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 
@@ -49,7 +49,7 @@ import { VotingResults } from '@models/votingResult.model';
               <ion-col [size]="12" [sizeMd]="results ? 9 : 12">
                 <ion-item
                   lines="none"
-                  *ngFor="let option of ballot.options; let oIndex = index"
+                  *ngFor="let option of getOptionsOfBallotIncludingAbsentsByIndex(bIndex); let oIndex = index"
                   [button]="results && !votingSession.isSecret"
                   [id]="'votersList-' + bIndex + '-' + oIndex"
                 >
@@ -144,7 +144,7 @@ import { VotingResults } from '@models/votingResult.model';
     `
   ]
 })
-export class BallotsStandaloneComponent implements OnInit {
+export class BallotsStandaloneComponent implements OnInit, OnDestroy {
   /**
    * The voting session containing the ballots to display.
    */
@@ -171,9 +171,18 @@ export class BallotsStandaloneComponent implements OnInit {
   charts: Chart<'doughnut'>[] = [];
   chartColors = CHART_COLORS;
 
-  constructor(public app: AppService) {}
+  constructor(private t: IDEATranslationsService, public app: AppService) {}
   ngOnInit(): void {
     if (this.results) setTimeout((): void => this.buildCharts(), 300);
+  }
+  ngOnDestroy(): void {
+    this.charts.forEach(chart => chart?.destroy());
+  }
+
+  getOptionsOfBallotIncludingAbsentsByIndex(bIndex: number): string[] {
+    const options = this.votingSession.ballots[bIndex].options;
+    if (!this.results) return options;
+    else return [...options, this.t._('VOTING.ABSENT')];
   }
 
   handleBallotReorder({ detail }): void {
@@ -184,11 +193,13 @@ export class BallotsStandaloneComponent implements OnInit {
 
   buildCharts(): void {
     if (!this.results) return;
-    this.votingSession.ballots.forEach((ballot, bIndex): void => {
+    this.votingSession.ballots.forEach((_, bIndex): void => {
       if (this.charts[bIndex]) this.charts[bIndex].destroy();
       const chartCanvas = document.getElementById('chartBallot-' + bIndex) as HTMLCanvasElement;
-      const labels = ballot.options;
-      const data = ballot.options.map((_, oIndex): any => this.results[bIndex][oIndex].value);
+      const labels = this.getOptionsOfBallotIncludingAbsentsByIndex(bIndex);
+      const data = this.getOptionsOfBallotIncludingAbsentsByIndex(bIndex).map(
+        (_, oIndex): any => this.results[bIndex][oIndex].value
+      );
       this.charts[bIndex] = new Chart(chartCanvas, {
         type: 'doughnut',
         data: { labels, datasets: [{ data, backgroundColor: this.chartColors }] },

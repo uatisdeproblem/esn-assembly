@@ -200,7 +200,7 @@ class VotingSessionsRC extends ResourceController {
 
     for (const votingTicket of votingTickets) {
       try {
-        await this.sendVotingTicketToVoter(votingTicket);
+        if (votingTicket.voterEmail) await this.sendVotingTicketToVoter(votingTicket);
       } catch (error) {
         // it's ok if one email is not sent/received: we can send it again
         this.logger.warn('Voting ticket failed to send', error, { ...votingTicket });
@@ -268,20 +268,29 @@ class VotingSessionsRC extends ResourceController {
       })
     ).map(x => new VotingResultForBallotOption(x));
 
-    const votingResult: VotingResults = [];
+    const votingResults: VotingResults = [];
     this.votingSession.ballots.forEach((ballot, bIndex): void => {
-      votingResult[bIndex] = ballot.options.map((): { value: number; voters?: string[] } => ({
+      votingResults[bIndex] = ballot.options.map((): { value: number; voters?: string[] } => ({
         value: 0,
         voters: this.votingSession.isSecret ? undefined : []
       }));
     });
     resultsForBallotOption.forEach(x => {
       const { bIndex, oIndex } = x.getIndexesFromSK();
-      votingResult[bIndex][oIndex].value = x.value;
-      if (!this.votingSession.isSecret) votingResult[bIndex][oIndex].voters = x.voters ?? [];
+      votingResults[bIndex][oIndex].value = x.value;
+      if (!this.votingSession.isSecret) votingResults[bIndex][oIndex].voters = x.voters ?? [];
+    });
+    votingResults.forEach(ballotResult => {
+      const totValue = ballotResult.reduce((tot, acc): number => (tot += acc.value), 0);
+      const absent: { value: number; voters?: string[] } = { value: 1 - totValue };
+      if (!this.votingSession.isSecret) {
+        const votersPresent = new Set(this.votingSession.participantVoters);
+        absent.voters = this.votingSession.voters.map(x => x.name).filter(x => !votersPresent.has(x));
+      }
+      ballotResult.push(absent);
     });
 
-    return votingResult;
+    return votingResults;
   }
   private async publishVotingResults(): Promise<VotingSession> {
     if (this.votingSession.results) throw new RCError('Already public');

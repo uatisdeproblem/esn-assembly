@@ -749,6 +749,12 @@
     "VOTERS_FOR": "Voters for",
     "DOWNLOAD_RESULTS": "Download results",
     "DOWNLOAD_VOTERS_AUDIT": "Download voters audit",
-    "VOTERS_AUDIT": "Voters audit"
+    "VOTERS_AUDIT": "Voters audit",
+    "ABSENT": "Absent",
+    "PARTICIPATION": "Participation",
+    "THESE_VOTERS_WONT_RECEIVE_VOTING_LINK": "The following voters won't receive a voting link:",
+    "NO_VOTING_MEANS_ABSENT": "No vote means absent",
+    "NO_VOTING_MEANS_ABSENT_I": "Without voting link, the voters won't be able to vote. That means they will count as absent.",
+    "OF_WHICH_NUM_WITHOUT_EMAIL": "Of them won't receive a voting link"
   }
 }

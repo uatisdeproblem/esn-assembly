@@ -91,6 +91,12 @@ class VoteRC extends ResourceController {
         ':ip': votingTicket.ipAddress
       }
     };
+    const updateParticipantVoters = {
+      TableName: DDB_TABLES.votingSessions,
+      Key: { sessionId: this.votingSession.sessionId },
+      UpdateExpression: 'SET participantVoters = list_append(if_not_exists(participantVoters, :emptyArr), :voters)',
+      ExpressionAttributeValues: { ':voters': [votingTicket.voterName], ':emptyArr': [] as string[] }
+    };
     const updateIncrementalResultForBallotOption = this.votingSession.ballots.map((_, bIndex): any => {
       const updateParams: any = {
         TableName: DDB_TABLES.votingResults,
@@ -105,13 +111,14 @@ class VoteRC extends ResourceController {
       if (!this.votingSession.isSecret) {
         updateParams.UpdateExpression += ', voters = list_append(if_not_exists(voters, :emptyArr), :voters)';
         updateParams.ExpressionAttributeValues[':voters'] = [votingTicket.voterName];
-        updateParams.ExpressionAttributeValues[':emptyArr'] = [];
+        updateParams.ExpressionAttributeValues[':emptyArr'] = [] as string[];
       }
       return updateParams;
     });
 
     await ddb.transactWrites([
       { Update: updateVotingTicket },
+      { Update: updateParticipantVoters },
       ...updateIncrementalResultForBallotOption.map(x => ({ Update: x }))
     ]);
   }

@@ -198,7 +198,7 @@
           >
             <div class="footerTotals" *ngIf="!app.isInMobileMode() && !votingSession.hasStarted()">
               <ng-container>
-                <span><strong>{{ 'VOTING.MISSING_EMAILS' | translate }}</strong>: {{ missingEmails }}</span>
+                <span><strong>{{ 'VOTING.MISSING_EMAILS' | translate }}</strong>: {{ numMissingEmails }}</span>
                 <span><strong>{{ 'VOTING.DUPLICATED_NAMES' | translate }}</strong>: {{ numDuplicatedNames }}</span>
                 <span><strong>{{ 'VOTING.DUPLICATED_EMAILS' | translate }}</strong>: {{ numDuplicatedEmails }}</span>
                 <span *ngIf="votingSession.isWeighted">
@@ -290,10 +290,15 @@
           <ion-item>
             <ion-icon
               slot="start"
-              [icon]="hasFieldAnError('voters.missingEmails') ? 'close' : 'checkmark'"
-              [color]="hasFieldAnError('voters.missingEmails') ? 'danger' : 'success'"
+              [icon]="getNameOfVotersWithoutEmail().length !== 0 ? 'warning' : 'checkmark'"
+              [color]="getNameOfVotersWithoutEmail().length !== 0 ? 'warning' : 'success'"
             />
-            <ion-label>{{ 'VOTING.THERE_ARE_NO_MISSING_VOTERS_EMAILS' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">
+              {{ (getNameOfVotersWithoutEmail().length !== 0 ? 'VOTING.THESE_VOTERS_WONT_RECEIVE_VOTING_LINK' :
+              'VOTING.THERE_ARE_NO_MISSING_VOTERS_EMAILS') | translate }}
+              <p>{{ getNameOfVotersWithoutEmail().join(', ') }}</p>
+            </ion-label>
+            <idea-show-hint-button slot="end" hint="VOTING.NO_VOTING_MEANS_ABSENT" translate />
           </ion-item>
         </ion-card-content>
       </ion-card>
@@ -318,7 +323,13 @@
       </ion-item>
       <ion-item>
         <ion-icon slot="start" icon="ticket-outline" />
-        <ion-label><b>{{ votingSession.voters.length }}</b> {{ 'VOTING.VOTERS' | translate | lowercase }}</ion-label>
+        <ion-label>
+          <b>{{ votingSession.voters.length }}</b> {{ 'VOTING.VOTERS' | translate | lowercase }}
+          <p *ngIf="getNameOfVotersWithoutEmail().length">
+            <b>{{ getNameOfVotersWithoutEmail().length }}</b> {{ 'VOTING.OF_WHICH_NUM_WITHOUT_EMAIL' | translate |
+            lowercase }}
+          </p>
+        </ion-label>
       </ion-item>
       <ion-item>
         <ion-icon slot="start" icon="trail-sign-outline" />

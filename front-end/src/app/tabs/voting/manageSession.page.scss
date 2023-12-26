@@ -25,6 +25,9 @@ ion-card.sessionChecklistCard {
   ion-card-header {
     padding-bottom: 0;
     ion-item {
+      ion-label {
+        font-size: 1.1em;
+      }
       ion-icon {
         margin-right: 16px;
       }
@@ -35,8 +38,9 @@ ion-card.sessionChecklistCard {
       --min-height: 40px;
       --padding-start: 8px;
       ion-label {
-        margin: 0;
-        font-size: 0.9em;
+        p {
+          margin: 0;
+        }
       }
       ion-icon {
         margin: 6px 16px;

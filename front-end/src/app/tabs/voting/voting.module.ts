@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-import { IDEASelectModule, IDEATranslationsModule } from '@idea-ionic/common';
+import { IDEASelectModule, IDEAShowHintButtonModule, IDEATranslationsModule } from '@idea-ionic/common';
 
 import { VotingRoutingModule } from './voting.routing.module';
 import { VotingSessionsPage } from './votingSessions.page';
@@ -29,6 +29,7 @@ import { DateTimezonePipe } from '@common/dateTimezone.pipe';
     NgxDatatableModule,
     IDEATranslationsModule,
     IDEASelectModule,
+    IDEAShowHintButtonModule,
     VotingRoutingModule,
     VotingSessionStandaloneComponent,
     ManageBallotStandaloneComponent,
