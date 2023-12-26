@@ -68,6 +68,7 @@ export class ManageVotingSessionPage implements OnDestroy {
 
   votingTickets: VotingTicket[];
   results: VotingResults;
+  showRawResults = true;
 
   constructor(
     private location: Location,

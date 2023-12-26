@@ -18,6 +18,8 @@ export class VotingSessionPage {
 
   absentVoters: Voter[];
 
+  showRawResults = false;
+
   constructor(
     private loading: IDEALoadingService,
     private message: IDEAMessageService,

@@ -501,7 +501,10 @@
             {{ 'VOTING.PUBLISH_RESULTS' | translate }} <ion-icon slot="end" icon="share" />
           </ion-button>
         </ion-list-header>
-        <app-voting-ballots [votingSession]="votingSession" [results]="results" />
+        <div class="ion-text-end ion-padding-end">
+          <ion-toggle [(ngModel)]="showRawResults">{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
+        </div>
+        <app-voting-ballots [votingSession]="votingSession" [results]="results" [raw]="showRawResults" />
         <ion-row>
           <ion-col>
             <ion-button color="medium" (click)="downloadResults()">

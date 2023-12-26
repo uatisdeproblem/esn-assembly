@@ -763,6 +763,8 @@
     "EXTEND_DURATION": "Extend duration",
     "STOP_PREMATURELY": "Stop prematurely",
     "SHOW_VOTING_TOKEN": "Show voting token",
-    "RESEND_VOTING_LINK": "Resend voting link"
+    "RESEND_VOTING_LINK": "Resend voting link",
+    "RAW_RESULTS": "Raw results",
+    "NO_OPTION_RECEIVED_ENOUGH_VOTES": "No option received enough votes"
   }
 }
