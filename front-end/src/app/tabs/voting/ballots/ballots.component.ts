@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import Chart from 'chart.js/auto';
 import { IDEATranslationsModule, IDEATranslationsService } from '@idea-ionic/common';
@@ -164,7 +164,7 @@ import { VotingResults } from '@models/votingResult.model';
     `
   ]
 })
-export class BallotsStandaloneComponent implements OnInit, OnDestroy {
+export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
   /**
    * The voting session containing the ballots to display.
    */
@@ -196,8 +196,10 @@ export class BallotsStandaloneComponent implements OnInit, OnDestroy {
   chartColors = CHART_COLORS;
 
   constructor(private t: IDEATranslationsService, public app: AppService) {}
-  ngOnInit(): void {
-    if (this.results) setTimeout((): void => this.buildCharts(), 300);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.results || changes.raw) {
+      if (this.results) setTimeout((): void => this.buildCharts(), 300);
+    }
   }
   ngOnDestroy(): void {
     this.charts.forEach(chart => chart?.destroy());
