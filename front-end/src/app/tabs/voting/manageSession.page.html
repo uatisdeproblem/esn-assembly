@@ -409,7 +409,7 @@
           </ion-item>
           <ion-item>
             <ion-icon slot="start" icon="log-in-outline" />
-            <ion-label>
+            <ion-label class="ion-text-wrap">
               <p>{{ 'VOTING.STARTED_VOTING' | translate }}</p>
               {{ getNumVotersWhoSignedIn() }} ({{ (getNumVotersWhoSignedIn() / votingSession.voters.length) | percent
               }})
@@ -417,21 +417,21 @@
           </ion-item>
           <ion-item>
             <ion-icon slot="start" icon="checkmark-outline" />
-            <ion-label>
+            <ion-label class="ion-text-wrap">
               <p>{{ 'VOTING.VOTED' | translate }}</p>
               {{ getNumVotersWhoVoted() }} ({{ (getNumVotersWhoVoted() / votingSession.voters.length) | percent }})
             </ion-label>
           </ion-item>
           <ion-item>
             <ion-icon slot="start" icon="play-outline" />
-            <ion-label>
+            <ion-label class="ion-text-wrap">
               <p>{{ 'VOTING.STARTS_AT' | translate }}</p>
               {{ votingSession.startsAt | dateTz: 'datetime' : votingSession.timezone }}, {{ votingSession.timezone }}
             </ion-label>
           </ion-item>
           <ion-item>
             <ion-icon slot="start" icon="stop-outline" />
-            <ion-label>
+            <ion-label class="ion-text-wrap">
               <p>{{ 'VOTING.ENDS_AT' | translate }}</p>
               {{ votingSession.endsAt | dateTz: 'datetime' : votingSession.timezone }}, {{ votingSession.timezone }}
             </ion-label>

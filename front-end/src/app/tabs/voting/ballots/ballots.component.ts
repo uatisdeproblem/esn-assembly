@@ -96,7 +96,7 @@ import { VotingResults } from '@models/votingResult.model';
               </ion-col>
               <ion-col [size]="12" [sizeMd]="3" *ngIf="results">
                 <div class="chartContainer">
-                  <canvas [id]="'chartBallot-' + bIndex"></canvas>
+                  <canvas [id]="chartCanvasBaseId + bIndex"></canvas>
                 </div>
               </ion-col>
               <ion-col [size]="12" *ngIf="results && !raw">
@@ -195,10 +195,15 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
   charts: Chart<'doughnut'>[] = [];
   chartColors = CHART_COLORS;
 
+  chartCanvasBaseId: string;
+
   constructor(private t: IDEATranslationsService, public app: AppService) {}
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.results || changes.raw) {
-      if (this.results) setTimeout((): void => this.buildCharts(), 300);
+      this.charts.forEach(chart => chart?.destroy());
+      // we need to continue refresh the canvas ID because sometimes the chart's canvas doesn't update
+      this.chartCanvasBaseId = 'chartBallot-'.concat(Date.now().toString(), '-');
+      setTimeout((): void => this.buildCharts(), 300);
     }
   }
   ngOnDestroy(): void {
@@ -244,8 +249,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
   buildCharts(): void {
     if (!this.results) return;
     this.votingSession.ballots.forEach((_, bIndex): void => {
-      if (this.charts[bIndex]) this.charts[bIndex].destroy();
-      const chartCanvas = document.getElementById('chartBallot-' + bIndex) as HTMLCanvasElement;
+      const chartCanvas = document.getElementById(this.chartCanvasBaseId + bIndex) as HTMLCanvasElement;
       const labels = this.getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex);
       const data = this.getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex).map((_, oIndex): any =>
         this.getResultOfBallotOptionBasedOnRaw(bIndex, oIndex)
