@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { IonRefresher } from '@ionic/angular';
-import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
+import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
 import { Voter, VotingSession } from '@models/votingSession.model';
+import { WorkBook, utils, writeFile } from 'xlsx';
 
 @Component({
   selector: 'voting-session',
@@ -24,6 +25,7 @@ export class VotingSessionPage {
     private loading: IDEALoadingService,
     private message: IDEAMessageService,
     private _voting: VotingService,
+    private t: IDEATranslationsService,
     public app: AppService
   ) {}
   async ionViewWillEnter(): Promise<void> {
@@ -54,7 +56,30 @@ export class VotingSessionPage {
   }
 
   downloadResults(): void {
-    // @todo use this.votingSession.results
-    // filename const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+    const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+
+    const wb: WorkBook = {
+      SheetNames: [],
+      Sheets: {},
+      Props: {
+        Title: `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}`
+      }
+    };
+
+    this.votingSession.results.forEach((votingResult, index) => {
+      const dataResult = votingResult.map((result, optionIndex) => {
+        const ballots = [
+          ...this.votingSession.ballots[index].options,
+          this.t._('VOTING.ABSTAIN'),
+          this.t._('VOTING.ABSENT')
+        ];
+        return {
+          Name: ballots[optionIndex],
+          Results: `${result.value * 100}%`
+        };
+      });
+      utils.book_append_sheet(wb, utils.json_to_sheet(dataResult), `Voting-${index}`);
+    });
+    return writeFile(wb, filename);
   }
 }

@@ -647,8 +647,31 @@ export class ManageVotingSessionPage implements OnDestroy {
     alert.present();
   }
   downloadResults(): void {
-    // @todo use this.results
-    // filename const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+    const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+
+    const wb: WorkBook = {
+      SheetNames: [],
+      Sheets: {},
+      Props: {
+        Title: `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}`
+      }
+    };
+
+    this.votingSession.results.forEach((votingResult, index) => {
+      const dataResult = votingResult.map((result, optionIndex) => {
+        const ballots = [
+          ...this.votingSession.ballots[index].options,
+          this.t._('VOTING.ABSTAIN'),
+          this.t._('VOTING.ABSENT')
+        ];
+        return {
+          Name: ballots[optionIndex],
+          Results: `${result.value * 100}%`
+        };
+      });
+      utils.book_append_sheet(wb, utils.json_to_sheet(dataResult), `Voting-${index}`);
+    });
+    return writeFile(wb, filename);
   }
   downloadVotersAudit(): void {
     if (!this.votingTickets) return;
