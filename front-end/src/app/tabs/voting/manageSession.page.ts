@@ -238,10 +238,21 @@ export class ManageVotingSessionPage implements OnDestroy {
   }
 
   async duplicateSession(): Promise<void> {
-    const duplicateSession: VotingSession = new VotingSession(this.votingSession);
-    duplicateSession.name = `${this.votingSession.name} - Clone`;
     try {
-      await this._voting.insert(duplicateSession);
+      await this._voting.insert(
+        new VotingSession({
+          resultsArePublished: false,
+          name: `${this.votingSession.name} - Clone`,
+          event: this.votingSession.event,
+          timezone: this.votingSession.timezone,
+          voters: this.votingSession.voters,
+          scrutineersIds: this.votingSession.scrutineersIds,
+          isWeighted: this.votingSession.isWeighted,
+          isSecret: this.votingSession.isSecret,
+          description: this.votingSession.description,
+          ballots: this.votingSession.ballots
+        })
+      );
       this.message.success('COMMON.OPERATION_COMPLETED');
       this.app.goToInTabs(['voting'], { back: true });
     } catch (error) {

@@ -204,10 +204,15 @@ export class ManageOpportunityPage {
   }
 
   async duplicateOpportunity(): Promise<void> {
-    const duplicateOpportunity: Opportunity= new Opportunity(this.opportunity);
-    duplicateOpportunity.name = `${this.opportunity.name} - Clone`;
     try {
-      await this._opportunities.insert(duplicateOpportunity);
+      await this._opportunities.insert(new Opportunity({
+        name: `${this.opportunity.name} - Clone`,
+        additionalManagersIds: this.opportunity.additionalManagersIds,
+        contactEmail: this.opportunity.contactEmail,
+        expectedAttachments: this.opportunity.expectedAttachments,
+        attachments: this.opportunity.attachments,
+        content: this.opportunity.content,
+      }));
       this.message.success('COMMON.OPERATION_COMPLETED');
       this.app.goToInTabs(['opportunities'], { back: true });
     } catch (error) {

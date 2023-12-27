@@ -252,10 +252,19 @@ export class ManageTopicPage {
   }
 
   async duplicateTopic(): Promise<void> {
-    const duplicateTopic: Topic = new Topic(this.topic);
-    duplicateTopic.name = `${this.topic.name} - Clone`;
     try {
-      await this._topics.insert(duplicateTopic);
+      await this._topics.insert(new Topic({
+        name: `${this.topic.name} - Clone`,
+        type: this.topic.type,
+        content: this.topic.content,
+        event: this.topic.event,
+        category: this.topic.category,
+        subjects: this.topic.subjects,
+        apprectiations: this.topic.appreciations,
+        mustBeSigned: this.topic.mustBeSigned,
+        rolesAbleToInteract: this.topic.rolesAbleToInteract,
+        attachments: this.topic.attachments,
+      }));
       this.message.success('COMMON.OPERATION_COMPLETED');
       this.app.goToInTabs(['topics'], { back: true });
     } catch (error) {
