@@ -157,6 +157,7 @@
       />
     </div>
     <ng-container *ngIf="pageSection === PageSections.VOTERS">
+      <input type="file" id="importVoters" accept=".xlsx, .csv" style="display: none" (change)="importVoters($event)" />
       <ion-toolbar id="votersTableToolbar" color="ideaToolbar">
         <ion-searchbar #votersSearchbar (ionInput)="filterVoters($event.target.value)" />
         <ion-buttons slot="end" *ngIf="editMode">

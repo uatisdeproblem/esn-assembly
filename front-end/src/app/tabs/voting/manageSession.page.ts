@@ -1,7 +1,7 @@
 import { Component, HostListener, Input, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ColumnMode, DatatableComponent, SelectionType, TableColumn } from '@swimlane/ngx-datatable';
-import { WorkBook, utils, writeFile } from 'xlsx';
+import { WorkBook, read, utils, writeFile } from 'xlsx';
 import { AlertController, IonSearchbar, ModalController } from '@ionic/angular';
 import { epochISOString } from 'idea-toolbox';
 import {
@@ -416,7 +416,7 @@ export class ManageVotingSessionPage implements OnDestroy {
       {
         text: this.t._('VOTING.IMPORT_VOTERS'),
         icon: 'cloud-upload',
-        handler: (): void => this.importVoters()
+        handler: (): void => this.pickImportVoters()
       },
       {
         text: this.t._('VOTING.EXPORT_VOTERS'),
@@ -435,12 +435,56 @@ export class ManageVotingSessionPage implements OnDestroy {
     const actions = await this.actionsCtrl.create({ header, buttons });
     actions.present();
   }
-  private importVoters(): void {
-    // @todo
+
+  private pickImportVoters(): void {
+    document.getElementById('importVoters').click();
   }
+
+  async importVoters(event: any): Promise<void> {
+    const file = event.target.files[0];
+
+    try {
+      this.votingSession.voters = [];
+
+      const fileReader = new FileReader();
+      fileReader.readAsBinaryString(file);
+      fileReader.onload = async e => {
+        const workbook = read(fileReader.result, { type: 'binary' });
+        const header = utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { raw: true, header: 1 })[0];
+        const rows: { name: string; email: string; voteWeight: string }[] = utils.sheet_to_json(
+          workbook.Sheets[workbook.SheetNames[0]],
+          {
+            raw: true,
+            header: header as any,
+            defval: '',
+            range: 1 // skip header row
+          }
+        );
+
+        rows.forEach(row => {
+          this.votingSession.voters.push(
+            new Voter({
+              name: row.name,
+              email: row.email,
+              voteWeight: Number(row.voteWeight)
+            }, this.votingSession)
+          );
+        });
+
+        this.filterVoters();
+      };
+    } catch (err) {
+      this.message.error('COMMON.ERROR');
+    }
+  }
+
   private exportVoters(): void {
-    // @todo
+    const title: string = `Export Voters - ${this.votingSession.name}`;
+    const wb: WorkBook = { SheetNames: [], Sheets: {}, Props: { Title: title } };
+    utils.book_append_sheet(wb, utils.json_to_sheet(this.votingSession.voters), 'Voters Template');
+    return writeFile(wb, title.concat('.xlsx'));
   }
+
   private async removeAllVoters(): Promise<void> {
     const doRemove = (): void => {
       this.votingSession.voters = [];
