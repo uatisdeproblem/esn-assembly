@@ -646,7 +646,7 @@
     "BALLOTS_I": "The elements voted on in the current session.",
     "GENERAL": "General",
     "VOTERS": "Voters",
-    "SCRUTINEERS": "Voting session moderators",
+    "SCRUTINEERS": "Session moderators",
     "SCRUTINEERS_I": "These users can manage the session and see the results before they are published.",
     "SCRUTINEERS_II": "Administrators are always session moderators.",
     "ADD_SCRUTINEER": "Add moderator",
