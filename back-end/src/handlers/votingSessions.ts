@@ -111,10 +111,12 @@ class VotingSessionsRC extends ResourceController {
     this.votingSession = new VotingSession(this.body);
     this.votingSession.sessionId = await ddb.IUNID(PROJECT);
     this.votingSession.createdAt = new Date().toISOString();
+    delete this.votingSession.updatedAt;
     delete this.votingSession.startsAt;
     delete this.votingSession.endsAt;
+    delete this.votingSession.timezone;
     delete this.votingSession.results;
-    delete this.votingSession.archivedAt;
+    delete this.votingSession.participantVoters;
 
     await this.putSafeResource({ noOverwrite: true });
 

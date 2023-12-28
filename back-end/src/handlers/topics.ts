@@ -109,6 +109,8 @@ class Topics extends ResourceController {
 
     this.topic = new Topic(this.body);
     this.topic.topicId = await ddb.IUNID(PROJECT);
+    delete this.topic.updatedAt;
+    delete this.topic.numOfQuestions;
 
     await this.putSafeResource({ noOverwrite: true });
 
