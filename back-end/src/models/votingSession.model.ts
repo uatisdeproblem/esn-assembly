@@ -322,5 +322,5 @@ export interface ExportableVoter {
   Name: string;
   'Voter Identifier': string;
   Email: string;
-  'Vote Weight': number;
+  'Vote Weight'?: number;
 }

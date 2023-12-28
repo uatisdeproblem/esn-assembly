@@ -14,6 +14,7 @@ import { VotingSessionStandaloneComponent } from './votingSession.component';
 import { ManageBallotStandaloneComponent } from './ballots/manageBallot.component';
 import { ManageVoterStandaloneComponent } from './voters/manageVoter.component';
 import { BallotsStandaloneComponent } from './ballots/ballots.component';
+import { ImportVotersStandaloneComponent } from './voters/importVoters.component';
 
 import { EditModeButtonsModule } from '@common/editModeButtons.module';
 import { EventsPickerComponent } from '@common/eventsPicker.component';
@@ -35,6 +36,7 @@ import { DateTimezonePipe } from '@common/dateTimezone.pipe';
     ManageBallotStandaloneComponent,
     ManageVoterStandaloneComponent,
     BallotsStandaloneComponent,
+    ImportVotersStandaloneComponent,
     EditModeButtonsModule,
     EventsPickerComponent,
     DatetimeWithTimezoneStandaloneComponent,

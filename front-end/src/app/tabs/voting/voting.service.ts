@@ -337,18 +337,18 @@ export class VotingService {
   /**
    * Download a spreadsheet with the voters.
    */
-  downloadVotersSpreadsheet(filename: string, voters: Voter[]): void {
-    if (!voters) return;
+  downloadVotersSpreadsheet(filename: string, votingSession: VotingSession): void {
+    if (!votingSession.voters) return;
 
-    const exportableVotingTickets: ExportableVoter[] = voters.map(x => ({
-      Name: x.name,
-      'Voter Identifier': x.id,
-      Email: x.email,
-      'Vote Weight': x.voteWeight
-    }));
+    const exportableVoters: ExportableVoter[] = [];
+    votingSession.voters.forEach(x => {
+      const voter: ExportableVoter = { Name: x.name, 'Voter Identifier': x.id, Email: x.email };
+      if (votingSession.isWeighted) voter['Vote Weight'] = x.voteWeight;
+      exportableVoters.push(voter);
+    });
 
     const wb: WorkBook = { SheetNames: [], Sheets: {} };
-    utils.book_append_sheet(wb, utils.json_to_sheet(exportableVotingTickets), filename.slice(0, 30));
+    utils.book_append_sheet(wb, utils.json_to_sheet(exportableVoters), filename.slice(0, 30));
     return writeFile(wb, filename);
   }
 }

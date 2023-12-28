@@ -13,6 +13,7 @@ import {
 
 import { ManageBallotStandaloneComponent } from './ballots/manageBallot.component';
 import { ManageVoterStandaloneComponent } from './voters/manageVoter.component';
+import { ImportVotersStandaloneComponent } from './voters/importVoters.component';
 
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
@@ -438,7 +439,7 @@ export class ManageVotingSessionPage implements OnDestroy {
       buttons.push({
         text: this.t._('VOTING.IMPORT_VOTERS'),
         icon: 'cloud-upload',
-        handler: (): void => this.importVoters()
+        handler: (): Promise<void> => this.importVoters()
       });
     buttons.push({
       text: this.t._('VOTING.EXPORT_VOTERS'),
@@ -457,13 +458,22 @@ export class ManageVotingSessionPage implements OnDestroy {
     const actions = await this.actionsCtrl.create({ header, buttons });
     actions.present();
   }
-  private importVoters(): void {
-    // @todo
+  private async importVoters(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ImportVotersStandaloneComponent,
+      componentProps: { votingSession: this.votingSession }
+    });
+    modal.onDidDismiss().then(({ data: voters }): void => {
+      if (!voters) return;
+      this.votingSession.voters = voters;
+      this.filterVoters();
+    });
+    modal.present();
   }
   private exportVoters(): void {
     const sessionName = this.votingSession.name.replace(/[^\w\s]/g, '');
     const filename = `${sessionName} - ${this.t._('VOTING.VOTERS')}.xlsx`;
-    this._voting.downloadVotersSpreadsheet(filename, this.votingSession.voters);
+    this._voting.downloadVotersSpreadsheet(filename, this.votingSession);
   }
   private async removeAllVoters(): Promise<void> {
     const doRemove = (): void => {

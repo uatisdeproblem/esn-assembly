@@ -234,6 +234,17 @@ app-html-editor {
   user-select: all !important;
 }
 
+hr {
+  clear: both;
+  height: 1px;
+  min-height: 0;
+  margin: 30px auto;
+  padding: 0;
+  border: none;
+  border-top: medium solid rgba(var(--ion-color-medium-rgb), 0.1);
+  width: 100%;
+}
+
 ion-item input[type='datetime-local'] {
   border: none;
   margin: 6px 0;
