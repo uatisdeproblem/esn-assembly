@@ -159,8 +159,8 @@
     <ng-container *ngIf="pageSection === PageSections.VOTERS">
       <ion-toolbar id="votersTableToolbar" color="ideaToolbar">
         <ion-searchbar #votersSearchbar (ionInput)="filterVoters($event.target.value)" />
-        <ion-buttons slot="end" *ngIf="editMode">
-          <ion-button *ngIf="votingSession.voters.length < 1000" (click)="addVoter()">
+        <ion-buttons slot="end">
+          <ion-button *ngIf="editMode && votingSession.voters.length < 1000" (click)="addVoter()">
             {{ 'COMMON.ADD' | translate }}
           </ion-button>
           <ion-button (click)="actionsOnVoters()"><ion-icon icon="ellipsis-horizontal" slot="icon-only" /></ion-button>

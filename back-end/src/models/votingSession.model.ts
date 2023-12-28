@@ -314,3 +314,13 @@ export class Voter extends Resource {
     return e;
   }
 }
+
+/**
+ * A flat, exportable version of a voter.
+ */
+export interface ExportableVoter {
+  Name: string;
+  'Voter Identifier': string;
+  Email: string;
+  'Vote Weight': number;
+}

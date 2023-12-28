@@ -433,25 +433,26 @@ export class ManageVotingSessionPage implements OnDestroy {
 
   async actionsOnVoters(): Promise<void> {
     const header = this.t._('COMMON.ACTIONS');
-    const buttons = [
-      {
+    const buttons = [];
+    if (this.editMode)
+      buttons.push({
         text: this.t._('VOTING.IMPORT_VOTERS'),
         icon: 'cloud-upload',
         handler: (): void => this.importVoters()
-      },
-      {
-        text: this.t._('VOTING.EXPORT_VOTERS'),
-        icon: 'cloud-download',
-        handler: (): void => this.exportVoters()
-      },
-      {
+      });
+    buttons.push({
+      text: this.t._('VOTING.EXPORT_VOTERS'),
+      icon: 'cloud-download',
+      handler: (): void => this.exportVoters()
+    });
+    if (this.editMode)
+      buttons.push({
         text: this.t._('VOTING.REMOVE_ALL_VOTERS'),
         icon: 'trash',
         role: 'destructive',
         handler: (): Promise<void> => this.removeAllVoters()
-      },
-      { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
-    ];
+      });
+    buttons.push({ text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' });
 
     const actions = await this.actionsCtrl.create({ header, buttons });
     actions.present();
@@ -460,7 +461,9 @@ export class ManageVotingSessionPage implements OnDestroy {
     // @todo
   }
   private exportVoters(): void {
-    // @todo
+    const sessionName = this.votingSession.name.replace(/[^\w\s]/g, '');
+    const filename = `${sessionName} - ${this.t._('VOTING.VOTERS')}.xlsx`;
+    this._voting.downloadVotersSpreadsheet(filename, this.votingSession.voters);
   }
   private async removeAllVoters(): Promise<void> {
     const doRemove = (): void => {

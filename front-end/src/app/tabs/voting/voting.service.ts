@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { WorkBook, utils, writeFile } from 'xlsx';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { Voter, VotingSession } from '@models/votingSession.model';
+import { ExportableVoter, Voter, VotingSession } from '@models/votingSession.model';
 import { ExportableVotingTicket, VotingTicket } from '@models/votingTicket.model';
 import { VotingResults } from '@models/votingResult.model';
 
@@ -329,6 +329,23 @@ export class VotingService {
         .map(y => y.Name)
         .join(', ');
     });
+
+    const wb: WorkBook = { SheetNames: [], Sheets: {} };
+    utils.book_append_sheet(wb, utils.json_to_sheet(exportableVotingTickets), filename.slice(0, 30));
+    return writeFile(wb, filename);
+  }
+  /**
+   * Download a spreadsheet with the voters.
+   */
+  downloadVotersSpreadsheet(filename: string, voters: Voter[]): void {
+    if (!voters) return;
+
+    const exportableVotingTickets: ExportableVoter[] = voters.map(x => ({
+      Name: x.name,
+      'Voter Identifier': x.id,
+      Email: x.email,
+      'Vote Weight': x.voteWeight
+    }));
 
     const wb: WorkBook = { SheetNames: [], Sheets: {} };
     utils.book_append_sheet(wb, utils.json_to_sheet(exportableVotingTickets), filename.slice(0, 30));
