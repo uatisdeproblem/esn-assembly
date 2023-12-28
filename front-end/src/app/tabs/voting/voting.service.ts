@@ -317,8 +317,18 @@ export class VotingService {
       'Vote identifier': x.voterId,
       'IP address': x.ipAddress ?? '-',
       'User agent': x.userAgent ?? '-',
-      'Vote date/time': x.votedAt ?? '-'
+      'Vote date/time': x.votedAt ?? '-',
+      'Fraud detection': ''
     }));
+    exportableVotingTickets.forEach(x => {
+      if (x['IP address'] === '-' || x['User agent'] === '-') return;
+      x['Fraud detection'] = exportableVotingTickets
+        .filter(
+          y => y['Name'] !== x['Name'] && y['IP address'] === x['IP address'] && y['User agent'] === x['User agent']
+        )
+        .map(y => y.Name)
+        .join(', ');
+    });
 
     const wb: WorkBook = { SheetNames: [], Sheets: {} };
     utils.book_append_sheet(wb, utils.json_to_sheet(exportableVotingTickets), filename.slice(0, 30));
