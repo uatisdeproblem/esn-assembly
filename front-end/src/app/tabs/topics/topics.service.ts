@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
 import { Topic, TopicTypes } from '@models/topic.model';
+import { Application } from '@models/application.model';
+import { Opportunity } from '@models/opportunity.model';
+import { GAEventAttached } from '@models/event.model';
+import { TopicCategoryAttached } from '@models/category.model';
 
 @Injectable({ providedIn: 'root' })
 export class TopicsService {
@@ -165,6 +169,18 @@ export class TopicsService {
    */
   async insert(topic: Topic): Promise<Topic> {
     return new Topic(await this.api.postResource('topics', { body: topic }));
+  }
+  /**
+   * Insert a topic from an opportunity's application.
+   */
+  async insertFromApplicationToOpportunity(
+    opportunity: Opportunity,
+    application: Application,
+    category: TopicCategoryAttached,
+    event: GAEventAttached
+  ): Promise<Topic> {
+    const body = { action: 'INSERT_FROM_APPLICATION', opportunity, application, category, event };
+    return new Topic(await this.api.patchResource('topics', { body }));
   }
 
   /**

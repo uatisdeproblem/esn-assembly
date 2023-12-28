@@ -609,7 +609,9 @@
     "REVIEW_REJECT": "Reject",
     "REVIEW_APPROVE": "Approve",
     "REVIEWER_LEFT_MESSAGE": "The reviewer left a message",
-    "APPLICANT_WILL_RECEIVE_NOTIFICATION": "The applicant will receive a notification."
+    "APPLICANT_WILL_RECEIVE_NOTIFICATION": "The applicant will receive a notification.",
+    "PROMOTE_TO_QA": "Promote to Q&A topic",
+    "PROMOTE_TO_QA_I": "A new Q&A topic will be added as a draft, and all the information included in this application will be copied over."
   },
   "VOTING": {
     "VOTING_SESSION": "Voting session",

@@ -429,6 +429,38 @@ paths:
           $ref: '#/components/responses/Topic'
         400:
           $ref: '#/components/responses/BadParameters'
+    patch:
+      summary: Actions on the topics
+      tags: [Topics]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [INSERT_FROM_APPLICATION]
+                opportunity:
+                  description: (INSERT_FROM_APPLICATION)
+                  $ref: '#/components/responses/Opportunity'
+                application:
+                  description: (INSERT_FROM_APPLICATION)
+                  $ref: '#/components/responses/Application'
+                category:
+                  description: (INSERT_FROM_APPLICATION)
+                  $ref: '#/components/responses/Category'
+                event:
+                  description: (INSERT_FROM_APPLICATION)
+                  $ref: '#/components/responses/Event'
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /topics/{topicId}:
     get:
       summary: Get a topic
