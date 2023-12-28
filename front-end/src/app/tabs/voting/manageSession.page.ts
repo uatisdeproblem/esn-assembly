@@ -1,7 +1,6 @@
 import { Component, HostListener, Input, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ColumnMode, DatatableComponent, SelectionType, TableColumn } from '@swimlane/ngx-datatable';
-import { WorkBook, utils, writeFile } from 'xlsx';
 import { AlertController, IonSearchbar, ModalController } from '@ionic/angular';
 import { epochISOString } from 'idea-toolbox';
 import {
@@ -19,7 +18,7 @@ import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
 import { VotingMajorityTypes, VotingBallot, VotingSession, Voter } from '@models/votingSession.model';
-import { ExportableVotingTicket, VotingTicket } from '@models/votingTicket.model';
+import { VotingTicket } from '@models/votingTicket.model';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 import { VotingResults } from '@models/votingResult.model';
 
@@ -647,47 +646,18 @@ export class ManageVotingSessionPage implements OnDestroy {
     alert.present();
   }
   downloadResults(): void {
-    const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+    if (!this.results) return;
 
-    const wb: WorkBook = {
-      SheetNames: [],
-      Sheets: {},
-      Props: {
-        Title: `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}`
-      }
-    };
-
-    this.votingSession.results.forEach((votingResult, index) => {
-      const dataResult = votingResult.map((result, optionIndex) => {
-        const ballots = [
-          ...this.votingSession.ballots[index].options,
-          this.t._('VOTING.ABSTAIN'),
-          this.t._('VOTING.ABSENT')
-        ];
-        return {
-          Name: ballots[optionIndex],
-          Results: `${result.value * 100}%`
-        };
-      });
-      utils.book_append_sheet(wb, utils.json_to_sheet(dataResult), `Voting-${index}`);
-    });
-    return writeFile(wb, filename);
+    const sessionName = this.votingSession.name.replace(/[^\w\s]/g, '');
+    const filename = `${sessionName} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+    this._voting.downloadResultsSpreadsheet(filename, this.votingSession, this.results);
   }
   downloadVotersAudit(): void {
     if (!this.votingTickets) return;
 
-    const exportableVotingTickets: ExportableVotingTicket[] = this.votingTickets.map(x => ({
-      Name: x.voterName,
-      'Vote identifier': x.voterId,
-      'IP address': x.ipAddress ?? '-',
-      'User agent': x.userAgent ?? '-',
-      'Vote date/time': x.votedAt ?? '-'
-    }));
-
-    const wb: WorkBook = { SheetNames: [], Sheets: {} };
-    utils.book_append_sheet(wb, utils.json_to_sheet(exportableVotingTickets), '1');
-    const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.VOTERS_AUDIT')}.xlsx`;
-    return writeFile(wb, filename);
+    const sessionName = this.votingSession.name.replace(/[^\w\s]/g, '');
+    const filename = `${sessionName} - ${this.t._('VOTING.VOTERS_AUDIT')}.xlsx`;
+    this._voting.downloadVotersAuditSpreadsheet(filename, this.votingTickets);
   }
 }
 

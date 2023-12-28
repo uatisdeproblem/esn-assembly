@@ -6,7 +6,6 @@ import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
 import { Voter, VotingSession } from '@models/votingSession.model';
-import { WorkBook, utils, writeFile } from 'xlsx';
 
 @Component({
   selector: 'voting-session',
@@ -56,30 +55,10 @@ export class VotingSessionPage {
   }
 
   downloadResults(): void {
-    const filename = `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+    if (!this.votingSession.results) return;
 
-    const wb: WorkBook = {
-      SheetNames: [],
-      Sheets: {},
-      Props: {
-        Title: `${this.votingSession.name.replace(/[^\w\s]/g, '')} - ${this.t._('VOTING.RESULTS')}`
-      }
-    };
-
-    this.votingSession.results.forEach((votingResult, index) => {
-      const dataResult = votingResult.map((result, optionIndex) => {
-        const ballots = [
-          ...this.votingSession.ballots[index].options,
-          this.t._('VOTING.ABSTAIN'),
-          this.t._('VOTING.ABSENT')
-        ];
-        return {
-          Name: ballots[optionIndex],
-          Results: `${result.value * 100}%`
-        };
-      });
-      utils.book_append_sheet(wb, utils.json_to_sheet(dataResult), `Voting-${index}`);
-    });
-    return writeFile(wb, filename);
+    const sessionName = this.votingSession.name.replace(/[^\w\s]/g, '');
+    const filename = `${sessionName} - ${this.t._('VOTING.RESULTS')}.xlsx`;
+    this._voting.downloadResultsSpreadsheet(filename, this.votingSession, this.votingSession.results);
   }
 }

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
+import { WorkBook, utils, writeFile } from 'xlsx';
 import { IDEAApiService } from '@idea-ionic/common';
 
 import { Voter, VotingSession } from '@models/votingSession.model';
-import { VotingTicket } from '@models/votingTicket.model';
+import { ExportableVotingTicket, VotingTicket } from '@models/votingTicket.model';
 import { VotingResults } from '@models/votingResult.model';
 
 @Injectable({ providedIn: 'root' })
@@ -264,6 +265,64 @@ export class VotingService {
     const path = ['voting-sessions', votingSession.sessionId];
     const body = { action: 'PUBLISH_RESULTS' };
     return new VotingSession(await this.api.patchResource(path, { body }));
+  }
+
+  /**
+   * Download a spreadsheet with the results of a voting session.
+   */
+  downloadResultsSpreadsheet(filename: string, votingSession: VotingSession, results?: VotingResults): void {
+    results = results ?? votingSession.results;
+    if (!results) return;
+
+    const wb: WorkBook = { SheetNames: [], Sheets: {} };
+    const sheetRows = [];
+
+    if (votingSession.isSecret) {
+      votingSession.ballots.forEach((ballot, bIndex): void => {
+        sheetRows.push([ballot.text]);
+        [...ballot.options, 'Abstain', 'Absent'].forEach((option, oIndex): void => {
+          sheetRows.push([option, votingSession.results[bIndex][oIndex].value]);
+        });
+        sheetRows.push([], []);
+      });
+    } else {
+      sheetRows.push([, ...votingSession.ballots.map(b => b.text)]);
+      votingSession.voters.forEach(voter => {
+        const row = [voter.name];
+        votingSession.ballots.forEach((ballot, bIndex): void => {
+          const votedOptionIndex = votingSession.results[bIndex].findIndex(o => o.voters?.includes(voter.name));
+          const votedOption =
+            votedOptionIndex === -1
+              ? 'Absent'
+              : votedOptionIndex === ballot.options.length
+              ? 'Abstain'
+              : votingSession.ballots[bIndex].options[votedOptionIndex];
+          row.push(votedOption);
+        });
+        sheetRows.push(row);
+      });
+    }
+
+    utils.book_append_sheet(wb, utils.aoa_to_sheet(sheetRows), filename.slice(0, 30));
+    writeFile(wb, filename);
+  }
+  /**
+   * Download a spreadsheet with the voters audit data.
+   */
+  downloadVotersAuditSpreadsheet(filename: string, votingTickets: VotingTicket[]): void {
+    if (!votingTickets) return;
+
+    const exportableVotingTickets: ExportableVotingTicket[] = votingTickets.map(x => ({
+      Name: x.voterName,
+      'Vote identifier': x.voterId,
+      'IP address': x.ipAddress ?? '-',
+      'User agent': x.userAgent ?? '-',
+      'Vote date/time': x.votedAt ?? '-'
+    }));
+
+    const wb: WorkBook = { SheetNames: [], Sheets: {} };
+    utils.book_append_sheet(wb, utils.json_to_sheet(exportableVotingTickets), filename.slice(0, 30));
+    return writeFile(wb, filename);
   }
 }
 
