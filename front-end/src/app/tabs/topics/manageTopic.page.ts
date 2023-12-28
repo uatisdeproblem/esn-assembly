@@ -250,26 +250,32 @@ export class ManageTopicPage {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
-
   async duplicateTopic(): Promise<void> {
-    try {
-      await this._topics.insert(new Topic({
-        name: `${this.topic.name} - Clone`,
-        type: this.topic.type,
-        content: this.topic.content,
-        event: this.topic.event,
-        category: this.topic.category,
-        subjects: this.topic.subjects,
-        apprectiations: this.topic.appreciations,
-        mustBeSigned: this.topic.mustBeSigned,
-        rolesAbleToInteract: this.topic.rolesAbleToInteract,
-        attachments: this.topic.attachments,
-      }));
-      this.message.success('COMMON.OPERATION_COMPLETED');
-      this.app.goToInTabs(['topics'], { back: true });
-    } catch (error) {
-      this.message.error('COMMON.OPERATION_FAILED');
-    }
+    const doDuplicate = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const copy = new Topic(this.topic);
+        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+        delete copy.publishedSince;
+        delete copy.willCloseAt;
+        delete copy.closedAt;
+        delete copy.archivedAt;
+        copy.load(await this._topics.insert(copy));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.goToInTabs(['topics', copy.topicId, 'manage'], { root: true });
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DUPLICATE'), handler: doDuplicate }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
   }
 
   enterEditMode(): void {

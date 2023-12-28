@@ -202,22 +202,32 @@ export class ManageOpportunityPage {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
-
   async duplicateOpportunity(): Promise<void> {
-    try {
-      await this._opportunities.insert(new Opportunity({
-        name: `${this.opportunity.name} - Clone`,
-        additionalManagersIds: this.opportunity.additionalManagersIds,
-        contactEmail: this.opportunity.contactEmail,
-        expectedAttachments: this.opportunity.expectedAttachments,
-        attachments: this.opportunity.attachments,
-        content: this.opportunity.content,
-      }));
-      this.message.success('COMMON.OPERATION_COMPLETED');
-      this.app.goToInTabs(['opportunities'], { back: true });
-    } catch (error) {
-      this.message.error('COMMON.OPERATION_FAILED');
-    }
+    const doDuplicate = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const copy = new Opportunity(this.opportunity);
+        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+        delete copy.publishedSince;
+        delete copy.willCloseAt;
+        delete copy.closedAt;
+        delete copy.archivedAt;
+        copy.load(await this._opportunities.insert(copy));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.goToInTabs(['opportunities', copy.opportunityId, 'manage'], { root: true });
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DUPLICATE'), handler: doDuplicate }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
   }
 
   enterEditMode(): void {

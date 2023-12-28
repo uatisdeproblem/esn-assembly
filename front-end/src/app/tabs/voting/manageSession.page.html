@@ -129,7 +129,7 @@
       />
 
       <ion-row class="ion-padding-top ion-margin-top" *ngIf="editMode === UXMode.VIEW">
-        <ion-col>
+        <ion-col *ngIf="app.user.isAdministrator">
           <ion-button color="medium" (click)="duplicateSession()">{{ 'COMMON.DUPLICATE' | translate }}</ion-button>
         </ion-col>
         <ion-col class="ion-text-center">

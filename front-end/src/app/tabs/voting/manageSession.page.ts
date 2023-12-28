@@ -236,28 +236,30 @@ export class ManageVotingSessionPage implements OnDestroy {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
-
   async duplicateSession(): Promise<void> {
-    try {
-      await this._voting.insert(
-        new VotingSession({
-          resultsArePublished: false,
-          name: `${this.votingSession.name} - Clone`,
-          event: this.votingSession.event,
-          timezone: this.votingSession.timezone,
-          voters: this.votingSession.voters,
-          scrutineersIds: this.votingSession.scrutineersIds,
-          isWeighted: this.votingSession.isWeighted,
-          isSecret: this.votingSession.isSecret,
-          description: this.votingSession.description,
-          ballots: this.votingSession.ballots
-        })
-      );
-      this.message.success('COMMON.OPERATION_COMPLETED');
-      this.app.goToInTabs(['voting'], { back: true });
-    } catch (error) {
-      this.message.error('COMMON.OPERATION_FAILED');
-    }
+    const doDuplicate = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const copy = new VotingSession(this.votingSession);
+        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+        delete copy.publishedSince;
+        delete copy.archivedAt;
+        copy.load(await this._voting.insert(copy));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.goToInTabs(['voting', copy.sessionId, 'manage'], { root: true });
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DUPLICATE'), handler: doDuplicate }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
   }
 
   async addScrutineer(): Promise<void> {

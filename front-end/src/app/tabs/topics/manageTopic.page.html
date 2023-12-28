@@ -9,7 +9,7 @@
 </ion-header>
 <ion-content [class.viewMode]="!editMode">
   <ion-list class="aList maxWidthContainer" [lines]="editMode ? 'full': 'none'" *ngIf="topic">
-    <p class="ion-text-end" *ngIf="!editMode && !topic.isArchived()">
+    <p class="ion-text-end" *ngIf="!editMode && !topic.isArchived() && !topic.isDraft()">
       <ion-button [color]="topic.closedAt ? 'ESNgreen': 'ESNpink'" (click)="manageTopicStatus(!!topic.closedAt)">
         {{ (topic.closedAt ? 'TOPICS.OPEN_TOPIC' : 'TOPICS.CLOSE_TOPIC') | translate }}
       </ion-button>
@@ -257,7 +257,7 @@
     ></idea-checker>
 
     <ion-row class="ion-padding-top ion-margin-top" *ngIf="editMode === UXMode.VIEW">
-      <ion-col>
+      <ion-col *ngIf="app.user.isAdministrator">
         <ion-button color="medium" (click)="duplicateTopic()">{{ 'COMMON.DUPLICATE' | translate }}</ion-button>
       </ion-col>
       <ion-col class="ion-text-center">

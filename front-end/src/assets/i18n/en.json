@@ -78,7 +78,8 @@
     "UNKNOWN": "Unknown",
     "DUPLICATE": "Duplicate",
     "ERROR": "Error",
-    "OR": "Or"
+    "OR": "Or",
+    "COPY": "Copy"
   },
   "LANGUAGES": {
     "EN": "English"
