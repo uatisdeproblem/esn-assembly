@@ -102,7 +102,7 @@
               <p>{{ 'VOTING.BALLOTS_I' | translate }}</p>
             </ion-label>
           </ion-list-header>
-          <div class="ion-text-end ion-padding-end">
+          <div class="ion-text-end ion-padding-end" *ngIf="votingSession.results">
             <ion-toggle [(ngModel)]="showRawResults">{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
           </div>
           <ion-item class="noElements" *ngIf="!votingSession.ballots.length">
