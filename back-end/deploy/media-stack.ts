@@ -36,7 +36,17 @@ export class MediaStack extends cdk.Stack {
         }
       ],
       removalPolicy: RemovalPolicy.DESTROY,
-      lifecycleRules: [{ prefix: 'downloads/', expiration: cdk.Duration.days(1) }]
+      lifecycleRules: [
+        { prefix: 'downloads/', expiration: cdk.Duration.days(1) },
+        {
+          prefix: 'attachments/',
+          transitions: [{ storageClass: S3.StorageClass.INFREQUENT_ACCESS, transitionAfter: cdk.Duration.days(200) }]
+        },
+        {
+          prefix: 'images/',
+          transitions: [{ storageClass: S3.StorageClass.INFREQUENT_ACCESS, transitionAfter: cdk.Duration.days(30) }]
+        }
+      ]
     });
     this.mediaBucketArn = s3MediaBucket.bucketArn;
 
