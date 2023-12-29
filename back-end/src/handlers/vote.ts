@@ -2,11 +2,12 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
 
 import { VotingSession } from '../models/votingSession.model';
 import { VotingTicket } from '../models/votingTicket.model';
 import { VotingResultForBallotOption } from '../models/votingResult.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -15,10 +16,19 @@ import { VotingResultForBallotOption } from '../models/votingResult.model';
 const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions,
   votingTickets: process.env.DDB_TABLE_votingTickets,
-  votingResults: process.env.DDB_TABLE_votingResults
+  votingResults: process.env.DDB_TABLE_votingResults,
+  configurations: process.env.DDB_TABLE_configurations
 };
 const ddb = new DynamoDB({ debug: false });
 process.env.LOG_LEVEL = 'WARN'; // avoid logging the requests, for secrecy
+
+const STAGE = process.env.STAGE;
+const SES_CONFIG = {
+  source: process.env.SES_SOURCE_ADDRESS,
+  sourceArn: process.env.SES_IDENTITY_ARN,
+  region: process.env.SES_REGION
+};
+const ses = new SES();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new VoteRC(ev, cb).handleRequest();
 
@@ -121,6 +131,19 @@ class VoteRC extends ResourceController {
       { Update: updateParticipantVoters },
       ...updateIncrementalResultForBallotOption.map(x => ({ Update: x }))
     ]);
+
+    try {
+      await this.sendVotingConfirmationToVoter(votingTicket);
+    } catch (error) {
+      this.logger.warn('Voting confirmation failed to send', error, { ...votingTicket });
+    }
+  }
+  private async sendVotingConfirmationToVoter(ticket: VotingTicket): Promise<void> {
+    const template = `notify-voting-confirmation-${STAGE}`;
+    const templateData = { user: ticket.voterName, title: this.votingSession.name };
+    const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
+    const sesConfig = { ...SES_CONFIG, sourceName: appTitle };
+    await ses.sendTemplatedEmail({ toAddresses: [ticket.voterEmail], template, templateData }, sesConfig);
   }
 
   private async getVotingTicketAndCheckToken(voterId: string, token: string): Promise<VotingTicket> {
