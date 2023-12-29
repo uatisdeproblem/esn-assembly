@@ -1,7 +1,7 @@
 <ion-tabs class="desktopTabs" *ngIf="!app.isInMobileMode()">
   <ion-tab-bar color="ideaToolbar" slot="top">
     <ion-tab-button (click)="app.goTo([''])">
-      <ion-img [src]="app.getIcon()"></ion-img>
+      <ion-img [src]="app.getIcon(true)"></ion-img>
     </ion-tab-button>
     <ion-tab-button tab="dashboard">
       <ion-label>{{ 'TABS.DASHBOARD' | translate }}</ion-label>

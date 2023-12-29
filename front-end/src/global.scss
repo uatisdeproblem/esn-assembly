@@ -168,7 +168,8 @@ ion-col.noElements {
 }
 
 ion-toolbar ion-buttons[slot='start'] ion-img {
-  width: 30px;
+  height: 30px;
+  max-width: 60px;
   margin-left: 16px;
 }
 

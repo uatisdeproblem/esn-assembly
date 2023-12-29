@@ -38,9 +38,13 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
    - `DOMAIN`: the domain name you purchased/imported earlier. Example: _esn-italy-assembly.link_.
    - `PROD_CUSTOM_DOMAIN`: set it to `null` as for the example in the comment next to the constant.
 1. You can create as many enviroments (stages) as you like; a common (the default) configuration is with _prod_ and _dev_ stages, but you can also create only a production stage or whatever you like.
+1. Create a random secure string (`{VALUE}`) that the app will use to create authentication tokens. Note: `{PROJECT}` must be the same one just set above.
+   ```
+   aws ssm put-parameter --profile {AWS_PROFILE} --type "SecureString" --name "/{PROJECT}/auth" --value "{VALUE}"
+   ```
 1. From the terminal/prompt, make sure to be in the `/back-end` folder of the project, substitute the STAGE variable (based on the stage/environment you want to deploy) and run:
    ```
-   cdk deploy --context stage=STAGE --all --require-approval never --outputs-file output-config.json
+   cdk deploy --profile {AWS_PROFILE} --context stage=STAGE --all --require-approval never --outputs-file output-config.json
    ```
 1. _...it will take some time!_ If prompeted, confirm all the requests to create new resources.
 1. At the end of the deployment, identify the generated file `/back-end/output-config.json` to get some important configurations to set in a few support files; _note: the same values also appear in the terminal while the resources are being created_:
@@ -58,6 +62,7 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
    1. "Terminal > Run build task", select "Deploy front-end environment" and select the stage you've just created.
 1. **Repeat the deployment steps for each of the desired stages (e.g. _prod_, _dev_)**. Note: after you deployed the 2nd, 3rd, etc. stage, you only need to change/set project-specific parameters: the rest of those you've already set during the deployment of the first stage.
 1. Feel free to commit the few changed files in the forked GitHub repository. Please, if you do any changes to the source code, commit them to the forked repository so that other NOs/sections can take advantage of your improvements.
+1. **Note well.** The first user to login in a given environment will automatically be administrator.
 1. Some of the internal features require the sending of email messages. To enable our AWS account to send emails (through the [SES service](https://aws.amazon.com/ses/)), we need to request to AWS to be taken out of the default sandbox of SES. [Read here for more information](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html). To do this, you can start by running the following command in the terminal, then follow AWS instructions (you will receive a follow-up email) accordingly. Basically, you have to prove that you can handle the project's email sending without generating too much SPAM or receiving too many email bounces.
 
    ```

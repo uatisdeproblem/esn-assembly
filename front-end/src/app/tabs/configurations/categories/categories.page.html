@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
     <ion-buttons slot="start">
-      <ion-img [src]="app.getIcon()"></ion-img>
+      <ion-img [src]="app.getIcon(true)"></ion-img>
     </ion-buttons>
     <ion-title>{{ app.configurations.appTitle }}</ion-title>
   </ion-toolbar>

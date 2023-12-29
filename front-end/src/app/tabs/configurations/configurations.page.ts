@@ -132,6 +132,19 @@ export class ConfigurationsPage implements OnInit {
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }
+  async changeAppSubtitle(): Promise<void> {
+    const header = this.t._('CONFIGURATIONS.APP_SUBTITLE');
+    const inputs: any[] = [{ name: 'appSubtitle', type: 'text', value: this.configurations.appSubtitle }];
+    const doChange = async ({ appSubtitle }): Promise<void> => {
+      if (!appSubtitle) return;
+      const newConfigurations = new Configurations(this.configurations);
+      newConfigurations.appSubtitle = appSubtitle;
+      await this.updateConfigurations(newConfigurations);
+    };
+    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const alert = await this.alertCtrl.create({ header, inputs, buttons });
+    await alert.present();
+  }
   async changeSupportEmail(): Promise<void> {
     const header = this.t._('CONFIGURATIONS.SUPPORT_EMAIL');
     const inputs: any[] = [{ name: 'supportEmail', type: 'text', value: this.configurations.supportEmail }];

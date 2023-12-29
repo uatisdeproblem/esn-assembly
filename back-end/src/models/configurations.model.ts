@@ -31,6 +31,10 @@ export class Configurations extends Resource {
    */
   appTitle: string;
   /**
+   * The subtitle of the platform.
+   */
+  appSubtitle: string;
+  /**
    * A contact email to reach if support is needed by users.
    */
   supportEmail: string;
@@ -57,7 +61,8 @@ export class Configurations extends Resource {
     this.opportunitiesManagersIds = this.cleanArray(x.opportunitiesManagersIds, String).map(x => x.toLowerCase());
     this.bannedUsersIds = this.cleanArray(x.bannedUsersIds, String).map(x => x.toLowerCase());
 
-    this.appTitle = this.clean(x.appTitle, String);
+    this.appTitle = this.clean(x.appTitle, String, 'Assembly app');
+    this.appSubtitle = this.clean(x.appSubtitle, String);
     this.supportEmail = this.clean(x.supportEmail, String);
     this.appLogoURL = this.clean(x.appLogoURL, String);
     this.appLogoURLDarkMode = this.clean(x.appLogoURLDarkMode, String);
