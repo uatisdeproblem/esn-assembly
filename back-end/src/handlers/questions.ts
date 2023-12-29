@@ -217,7 +217,6 @@ class Questions extends ResourceController {
     }
   }
 
-  // @todo to improve performance
   private async getNumQuestionsMadeByUser(): Promise<number> {
     try {
       const questions = await ddb.scan({

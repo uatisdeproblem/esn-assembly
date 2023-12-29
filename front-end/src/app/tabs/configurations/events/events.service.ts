@@ -106,12 +106,4 @@ export class GAEventsService {
   async delete(event: GAEvent): Promise<void> {
     await this.api.deleteResource(['events', event.eventId]);
   }
-
-  /**
-   * Get the URL to a summary spreadsheet containing questions and answers to this event's topics.
-   */
-  async downloadSummarySpreadsheet(event: GAEvent): Promise<string> {
-    const { url } = await this.api.getResource(['events', event.eventId], { params: { summarySpreadsheet: true } });
-    return url;
-  }
 }

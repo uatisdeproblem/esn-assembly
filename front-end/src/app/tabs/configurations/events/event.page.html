@@ -13,15 +13,6 @@
       </ion-label>
       <ion-input [(ngModel)]="event.name" [disabled]="!editMode"></ion-input>
     </ion-item>
-    <ion-row class="ion-padding-top" *ngIf="!editMode">
-      <ion-col class="ion-text-center">
-        <p class="explanation">{{ 'EVENTS.DOWNLOAD_SUMMARY_SPREADSHEET_I' | translate }}</p>
-        <ion-button (click)="downloadSummarySpreadsheet()">
-          {{ 'EVENTS.DOWNLOAD_SUMMARY_SPREADSHEET' | translate }}
-          <ion-icon slot="end" icon="download-outline"></ion-icon>
-        </ion-button>
-      </ion-col>
-    </ion-row>
     <ion-row class="ion-padding-top" *ngIf="editMode === UXMode.EDIT">
       <ion-col>
         <ion-button color="warning" (click)="archiveEvent(!event.archivedAt)">
