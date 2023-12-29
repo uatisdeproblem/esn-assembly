@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
   <ion-toolbar color="ideaToolbar">
     <ion-buttons slot="start">
-      <ion-img [src]="app.getIcon()"></ion-img>
+      <ion-img [src]="app.getIcon(true)"></ion-img>
     </ion-buttons>
     <ion-title>{{ 'TABS.PROFILE' | translate }}</ion-title>
   </ion-toolbar>

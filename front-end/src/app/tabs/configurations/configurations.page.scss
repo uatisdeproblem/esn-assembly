@@ -1,3 +1,7 @@
 ion-item idea-show-hint-button[slot='start'] {
   margin-right: 16px;
 }
+
+ion-thumbnail ion-img {
+  object-fit: contain;
+}

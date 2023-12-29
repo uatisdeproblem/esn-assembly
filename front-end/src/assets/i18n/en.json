@@ -85,7 +85,6 @@
     "EN": "English"
   },
   "AUTH": {
-    "SUBTITLE": "Erasmus Student Network",
     "LOGIN_WITH_ESN_ACCOUNTS": "Sign in with ESN Accounts"
   },
   "TABS": {
@@ -287,12 +286,14 @@
     },
     "APP_TITLE": "App title",
     "APP_TITLE_I": "This name will be used in the login page and everywhere in the app.",
+    "APP_SUBTITLE": "App subtitle",
+    "APP_SUBTITLE_I": "This name will be used in the login page and everywhere in the app.",
     "SUPPORT_EMAIL": "Support email",
     "SUPPORT_EMAIL_I": "The email address where your users should reach you in case they need help.",
     "APP_LOGO_LIGHT": "App logo (default)",
-    "APP_LOGO_LIGHT_I": "This logo will be used in the login page and everywhere in the app (light mode, default).",
-    "APP_LOGO_DARK": "App logo (dark mode)",
-    "APP_LOGO_DARK_I": "This logo will be used in the login page and everywhere in the app (dark mode).",
+    "APP_LOGO_LIGHT_I": "This logo will be used in the login page and everywhere in the app (light background, default).",
+    "APP_LOGO_DARK": "App logo (dark background)",
+    "APP_LOGO_DARK_I": "This logo will be used in the login page and everywhere in the app (dark background).",
     "RESET_APP_LOGO": "Reset app logo",
     "RESET_APP_LOGO_I": "This will reset the app logo to the default one.",
     "TIMEZONE_OF_REFERENCE": "Timezone of reference",

@@ -1,9 +1,11 @@
 <ion-content>
   <form class="flexBox">
     <ion-card class="authCard">
-      <ion-img [src]="app.getIcon()"></ion-img>
+      <ion-img [src]="app.getIcon(app.isInDarkMode())"></ion-img>
       <ion-card-header>
-        <ion-card-subtitle>{{ 'AUTH.SUBTITLE' | translate }}</ion-card-subtitle>
+        <ion-card-subtitle *ngIf="app.configurations.appSubtitle">
+          {{ app.configurations.appSubtitle }}
+        </ion-card-subtitle>
         <ion-card-title>{{ app.configurations.appTitle }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>

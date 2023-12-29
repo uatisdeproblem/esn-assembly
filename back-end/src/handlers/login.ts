@@ -64,9 +64,7 @@ class Login extends ResourceController {
       const attributes = data['cas:attributes'][0];
       const userId = String(data['cas:user'][0]).toLowerCase();
 
-      const { administratorsIds, opportunitiesManagersIds } = new Configurations(
-        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
-      );
+      const { administratorsIds, opportunitiesManagersIds } = await this.loadOrInitConfigurations(userId);
 
       const user = new User({
         userId,
@@ -93,6 +91,24 @@ class Login extends ResourceController {
     } catch (err) {
       this.logger.error('VALIDATE CAS TICKET', err);
       throw new RCError('Login failed');
+    }
+  }
+
+  private async loadOrInitConfigurations(firstAdminId: string): Promise<Configurations> {
+    try {
+      return new Configurations(
+        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
+      );
+    } catch (err) {
+      if (String(err) === 'Error: Not found') {
+        const configurations = new Configurations({ PK: Configurations.PK, administratorsIds: [firstAdminId] });
+        await ddb.put({
+          TableName: DDB_TABLES.configurations,
+          Item: configurations,
+          ConditionExpression: 'attribute_not_exists(PK)'
+        });
+        return configurations;
+      } else throw new RCError('Error loading configuration');
     }
   }
 }

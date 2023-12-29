@@ -9,7 +9,7 @@ export const DOMAIN = 'esn-ga.link';
 /**
  * An additional custom domain to use.
  */
-export const PROD_CUSTOM_DOMAIN = 'ga.esn.org'; // in case of first creation, use: `const PROD_CUSTOM_DOMAIN = null;`
+export const PROD_CUSTOM_DOMAIN: string | null = 'ga.esn.org'; // in case of first creation, use: `null`
 
 export const parameters: Parameters = {
   project: PROJECT,
