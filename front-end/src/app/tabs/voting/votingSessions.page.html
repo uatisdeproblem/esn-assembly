@@ -1,0 +1,69 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="ideaToolbar" *ngIf="app.isInMobileMode()">
+    <ion-buttons slot="start">
+      <ion-img [src]="app.getIcon()"></ion-img>
+    </ion-buttons>
+    <ion-title>{{ 'TABS.VOTING' | translate }}</ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="filtersBar" color="ideaToolbar">
+    <ion-searchbar
+      #searchbar
+      [placeholder]="'VOTING.FILTER_RECENT_SESSIONS' | translate"
+      (ionInput)="filter($event.target.value)"
+    ></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-lg-down">
+        <ion-select
+          interface="popover"
+          [(ngModel)]="filterByEvent"
+          [disabled]="!events"
+          (ionChange)="filter(searchbar.value)"
+        >
+          <ion-select-option [value]="null">{{ 'VOTING.ALL_EVENTS' | translate }}</ion-select-option>
+          <ion-select-option *ngFor="let event of events" [value]="event.eventId">{{ event.name }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item lines="none" color="ideaToolbar" class="ion-hide-md-down">
+        <ion-select interface="popover" [(ngModel)]="sortBy" (ionChange)="filter(searchbar.value)">
+          <ion-select-option *ngFor="let sortBy of SortBy | keyvalue" [value]="sortBy.key">
+            {{ 'VOTING.SORT_BY' | translate }} {{ ('VOTING.SORT_BY_OPTIONS.' + sortBy.key) | translate | lowercase }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-button fill="solid" color="ESNpink" (click)="app.goToInTabs(['voting', 'archive'])">
+        <ion-icon icon="archive-outline" slot="icon-only" *ngIf="app.isInMobileMode()"></ion-icon>
+        <ion-text *ngIf="!app.isInMobileMode()">{{ 'ARCHIVE.ARCHIVE' | translate }}</ion-text>
+      </ion-button>
+      <ion-button fill="solid" color="ESNgreen" *ngIf="app.user.isAdministrator" (click)="addVotingSession()">
+        <ion-icon icon="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" *ngIf="app.isInMobileMode()" (ionRefresh)="handleRefresh($event?.target)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-list class="aList">
+    <ion-item lines="full" class="ion-text-center noElements" *ngIf="votingSessions && !votingSessions.length">
+      <ion-label>{{ 'VOTING.NO_RECENT_SESSION' | translate }}</ion-label>
+    </ion-item>
+    <ng-container *ngIf="app.isInMobileMode()">
+      <app-voting-session *ngIf="!votingSessions" />
+      <app-voting-session *ngFor="let vs of votingSessions" [votingSession]="vs" (select)="goToVotingSession(vs)" />
+    </ng-container>
+    <ion-grid *ngIf="!app.isInMobileMode()">
+      <app-voting-session *ngIf="!votingSessions" [row]="true" />
+      <app-voting-session *ngIf="votingSessions?.length" [row]="true" [header]="true" />
+      <app-voting-session
+        *ngFor="let vs of votingSessions"
+        [votingSession]="vs"
+        [row]="true"
+        (select)="goToVotingSession(vs)"
+      />
+    </ion-grid>
+    <ion-infinite-scroll (ionInfinite)="filter(searchbar.value, $event.target)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-list>
+</ion-content>

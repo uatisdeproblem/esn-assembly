@@ -68,7 +68,9 @@ const apiResources: ResourceController[] = [
       '/opportunities/{opportunityId}/applications',
       '/opportunities/{opportunityId}/applications/{applicationId}'
     ]
-  }
+  },
+  { name: 'votingSessions', paths: ['/voting-sessions', '/voting-sessions/{sessionId}'] },
+  { name: 'vote', paths: ['/voting-sessions/{sessionId}/vote'] }
 ];
 
 const tables: { [tableName: string]: DDBTable } = {
@@ -202,6 +204,27 @@ const tables: { [tableName: string]: DDBTable } = {
   applications: {
     PK: { name: 'opportunityId', type: DDB.AttributeType.STRING },
     SK: { name: 'applicationId', type: DDB.AttributeType.STRING }
+  },
+  votingSessions: {
+    PK: { name: 'sessionId', type: DDB.AttributeType.STRING },
+    indexes: [
+      {
+        indexName: 'sessionId-meta-index',
+        partitionKey: { name: 'topicId', type: DDB.AttributeType.STRING },
+        sortKey: { name: 'name', type: DDB.AttributeType.STRING },
+        projectionType: DDB.ProjectionType.INCLUDE,
+        nonKeyAttributes: ['event']
+      }
+    ]
+  },
+  votingTickets: {
+    PK: { name: 'sessionId', type: DDB.AttributeType.STRING },
+    SK: { name: 'voterId', type: DDB.AttributeType.STRING },
+    stream: DDB.StreamViewType.NEW_AND_OLD_IMAGES
+  },
+  votingResults: {
+    PK: { name: 'sessionId', type: DDB.AttributeType.STRING },
+    SK: { name: 'ballotOption', type: DDB.AttributeType.STRING }
   }
 };
 

@@ -250,6 +250,33 @@ export class ManageTopicPage {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
+  async duplicateTopic(): Promise<void> {
+    const doDuplicate = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const copy = new Topic(this.topic);
+        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+        delete copy.publishedSince;
+        delete copy.willCloseAt;
+        delete copy.closedAt;
+        delete copy.archivedAt;
+        copy.load(await this._topics.insert(copy));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.goToInTabs(['topics', copy.topicId, 'manage'], { root: true });
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DUPLICATE'), handler: doDuplicate }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
+  }
 
   enterEditMode(): void {
     this.entityBeforeChange = new Topic(this.topic);

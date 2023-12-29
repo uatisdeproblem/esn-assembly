@@ -41,9 +41,8 @@ export class EmailTemplateComponent implements OnInit {
     this.content = content;
     this.variables = [
       { code: 'user', description: this.t._('EMAIL_TEMPLATE.VARIABLES.USER') },
-      { code: 'topic', description: this.t._('EMAIL_TEMPLATE.VARIABLES.TOPIC') },
-      { code: 'question', description: this.t._('EMAIL_TEMPLATE.VARIABLES.QUESTION') },
-      { code: 'opportunity', description: this.t._('EMAIL_TEMPLATE.VARIABLES.OPPORTUNITY') },
+      { code: 'title', description: this.t._('EMAIL_TEMPLATE.VARIABLES.TITLE') },
+      { code: 'detail', description: this.t._('EMAIL_TEMPLATE.VARIABLES.DETAIL') },
       { code: 'url', description: this.t._('EMAIL_TEMPLATE.VARIABLES.URL') },
       { code: 'message', description: this.t._('EMAIL_TEMPLATE.VARIABLES.MESSAGE') }
     ];

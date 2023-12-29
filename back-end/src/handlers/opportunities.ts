@@ -84,6 +84,8 @@ class OpportunitiesRC extends ResourceController {
     this.opportunity.opportunityId = await ddb.IUNID(PROJECT);
     this.opportunity.createdAt = new Date().toISOString();
     this.opportunity.yearOfCreation = new Date(this.opportunity.createdAt).getFullYear();
+    delete this.opportunity.updatedAt;
+    this.opportunity.numOfApplications = 0;
 
     await this.putSafeResource({ noOverwrite: true });
 

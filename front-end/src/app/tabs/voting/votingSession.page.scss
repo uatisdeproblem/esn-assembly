@@ -1,0 +1,35 @@
+ion-card.votingSessionCard {
+  @media screen and (max-width: 991px) {
+    margin: 0;
+    width: 100%;
+    box-shadow: none;
+  }
+
+  ion-card-header {
+    padding-bottom: 0;
+    ion-card-title {
+      margin-top: 6px;
+    }
+    p.badges {
+      margin-bottom: 0;
+      ion-badge {
+        margin-right: 6px;
+      }
+    }
+  }
+
+  ion-accordion div[slot='content'] {
+    background-color: var(--ion-color-white);
+    ion-item {
+      --min-height: 32px;
+      ion-label {
+        margin: 0;
+      }
+    }
+  }
+}
+
+ion-toggle {
+  font-size: 0.9em;
+  color: var(--ion-color-step-600);
+}

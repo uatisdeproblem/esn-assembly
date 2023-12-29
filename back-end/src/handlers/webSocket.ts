@@ -7,6 +7,8 @@ import { ApiGatewayManagementApi } from '@aws-sdk/client-apigatewaymanagementapi
 import { DynamoDB, GenericController, RCError, StreamController } from 'idea-aws';
 
 import { WebSocketConnection, WebSocketConnectionTypes, WebSocketMessage } from '../models/webSocket.model';
+import { VotingSession } from '../models/votingSession.model';
+import { Configurations } from '../models/configurations.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -15,6 +17,10 @@ import { WebSocketConnection, WebSocketConnectionTypes, WebSocketMessage } from 
 const api = new ApiGatewayManagementApi({ endpoint: process.env.WEB_SOCKET_API_URL });
 
 const DDB_CONNECTIONS_TABLE = process.env.DDB_CONNECTIONS_TABLE;
+const DDB_TABLES = {
+  configurations: process.env.DDB_TABLE_configurations,
+  votingSessions: process.env.DDB_TABLE_votingSessions
+};
 const ddb = new DynamoDB();
 
 const TWO_HOURS_FROM_NOW_IN_SECONDS = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
@@ -61,6 +67,7 @@ class WebSocketApiController extends GenericController {
     if (!type || !referenceId) throw new RCError('Missing connection references');
     if (!Object.values(WebSocketConnectionTypes).includes(type)) throw new RCError('Unsupported connection reference');
     const connection = { connectionId, type, referenceId, expiresAt: TWO_HOURS_FROM_NOW_IN_SECONDS, userId };
+    await this.checkIfUserCanOpenConnection(type, referenceId, userId);
     this.logger.debug('Opening connection', connection);
     await ddb.put({ TableName: DDB_CONNECTIONS_TABLE, Item: connection });
   }
@@ -72,6 +79,25 @@ class WebSocketApiController extends GenericController {
     this.logger.debug('Mockup message', { connectionId });
     const response = 'Active connection '.concat(connectionId);
     await api.postToConnection({ ConnectionId: connectionId, Data: response });
+  }
+
+  private async checkIfUserCanOpenConnection(
+    type: WebSocketConnectionTypes,
+    referenceId: string,
+    userId: string | null
+  ): Promise<void> {
+    if (type === WebSocketConnectionTypes.VOTING_TICKETS) {
+      if (!userId) throw new RCError('Unauthorized');
+      const { administratorsIds } = new Configurations(
+        await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
+      );
+      if (administratorsIds.includes(userId)) return;
+      const votingSession = new VotingSession(
+        await ddb.get({ TableName: DDB_TABLES.votingSessions, Key: { sessionId: referenceId } })
+      );
+      if (votingSession.scrutineersIds.includes(userId)) return;
+      throw new RCError('Unauthorized');
+    }
   }
 }
 
@@ -116,6 +142,9 @@ class WebSocketStreamController extends StreamController {
       socketMessage = { action, type: WebSocketConnectionTypes.TOPICS, referenceId: itemKeys.topicId, item };
     } else if (tableName.endsWith('_messages')) {
       socketMessage = { action, type: WebSocketConnectionTypes.MESSAGES, referenceId: itemKeys.topicId, item };
+    } else if (tableName.endsWith('_votingTickets')) {
+      delete item.token; // for security reasons, we don't expose the token
+      socketMessage = { action, type: WebSocketConnectionTypes.VOTING_TICKETS, referenceId: itemKeys.sessionId, item };
     }
     return socketMessage;
   }

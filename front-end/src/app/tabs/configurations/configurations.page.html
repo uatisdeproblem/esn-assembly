@@ -54,7 +54,7 @@
         <idea-show-hint-button slot="start" class="ion-margin-top" hint="CONFIGURATIONS.SUPPORT_EMAIL" translate />
       </ion-item>
       <ion-item>
-        <ion-label>{{ 'CONFIGURATIONS.APP_LOGO_LIGHT' | translate }}</ion-label>
+        <ion-label class="ion-text-wrap">{{ 'CONFIGURATIONS.APP_LOGO_LIGHT' | translate }}</ion-label>
         <ion-avatar slot="end"><ion-img [src]="configurations.appLogoURL ?? app.getIcon()" /></ion-avatar>
         <input #appLogoInput type="file" accept="image/*" style="display: none" (change)="uploadAppLogo($event)" />
         <ion-button slot="end" fill="clear" color="medium" (click)="appLogoInput.click()">
@@ -66,7 +66,7 @@
         <idea-show-hint-button slot="start" hint="CONFIGURATIONS.APP_LOGO_LIGHT" translate />
       </ion-item>
       <ion-item>
-        <ion-label>{{ 'CONFIGURATIONS.APP_LOGO_DARK' | translate }}</ion-label>
+        <ion-label class="ion-text-wrap">{{ 'CONFIGURATIONS.APP_LOGO_DARK' | translate }}</ion-label>
         <ion-avatar slot="end"><ion-img [src]="configurations.appLogoURLDarkMode ?? app.getIcon(true)" /></ion-avatar>
         <input
           #appLogoDarkModeInput
@@ -207,16 +207,32 @@
         </ion-label>
       </ion-list-header>
       <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.QUESTIONS)">
-        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.QUESTIONS' | translate }}</ion-label>
+        <ion-label class="ion-text-wrap">
+          {{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.QUESTIONS' | translate }}
+        </ion-label>
       </ion-item>
       <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.ANSWERS)">
-        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.ANSWERS' | translate }}</ion-label>
+        <ion-label class="ion-text-wrap"> {{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.ANSWERS' | translate }} </ion-label>
       </ion-item>
       <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_APPROVED)">
-        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_APPROVED' | translate }}</ion-label>
+        <ion-label class="ion-text-wrap">
+          {{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_APPROVED' | translate }}
+        </ion-label>
       </ion-item>
       <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.APPLICATION_REJECTED)">
-        <ion-label>{{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_REJECTED' | translate }}</ion-label>
+        <ion-label class="ion-text-wrap">
+          {{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.APPLICATION_REJECTED' | translate }}
+        </ion-label>
+      </ion-item>
+      <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.VOTING_INSTRUCTIONS)">
+        <ion-label class="ion-text-wrap">
+          {{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.VOTING_INSTRUCTIONS' | translate }}
+        </ion-label>
+      </ion-item>
+      <ion-item button detail (click)="openTemplateEmailModal(EmailTemplates.VOTING_CONFIRMATION)">
+        <ion-label class="ion-text-wrap">
+          {{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.VOTING_CONFIRMATION' | translate }}
+        </ion-label>
       </ion-item>
     </ion-list>
   </div>

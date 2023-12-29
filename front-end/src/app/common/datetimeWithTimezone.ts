@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -15,6 +25,7 @@ import { AppService } from '@app/app.service';
     <ion-item [lines]="lines" [color]="color">
       <ion-label position="stacked">{{ label }} <ion-text class="obligatoryDot" *ngIf="obligatory" /></ion-label>
       <input
+        #dateTime
         type="datetime-local"
         [disabled]="disabled"
         [value]="initialValue"
@@ -23,12 +34,17 @@ import { AppService } from '@app/app.service';
     </ion-item>
   `
 })
-export class DatetimeWithTimezoneStandaloneComponent implements OnInit {
+export class DatetimeWithTimezoneStandaloneComponent implements OnInit, OnChanges {
   /**
-   * @todo
+   * The date to manage.
    */
   @Input() date: epochISOString;
   @Output() dateChange = new EventEmitter<epochISOString>();
+  /**
+   * The timezone to consider.
+   * Fallback to the default value set in the configurations.
+   */
+  @Input() timezone: string;
   /**
    * A label for the item.
    */
@@ -52,15 +68,26 @@ export class DatetimeWithTimezoneStandaloneComponent implements OnInit {
 
   initialValue: epochISOString;
 
+  @ViewChild('dateTime') dateTime: ElementRef;
+
   constructor(public app: AppService) {}
   async ngOnInit(): Promise<void> {
+    this.timezone = this.timezone ?? this.app.configurations.timezone;
     this.initialValue = this.utcToZonedTimeString(this.date);
   }
-
-  utcToZonedTimeString(isoString: epochISOString, timezone = this.app.configurations.timezone): string {
-    return formatInTimeZone(isoString, timezone, "yyyy-MM-dd'T'HH:mm");
+  ngOnChanges(changes: SimpleChanges): void {
+    // fix the date if the linked timezone changes
+    if (changes.timezone?.currentValue && this.dateTime) {
+      setTimeout((): void => {
+        this.dateChange.emit(this.zonedTimeStringToUTC(this.dateTime.nativeElement.value));
+      }, 100);
+    }
   }
-  zonedTimeStringToUTC(dateLocale: string, timezone = this.app.configurations.timezone): epochISOString {
-    return zonedTimeToUtc(new Date(dateLocale), timezone).toISOString();
+
+  utcToZonedTimeString(isoString: epochISOString): string {
+    return formatInTimeZone(isoString, this.timezone, "yyyy-MM-dd'T'HH:mm");
+  }
+  zonedTimeStringToUTC(dateLocale: string): epochISOString {
+    return zonedTimeToUtc(new Date(dateLocale), this.timezone).toISOString();
   }
 }

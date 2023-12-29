@@ -1,0 +1,45 @@
+ion-title ion-img {
+  width: 30px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+ion-content {
+  --background: var(--ion-color-white);
+}
+
+ion-list.aList ion-list-header {
+  ion-label h1 {
+    font-size: 1.8em;
+  }
+}
+
+app-html-editor {
+  --app-html-editor-background-color: var(--ion-color-light);
+  --app-html-editor-border-with: 0;
+  --app-html-editor-margin: 10px;
+  --app-html-editor-border-radius: 8px;
+  font-size: 0.9em;
+}
+
+ion-card {
+  border-radius: 8px;
+  box-shadow: rgba(9, 30, 66, 0.15) 0px 1px 1px, rgba(9, 30, 66, 0.1) 0px 0px 1px 1px !important;
+}
+
+ion-card.ballotCard {
+  margin-bottom: 20px;
+  ion-card-header {
+    padding-bottom: 8px;
+    ion-card-title {
+      font-size: 1.3em;
+    }
+    ion-card-subtitle {
+      margin-top: 4px;
+      color: var(--ion-color-step-400);
+    }
+  }
+  ion-card-content ion-radio {
+    font-size: 0.95em;
+  }
+}

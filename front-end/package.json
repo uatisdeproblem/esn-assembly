@@ -1,6 +1,6 @@
 {
   "name": "esn-assembly",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "author": "Matteo Carbone",
   "homepage": "https://matteocarbone.com/",
   "scripts": {
@@ -27,6 +27,7 @@
     "@ionic/angular": "^7.4.1",
     "@ionic/storage-angular": "^4.0.0",
     "@kolkov/angular-editor": "^3.0.0-beta.0",
+    "@swimlane/ngx-datatable": "^20.1.0",
     "chart.js": "^4.4.0",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
@@ -37,6 +38,7 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.4.1",
     "typeface-poppins": "^1.1.13",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {

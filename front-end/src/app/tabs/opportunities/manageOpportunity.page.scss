@@ -2,6 +2,6 @@ ion-grid {
   background: var(--ion-color-white);
 }
 
-ion-list.aList ion-list-header {
+ion-list.aList ion-list-header:not(:first-of-type) {
   margin-top: 34px;
 }

@@ -173,8 +173,8 @@ class Answers extends ResourceController {
     const template = `notify-new-answer-${STAGE}`;
     const templateData = {
       user: question.creator.name,
-      topic: topic.name,
-      question: question.summary,
+      title: topic.name,
+      detail: question.summary,
       url: QUESTION_BASE_URL.concat(topic.topicId)
     };
     const { appTitle } = await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } });
