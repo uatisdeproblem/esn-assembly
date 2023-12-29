@@ -2,16 +2,11 @@
 /// IMPORTS
 ///
 
-import { stripHtml } from 'string-strip-html';
-import { utils, write } from 'xlsx';
-import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
-import { SignedURL } from 'idea-toolbox';
+import { DynamoDB, RCError, ResourceController } from 'idea-aws';
 
 import { GAEvent } from '../models/event.model';
-import { Topic, StandardTopicQuestionsExportable, TopicTypes } from '../models/topic.model';
+import { Topic } from '../models/topic.model';
 import { User } from '../models/user.model';
-import { Question } from '../models/question.model';
-import { Answer } from '../models/answer.model';
 import { VotingSession } from '../models/votingSession.model';
 
 ///
@@ -27,10 +22,6 @@ const DDB_TABLES = {
   votingSessions: process.env.DDB_TABLE_votingSessions
 };
 const ddb = new DynamoDB();
-
-const S3_BUCKET_MEDIA = process.env.S3_BUCKET_MEDIA;
-const S3_DOWNLOADS_FOLDER = process.env.S3_DOWNLOADS_FOLDER;
-const s3 = new S3();
 
 export const handler = (ev: any, _: any, cb: any): Promise<void> => new GAEvents(ev, cb).handleRequest();
 
@@ -84,55 +75,8 @@ class GAEvents extends ResourceController {
     return await this.putSafeResource({ noOverwrite: true });
   }
 
-  protected async getResource(): Promise<GAEvent | SignedURL> {
-    if (this.queryParams.summarySpreadsheet) return await this.getSummarySpreadsheet();
-    else return this.gaEvent;
-  }
-  private async getSummarySpreadsheet(): Promise<SignedURL> {
-    // @todo to optimise with indexes
-    const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics });
-    const questions: Question[] = await ddb.scan({ TableName: DDB_TABLES.questions });
-    const answers: Answer[] = await ddb.scan({ TableName: DDB_TABLES.answers });
-
-    const topicsExportable: StandardTopicQuestionsExportable[] = [];
-    topics
-      .map(t => new Topic(t))
-      .filter(t => t.type === TopicTypes.STANDARD)
-      .filter(t => t.event.eventId === this.gaEvent.eventId)
-      .filter(t => !t.isDraft())
-      .sort((a, b): number => b.createdAt.localeCompare(a.createdAt))
-      .forEach(t => {
-        questions
-          .filter(q => q.topicId === t.topicId)
-          .sort((a, b): number => (b.updatedAt ?? b.createdAt).localeCompare(a.updatedAt ?? a.createdAt))
-          .forEach(q => {
-            const Answers = answers
-              .filter(a => a.questionId === q.questionId)
-              .sort((a, b): number => a.createdAt.localeCompare(b.createdAt))
-              .map(a => `[${a.creator.name}]\n\n${stripHtml(a.text).result}`)
-              .join('\n\n======\n\n');
-            topicsExportable.push({
-              Topic: t.name,
-              Category: t.category.name,
-              Subjects: t.subjects.map(s => s.name).join(', '),
-              Summary: q.summary,
-              Question: stripHtml(q.text).result,
-              Creator: q.creator.name,
-              Answers
-            });
-          });
-      });
-
-    const workbook: any = { SheetNames: [], Sheets: {}, Props: { Title: PROJECT, Author: PROJECT } };
-    utils.book_append_sheet(workbook, utils.json_to_sheet(topicsExportable), '1');
-    const buffer = Buffer.from(write(workbook, { bookType: 'xlsx', type: 'buffer' }));
-
-    return await s3.createDownloadURLFromData(buffer, {
-      bucket: S3_BUCKET_MEDIA,
-      prefix: S3_DOWNLOADS_FOLDER,
-      key: `${this.gaEvent.name.replace(/[^\w\s]/g, '')}.xlsx`,
-      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
+  protected async getResource(): Promise<GAEvent> {
+    return this.gaEvent;
   }
 
   protected async putResource(): Promise<GAEvent> {

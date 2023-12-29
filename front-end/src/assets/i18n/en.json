@@ -319,10 +319,8 @@
     "EVENT": "Event",
     "MANAGE_EVENT": "Manage event",
     "NAME": "Name",
-    "CANT_DELETE_IF_USED_WARNING": "The deletion will fail in case the event is used in any topic. In that case, prefer the archive action instead.",
-    "CANT_DELETE_IF_USED_ERROR": "You can't delete an event if it's used in at least a topic.",
-    "DOWNLOAD_SUMMARY_SPREADSHEET": "Summary spreadsheet",
-    "DOWNLOAD_SUMMARY_SPREADSHEET_I": "You can download a spreadsheet containing questions and answers of this event's standard topics; note: live topics are not included."
+    "CANT_DELETE_IF_USED_WARNING": "The deletion will fail in case the event is used in any topic, voting session or other entity. In that case, prefer the archive action instead.",
+    "CANT_DELETE_IF_USED_ERROR": "You can't delete an event if it's used in at least a topic, voting session or other entity."
   },
   "ATTACHMENTS": {
     "ERROR_UPLOADING_ATTACHMENT": "Error while uploading the attachment",
