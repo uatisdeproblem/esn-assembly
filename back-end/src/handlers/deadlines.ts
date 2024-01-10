@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { addStatisticEntry } from './statistics';
 
@@ -42,7 +42,7 @@ class Deadlines extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.deadlines, Key: { deadlineId: this.resourceId } })
       );
     } catch (err) {
-      throw new RCError('Link not found');
+      throw new HandledError('Link not found');
     }
   }
 
@@ -60,7 +60,7 @@ class Deadlines extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Deadline> {
     const errors = this.deadline.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     if (this.deadline.event?.eventId) {
       try {
@@ -68,7 +68,7 @@ class Deadlines extends ResourceController {
           await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.deadline.event.eventId } })
         );
       } catch (error) {
-        throw new RCError('Event not found');
+        throw new HandledError('Event not found');
       }
     }
 
@@ -80,7 +80,7 @@ class Deadlines extends ResourceController {
   }
 
   protected async postResources(): Promise<Deadline> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.deadline = new Deadline(this.body);
     this.deadline.deadlineId = await ddb.IUNID(PROJECT);
@@ -94,7 +94,7 @@ class Deadlines extends ResourceController {
   }
 
   protected async putResource(): Promise<Deadline> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const oldDeadline = new Deadline(this.deadline);
     this.deadline.safeLoad(this.body, oldDeadline);
@@ -103,7 +103,7 @@ class Deadlines extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.deadlines, Key: { deadlineId: this.deadline.deadlineId } });
   }

@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, SES } from 'idea-aws';
 
 import { isEmailInBlockList } from './sesNotifications';
 
@@ -59,10 +59,10 @@ class Answers extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.pathParameters.topicId } })
       );
     } catch (err) {
-      throw new RCError('Topic not found');
+      throw new HandledError('Topic not found');
     }
 
-    if (this.topic.type !== TopicTypes.STANDARD) throw new RCError('Incompatible type of topic');
+    if (this.topic.type !== TopicTypes.STANDARD) throw new HandledError('Incompatible type of topic');
 
     try {
       this.question = new Question(
@@ -72,7 +72,7 @@ class Answers extends ResourceController {
         })
       );
     } catch (err) {
-      throw new RCError('Question not found');
+      throw new HandledError('Question not found');
     }
 
     if (!this.resourceId) return;
@@ -85,7 +85,7 @@ class Answers extends ResourceController {
         })
       );
     } catch (err) {
-      throw new RCError('Answer not found');
+      throw new HandledError('Answer not found');
     }
   }
 
@@ -101,7 +101,7 @@ class Answers extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Answer> {
     const errors = this.answer.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     const putParams: any = { TableName: DDB_TABLES.answers, Item: this.answer };
     if (opts.noOverwrite)
@@ -134,7 +134,7 @@ class Answers extends ResourceController {
   }
 
   protected async putResource(): Promise<Answer> {
-    if (!this.answer.canUserEdit(this.topic, this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.answer.canUserEdit(this.topic, this.galaxyUser)) throw new HandledError('Unauthorized');
 
     const oldAnswer = new Answer(this.answer);
     this.answer.safeLoad(this.body, oldAnswer);
@@ -144,7 +144,7 @@ class Answers extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.answer.canUserEdit(this.topic, this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.answer.canUserEdit(this.topic, this.galaxyUser)) throw new HandledError('Unauthorized');
 
     await ddb.delete({
       TableName: DDB_TABLES.answers,

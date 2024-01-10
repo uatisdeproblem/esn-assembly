@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, SES } from 'idea-aws';
 
 import { VotingSession } from '../models/votingSession.model';
 import { VotingTicket } from '../models/votingTicket.model';
@@ -19,8 +19,7 @@ const DDB_TABLES = {
   votingResults: process.env.DDB_TABLE_votingResults,
   configurations: process.env.DDB_TABLE_configurations
 };
-const ddb = new DynamoDB({ debug: false });
-process.env.LOG_LEVEL = 'WARN'; // avoid logging the requests, for secrecy
+const ddb = new DynamoDB();
 
 const STAGE = process.env.STAGE;
 const SES_CONFIG = {
@@ -41,6 +40,7 @@ class VoteRC extends ResourceController {
 
   constructor(event: any, callback: any) {
     super(event, callback);
+    this.silentLambdaLogs(); // avoid logging the requests, for secrecy
   }
 
   protected async checkAuthBeforeRequest(): Promise<void> {
@@ -51,17 +51,17 @@ class VoteRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.votingSessions, Key: { sessionId } })
       );
     } catch (err) {
-      throw new RCError('Voting session not found');
+      throw new HandledError('Voting session not found');
     }
 
-    if (!this.votingSession.isInProgress()) throw new RCError('Voting session not in progress');
+    if (!this.votingSession.isInProgress()) throw new HandledError('Voting session not in progress');
   }
 
   protected async getResources(): Promise<{ votingSession: VotingSession; votingTicket: VotingTicket }> {
     const { voterId, token } = this.queryParams;
     const votingTicket = await this.getVotingTicketAndCheckToken(voterId, token);
 
-    if (votingTicket.votedAt) throw new RCError('Already voted');
+    if (votingTicket.votedAt) throw new HandledError('Already voted');
 
     if (!votingTicket.signedInAt) {
       votingTicket.signedInAt = new Date().toISOString();
@@ -77,18 +77,18 @@ class VoteRC extends ResourceController {
   }
 
   protected async postResources(): Promise<void> {
-    if (!this.body.votingTicket || !this.body.submission) throw new RCError('Bad request');
+    if (!this.body.votingTicket || !this.body.submission) throw new HandledError('Bad request');
 
     const { voterId, token } = this.body.votingTicket;
     const votingTicket = await this.getVotingTicketAndCheckToken(voterId, token);
 
-    if (votingTicket.votedAt) throw new RCError('Already voted');
+    if (votingTicket.votedAt) throw new HandledError('Already voted');
     votingTicket.votedAt = new Date().toISOString();
     votingTicket.userAgent = this.event.headers['user-agent'] ?? null;
     votingTicket.ipAddress = this.event.headers['x-forwarded-for'] ?? null;
 
     const errors = this.votingSession.validateVoteSubmission(this.body.submission);
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     const updateVotingTicket = {
       TableName: DDB_TABLES.votingTickets,
@@ -135,7 +135,7 @@ class VoteRC extends ResourceController {
     try {
       await this.sendVotingConfirmationToVoter(votingTicket);
     } catch (error) {
-      this.logger.warn('Voting confirmation failed to send', error, { ...votingTicket });
+      this.logger.warn('Voting confirmation failed to send', error, { votingTicket });
     }
   }
   private async sendVotingConfirmationToVoter(ticket: VotingTicket): Promise<void> {
@@ -157,7 +157,7 @@ class VoteRC extends ResourceController {
       if (votingTicket.token !== token) throw new Error();
       return votingTicket;
     } catch (err) {
-      throw new RCError('Voter not found');
+      throw new HandledError('Voter not found');
     }
   }
 }

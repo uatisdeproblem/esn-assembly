@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, S3 } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
 
 import { User } from '../models/user.model';
@@ -40,7 +40,7 @@ class PublicAttachmentsRC extends ResourceController {
       case 'GET_ATTACHMENT_DOWNLOAD_URL':
         return await this.getSignedURLToDownloadAttachment();
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async getSignedURLToUploadAttachment(): Promise<SignedURL> {
@@ -54,8 +54,8 @@ class PublicAttachmentsRC extends ResourceController {
   }
   private async getSignedURLToDownloadAttachment(): Promise<SignedURL> {
     const { attachmentId } = this.body;
-    if (!attachmentId) throw new RCError('Missing attachment ID');
-    if (!attachmentId.startsWith(ATTACHMENTS_PREFIX)) throw new RCError('Not found');
+    if (!attachmentId) throw new HandledError('Missing attachment ID');
+    if (!attachmentId.startsWith(ATTACHMENTS_PREFIX)) throw new HandledError('Not found');
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}`;
     return await s3.signedURLGet(S3_BUCKET_MEDIA, key);

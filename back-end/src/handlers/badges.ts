@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { UserBadge, Badges } from '../models/userBadge.model';
@@ -50,7 +50,7 @@ class BadgesRC extends ResourceController {
         })
       );
     } catch (err) {
-      throw new RCError('Badge not found');
+      throw new HandledError('Badge not found');
     }
 
     if (!this.userBadge.firstSeenAt) {
@@ -66,24 +66,24 @@ class BadgesRC extends ResourceController {
   }
 
   protected async postResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const { userId } = this.queryParams;
     const badge = this.resourceId as Badges;
 
-    if (!userId) throw new RCError('No target user');
-    if (!badge || !Object.values(Badges).includes(badge)) throw new RCError('Invalid badge');
+    if (!userId) throw new HandledError('No target user');
+    if (!badge || !Object.values(Badges).includes(badge)) throw new HandledError('Invalid badge');
 
     await addBadgeToUser(ddb, userId, badge);
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const { userId } = this.queryParams;
     const badge = this.resourceId as Badges;
 
-    if (!userId) throw new RCError('No target user');
+    if (!userId) throw new HandledError('No target user');
 
     await ddb.delete({ TableName: DDB_TABLES.usersBadges, Key: { userId, badge } });
   }

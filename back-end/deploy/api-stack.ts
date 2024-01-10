@@ -29,6 +29,7 @@ export interface ApiProps extends cdk.StackProps {
   mediaBucketArn: string;
   ses: { identityArn: string; notificationTopicArn: string };
   removalPolicy: RemovalPolicy;
+  lambdaLogLevel: 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL';
   appDomain: string;
 }
 export interface ResourceController {
@@ -51,7 +52,8 @@ const defaultLambdaFnProps: NodejsFunctionProps = {
   memorySize: 1024,
   bundling: { minify: true, sourceMap: true },
   environment: { NODE_OPTIONS: '--enable-source-maps' },
-  logRetention: RetentionDays.TWO_WEEKS
+  logRetention: RetentionDays.TWO_WEEKS,
+  logFormat: Lambda.LogFormat.JSON
 };
 
 const defaultDDBTableProps: DDB.TableProps | any = {
@@ -80,6 +82,7 @@ export class ApiStack extends cdk.Stack {
       defaultLambdaFnProps,
       project: props.project,
       stage: props.stage,
+      lambdaLogLevel: props.lambdaLogLevel,
       appDomain: props.appDomain
     });
     const { lambdaFnWebSocket } = await this.createWebSocketAPIAndStage({
@@ -192,6 +195,7 @@ export class ApiStack extends cdk.Stack {
     resourceControllers: ResourceController[];
     defaultLambdaFnProps: NodejsFunctionProps;
     api: cdk.aws_apigatewayv2.CfnApi;
+    lambdaLogLevel: 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL';
     appDomain: string;
   }): {
     lambdaFunctions: { [resourceName: string]: NodejsFunction };
@@ -210,7 +214,8 @@ export class ApiStack extends cdk.Stack {
       const lambdaFn = new NodejsFunction(this, resource.name.concat('Function'), {
         ...params.defaultLambdaFnProps,
         functionName: lambdaFnName,
-        entry: `./src/handlers/${resource.name}.ts`
+        entry: `./src/handlers/${resource.name}.ts`,
+        applicationLogLevel: params.lambdaLogLevel
       });
 
       // link the Lambda function to the Resource Controller's paths (if any)

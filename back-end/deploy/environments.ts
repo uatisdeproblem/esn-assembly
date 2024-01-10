@@ -25,11 +25,13 @@ export const stages: { [stage: string]: Stage } = {
   prod: {
     domain: DOMAIN,
     alternativeDomains: PROD_CUSTOM_DOMAIN ? [PROD_CUSTOM_DOMAIN] : undefined,
-    destroyDataOnDelete: false
+    destroyDataOnDelete: false,
+    logLevel: 'INFO'
   },
   dev: {
     domain: 'dev.'.concat(DOMAIN),
-    destroyDataOnDelete: true
+    destroyDataOnDelete: true,
+    logLevel: 'DEBUG'
   }
 };
 
@@ -70,4 +72,8 @@ export interface Stage {
    * It should be True for dev and False for prod environments.
    */
   destroyDataOnDelete: boolean;
+  /**
+   * The minimum level of log to print in functions (default: `INFO`).
+   */
+  logLevel?: 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL';
 }

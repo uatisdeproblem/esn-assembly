@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { UserDraft } from '../models/userDraft.model';
@@ -40,7 +40,7 @@ class UserDraftsRC extends ResourceController {
         })
       );
     } catch (err) {
-      throw new RCError('Draft not found');
+      throw new HandledError('Draft not found');
     }
   }
 
@@ -59,7 +59,7 @@ class UserDraftsRC extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<UserDraft> {
     const errors = this.draft.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     this.draft.expiresAt = getExpiresAt();
 

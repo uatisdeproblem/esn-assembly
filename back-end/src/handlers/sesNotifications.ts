@@ -40,7 +40,7 @@ class HandleSESNotifications extends GenericController {
           case 'Reject':
           case 'Rendering Failure':
           case 'DeliveryDelay':
-            this.logger.warn('SES '.concat(message.eventType), message);
+            this.logger.warn('SES '.concat(message.eventType), { message });
             break;
           case 'Send':
           case 'Delivery':
@@ -48,7 +48,7 @@ class HandleSESNotifications extends GenericController {
             break;
         }
       } catch (err) {
-        this.logger.error('SES '.concat(message.eventType ?? 'unknown'), err, message);
+        this.logger.error('SES '.concat(message.eventType ?? 'unknown'), err, { message });
         throw err;
       }
     }

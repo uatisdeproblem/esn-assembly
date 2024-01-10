@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, SES } from 'idea-aws';
 
 import { isEmailInBlockList } from './sesNotifications';
 import { addBadgeToUser } from './badges';
@@ -61,10 +61,10 @@ class Questions extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.pathParameters.topicId } })
       );
     } catch (err) {
-      throw new RCError('Topic not found');
+      throw new HandledError('Topic not found');
     }
 
-    if (this.topic.type !== TopicTypes.STANDARD) throw new RCError('Incompatible type of topic');
+    if (this.topic.type !== TopicTypes.STANDARD) throw new HandledError('Incompatible type of topic');
 
     if (!this.resourceId) return;
 
@@ -76,7 +76,7 @@ class Questions extends ResourceController {
         })
       );
     } catch (err) {
-      throw new RCError('Question not found');
+      throw new HandledError('Question not found');
     }
   }
 
@@ -92,7 +92,7 @@ class Questions extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Question> {
     const errors = this.question.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     const putParams: any = { TableName: DDB_TABLES.questions, Item: this.question };
     if (opts.noOverwrite)
@@ -134,9 +134,9 @@ class Questions extends ResourceController {
   }
 
   protected async putResource(): Promise<Question> {
-    if (!this.question.canUserEdit(this.topic, this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.question.canUserEdit(this.topic, this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (await this.questionHasAnswers()) throw new RCError('Question has answers');
+    if (await this.questionHasAnswers()) throw new HandledError('Question has answers');
 
     const oldQuestion = new Question(this.question);
     this.question.safeLoad(this.body, oldQuestion);
@@ -150,7 +150,7 @@ class Questions extends ResourceController {
       case 'USER_CLAPS':
         return await this.getAnswersIdsClappedByUser();
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
 
@@ -165,9 +165,9 @@ class Questions extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.question.canUserEdit(this.topic, this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.question.canUserEdit(this.topic, this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (await this.questionHasAnswers()) throw new RCError('Question has answers');
+    if (await this.questionHasAnswers()) throw new HandledError('Question has answers');
 
     await ddb.delete({
       TableName: DDB_TABLES.questions,

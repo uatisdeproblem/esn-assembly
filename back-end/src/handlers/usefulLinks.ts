@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { addStatisticEntry } from './statistics';
 
@@ -42,7 +42,7 @@ class UsefulLinks extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.usefulLinks, Key: { linkId: this.resourceId } })
       );
     } catch (err) {
-      throw new RCError('Link not found');
+      throw new HandledError('Link not found');
     }
   }
 
@@ -57,7 +57,7 @@ class UsefulLinks extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<UsefulLink> {
     const errors = this.usefulLink.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     if (this.usefulLink.event?.eventId) {
       try {
@@ -65,7 +65,7 @@ class UsefulLinks extends ResourceController {
           await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.usefulLink.event.eventId } })
         );
       } catch (error) {
-        throw new RCError('Event not found');
+        throw new HandledError('Event not found');
       }
     }
 
@@ -77,7 +77,7 @@ class UsefulLinks extends ResourceController {
   }
 
   protected async postResources(): Promise<UsefulLink> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.usefulLink = new UsefulLink(this.body);
     this.usefulLink.linkId = await ddb.IUNID(PROJECT);
@@ -91,7 +91,7 @@ class UsefulLinks extends ResourceController {
   }
 
   protected async putResource(): Promise<UsefulLink> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const oldLink = new UsefulLink(this.usefulLink);
     this.usefulLink.safeLoad(this.body, oldLink);
@@ -104,12 +104,12 @@ class UsefulLinks extends ResourceController {
       case 'SWAP_SORT':
         return await this.swapSort(this.body.otherLinkId);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async swapSort(otherLinkId: string): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
-    if (this.usefulLink.linkId === otherLinkId) throw new RCError('Same link');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (this.usefulLink.linkId === otherLinkId) throw new HandledError('Same link');
 
     const otherLink = new UsefulLink(
       await ddb.get({ TableName: DDB_TABLES.usefulLinks, Key: { linkId: otherLinkId } })
@@ -126,7 +126,7 @@ class UsefulLinks extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.usefulLinks, Key: { linkId: this.usefulLink.linkId } });
   }

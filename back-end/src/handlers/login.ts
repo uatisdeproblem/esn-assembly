@@ -5,7 +5,7 @@
 import { default as Axios } from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { sign } from 'jsonwebtoken';
-import { DynamoDB, RCError, ResourceController, SystemsManager } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, SystemsManager } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { Configurations } from '../models/configurations.model';
@@ -58,7 +58,7 @@ class Login extends ResourceController {
       this.logger.debug('CAS ticket validated and parsed', { ticket: jsonWithUserData });
 
       const success = !!jsonWithUserData['cas:serviceResponse']['cas:authenticationSuccess'];
-      if (!success) throw new RCError('Login failed');
+      if (!success) throw new HandledError('Login failed');
 
       const data = jsonWithUserData['cas:serviceResponse']['cas:authenticationSuccess'][0];
       const attributes = data['cas:attributes'][0];
@@ -79,7 +79,7 @@ class Login extends ResourceController {
         isAdministrator: administratorsIds.includes(userId),
         canManageOpportunities: administratorsIds.includes(userId) || opportunitiesManagersIds.includes(userId)
       });
-      this.logger.info('ESN Accounts login', user);
+      this.logger.info('ESN Accounts login', { user });
 
       const userData = JSON.parse(JSON.stringify(user));
       const secret = await getJwtSecretFromSystemsManager();
@@ -90,7 +90,7 @@ class Login extends ResourceController {
       this.callback(null, { statusCode: 302, headers: { Location: `${appURL}/auth?token=${token}` } });
     } catch (err) {
       this.logger.error('VALIDATE CAS TICKET', err);
-      throw new RCError('Login failed');
+      throw new HandledError('Login failed');
     }
   }
 
@@ -108,7 +108,7 @@ class Login extends ResourceController {
           ConditionExpression: 'attribute_not_exists(PK)'
         });
         return configurations;
-      } else throw new RCError('Error loading configuration');
+      } else throw new HandledError('Error loading configuration');
     }
   }
 }

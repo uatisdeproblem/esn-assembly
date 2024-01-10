@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, S3, SES } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, S3, SES } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
 
 import { isEmailInBlockList } from './sesNotifications';
@@ -64,7 +64,7 @@ class ApplicationsRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.opportunities, Key: { opportunityId } })
       );
     } catch (err) {
-      throw new RCError('Opportunity not found');
+      throw new HandledError('Opportunity not found');
     }
 
     if (!this.resourceId) return;
@@ -74,11 +74,11 @@ class ApplicationsRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.applications, Key: { opportunityId, applicationId: this.resourceId } })
       );
     } catch (err) {
-      throw new RCError('Application not found');
+      throw new HandledError('Application not found');
     }
 
     if (!this.opportunity.canUserManage(this.galaxyUser) && this.application.userId !== this.galaxyUser.userId)
-      throw new RCError('Unauthorized');
+      throw new HandledError('Unauthorized');
   }
 
   protected async getResources(): Promise<Application[]> {
@@ -99,7 +99,7 @@ class ApplicationsRC extends ResourceController {
       case 'GET_ATTACHMENT_UPLOAD_URL':
         return await this.getSignedURLToUploadAttachment();
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async getSignedURLToUploadAttachment(): Promise<SignedURL> {
@@ -113,10 +113,10 @@ class ApplicationsRC extends ResourceController {
   }
 
   protected async postResources(): Promise<Application> {
-    if (this.opportunity.isClosed()) throw new RCError('Opportunity is closed');
+    if (this.opportunity.isClosed()) throw new HandledError('Opportunity is closed');
 
     const userApplications = (await this.getResources()).filter(x => x.userId === this.galaxyUser.userId);
-    if (userApplications.length) throw new RCError('Can apply only once');
+    if (userApplications.length) throw new HandledError('Can apply only once');
 
     const { motivation, attachments } = this.body;
     this.application = new Application({ motivation, attachments });
@@ -126,7 +126,7 @@ class ApplicationsRC extends ResourceController {
     this.application.subject = Subject.fromUser(this.galaxyUser);
 
     const errors = this.application.validate(this.opportunity);
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     await ddb.put({
       TableName: DDB_TABLES.applications,
@@ -140,7 +140,7 @@ class ApplicationsRC extends ResourceController {
   }
 
   protected async putResource(): Promise<Application> {
-    if (this.opportunity.isArchived()) throw new RCError('Opportunity is archived');
+    if (this.opportunity.isArchived()) throw new HandledError('Opportunity is archived');
     if (!this.opportunity.canUserManage(this.galaxyUser)) {
       if (this.opportunity.isClosed()) throw new Error('Opportunity is closed');
       if (this.application.getStatus() !== ApplicationStatuses.REJECTED)
@@ -151,7 +151,7 @@ class ApplicationsRC extends ResourceController {
     this.application.safeLoad(this.body, oldApplication);
 
     const errors = this.application.validate(this.opportunity);
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     delete this.application.rejectedAt;
     this.application.updatedAt = new Date().toISOString();
@@ -170,12 +170,12 @@ class ApplicationsRC extends ResourceController {
       case 'REVIEW_REJECT':
         return await this.reviewApplication(false, this.body.message);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async getSignedURLToDownloadAttachmentByExpectedName(expectedName: string): Promise<SignedURL> {
     const attachment = this.application.attachments[expectedName];
-    if (!attachment || !attachment.attachmentId.startsWith(ATTACHMENTS_PREFIX)) throw new RCError('Not found');
+    if (!attachment || !attachment.attachmentId.startsWith(ATTACHMENTS_PREFIX)) throw new HandledError('Not found');
 
     // further permissions check to access private attachment
     const userId = this.opportunity.canUserManage(this.galaxyUser) ? this.application.userId : this.galaxyUser.userId;
@@ -184,7 +184,7 @@ class ApplicationsRC extends ResourceController {
     return await s3.signedURLGet(S3_BUCKET_MEDIA, key);
   }
   private async reviewApplication(approve: boolean, message: string): Promise<Application> {
-    if (this.opportunity.isArchived()) throw new RCError('Opportunity is archived');
+    if (this.opportunity.isArchived()) throw new HandledError('Opportunity is archived');
     if (!this.opportunity.canUserManage(this.galaxyUser)) throw new Error('Unauthorized');
 
     const now = new Date().toISOString();
@@ -229,7 +229,7 @@ class ApplicationsRC extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (this.opportunity.isArchived()) throw new RCError('Opportunity is archived');
+    if (this.opportunity.isArchived()) throw new HandledError('Opportunity is archived');
     if (!this.opportunity.canUserManage(this.galaxyUser) && this.opportunity.isClosed())
       throw new Error('Opportunity is closed');
 

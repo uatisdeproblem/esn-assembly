@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, S3 } from 'idea-aws';
 import { Attachment } from 'idea-toolbox';
 
 import { addBadgeToUser } from './badges';
@@ -59,7 +59,7 @@ class Topics extends ResourceController {
     try {
       this.topic = new Topic(await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.resourceId } }));
     } catch (err) {
-      throw new RCError('Topic not found');
+      throw new HandledError('Topic not found');
     }
   }
 
@@ -85,14 +85,14 @@ class Topics extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Topic> {
     const errors = this.topic.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     try {
       this.topic.category = new TopicCategoryAttached(
         await ddb.get({ TableName: DDB_TABLES.categories, Key: { categoryId: this.topic.category.categoryId } })
       );
     } catch (error) {
-      throw new RCError('Category not found');
+      throw new HandledError('Category not found');
     }
 
     try {
@@ -100,7 +100,7 @@ class Topics extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.topic.event.eventId } })
       );
     } catch (error) {
-      throw new RCError('Event not found');
+      throw new HandledError('Event not found');
     }
 
     const putParams: any = { TableName: DDB_TABLES.topics, Item: this.topic };
@@ -113,7 +113,7 @@ class Topics extends ResourceController {
   }
 
   protected async postResources(): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.topic = new Topic(this.body);
     this.topic.topicId = await ddb.IUNID(PROJECT);
@@ -138,7 +138,7 @@ class Topics extends ResourceController {
           this.body.event
         );
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async insertFromApplication(
@@ -190,7 +190,7 @@ class Topics extends ResourceController {
   }
 
   protected async getResource(): Promise<Topic> {
-    if (this.topic.isDraft() && !this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (this.topic.isDraft() && !this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.TOPICS, this.resourceId);
 
@@ -198,7 +198,7 @@ class Topics extends ResourceController {
   }
 
   protected async putResource(): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const oldTopic = new Topic(this.topic);
     this.topic.safeLoad(this.body, oldTopic);
@@ -219,11 +219,11 @@ class Topics extends ResourceController {
       case 'MESSAGES_UPVOTES':
         return await this.getMessagesIdsUpvotedByUser();
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async manageStatus(open: boolean): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     if (open) delete this.topic.closedAt;
     else this.topic.closedAt = new Date().toISOString();
@@ -232,7 +232,7 @@ class Topics extends ResourceController {
     return this.topic;
   }
   private async manageArchive(archive: boolean): Promise<Topic> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     if (archive) {
       this.topic.archivedAt = new Date().toISOString();
@@ -253,14 +253,14 @@ class Topics extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const topics: RelatedTopic[] = await ddb.query({
       TableName: DDB_TABLES.relatedTopics,
       KeyConditionExpression: 'topicA = :topicId',
       ExpressionAttributeValues: { ':topicId': this.topic.topicId }
     });
-    if (topics.length > 0) throw new RCError('Unlink related topics first');
+    if (topics.length > 0) throw new HandledError('Unlink related topics first');
 
     await ddb.delete({ TableName: DDB_TABLES.topics, Key: { topicId: this.topic.topicId } });
   }

@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { Message } from '../models/message.model';
 import { Topic, TopicTypes } from '../models/topic.model';
@@ -43,10 +43,10 @@ class MessagesRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.pathParameters.topicId } })
       );
     } catch (err) {
-      throw new RCError('Topic not found');
+      throw new HandledError('Topic not found');
     }
 
-    if (this.topic.type !== TopicTypes.LIVE) throw new RCError('Incompatible type of topic');
+    if (this.topic.type !== TopicTypes.LIVE) throw new HandledError('Incompatible type of topic');
 
     if (!this.resourceId) return;
 
@@ -58,11 +58,11 @@ class MessagesRC extends ResourceController {
         })
       );
     } catch (err) {
-      throw new RCError('Message not found');
+      throw new HandledError('Message not found');
     }
 
     if (!this.galaxyUser.isAdministrator && this.message.creator?.id !== this.galaxyUser.userId)
-      throw new RCError('Unauthorized');
+      throw new HandledError('Unauthorized');
   }
 
   protected async getResources(): Promise<Message[]> {
@@ -91,7 +91,7 @@ class MessagesRC extends ResourceController {
     this.message.numOfUpvotes = 0;
 
     const errors = this.message.validate(this.topic);
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     await ddb.put({
       TableName: DDB_TABLES.messages,
@@ -118,7 +118,7 @@ class MessagesRC extends ResourceController {
       case 'UNDO_COMPLETE':
         return await this.undoComplete();
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async markComplete(): Promise<Message> {

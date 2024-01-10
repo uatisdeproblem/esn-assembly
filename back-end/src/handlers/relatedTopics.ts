@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { Topic } from '../models/topic.model';
 import { RelatedTopic, RelatedTopicRelations } from '../models/relatedTopic.model';
@@ -40,7 +40,7 @@ class RelatedTopics extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.pathParameters.topicId } })
       );
     } catch (err) {
-      throw new RCError('Topic not found');
+      throw new HandledError('Topic not found');
     }
 
     if (!this.resourceId) return;
@@ -48,7 +48,7 @@ class RelatedTopics extends ResourceController {
     try {
       this.relatedTopic = new Topic(await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.resourceId } }));
     } catch (err) {
-      throw new RCError('Related topic not found');
+      throw new HandledError('Related topic not found');
     }
   }
 
@@ -67,7 +67,7 @@ class RelatedTopics extends ResourceController {
   }
 
   protected async postResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const relatedTopic1: RelatedTopic = {
       topicA: this.topic.topicId,
@@ -86,7 +86,7 @@ class RelatedTopics extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const relatedTopic1Delete = {
       TableName: DDB_TABLES.relatedTopics,

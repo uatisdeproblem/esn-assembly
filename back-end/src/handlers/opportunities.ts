@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { addStatisticEntry } from './statistics';
 
@@ -41,7 +41,7 @@ class OpportunitiesRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.opportunities, Key: { opportunityId: this.resourceId } })
       );
     } catch (err) {
-      throw new RCError('Opportunity not found');
+      throw new HandledError('Opportunity not found');
     }
   }
 
@@ -66,7 +66,7 @@ class OpportunitiesRC extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Opportunity> {
     const errors = this.opportunity.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     const putParams: any = { TableName: DDB_TABLES.opportunities, Item: this.opportunity };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(opportunityId)';
@@ -78,7 +78,7 @@ class OpportunitiesRC extends ResourceController {
   }
 
   protected async postResources(): Promise<Opportunity> {
-    if (!this.galaxyUser.canManageOpportunities) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.canManageOpportunities) throw new HandledError('Unauthorized');
 
     this.opportunity = new Opportunity(this.body);
     this.opportunity.opportunityId = await ddb.IUNID(PROJECT);
@@ -94,7 +94,7 @@ class OpportunitiesRC extends ResourceController {
 
   protected async getResource(): Promise<Opportunity> {
     if (this.opportunity.isDraft() && !this.opportunity.canUserManage(this.galaxyUser))
-      throw new RCError('Unauthorized');
+      throw new HandledError('Unauthorized');
 
     await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.OPPORTUNITIES, this.resourceId);
 
@@ -102,7 +102,7 @@ class OpportunitiesRC extends ResourceController {
   }
 
   protected async putResource(): Promise<Opportunity> {
-    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     const oldOpportunity = new Opportunity(this.opportunity);
     this.opportunity.safeLoad(this.body, oldOpportunity);
@@ -121,11 +121,11 @@ class OpportunitiesRC extends ResourceController {
       case 'UNARCHIVE':
         return await this.manageArchive(false);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async manageStatus(open: boolean): Promise<Opportunity> {
-    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     if (open) delete this.opportunity.closedAt;
     else this.opportunity.closedAt = new Date().toISOString();
@@ -134,7 +134,7 @@ class OpportunitiesRC extends ResourceController {
     return this.opportunity;
   }
   private async manageArchive(archive: boolean): Promise<Opportunity> {
-    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     if (archive) {
       this.opportunity.archivedAt = new Date().toISOString();
@@ -146,7 +146,7 @@ class OpportunitiesRC extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.opportunity.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.opportunities, Key: { opportunityId: this.opportunity.opportunityId } });
   }

@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, SES } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, SES } from 'idea-aws';
 import { epochISOString } from 'idea-toolbox';
 
 import { GAEventAttached } from '../models/event.model';
@@ -59,7 +59,7 @@ class VotingSessionsRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.votingSessions, Key: { sessionId: this.resourceId } })
       );
     } catch (err) {
-      throw new RCError('Voting session not found');
+      throw new HandledError('Voting session not found');
     }
   }
 
@@ -84,7 +84,7 @@ class VotingSessionsRC extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<VotingSession> {
     const errors = this.votingSession.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     if (this.votingSession.event?.eventId) {
       try {
@@ -92,7 +92,7 @@ class VotingSessionsRC extends ResourceController {
           await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.votingSession.event.eventId } })
         );
       } catch (error) {
-        throw new RCError('Event not found');
+        throw new HandledError('Event not found');
       }
     }
 
@@ -106,7 +106,7 @@ class VotingSessionsRC extends ResourceController {
   }
 
   protected async postResources(): Promise<VotingSession> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.votingSession = new VotingSession(this.body);
     this.votingSession.sessionId = await ddb.IUNID(PROJECT);
@@ -125,15 +125,15 @@ class VotingSessionsRC extends ResourceController {
 
   protected async getResource(): Promise<VotingSession> {
     if (this.votingSession.isDraft() && !this.votingSession.canUserManage(this.galaxyUser))
-      throw new RCError('Unauthorized');
+      throw new HandledError('Unauthorized');
 
     return this.votingSession;
   }
 
   protected async putResource(): Promise<VotingSession> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (this.votingSession.hasStarted()) throw new RCError("Can't be changed after start");
+    if (this.votingSession.hasStarted()) throw new HandledError("Can't be changed after start");
 
     const oldSession = new VotingSession(this.votingSession);
     this.votingSession.safeLoad(this.body, oldSession);
@@ -166,20 +166,20 @@ class VotingSessionsRC extends ResourceController {
       case 'UNARCHIVE':
         return await this.manageArchive(false);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async startVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (this.votingSession.hasStarted()) throw new RCError("Can't be changed after start");
+    if (this.votingSession.hasStarted()) throw new HandledError("Can't be changed after start");
 
     this.votingSession.startsAt = new Date().toISOString();
     this.votingSession.endsAt = new Date(endsAt).toISOString();
     this.votingSession.timezone = timezone;
 
     const errors = this.votingSession.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     const sumOfWeights = this.votingSession.getTotWeights();
     const balancedWeights: Record<string, number> = {};
@@ -202,8 +202,8 @@ class VotingSessionsRC extends ResourceController {
     try {
       await ddb.batchPut(DDB_TABLES.votingTickets, votingTickets);
     } catch (error) {
-      this.logger.error('Voting ticket generation', error, { ...this.votingSession });
-      throw new RCError('Failed voting ticket generation');
+      this.logger.error('Voting ticket generation', error, { votingSession: this.votingSession });
+      throw new HandledError('Failed voting ticket generation');
     }
 
     await ddb.put({ TableName: DDB_TABLES.votingSessions, Item: this.votingSession });
@@ -213,7 +213,7 @@ class VotingSessionsRC extends ResourceController {
         if (votingTicket.voterEmail) await this.sendVotingTicketToVoter(votingTicket);
       } catch (error) {
         // it's ok if one email is not sent/received: we can send it again
-        this.logger.warn('Voting ticket failed to send', error, { ...votingTicket });
+        this.logger.warn('Voting ticket failed to send', error, { votingTicket });
         // possible improvement: manage bounces with SES? #53
       }
     }
@@ -232,9 +232,9 @@ class VotingSessionsRC extends ResourceController {
     await ses.sendTemplatedEmail({ toAddresses: [email], template, templateData }, sesConfig);
   }
   private async getVotingSessionTicketsStatus(): Promise<VotingTicket[]> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (!this.votingSession.hasStarted()) throw new RCError("Session didn't start yet");
+    if (!this.votingSession.hasStarted()) throw new HandledError("Session didn't start yet");
 
     let votingTickets: VotingTicket[] = await ddb.query({
       TableName: DDB_TABLES.votingTickets,
@@ -246,12 +246,12 @@ class VotingSessionsRC extends ResourceController {
     return votingTickets;
   }
   private async extendEndOfVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+    if (!this.votingSession.isInProgress()) throw new HandledError("Session isn't in progress");
 
     const newEnd = new Date(endsAt).toISOString();
-    if (newEnd < this.votingSession.endsAt) throw new RCError("Can't be lower than previous end");
+    if (newEnd < this.votingSession.endsAt) throw new HandledError("Can't be lower than previous end");
     this.votingSession.endsAt = newEnd;
     this.votingSession.timezone = timezone;
 
@@ -265,9 +265,9 @@ class VotingSessionsRC extends ResourceController {
     return this.votingSession;
   }
   private async stopVotingSessionPrematurely(): Promise<VotingSession> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+    if (!this.votingSession.isInProgress()) throw new HandledError("Session isn't in progress");
 
     this.votingSession.endsAt = new Date().toISOString();
     await ddb.update({
@@ -279,9 +279,9 @@ class VotingSessionsRC extends ResourceController {
     return this.votingSession;
   }
   private async resendVotingLinkToVoter(voterId: string, email: string): Promise<void> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+    if (!this.votingSession.isInProgress()) throw new HandledError("Session isn't in progress");
 
     const votingTicket = new VotingTicket(
       await ddb.get({ TableName: DDB_TABLES.votingTickets, Key: { sessionId: this.votingSession.sessionId, voterId } })
@@ -289,16 +289,16 @@ class VotingSessionsRC extends ResourceController {
     await this.sendVotingTicketToVoter(votingTicket, email);
   }
   private async getVotingTokenOfVoter(voterId: string): Promise<VotingTicket> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (!this.votingSession.isInProgress()) throw new RCError("Session isn't in progress");
+    if (!this.votingSession.isInProgress()) throw new HandledError("Session isn't in progress");
 
     return new VotingTicket(
       await ddb.get({ TableName: DDB_TABLES.votingTickets, Key: { sessionId: this.votingSession.sessionId, voterId } })
     );
   }
   private async checkWhetherSessionShouldEndEarly(): Promise<VotingSession> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     if (!this.votingSession.isInProgress()) return this.votingSession;
 
@@ -323,9 +323,9 @@ class VotingSessionsRC extends ResourceController {
     return this.votingSession;
   }
   private async getVotingResults(): Promise<VotingResults> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
-    if (!this.votingSession.hasEnded()) throw new RCError('Session has not ended');
+    if (!this.votingSession.hasEnded()) throw new HandledError('Session has not ended');
 
     const resultsForBallotOption = (
       await ddb.query({
@@ -360,7 +360,7 @@ class VotingSessionsRC extends ResourceController {
     return votingResults;
   }
   private async publishVotingResults(): Promise<VotingSession> {
-    if (this.votingSession.results) throw new RCError('Already public');
+    if (this.votingSession.results) throw new HandledError('Already public');
 
     this.votingSession.results = await this.getVotingResults();
 
@@ -373,7 +373,7 @@ class VotingSessionsRC extends ResourceController {
     return this.votingSession;
   }
   private async manageArchive(archive: boolean): Promise<VotingSession> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     if (archive) this.votingSession.archivedAt = new Date().toISOString();
     else delete this.votingSession.archivedAt;
@@ -383,7 +383,7 @@ class VotingSessionsRC extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new RCError('Unauthorized');
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.votingSessions, Key: { sessionId: this.votingSession.sessionId } });
 
@@ -396,7 +396,7 @@ class VotingSessionsRC extends ResourceController {
       });
       await ddb.batchDelete(DDB_TABLES.votingTickets, votingTickets);
     } catch (error) {
-      this.logger.warn('Failed deleting voting tickets', error, { ...this.votingSession });
+      this.logger.warn('Failed deleting voting tickets', error, { votingSession: this.votingSession });
     }
 
     try {
@@ -408,7 +408,7 @@ class VotingSessionsRC extends ResourceController {
       });
       await ddb.batchDelete(DDB_TABLES.votingResults, votingResults);
     } catch (error) {
-      this.logger.warn('Failed deleting voting results', error, { ...this.votingSession });
+      this.logger.warn('Failed deleting voting results', error, { votingSession: this.votingSession });
     }
   }
 }

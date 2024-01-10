@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { TopicCategory } from '../models/category.model';
 import { Topic } from '../models/topic.model';
@@ -39,7 +39,7 @@ class TopicCategories extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.categories, Key: { categoryId: this.resourceId } })
       );
     } catch (err) {
-      throw new RCError('Category not found');
+      throw new HandledError('Category not found');
     }
   }
 
@@ -52,7 +52,7 @@ class TopicCategories extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<TopicCategory> {
     const errors = this.topicCategory.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     const putParams: any = { TableName: DDB_TABLES.categories, Item: this.topicCategory };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(categoryId)';
@@ -62,7 +62,7 @@ class TopicCategories extends ResourceController {
   }
 
   protected async postResources(): Promise<TopicCategory> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.topicCategory = new TopicCategory(this.body);
     this.topicCategory.categoryId = await ddb.IUNID(PROJECT);
@@ -75,7 +75,7 @@ class TopicCategories extends ResourceController {
   }
 
   protected async putResource(): Promise<TopicCategory> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const oldCategory = new TopicCategory(this.topicCategory);
     this.topicCategory.safeLoad(this.body, oldCategory);
@@ -90,11 +90,11 @@ class TopicCategories extends ResourceController {
       case 'UNARCHIVE':
         return await this.manageArchive(false);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async manageArchive(archive: boolean): Promise<TopicCategory> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     if (archive) this.topicCategory.archivedAt = new Date().toISOString();
     else delete this.topicCategory.archivedAt;
@@ -104,11 +104,11 @@ class TopicCategories extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
     const topicsWithCategory = topics.filter(x => x.category.categoryId === this.topicCategory.categoryId);
-    if (topicsWithCategory.length > 0) throw new RCError('Category is used');
+    if (topicsWithCategory.length > 0) throw new HandledError('Category is used');
 
     await ddb.delete({ TableName: DDB_TABLES.categories, Key: { categoryId: this.topicCategory.categoryId } });
   }
