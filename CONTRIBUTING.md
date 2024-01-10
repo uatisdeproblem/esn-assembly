@@ -119,6 +119,6 @@ When we are confident with the results, we can **commit our changes and create a
 
 We will **discuss together** whether we can fix any problem or improve the code; finally, we will merge the changes and publish the new feature in the app.
 
-Oh, [here you can find some best pratices](https://iter-idea.notion.site/Git-conventions-7f411b668d984eb3a05a03dfcae25d6f) about managing/committing/reviewing our code: it would be nice to follow them. 😉
+Oh, [here you can find some best practices](https://iter-idea.notion.site/Git-conventions-7f411b668d984eb3a05a03dfcae25d6f) about managing/committing/reviewing our code: it would be nice to follow them. 😉
 
-P.S. [here's anohter resource](https://github.com/uatisdeproblem/egm-app/files/13060363/ITER.IDEA.s.cloud.solutions_.what.s.under.the.hood.CommIT.2023.pdf) that presents everything you've read here.
+P.S. [here's another resource](https://docs.google.com/presentation/d/1kHiWzoZw9U0KWOa64QJJHZA7yjRsHEqubCWsceMJS3c/edit?usp=sharing) that presents everything you've read here.
