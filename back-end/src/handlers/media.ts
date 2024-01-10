@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController, S3 } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, S3 } from 'idea-aws';
 import { SignedURL } from 'idea-toolbox';
 
 import { User } from '../models/user.model';
@@ -33,7 +33,7 @@ class Media extends ResourceController {
   }
 
   protected async checkAuthBeforeRequest(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
   }
 
   protected async postResources(): Promise<SignedURL> {

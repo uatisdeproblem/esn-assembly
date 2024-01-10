@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { GAEvent } from '../models/event.model';
 import { Topic } from '../models/topic.model';
@@ -44,7 +44,7 @@ class GAEvents extends ResourceController {
     try {
       this.gaEvent = new GAEvent(await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.resourceId } }));
     } catch (err) {
-      throw new RCError('Event not found');
+      throw new HandledError('Event not found');
     }
   }
 
@@ -57,7 +57,7 @@ class GAEvents extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<GAEvent> {
     const errors = this.gaEvent.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     const putParams: any = { TableName: DDB_TABLES.events, Item: this.gaEvent };
     if (opts.noOverwrite) putParams.ConditionExpression = 'attribute_not_exists(eventId)';
@@ -67,7 +67,7 @@ class GAEvents extends ResourceController {
   }
 
   protected async postResources(): Promise<GAEvent> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.gaEvent = new GAEvent(this.body);
     this.gaEvent.eventId = await ddb.IUNID(PROJECT);
@@ -80,7 +80,7 @@ class GAEvents extends ResourceController {
   }
 
   protected async putResource(): Promise<GAEvent> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const oldEvent = new GAEvent(this.gaEvent);
     this.gaEvent.safeLoad(this.body, oldEvent);
@@ -95,11 +95,11 @@ class GAEvents extends ResourceController {
       case 'UNARCHIVE':
         return await this.manageArchive(false);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async manageArchive(archive: boolean): Promise<GAEvent> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     if (archive) this.gaEvent.archivedAt = new Date().toISOString();
     else delete this.gaEvent.archivedAt;
@@ -109,18 +109,18 @@ class GAEvents extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
     const topicsWithEvent = topics.filter(x => x.event.eventId === this.gaEvent.eventId);
-    if (topicsWithEvent.length > 0) throw new RCError('Event is used');
+    if (topicsWithEvent.length > 0) throw new HandledError('Event is used');
 
     const votingSessions: VotingSession[] = await ddb.scan({
       TableName: DDB_TABLES.votingSessions,
       IndexName: 'sessionId-meta-index'
     });
     const votingSessionsWithEvent = votingSessions.filter(x => x.event?.eventId === this.gaEvent.eventId);
-    if (votingSessionsWithEvent.length > 0) throw new RCError('Event is used');
+    if (votingSessionsWithEvent.length > 0) throw new HandledError('Event is used');
 
     await ddb.delete({ TableName: DDB_TABLES.events, Key: { eventId: this.gaEvent.eventId } });
   }

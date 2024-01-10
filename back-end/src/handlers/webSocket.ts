@@ -4,7 +4,7 @@
 
 import { DynamoDBRecord } from 'aws-lambda';
 import { ApiGatewayManagementApi } from '@aws-sdk/client-apigatewaymanagementapi';
-import { DynamoDB, GenericController, RCError, StreamController } from 'idea-aws';
+import { DynamoDB, GenericController, HandledError, StreamController } from 'idea-aws';
 
 import { WebSocketConnection, WebSocketConnectionTypes, WebSocketMessage } from '../models/webSocket.model';
 import { VotingSession } from '../models/votingSession.model';
@@ -50,7 +50,7 @@ class WebSocketApiController extends GenericController {
           await this.mockupInfo(connectionId);
           break;
         default:
-          throw new RCError('Unsupported action');
+          throw new HandledError('Unsupported action');
       }
       this.callback(null, { statusCode: 200 });
     } catch (error) {
@@ -64,11 +64,12 @@ class WebSocketApiController extends GenericController {
     referenceId: string,
     userId?: string
   ): Promise<void> {
-    if (!type || !referenceId) throw new RCError('Missing connection references');
-    if (!Object.values(WebSocketConnectionTypes).includes(type)) throw new RCError('Unsupported connection reference');
+    if (!type || !referenceId) throw new HandledError('Missing connection references');
+    if (!Object.values(WebSocketConnectionTypes).includes(type))
+      throw new HandledError('Unsupported connection reference');
     const connection = { connectionId, type, referenceId, expiresAt: TWO_HOURS_FROM_NOW_IN_SECONDS, userId };
     await this.checkIfUserCanOpenConnection(type, referenceId, userId);
-    this.logger.debug('Opening connection', connection);
+    this.logger.debug('Opening connection', { connection });
     await ddb.put({ TableName: DDB_CONNECTIONS_TABLE, Item: connection });
   }
   private async disconnect(connectionId: string): Promise<void> {
@@ -87,7 +88,7 @@ class WebSocketApiController extends GenericController {
     userId: string | null
   ): Promise<void> {
     if (type === WebSocketConnectionTypes.VOTING_TICKETS) {
-      if (!userId) throw new RCError('Unauthorized');
+      if (!userId) throw new HandledError('Unauthorized');
       const { administratorsIds } = new Configurations(
         await ddb.get({ TableName: DDB_TABLES.configurations, Key: { PK: Configurations.PK } })
       );
@@ -96,7 +97,7 @@ class WebSocketApiController extends GenericController {
         await ddb.get({ TableName: DDB_TABLES.votingSessions, Key: { sessionId: referenceId } })
       );
       if (votingSession.scrutineersIds.includes(userId)) return;
-      throw new RCError('Unauthorized');
+      throw new HandledError('Unauthorized');
     }
   }
 }
@@ -106,13 +107,7 @@ class WebSocketApiController extends GenericController {
 ///
 
 class WebSocketStreamController extends StreamController {
-  handleRequest(): void {
-    Promise.all(this.records.map(record => this.mapDDBStreamRecordsIntoSocketMessages(record)))
-      .then((): void => this.done(null))
-      .catch((): void => this.done(new RCError('ERROR IN STREAM')));
-  }
-
-  private async mapDDBStreamRecordsIntoSocketMessages(record: DynamoDBRecord): Promise<void> {
+  protected async handleRecord(record: DynamoDBRecord): Promise<void> {
     const webSocketMessage = this.mapDDBTableStreamIntoSocketMessage(record);
     if (!webSocketMessage) return;
 

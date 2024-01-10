@@ -14,7 +14,7 @@ import {
   startOfHour,
   startOfMonth
 } from 'date-fns';
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
 import { Statistic, StatisticEntityTypes, StatisticEntry, StatisticGranularities } from '../models/statistic.model';
@@ -41,12 +41,12 @@ class StatisticsRC extends ResourceController {
   }
 
   protected async checkAuthBeforeRequest(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
   }
 
   protected async getResources(): Promise<Statistic> {
-    if (!this.queryParams.since || !this.queryParams.to) throw new RCError('Missing date interval');
-    if (!this.queryParams.entityType) throw new RCError('Missing entity type');
+    if (!this.queryParams.since || !this.queryParams.to) throw new HandledError('Missing date interval');
+    if (!this.queryParams.entityType) throw new HandledError('Missing entity type');
 
     const pk = StatisticEntry.getPK(this.queryParams.entityType, this.queryParams.entityId);
     const since = StatisticEntry.generateTimestamp(this.queryParams.since, -1);

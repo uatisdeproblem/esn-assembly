@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, GenericController, RCError } from 'idea-aws';
+import { DynamoDB, GenericController, HandledError } from 'idea-aws';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -21,7 +21,7 @@ class ScheduledOps extends GenericController {
       this.done(null);
     } catch (error) {
       this.logger.error('Failed scheduled ops', error);
-      this.done(new RCError('ERROR IN SCHEDULED OPS'));
+      this.done(new HandledError('ERROR IN SCHEDULED OPS'));
     }
   }
   private async closeTopicsWithPastDeadline(): Promise<void> {
@@ -38,7 +38,7 @@ class ScheduledOps extends GenericController {
           ExpressionAttributeValues: { ':deadline': topic.willCloseAt }
         });
       } catch (error) {
-        this.logger.warn('Topic NOT closed', error, topic);
+        this.logger.warn('Topic NOT closed', error, { topic });
       }
     }
   }
@@ -59,7 +59,7 @@ class ScheduledOps extends GenericController {
           ExpressionAttributeValues: { ':deadline': opportunity.willCloseAt }
         });
       } catch (error) {
-        this.logger.warn('Opportunity NOT closed', error, opportunity);
+        this.logger.warn('Opportunity NOT closed', error, { opportunity });
       }
     }
   }

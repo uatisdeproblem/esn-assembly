@@ -14,14 +14,6 @@ export class IDEAStack extends cdk.Stack {
       pointInTimeRecovery: true
     });
 
-    new DDB.Table(this, 'idea_ISID', {
-      tableName: 'idea_ISID',
-      partitionKey: { name: 'project', type: DDB.AttributeType.STRING },
-      sortKey: { name: 'id', type: DDB.AttributeType.STRING },
-      billingMode: DDB.BillingMode.PAY_PER_REQUEST,
-      pointInTimeRecovery: true
-    });
-
     new DDB.Table(this, 'idea_atomicCounters', {
       tableName: 'idea_atomicCounters',
       partitionKey: { name: 'key', type: DDB.AttributeType.STRING },

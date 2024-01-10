@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { addStatisticEntry } from './statistics';
 
@@ -42,7 +42,7 @@ class Communications extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.communications, Key: { communicationId: this.resourceId } })
       );
     } catch (err) {
-      throw new RCError('Link not found');
+      throw new HandledError('Link not found');
     }
   }
 
@@ -62,7 +62,7 @@ class Communications extends ResourceController {
 
   private async putSafeResource(opts: { noOverwrite: boolean }): Promise<Communication> {
     const errors = this.communication.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     if (this.communication.event?.eventId) {
       try {
@@ -70,7 +70,7 @@ class Communications extends ResourceController {
           await ddb.get({ TableName: DDB_TABLES.events, Key: { eventId: this.communication.event.eventId } })
         );
       } catch (error) {
-        throw new RCError('Event not found');
+        throw new HandledError('Event not found');
       }
     }
 
@@ -82,7 +82,7 @@ class Communications extends ResourceController {
   }
 
   protected async postResources(): Promise<Communication> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.communication = new Communication(this.body);
     this.communication.communicationId = await ddb.IUNID(PROJECT);
@@ -96,7 +96,7 @@ class Communications extends ResourceController {
   }
 
   protected async putResource(): Promise<Communication> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const oldCommunication = new Communication(this.communication);
     this.communication.safeLoad(this.body, oldCommunication);
@@ -111,11 +111,11 @@ class Communications extends ResourceController {
       case 'UNARCHIVE':
         return await this.manageArchive(false);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private async manageArchive(archive: boolean): Promise<Communication> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     if (archive) this.communication.archivedAt = new Date().toISOString();
     else delete this.communication.archivedAt;
@@ -125,7 +125,7 @@ class Communications extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     await ddb.delete({
       TableName: DDB_TABLES.communications,

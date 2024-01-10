@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, GetObjectTypes, RCError, ResourceController, S3, SES } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController, S3, SES } from 'idea-aws';
 
 import { Configurations, EmailTemplates } from '../models/configurations.model';
 import { User } from '../models/user.model';
@@ -55,7 +55,7 @@ class ConfigurationsRC extends ResourceController {
       );
     } catch (err) {
       if (String(err) === 'Error: Not found') this.configurations = new Configurations({ PK: Configurations.PK });
-      else throw new RCError('Error loading configuration');
+      else throw new HandledError('Error loading configuration');
     }
   }
 
@@ -64,12 +64,12 @@ class ConfigurationsRC extends ResourceController {
   }
 
   protected async putResources(): Promise<Configurations> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.configurations = new Configurations({ ...this.body, PK: Configurations.PK });
 
     const errors = this.configurations.validate();
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     await ddb.put({ TableName: DDB_TABLES.configurations, Item: this.configurations });
 
@@ -77,7 +77,7 @@ class ConfigurationsRC extends ResourceController {
   }
 
   protected async patchResources(): Promise<{ subject: string; content: string } | void> {
-    if (!this.galaxyUser.isAdministrator) throw new RCError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     switch (this.body.action) {
       case 'GET_EMAIL_TEMPLATE':
@@ -89,7 +89,7 @@ class ConfigurationsRC extends ResourceController {
       case 'TEST_EMAIL_TEMPLATE':
         return await this.testEmailTemplate(this.body.template);
       default:
-        throw new RCError('Unsupported action');
+        throw new HandledError('Unsupported action');
     }
   }
   private getSESTemplateName(emailTemplate: EmailTemplates): string {
@@ -107,7 +107,7 @@ class ConfigurationsRC extends ResourceController {
       case EmailTemplates.VOTING_CONFIRMATION:
         return 'notify-voting-confirmation';
       default:
-        throw new RCError("Template doesn't exist");
+        throw new HandledError("Template doesn't exist");
     }
   }
   private async getEmailTemplate(emailTemplate: EmailTemplates): Promise<{ subject: string; content: string }> {
@@ -122,8 +122,8 @@ class ConfigurationsRC extends ResourceController {
     }
   }
   private async setEmailTemplate(emailTemplate: EmailTemplates, subject: string, content: string): Promise<void> {
-    if (!subject) throw new RCError('Missing subject');
-    if (!content) throw new RCError('Missing content');
+    if (!subject) throw new HandledError('Missing subject');
+    if (!content) throw new HandledError('Missing content');
 
     const templateName = this.getSESTemplateName(emailTemplate);
     await ses.setTemplate(`${templateName}-${STAGE}`, subject, content, true);
@@ -143,23 +143,22 @@ class ConfigurationsRC extends ResourceController {
       await ses.testTemplate(`${templateName}-${STAGE}`, templateData);
     } catch (error) {
       this.logger.warn('Elaborating template', error, { template: `${templateName}-${STAGE}` });
-      throw new RCError('Bad template');
+      throw new HandledError('Bad template');
     }
 
     try {
       await ses.sendTemplatedEmail({ toAddresses, template: `${templateName}-${STAGE}`, templateData }, SES_CONFIG);
     } catch (error) {
       this.logger.warn('Sending template', error, { template: `${templateName}-${STAGE}` });
-      throw new RCError('Sending failed');
+      throw new HandledError('Sending failed');
     }
   }
   private async resetEmailTemplate(emailTemplate: EmailTemplates): Promise<void> {
     const templateName = this.getSESTemplateName(emailTemplate);
-    const content = (await s3.getObject({
+    const content = await s3.getObjectAsText({
       bucket: S3_BUCKET_MEDIA,
-      key: S3_ASSETS_FOLDER.concat('/', templateName, '.hbs'),
-      type: GetObjectTypes.TEXT
-    })) as string;
+      key: S3_ASSETS_FOLDER.concat('/', templateName, '.hbs')
+    });
     await ses.setTemplate(`${templateName}-${STAGE}`, templateName, content, true);
   }
 }

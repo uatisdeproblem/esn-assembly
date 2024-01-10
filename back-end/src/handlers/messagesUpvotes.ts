@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { addBadgeToUser } from './badges';
 
@@ -45,10 +45,10 @@ class MessagesUpvotesRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.pathParameters.topicId } })
       );
     } catch (err) {
-      throw new RCError('Topic not found');
+      throw new HandledError('Topic not found');
     }
 
-    if (this.topic.type !== TopicTypes.LIVE) throw new RCError('Incompatible type of topic');
+    if (this.topic.type !== TopicTypes.LIVE) throw new HandledError('Incompatible type of topic');
 
     try {
       this.message = new Message(
@@ -58,7 +58,7 @@ class MessagesUpvotesRC extends ResourceController {
         })
       );
     } catch (err) {
-      throw new RCError('Message not found');
+      throw new HandledError('Message not found');
     }
   }
 

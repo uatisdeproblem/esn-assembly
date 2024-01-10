@@ -34,7 +34,7 @@ then
   exit -1
 fi
 
-# run the deploy-quick script witg AWS CDK and exit
+# run the deploy-quick script with AWS CDK and exit
 if [ "${ACTION}" == "quick" ]
 then
   npm run compile && npm run deploy "${PROJECT}-dev-api" \

@@ -2,7 +2,7 @@
 /// IMPORTS
 ///
 
-import { DynamoDB, RCError, ResourceController } from 'idea-aws';
+import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { Message } from '../models/message.model';
 import { Topic, TopicTypes } from '../models/topic.model';
@@ -33,10 +33,10 @@ class MessagesAnonymousRC extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.topics, Key: { topicId: this.pathParameters.topicId } })
       );
     } catch (err) {
-      throw new RCError('Topic not found');
+      throw new HandledError('Topic not found');
     }
 
-    if (this.topic.type !== TopicTypes.LIVE) throw new RCError('Incompatible type of topic');
+    if (this.topic.type !== TopicTypes.LIVE) throw new HandledError('Incompatible type of topic');
   }
 
   protected async postResources(): Promise<Message> {
@@ -50,7 +50,7 @@ class MessagesAnonymousRC extends ResourceController {
     message.numOfUpvotes = 0;
 
     const errors = message.validate(this.topic);
-    if (errors.length) throw new RCError(`Invalid fields: ${errors.join(', ')}`);
+    if (errors.length) throw new HandledError(`Invalid fields: ${errors.join(', ')}`);
 
     await ddb.put({
       TableName: DDB_TABLES.messages,
