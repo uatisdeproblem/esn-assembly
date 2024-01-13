@@ -1,4 +1,4 @@
-# Contribute in the development
+# Contribute in the (front-end) development
 
 The main objective of the project is to **further develop and maintain the Assembly app**.
 
@@ -57,7 +57,7 @@ Each component/page is represented by a set of files (not all of them are always
 - `user.page.html`: contains the HTML structure.
 - `user.page.scss`: contains the style/presentation code (CSS) .
 - `user.page.ts`: contains the business logic (Typescript).
-- `user-routing.module.ts`: contains the routing instructions (e.g. the page is reachable through `/user`).
+- `user-routing.module.ts`: contains the routing instructions (e.g. the page is reachable through the relative path `/user`).
 - `user.module.ts`: contains the imports of the related components and modules.
 - `user.service.ts`: contains the API requests and the logics to interact with the user's data model.
 
@@ -84,7 +84,7 @@ You may have most of this stuff already on your dev computer, but if you need he
 
 Make sure you have installed the project's latest libraries and dependencies (and compiled the models) by running in the terminal, from project's root:
 
-```
+```sh
 cd back-end
 npm install
 cd ../front-end
@@ -93,7 +93,7 @@ npm install
 
 Start the project locally by running (from the `front-end` folder):
 
-```
+```sh
 npm run start
 ```
 
@@ -105,7 +105,7 @@ Any change that you make to the code will be automatically reloaded in the brows
 
 If you want to debug your code, you can open the [Developer Tools](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools) of your browser.
 
-⚠️⚠️ Since the app supports **development** and **production** stages, you need decide which to use when you run the front-end; in `/front-end/src/environments/environment.idea.ts` you can switch between "dev" and "prod" with the variable `api.stage`. Note: _dev_ and _prod_ environment use the same user base (the accounts to log-in), but they have their own databases; this means that organizations, venues, rooms, speakers, sessions and user profiles will be different based on which environment you’re referring to with the variable `api.stage`.
+⚠️⚠️ Since the app supports **development** and **production** stages, you need decide which to use when you run the front-end; in `/front-end/src/environments/environment.idea.ts` you can switch between "dev" and "prod" with the variable `STAGE`. Note: _dev_ and _prod_ environment have their own databases; this means that the app's contents will be different based on which environment you’re referring to with the variable `STAGE`.
 
 ### Tackle an issue, develop and commit changes
 
