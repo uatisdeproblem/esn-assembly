@@ -6,6 +6,7 @@ import { Communication } from '@models/communication.model';
 @Injectable({ providedIn: 'root' })
 export class CommunicationsService {
   private communications: Communication[];
+  private filterByYear: number = null;
 
   /**
    * The number of communications to consider for the pagination, when active.
@@ -15,10 +16,14 @@ export class CommunicationsService {
   constructor(private api: IDEAApiService) {}
 
   /**
-   * Load the communications from the back-end.
+   * Load the communications from the back-end, possibly filtering by year.
+   * If no year is specified, only the unarchived communications are returned.
    */
-  private async loadList(): Promise<void> {
-    const communications: Communication[] = await this.api.getResource('communications');
+  private async loadList(year: number = null): Promise<void> {
+    const params: any = {};
+    if (year) params.year = year;
+    this.filterByYear = year;
+    const communications: Communication[] = await this.api.getResource('communications', { params });
     this.communications = communications.map(x => new Communication(x));
   }
   /**
@@ -29,11 +34,12 @@ export class CommunicationsService {
     options: {
       force?: boolean;
       search?: string;
+      year?: number;
       withPagination?: boolean;
       startPaginationAfterId?: string;
     } = {}
   ): Promise<Communication[]> {
-    if (!this.communications || options.force) await this.loadList();
+    if (!this.communications || options.force || options.year !== this.filterByYear) await this.loadList(options.year);
     if (!this.communications) return null;
 
     options.search = options.search ? String(options.search).toLowerCase() : '';

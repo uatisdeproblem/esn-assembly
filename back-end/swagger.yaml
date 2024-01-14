@@ -1639,11 +1639,11 @@ paths:
       security:
         - AuthFunction: []
       parameters:
-        - name: archived
+        - name: year
           in: query
-          description: Whether to get archived communications instead of active ones
+          description: Get the communications of this year; if not specified, only unarchived ones are returned
           schema:
-            type: boolean
+            type: number
       responses:
         200:
           $ref: '#/components/responses/Communications'

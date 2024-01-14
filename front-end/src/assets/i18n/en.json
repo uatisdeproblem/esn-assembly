@@ -211,6 +211,7 @@
     "STATISTICS_APP_ACCESS": "App access"
   },
   "COMMUNICATIONS": {
+    "COMMUNICATIONS": "Communications",
     "MANAGE_COMMUNICATION": "Manage communication",
     "NAME": "Title",
     "BRIEF": "A brief description (for previews)",

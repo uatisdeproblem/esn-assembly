@@ -48,15 +48,13 @@ class Deadlines extends ResourceController {
 
   protected async getResources(): Promise<Deadline[]> {
     let deadlines: Deadline[] = await ddb.scan({ TableName: DDB_TABLES.deadlines });
+    deadlines = deadlines.map(x => new Deadline(x));
 
-    const lowerLimit = this.queryParams.year
-      ? new Date(this.queryParams.year, 0, 1, 0, 0, 0, 0).toISOString()
-      : new Date().toISOString();
+    if (this.queryParams.year)
+      deadlines = deadlines.filter(x => new Date(x.at).getFullYear().toString() === this.queryParams.year);
+    else deadlines = deadlines.filter(x => x.at >= new Date().toISOString());
 
-    deadlines = deadlines
-      .map(x => new Deadline(x))
-      .filter(x => x.at >= lowerLimit)
-      .sort((a, b): number => a.at.localeCompare(b.at));
+    deadlines = deadlines.sort((a, b): number => a.at.localeCompare(b.at));
 
     await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.DEADLINES);
 

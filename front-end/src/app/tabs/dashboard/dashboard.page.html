@@ -51,6 +51,14 @@
               <h1 *ngIf="!app.isInMobileMode()">{{ 'DASHBOARD.NEWS' | translate }}</h1>
               <p *ngIf="!editMode">{{ 'DASHBOARD.NEWS_I' | translate }}</p>
             </ion-label>
+            <ion-button
+              color="ESNpink"
+              *ngIf="app.user.isAdministrator && !editMode"
+              (click)="openCommunicationsArchive()"
+            >
+              <ion-icon icon="archive-outline" slot="icon-only" *ngIf="app.isInMobileMode()" />
+              <ion-text *ngIf="!app.isInMobileMode()">{{ 'ARCHIVE.ARCHIVE' | translate }}</ion-text>
+            </ion-button>
             <ion-button color="ESNgreen" *ngIf="editMode" (click)="addCommunication()">
               {{ 'COMMON.ADD' | translate }}
             </ion-button>

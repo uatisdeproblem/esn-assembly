@@ -79,6 +79,11 @@ import { Communication } from '@models/communication.model';
         <app-html-editor [(content)]="communication.content" [editMode]="true"></app-html-editor>
         <ion-row class="ion-padding-top" *ngIf="communication.communicationId">
           <ion-col>
+            <ion-button color="medium" (click)="duplicateCommunication()">
+              {{ 'COMMON.DUPLICATE' | translate }}
+            </ion-button>
+          </ion-col>
+          <ion-col class="ion-text-center">
             <ion-button color="warning" (click)="askAndArchive(!communication.isArchived())">
               {{ (communication.isArchived() ? 'COMMON.UNARCHIVE' : 'COMMON.ARCHIVE') | translate }}
             </ion-button>
@@ -156,6 +161,31 @@ export class ManageCommunicationComponent {
     this.modalCtrl.dismiss();
   }
 
+  async duplicateCommunication(): Promise<void> {
+    const doDuplicate = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const copy = new Communication(this.communication);
+        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+        copy.date = new Date().toISOString();
+        delete copy.archivedAt;
+        copy.load(await this._communications.insert(copy));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.close();
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DUPLICATE'), handler: doDuplicate }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
+  }
   async askAndArchive(archive = true): Promise<void> {
     const doArchive = async (): Promise<void> => {
       try {

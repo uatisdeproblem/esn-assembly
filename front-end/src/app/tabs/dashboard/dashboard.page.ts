@@ -5,6 +5,7 @@ import { IDEALoadingService, IDEAMessageService } from '@idea-ionic/common';
 
 import { CommunicationDetailComponent } from './communications/communicationDetail.component';
 import { ManageCommunicationComponent } from './communications/manageCommunication.component';
+import { CommunicationsComponent } from './communications/communications.component';
 import { DeadlinesComponent } from './deadlines/deadlines.component';
 import { ManageUsefulLinkComponent } from './usefulLinks/manageUsefulLink.component';
 import { StatisticPeriods } from '@app/common/statistics.component';
@@ -103,6 +104,14 @@ export class DashboardPage implements OnInit {
   }
   async addCommunication(): Promise<void> {
     await this.manageCommunication(new Communication());
+  }
+
+  async openCommunicationsArchive(): Promise<void> {
+    const modal = await this.modalCtrl.create({ component: CommunicationsComponent, backdropDismiss: false });
+    modal.onDidDismiss().then(async (): Promise<void> => {
+      this.communications = await this._communications.getList({ force: true });
+    });
+    await modal.present();
   }
 
   //
