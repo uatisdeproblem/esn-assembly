@@ -6,6 +6,7 @@ import { Deadline } from '@models/deadline.model';
 @Injectable({ providedIn: 'root' })
 export class DeadlinesService {
   private deadlines: Deadline[];
+  private currentYear: number = null;
 
   /**
    * The number of deadlines to consider for the pagination, when active.
@@ -15,10 +16,14 @@ export class DeadlinesService {
   constructor(private api: IDEAApiService) {}
 
   /**
-   * Load the deadlines from the back-end.
+   * Load the deadlines from the back-end, possibly filtering by year.
+   * If no year is specified, only the future deadlines are returned.
    */
-  private async loadList(): Promise<void> {
-    const deadlines: Deadline[] = await this.api.getResource('deadlines');
+  private async loadListOfYear(year: number = null): Promise<void> {
+    const params: any = {};
+    if (year) params.year = year;
+    this.currentYear = year;
+    const deadlines: Deadline[] = await this.api.getResource('deadlines', { params });
     this.deadlines = deadlines.map(x => new Deadline(x));
   }
   /**
@@ -29,11 +34,12 @@ export class DeadlinesService {
     options: {
       force?: boolean;
       search?: string;
+      year?: number;
       withPagination?: boolean;
       startPaginationAfterId?: string;
     } = {}
   ): Promise<Deadline[]> {
-    if (!this.deadlines || options.force) await this.loadList();
+    if (!this.deadlines || options.force || options.year !== this.currentYear) await this.loadListOfYear(options.year);
     if (!this.deadlines) return null;
 
     options.search = options.search ? String(options.search).toLowerCase() : '';

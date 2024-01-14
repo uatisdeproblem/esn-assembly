@@ -1544,10 +1544,16 @@ paths:
           $ref: '#/components/responses/BadParameters'
   /deadlines:
     get:
-      summary: Get the (future) deadlines
+      summary: Get the deadlines
       tags: [Deadlines]
       security:
         - AuthFunction: []
+      parameters:
+        - name: year
+          in: query
+          description: Get the deadlines of this year; if not specified, only future deadlines are returned
+          schema:
+            type: number
       responses:
         200:
           $ref: '#/components/responses/Deadlines'

@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
-import { IDEATranslationsModule } from '@idea-ionic/common';
+import { IDEAMessageService, IDEATranslationsModule } from '@idea-ionic/common';
 
 import { DeadlineComponent } from './deadline.component';
 import { ManageDeadlineComponent } from './manageDeadline.component';
@@ -11,9 +12,11 @@ import { DeadlinesService } from './deadlines.service';
 
 import { Deadline } from '@models/deadline.model';
 
+const FIRST_YEAR_FOR_DEADLINES = 2023;
+
 @Component({
   standalone: true,
-  imports: [CommonModule, IonicModule, IDEATranslationsModule, DeadlineComponent, ManageDeadlineComponent],
+  imports: [CommonModule, FormsModule, IonicModule, IDEATranslationsModule, DeadlineComponent, ManageDeadlineComponent],
   selector: 'app-dealines',
   template: `
     <ion-header class="ion-no-border">
@@ -38,6 +41,19 @@ import { Deadline } from '@models/deadline.model';
             {{ 'COMMON.ADD' | translate }}
           </ion-button>
         </ion-list-header>
+        <div class="ion-text-right">
+          <ion-item color="transparent" lines="none">
+            <ion-select
+              interface="popover"
+              labelPlacement="end"
+              [(ngModel)]="filterByYear"
+              (ionChange)="loadListOfYear(filterByYear)"
+            >
+              <ion-select-option [value]="null">{{ 'DEADLINES.FUTURE_DEADLINES' | translate }}</ion-select-option>
+              <ion-select-option *ngFor="let year of years" [value]="year">{{ year }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
         <ion-item class="noElements" *ngIf="deadlines && !deadlines.length">
           <ion-label>{{ 'COMMON.NO_ELEMENTS' | translate }}</ion-label>
         </ion-item>
@@ -65,7 +81,7 @@ import { Deadline } from '@models/deadline.model';
     `
   ]
 })
-export class DeadlinesComponent {
+export class DeadlinesComponent implements OnInit {
   /**
    * The deadlines to show.
    */
@@ -75,7 +91,27 @@ export class DeadlinesComponent {
    */
   @Input() editMode = false;
 
-  constructor(private modalCtrl: ModalController, private _deadlines: DeadlinesService, public app: AppService) {}
+  years: number[];
+  filterByYear: number = null;
+
+  constructor(
+    private modalCtrl: ModalController,
+    private message: IDEAMessageService,
+    private _deadlines: DeadlinesService,
+    public app: AppService
+  ) {}
+  ngOnInit(): void {
+    this.years = this.app.getYearsSince(FIRST_YEAR_FOR_DEADLINES);
+  }
+
+  async loadListOfYear(year: number | null): Promise<void> {
+    try {
+      this.deadlines = null;
+      this.deadlines = await this._deadlines.getList({ force: true, year });
+    } catch (error) {
+      this.message.error('COMMON.COULDNT_LOAD_LIST');
+    }
+  }
 
   close(): void {
     this.modalCtrl.dismiss();
@@ -91,7 +127,7 @@ export class DeadlinesComponent {
       backdropDismiss: false
     });
     modal.onDidDismiss().then(async (): Promise<void> => {
-      this.deadlines = await this._deadlines.getList({ force: true });
+      this.deadlines = await this._deadlines.getList({ force: true, year: this.filterByYear });
     });
     await modal.present();
   }

@@ -236,4 +236,14 @@ export class AppService {
     downloadLink.click();
     document.body.removeChild(downloadLink);
   }
+
+  /**
+   * Get a list with all the years since the specified one.
+   */
+  getYearsSince(firstYear: number): number[] {
+    const years: number[] = [];
+    const currentYear = new Date().getFullYear();
+    for (let year = firstYear; year <= currentYear; year++) years.push(year);
+    return years.reverse();
+  }
 }
