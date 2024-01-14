@@ -50,10 +50,11 @@ class Communications extends ResourceController {
     let communications: Communication[] = await ddb.scan({ TableName: DDB_TABLES.communications });
     communications = communications.map(x => new Communication(x));
 
-    const archived = this.queryParams.archived !== undefined && this.queryParams.archived !== 'false';
-    communications = communications
-      .filter(x => (archived ? x.isArchived() : !x.isArchived()))
-      .sort((a, b): number => b.date.localeCompare(a.date));
+    if (this.queryParams.year)
+      communications = communications.filter(x => new Date(x.date).getFullYear().toString() === this.queryParams.year);
+    else communications = communications.filter(x => !x.isArchived());
+
+    communications = communications.sort((a, b): number => b.date.localeCompare(a.date));
 
     await addStatisticEntry(this.galaxyUser, StatisticEntityTypes.COMMUNICATIONS);
 

@@ -30,7 +30,7 @@ export class ArchivePage implements OnInit {
     public app: AppService
   ) {}
   ngOnInit(): void {
-    this.years = this.getYearsSince(FIRST_YEAR_FOR_ARCHIVE);
+    this.years = this.app.getYearsSince(FIRST_YEAR_FOR_ARCHIVE);
   }
 
   async search(): Promise<void> {
@@ -57,13 +57,6 @@ export class ArchivePage implements OnInit {
     });
 
     if (scrollToNextPage) setTimeout((): Promise<void> => scrollToNextPage.complete(), 100);
-  }
-
-  private getYearsSince(firstYear: number): number[] {
-    const years: number[] = [];
-    const currentYear = new Date().getFullYear();
-    for (let year = firstYear; year <= currentYear; year++) years.push(year);
-    return years;
   }
 
   openOpportunity(opportunity: Opportunity): void {
