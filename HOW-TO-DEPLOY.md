@@ -40,10 +40,7 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
 1. Open the terminal (command prompt) and [boostrap CDK](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) in the account/region identified by running:
 
    ```sh
-   cdk bootstrap aws://{AWS_ACCOUNT_ID}/{AWS_REGION}
-
-   # example:
-   cdk bootstrap aws://123456789/eu-central-1
+   cdk bootstrap aws://{AWS_ACCOUNT_ID}/{AWS_REGION} --profile {AWS_PROFILE}
    ```
 
 1. Fork the [repository on GitHub](https://github.com/uatisdeproblem/esn-assembly) and download the project's files.
