@@ -352,9 +352,9 @@
   "PROFILE": {
     "MANAGE_ON_ESN_ACCOUNTS": "Profile on ESN Accounts",
     "FEEDBACK_OR_HELP": "Send feedback or ask for help",
-    "FEEDBACK_EMAIL_SUBJECT": "ESN GA Q&A - Feedback",
+    "FEEDBACK_EMAIL_SUBJECT": "ESN Assembly app - Feedback",
     "YOUR_BADGES": "Your badges",
-    "NO_BADGES": "No badges so far. While you're using the Q&A tool, you will earn some. Go get them all and make your ESNer friends envy you!",
+    "NO_BADGES": "No badges so far. While you're using the app, you will earn some. Go get them all and make your ESNer friends envy you!",
     "YOU_EARNED_A_BADGE": "Congrats!! You've earned a shiny new badge!",
     "BADGE_EARNED": "Earned",
     "BADGES": {
@@ -380,7 +380,7 @@
       "RAPID_ROCKET_SPEAKER": "Rapid rocket speaker"
     },
     "BADGES_I": {
-      "FIRST_QUESTION": "Congrats for starting your way into the Q&A app!",
+      "FIRST_QUESTION": "Congrats for starting your way into the app!",
       "PEER_PRESSURE_MINHO": "Pedro asks, you deliver. Just in time before GA Minho's deadline.",
       "QUESTIONS_MASTER": "This is the way! Asking lots of healthy questions help the Network grow stronger.",
       "NEWCOMER": "You're finally acclimating to the tool. We are happy about it!",
