@@ -59,7 +59,7 @@ import { VotingResults } from '@models/votingResult.model';
                   </ion-badge>
                   <ion-label class="ion-text-wrap">{{ option }}</ion-label>
                   <ion-badge *ngIf="results" slot="end" color="medium" class="resultPercentage">
-                    {{ getResultOfBallotOptionBasedOnRaw(bIndex, oIndex) | percent }}
+                    {{ getResultOfBallotOptionBasedOnRaw(bIndex, oIndex) | percent : '1.2-2' }}
                   </ion-badge>
                   <ion-popover
                     *ngIf="results && !votingSession.isSecret"
@@ -145,7 +145,7 @@ import { VotingResults } from '@models/votingResult.model';
         font-size: 0.9em;
       }
       ion-item ion-badge.resultPercentage {
-        width: 50px;
+        width: 60px;
         text-align: right;
       }
       ion-label h3 {
