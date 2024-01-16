@@ -281,7 +281,7 @@ export class VotingService {
       votingSession.ballots.forEach((ballot, bIndex): void => {
         sheetRows.push([ballot.text]);
         [...ballot.options, 'Abstain', 'Absent'].forEach((option, oIndex): void => {
-          sheetRows.push([option, votingSession.results[bIndex][oIndex].value]);
+          sheetRows.push([option, results[bIndex][oIndex].value]);
         });
         sheetRows.push([], []);
       });
@@ -290,7 +290,7 @@ export class VotingService {
       votingSession.voters.forEach(voter => {
         const row = [voter.name];
         votingSession.ballots.forEach((ballot, bIndex): void => {
-          const votedOptionIndex = votingSession.results[bIndex].findIndex(o => o.voters?.includes(voter.name));
+          const votedOptionIndex = results[bIndex].findIndex(o => o.voters?.includes(voter.name));
           const votedOption =
             votedOptionIndex === -1
               ? 'Absent'
