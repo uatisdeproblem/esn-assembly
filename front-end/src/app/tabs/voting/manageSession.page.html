@@ -504,7 +504,7 @@
           </ion-button>
         </ion-list-header>
         <div class="ion-text-end ion-padding-end">
-          <ion-toggle [(ngModel)]="showRawResults">{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
+          <ion-toggle [(ngModel)]="showRawResults" disabled>{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
         </div>
         <app-voting-ballots [votingSession]="votingSession" [results]="results" [raw]="showRawResults" />
         <ion-row>

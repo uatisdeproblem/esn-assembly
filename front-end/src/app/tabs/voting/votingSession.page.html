@@ -50,7 +50,15 @@
                   {{ votingSession.voters.length }}
                 </ion-label>
               </ion-item>
-              <ion-accordion-group *ngIf="votingSession.results">
+              <ion-item *ngIf="votingSession.results && votingSession.isSecret">
+                <ion-icon slot="start" icon="golf-outline" />
+                <ion-label>
+                  <p>{{ 'VOTING.PARTICIPATION' | translate }}</p>
+                  {{ ((votingSession.voters.length - absentVoters.length) / votingSession.voters.length) | percent }}
+                  ({{ votingSession.voters.length - absentVoters.length }})
+                </ion-label>
+              </ion-item>
+              <ion-accordion-group *ngIf="votingSession.results && !votingSession.isSecret">
                 <ion-accordion value="participation">
                   <ion-item slot="header">
                     <ion-icon slot="start" icon="golf-outline" />
@@ -61,7 +69,7 @@
                     </ion-label>
                   </ion-item>
                   <div class="ion-padding" slot="content">
-                    <ion-item lines="inset" *ngFor="let voter of votingSession.voters">
+                    <ion-item lines="inset" *ngFor="let voter of votingSession.getSortedVoters()">
                       <ion-label class="ion-text-wrap">{{ voter.name }}</ion-label>
                       <ion-badge slot="end" color="light" *ngIf="wasVoterAbsent(voter)">
                         {{ 'VOTING.ABSENT' | translate }}
@@ -103,7 +111,7 @@
             </ion-label>
           </ion-list-header>
           <div class="ion-text-end ion-padding-end" *ngIf="votingSession.results">
-            <ion-toggle [(ngModel)]="showRawResults">{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
+            <ion-toggle [(ngModel)]="showRawResults" disabled>{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
           </div>
           <ion-item class="noElements" *ngIf="!votingSession.ballots.length">
             <ion-label class="ion-text-wrap">{{ 'VOTING.NO_BALLOTS_YET' | translate }}</ion-label>

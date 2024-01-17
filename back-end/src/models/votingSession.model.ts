@@ -220,6 +220,12 @@ export class VotingSession extends Resource {
   }
 
   /**
+   * Get the list of voters sorted by name.
+   */
+  getSortedVoters(): Voter[] {
+    return this.voters.sort((a, b): number => a.name.localeCompare(b.name));
+  }
+  /**
    * Get the voters who didn't vote (absent).
    * Note: either a voter is present for all the ballots or they are absents for all the ballots.
    */

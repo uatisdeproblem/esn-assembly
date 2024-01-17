@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular';
 import Chart from 'chart.js/auto';
 import { IDEATranslationsModule, IDEATranslationsService } from '@idea-ionic/common';
+
+import { MajorityTypeStandaloneComponent } from './majorityType.component';
+import { BallotVotesDetailStandaloneComponent } from './ballotVotesDetail.component';
 
 import { AppService } from '@app/app.service';
 
@@ -30,18 +33,9 @@ import { VotingResults } from '@models/votingResult.model';
             </ion-item>
           </ng-container>
           <ion-card-title>{{ ballot.text }}</ion-card-title>
-          <ion-card-subtitle class="tappable" [id]="'majorityTypeInfo-' + bIndex">
+          <ion-card-subtitle class="tappable" (click)="openMajorityTypePopover(ballot.majorityType, $event)">
             {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType | translate }} <ion-icon icon="information" />
           </ion-card-subtitle>
-          <ion-popover [trigger]="'majorityTypeInfo-' + bIndex" triggerAction="click">
-            <ng-template>
-              <ion-content class="ion-padding">
-                <p style="font-size: 0.9em">
-                  {{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType + '_I' | translate }}
-                </p>
-              </ion-content>
-            </ng-template>
-          </ion-popover>
         </ion-card-header>
         <ion-card-content>
           <ion-grid class="ion-no-padding">
@@ -51,7 +45,7 @@ import { VotingResults } from '@models/votingResult.model';
                   lines="none"
                   *ngFor="let option of getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex); let oIndex = index"
                   [button]="results && !votingSession.isSecret"
-                  [id]="'votersList-' + bIndex + '-' + oIndex"
+                  (click)="openBallotVotesDetailPopover(bIndex, oIndex, option, $event)"
                 >
                   <ion-badge slot="start" color="light" *ngIf="!results">{{ oIndex + 1 }}</ion-badge>
                   <ion-badge slot="start" style="--background: {{ chartColors[oIndex] }}" *ngIf="results">
@@ -61,37 +55,6 @@ import { VotingResults } from '@models/votingResult.model';
                   <ion-badge *ngIf="results" slot="end" color="medium" class="resultPercentage">
                     {{ getResultOfBallotOptionBasedOnRaw(bIndex, oIndex) | percent : '1.2-2' }}
                   </ion-badge>
-                  <ion-popover
-                    *ngIf="results && !votingSession.isSecret"
-                    [trigger]="'votersList-' + bIndex + '-' + oIndex"
-                    triggerAction="click"
-                  >
-                    <ng-template>
-                      <ion-content>
-                        <ion-list class="ion-padding">
-                          <ion-list-header>
-                            <ion-label class="ion-margin-bottom">
-                              <p>{{ 'VOTING.VOTERS_FOR' | translate }}</p>
-                              <h3>{{ option }}</h3>
-                              <p style="margin-top: 4px">
-                                <ion-badge color="medium">
-                                  {{ getResultOfBallotOptionBasedOnRaw(bIndex, oIndex) }}
-                                </ion-badge>
-                              </p>
-                            </ion-label>
-                          </ion-list-header>
-                          <ion-item *ngIf="results[bIndex][oIndex].value === 0">
-                            <ion-label class="ion-padding-start">
-                              <i>{{ 'VOTING.NO_ONE' | translate }}</i>
-                            </ion-label>
-                          </ion-item>
-                          <ion-item *ngFor="let voter of results[bIndex][oIndex].voters">
-                            <ion-label class="ion-text-wrap ion-padding-start">{{ voter }}</ion-label>
-                          </ion-item>
-                        </ion-list>
-                      </ion-content>
-                    </ng-template>
-                  </ion-popover>
                 </ion-item>
               </ion-col>
               <ion-col [size]="12" [sizeMd]="3" *ngIf="results">
@@ -148,9 +111,6 @@ import { VotingResults } from '@models/votingResult.model';
         width: 60px;
         text-align: right;
       }
-      ion-label h3 {
-        font-weight: 500;
-      }
       div.chartContainer {
         height: 120px;
       }
@@ -197,7 +157,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
 
   chartCanvasBaseId: string;
 
-  constructor(private t: IDEATranslationsService, public app: AppService) {}
+  constructor(private popoverCtrl: PopoverController, private t: IDEATranslationsService, public app: AppService) {}
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.results || changes.raw) {
       this.charts.forEach(chart => chart?.destroy());
@@ -209,6 +169,15 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
   }
   ngOnDestroy(): void {
     this.charts.forEach(chart => chart?.destroy());
+  }
+
+  async openMajorityTypePopover(majorityType: string, event: Event): Promise<void> {
+    const popover = await this.popoverCtrl.create({
+      component: MajorityTypeStandaloneComponent,
+      componentProps: { majorityType },
+      event
+    });
+    popover.present();
   }
 
   getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex: number): string[] {
@@ -263,11 +232,33 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
           layout: { padding: 20 },
           plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: tooltipItem => `${Number(tooltipItem.formattedValue) * 100}%` } }
+            tooltip: {
+              callbacks: { label: tooltipItem => `${(Number(tooltipItem.formattedValue) * 100).toFixed(2)}%` }
+            }
           }
         }
       });
     });
+  }
+
+  async openBallotVotesDetailPopover(
+    ballotIndex: number,
+    optionIndex: number,
+    option: string,
+    event: Event
+  ): Promise<void> {
+    if (!this.results || this.votingSession.isSecret) return;
+    const componentProps = {
+      ballotOption: option,
+      resultValue: this.getResultOfBallotOptionBasedOnRaw(ballotIndex, optionIndex),
+      votersNames: this.results[ballotIndex][optionIndex].voters
+    };
+    const popover = await this.popoverCtrl.create({
+      component: BallotVotesDetailStandaloneComponent,
+      componentProps,
+      event
+    });
+    popover.present();
   }
 }
 
