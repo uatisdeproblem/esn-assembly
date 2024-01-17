@@ -54,6 +54,22 @@ export class Configurations extends Resource {
    * When displaying a user, which information to show.
    */
   usersOriginDisplay: UsersOriginDisplayOptions;
+  /**
+   * Whether to hide the Q&A topics feature from the front-end.
+   */
+  hideQATopics: boolean;
+  /**
+   * Whether to hide the opportunities feature from the front-end.
+   */
+  hideOpportunities: boolean;
+  /**
+   * Whether to hide the voting feature from the front-end.
+   */
+  hideVoting: boolean;
+  /**
+   * Whether to hide the badges (gamification) feature from the front-end.
+   */
+  hideBadges: boolean;
 
   load(x: any): void {
     super.load(x);
@@ -68,6 +84,10 @@ export class Configurations extends Resource {
     this.appLogoURLDarkMode = this.clean(x.appLogoURLDarkMode, String);
     this.timezone = this.clean(x.timezone, String, DEFAULT_TIMEZONE);
     this.usersOriginDisplay = this.clean(x.usersOriginDisplay, String, UsersOriginDisplayOptions.SECTION);
+    this.hideQATopics = this.clean(x.hideQATopics, Boolean, false);
+    this.hideOpportunities = this.clean(x.hideOpportunities, Boolean, false);
+    this.hideVoting = this.clean(x.hideVoting, Boolean, false);
+    this.hideBadges = this.clean(x.hideBadges, Boolean, false);
   }
 
   safeLoad(newData: any, safeData: any): void {

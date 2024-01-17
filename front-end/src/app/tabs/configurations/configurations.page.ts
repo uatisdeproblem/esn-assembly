@@ -193,6 +193,26 @@ export class ConfigurationsPage implements OnInit {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
+  async setVisibilityQATopicsFeature(show: boolean): Promise<void> {
+    const newConfigurations = new Configurations(this.configurations);
+    newConfigurations.hideQATopics = !show;
+    await this.updateConfigurations(newConfigurations);
+  }
+  async setVisibilityOpportunitiesFeature(show: boolean): Promise<void> {
+    const newConfigurations = new Configurations(this.configurations);
+    newConfigurations.hideOpportunities = !show;
+    await this.updateConfigurations(newConfigurations);
+  }
+  async setVisibilityVotingFeature(show: boolean): Promise<void> {
+    const newConfigurations = new Configurations(this.configurations);
+    newConfigurations.hideVoting = !show;
+    await this.updateConfigurations(newConfigurations);
+  }
+  async setVisibilityBadgesFeature(show: boolean): Promise<void> {
+    const newConfigurations = new Configurations(this.configurations);
+    newConfigurations.hideBadges = !show;
+    await this.updateConfigurations(newConfigurations);
+  }
 }
 
 enum PageSections {

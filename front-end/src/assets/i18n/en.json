@@ -305,7 +305,13 @@
       "USERS": "Users",
       "TEMPLATES": "Templates",
       "OPTIONS": "Options"
-    }
+    },
+    "HIDE_APP_FEATURES": "Hide app features",
+    "HIDE_APP_FEATURES_I": "Features will be hidden only from the menu; direct links to specific features will keep working.",
+    "HIDE_QA_TOPICS": "Hide Q&A topics",
+    "HIDE_OPPORTUNITIES": "Hide opportunities",
+    "HIDE_VOTING": "Hide voting",
+    "HIDE_BADGES": "Hide users badges"
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",
