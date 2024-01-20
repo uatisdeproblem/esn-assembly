@@ -54,8 +54,8 @@
                 <ion-icon slot="start" icon="golf-outline" />
                 <ion-label>
                   <p>{{ 'VOTING.PARTICIPATION' | translate }}</p>
-                  {{ ((votingSession.voters.length - absentVoters.length) / votingSession.voters.length) | percent }}
-                  ({{ votingSession.voters.length - absentVoters.length }})
+                  {{ ((votingSession.voters.length - absentVoters.length) / votingSession.voters.length) | percent :
+                  '1.0-2' }}
                 </ion-label>
               </ion-item>
               <ion-accordion-group *ngIf="votingSession.results && !votingSession.isSecret">
@@ -64,8 +64,8 @@
                     <ion-icon slot="start" icon="golf-outline" />
                     <ion-label>
                       <p>{{ 'VOTING.PARTICIPATION' | translate }}</p>
-                      {{ ((votingSession.voters.length - absentVoters.length) / votingSession.voters.length) | percent
-                      }} ({{ votingSession.voters.length - absentVoters.length }})
+                      {{ ((votingSession.voters.length - absentVoters.length) / votingSession.voters.length) | percent :
+                      '1.0-2' }}
                     </ion-label>
                   </ion-item>
                   <div class="ion-padding" slot="content">
@@ -111,7 +111,7 @@
             </ion-label>
           </ion-list-header>
           <div class="ion-text-end ion-padding-end" *ngIf="votingSession.results">
-            <ion-toggle [(ngModel)]="showRawResults" disabled>{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
+            <ion-toggle [(ngModel)]="showRawResults">{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
           </div>
           <ion-item class="noElements" *ngIf="!votingSession.ballots.length">
             <ion-label class="ion-text-wrap">{{ 'VOTING.NO_BALLOTS_YET' | translate }}</ion-label>
@@ -123,7 +123,7 @@
           />
           <p class="ion-text-center" *ngIf="votingSession.results">
             <ion-button color="medium" (click)="downloadResults()">
-              {{ 'VOTING.DOWNLOAD_RESULTS' | translate }} <ion-icon slot="end" icon="download" />
+              {{ 'VOTING.DOWNLOAD_CASTED_VOTES' | translate }} <ion-icon slot="end" icon="download" />
             </ion-button>
           </p>
         </ion-list>

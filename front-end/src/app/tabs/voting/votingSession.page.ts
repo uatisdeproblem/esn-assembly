@@ -18,7 +18,7 @@ export class VotingSessionPage {
 
   absentVoters: Voter[];
 
-  showRawResults = true;
+  showRawResults = false;
 
   constructor(
     private loading: IDEALoadingService,
