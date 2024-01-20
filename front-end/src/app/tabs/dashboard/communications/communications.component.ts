@@ -63,8 +63,8 @@ const FIRST_YEAR_FOR_COMMUNICATIONS = 2023;
         </ion-item>
         <ion-item button *ngFor="let communication of communications" (click)="openCommunication(communication)">
           <ion-label class="ion-text-wrap">
+            <p *ngIf="communication.event">{{ communication.event.name }}</p>
             {{ communication.name }}
-            <p>{{ communication.brief }}</p>
           </ion-label>
           <ion-note slot="end">{{ communication.date | dateTz }}</ion-note>
           <ion-button
@@ -85,8 +85,6 @@ const FIRST_YEAR_FOR_COMMUNICATIONS = 2023;
       ion-list.aList ion-list-header {
         margin-left: 8px;
       }
-    `,
-    `
       ion-toolbar ion-buttons[slot='start'] ion-button {
         margin-left: 8px;
       }

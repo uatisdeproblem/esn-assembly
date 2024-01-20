@@ -305,7 +305,13 @@
       "USERS": "Users",
       "TEMPLATES": "Templates",
       "OPTIONS": "Options"
-    }
+    },
+    "HIDE_APP_FEATURES": "Hide app features",
+    "HIDE_APP_FEATURES_I": "Features will be hidden only from the menu; direct links to specific features will keep working.",
+    "HIDE_QA_TOPICS": "Hide Q&A topics",
+    "HIDE_OPPORTUNITIES": "Hide opportunities",
+    "HIDE_VOTING": "Hide voting",
+    "HIDE_BADGES": "Hide users badges"
   },
   "CATEGORIES": {
     "CATEGORIES": "Categories",
@@ -761,7 +767,7 @@
     "PUBLISH_RESULTS_I": "Once the results are published, everyone will be able to see them. You can't go back from this choice.",
     "NO_ONE": "No one",
     "VOTERS_FOR": "Voters for",
-    "DOWNLOAD_RESULTS": "Download results",
+    "DOWNLOAD_CASTED_VOTES": "Download casted votes",
     "DOWNLOAD_VOTERS_AUDIT": "Download voters audit",
     "VOTERS_AUDIT": "Voters audit",
     "ABSENT": "Absent",

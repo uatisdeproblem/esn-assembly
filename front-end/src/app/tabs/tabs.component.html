@@ -6,13 +6,13 @@
     <ion-tab-button tab="dashboard">
       <ion-label>{{ 'TABS.DASHBOARD' | translate }}</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="topics">
+    <ion-tab-button tab="topics" *ngIf="!app.configurations.hideQATopics">
       <ion-label>{{ 'TABS.TOPICS' | translate }}</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="opportunities">
+    <ion-tab-button tab="opportunities" *ngIf="!app.configurations.hideOpportunities">
       <ion-label>{{ 'TABS.OPPORTUNITIES' | translate }}</ion-label>
     </ion-tab-button>
-    <ion-tab-button tab="voting">
+    <ion-tab-button tab="voting" *ngIf="!app.configurations.hideVoting">
       <ion-label>{{ 'TABS.VOTING' | translate }}</ion-label>
     </ion-tab-button>
     <ion-tab-button tab="profile">
@@ -29,13 +29,13 @@
     <ion-tab-button tab="dashboard">
       <ion-icon icon="home"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="topics">
+    <ion-tab-button tab="topics" *ngIf="!app.configurations.hideQATopics">
       <ion-icon icon="chatbubbles"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="opportunities">
+    <ion-tab-button tab="opportunities" *ngIf="!app.configurations.hideOpportunities">
       <ion-icon icon="balloon"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="voting">
+    <ion-tab-button tab="voting" *ngIf="!app.configurations.hideVoting">
       <ion-icon icon="ticket"></ion-icon>
     </ion-tab-button>
     <ion-tab-button tab="profile">

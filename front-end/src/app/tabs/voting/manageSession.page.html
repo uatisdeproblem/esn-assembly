@@ -413,15 +413,16 @@
             <ion-icon slot="start" icon="log-in-outline" />
             <ion-label class="ion-text-wrap">
               <p>{{ 'VOTING.STARTED_VOTING' | translate }}</p>
-              {{ getNumVotersWhoSignedIn() }} ({{ (getNumVotersWhoSignedIn() / votingSession.voters.length) | percent
-              }})
+              {{ getNumVotersWhoSignedIn() }} ({{ (getNumVotersWhoSignedIn() / votingSession.voters.length) | percent :
+              '1.0-2' }})
             </ion-label>
           </ion-item>
           <ion-item>
             <ion-icon slot="start" icon="checkmark-outline" />
             <ion-label class="ion-text-wrap">
               <p>{{ 'VOTING.VOTED' | translate }}</p>
-              {{ getNumVotersWhoVoted() }} ({{ (getNumVotersWhoVoted() / votingSession.voters.length) | percent }})
+              {{ getNumVotersWhoVoted() }} ({{ (getNumVotersWhoVoted() / votingSession.voters.length) | percent :
+              '1.0-2' }})
             </ion-label>
           </ion-item>
           <ion-item>
@@ -510,7 +511,7 @@
         <ion-row>
           <ion-col>
             <ion-button color="medium" (click)="downloadResults()">
-              {{ 'VOTING.DOWNLOAD_RESULTS' | translate }} <ion-icon slot="end" icon="download" />
+              {{ 'VOTING.DOWNLOAD_CASTED_VOTES' | translate }} <ion-icon slot="end" icon="download" />
             </ion-button>
           </ion-col>
           <ion-col class="ion-text-end" *ngIf="votingTickets?.length">
