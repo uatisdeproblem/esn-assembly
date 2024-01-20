@@ -190,7 +190,9 @@ export class ManageTopicPage {
         if (open) await this._topics.open(this.topic);
         else await this._topics.close(this.topic);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.goToInTabs(['topics', this.topic.topicId], { back: true });
+        this.app.goToInTabs(['topics', this.topic.topicId, this.topic.type === TopicTypes.LIVE ? 'live' : 'standard'], {
+          back: true
+        });
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
@@ -212,7 +214,9 @@ export class ManageTopicPage {
         if (archive) await this._topics.archive(this.topic);
         else await this._topics.unarchive(this.topic);
         this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.goToInTabs(['topics', this.topic.topicId], { back: true });
+        this.app.goToInTabs(['topics', this.topic.topicId, this.topic.type === TopicTypes.LIVE ? 'live' : 'standard'], {
+          back: true
+        });
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
       } finally {
