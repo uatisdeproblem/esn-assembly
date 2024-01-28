@@ -100,9 +100,7 @@ export class ManageBallotStandaloneComponent implements OnInit {
     this.ballot.options.push('');
   }
   handleOptionsReorder({ detail }): void {
-    const toReposition = this.ballot.options.splice(detail.from, 1)[0];
-    this.ballot.options.splice(detail.to, 0, toReposition);
-    detail.complete();
+    this.ballot.options = detail.complete(this.ballot.options);
   }
   removeOptionByIndex(index: number): void {
     this.ballot.options.splice(index, 1);
