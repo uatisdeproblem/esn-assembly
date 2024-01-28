@@ -220,9 +220,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
   }
 
   handleBallotReorder({ detail }): void {
-    const toReposition = this.votingSession.ballots.splice(detail.from, 1)[0];
-    this.votingSession.ballots.splice(detail.to, 0, toReposition);
-    detail.complete();
+    this.votingSession.ballots = detail.complete(this.votingSession.ballots);
   }
 
   buildCharts(): void {
