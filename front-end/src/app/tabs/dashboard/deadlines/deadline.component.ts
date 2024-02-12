@@ -4,7 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { isToday, isTomorrow } from 'date-fns';
 import { IDEATranslationsModule, IDEATranslationsService } from '@idea-ionic/common';
 
-import { DateTimezonePipe } from '@common/dateTimezone.pipe';
+import { DateTimezonePipe, formatDateWithLocaleAndTimeZone } from '@common/dateTimezone.pipe';
 
 import { AppService } from '@app/app.service';
 
@@ -99,6 +99,6 @@ export class DeadlineComponent {
     const date = new Date(this.deadline.at);
     if (isToday(date)) return this.t._('DEADLINES.TODAY');
     if (isTomorrow(date)) return this.t._('DEADLINES.TOMORROW');
-    else return this.t.formatDate(date);
+    else return formatDateWithLocaleAndTimeZone(date, this.t.getCurrentLang(), this.app.configurations.timezone);
   }
 }
