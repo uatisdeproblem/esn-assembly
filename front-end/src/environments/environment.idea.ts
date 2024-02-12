@@ -10,7 +10,7 @@ const STAGE = 'prod';
  */
 export const environment = {
   idea: {
-    app: { version: '1.8.3', mediaUrl: 'https://'.concat(parameters.mediaDomain), maxFileUploadSizeMB: 50 },
+    app: { version: '1.8.4', mediaUrl: 'https://'.concat(parameters.mediaDomain), maxFileUploadSizeMB: 50 },
     api: { url: parameters.apiDomain, stage: STAGE },
     socket: { url: parameters.webSocketApiDomain, stage: STAGE },
     ionicExtraModules: ['common']
