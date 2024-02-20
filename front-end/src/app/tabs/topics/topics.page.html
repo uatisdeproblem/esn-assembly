@@ -39,8 +39,11 @@
       <ion-item lines="none" color="ideaToolbar" class="ion-hide-lg-down">
         <ion-select interface="popover" [(ngModel)]="filterByStatus" (ionChange)="filter(searchbar.value)">
           <ion-select-option [value]="null">{{ 'TOPICS.ALL_STATUSES' | translate }}</ion-select-option>
-          <ion-select-option [value]="true">{{ 'TOPICS.STATUSES.OPEN' | translate }}</ion-select-option>
-          <ion-select-option [value]="false">{{ 'TOPICS.STATUSES.CLOSED' | translate }}</ion-select-option>
+          <ion-select-option [value]="'DRAFT'" *ngIf="app.user.isAdministrator">
+            {{ 'TOPICS.STATUSES.DRAFT' | translate }}
+          </ion-select-option>
+          <ion-select-option [value]="'OPEN'">{{ 'TOPICS.STATUSES.OPEN' | translate }}</ion-select-option>
+          <ion-select-option [value]="'CLOSED'">{{ 'TOPICS.STATUSES.CLOSED' | translate }}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item lines="none" color="ideaToolbar" class="ion-hide-xl-down">

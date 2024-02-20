@@ -3,7 +3,7 @@ import { IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
 import { IDEAActionSheetController, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
-import { TopicsService, TopicsSortBy } from './topics.service';
+import { TopicsService, TopicsSortBy, TopicsFilterByStatus } from './topics.service';
 import { TopicCategoryService } from '../configurations/categories/categories.service';
 import { GAEventsService } from '../configurations/events/events.service';
 
@@ -28,7 +28,7 @@ export class TopicsPage implements OnInit {
   events: GAEvent[];
   filterByEvent: string = null;
 
-  filterByStatus: boolean = null;
+  filterByStatus: TopicsFilterByStatus = null;
 
   TopicTypes = TopicTypes;
   filterByType: TopicTypes = null;

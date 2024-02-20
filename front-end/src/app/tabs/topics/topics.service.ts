@@ -36,7 +36,7 @@ export class TopicsService {
       search?: string;
       categoryId?: string;
       eventId?: string;
-      status?: boolean;
+      status?: TopicsFilterByStatus;
       type?: TopicTypes;
       withPagination?: boolean;
       startPaginationAfterId?: string;
@@ -65,9 +65,17 @@ export class TopicsService {
 
     if (options.eventId) filteredList = filteredList.filter(x => x.event.eventId === options.eventId);
 
-    if (options.status === true || options.status === false)
-      filteredList = filteredList.filter(x => (options.status ? !x.closedAt : x.closedAt));
-
+    switch (options.status) {
+      case TopicsFilterByStatus.DRAFT:
+        filteredList = filteredList.filter(x => !x.publishedSince);
+        break;
+      case TopicsFilterByStatus.OPEN:
+        filteredList = filteredList.filter(x => !x.closedAt && !!x.publishedSince);
+        break;
+      case TopicsFilterByStatus.CLOSED:
+        filteredList = filteredList.filter(x => x.closedAt && !!x.publishedSince);
+        break;
+    }
     if (options.type) filteredList = filteredList.filter(x => options.type === x.type);
 
     switch (options.sortBy) {
@@ -263,4 +271,10 @@ export enum TopicsSortBy {
   CREATED_DATE_DESC = 'CREATED_DATE_DESC',
   ACTIVITY_ASC = 'ACTIVITY_ASC',
   ACTIVITY_DESC = 'ACTIVITY_DESC'
+}
+
+export enum TopicsFilterByStatus {
+  DRAFT = 'DRAFT',
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED'
 }

@@ -108,6 +108,7 @@
     "LIVE_ON": "Live on",
     "STATUS": "Status",
     "STATUSES": {
+      "DRAFT":"Draft",
       "OPEN": "Open",
       "CLOSED": "Closed"
     },
