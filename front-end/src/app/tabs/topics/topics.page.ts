@@ -29,6 +29,7 @@ export class TopicsPage implements OnInit {
   filterByEvent: string = null;
 
   filterByStatus: TopicsFilterByStatus = null;
+  Statuses = TopicsFilterByStatus;
 
   TopicTypes = TopicTypes;
   filterByType: TopicTypes = null;
