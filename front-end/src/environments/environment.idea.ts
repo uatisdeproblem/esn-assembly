@@ -3,7 +3,7 @@ import { parameters } from '../../../back-end/deploy/environments';
 /**
  * The stage to use for API (and websocket) requests.
  */
-const STAGE = 'dev';
+const STAGE = 'prod';
 
 /**
  * Variables to configure an ITER IDEA's cloud app, together with its inner modules.
