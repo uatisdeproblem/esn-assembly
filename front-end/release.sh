@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # project specific parameters
-AWS_PROFILE='esn-ga'
-DOMAIN_PROD='esn-ga.link'
-DOMAIN_DEV='dev.esn-ga.link'
+AWS_PROFILE='esn-assembly-pt'
+DOMAIN_PROD='esn-assembly-pt.link'
+DOMAIN_DEV='dev.esn-assembly-pt.link'
 
 # other parameters
 ACTION=$1
