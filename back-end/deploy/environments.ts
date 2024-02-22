@@ -9,7 +9,7 @@ export const DOMAIN = 'esn-assembly-lt.link';
 /**
  * An additional custom domain to use.
  */
-export const PROD_CUSTOM_DOMAIN: string | null = null; // in case of first creation, use: `null`
+export const PROD_CUSTOM_DOMAIN = 'na.esn.lt';
 
 export const parameters: Parameters = {
   project: PROJECT,
