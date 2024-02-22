@@ -17,7 +17,7 @@ export const parameters: Parameters = {
   webSocketApiDomain: 'socket.'.concat(DOMAIN),
   mediaDomain: 'media.'.concat(DOMAIN),
   frontEndCertificateARN: PROD_CUSTOM_DOMAIN
-    ? 'arn:aws:acm:us-east-1:772823474617:certificate/12d7466b-c989-46ee-86c5-61b2cda3c35c'
+    ? 'arn:aws:acm:us-east-1:730335531065:certificate/4ae2327d-dcb4-4ca9-9b7c-0bd9c61302f7'
     : undefined
 };
 
