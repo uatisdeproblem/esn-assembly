@@ -34,6 +34,7 @@ If you're following this guide to implement the tool for a National Organization
 
 1. Install [NodeJS](https://nodejs.org/en/). The app is built on Typescript and NodeJS, so it's a mandatory development tool.
 1. Install the [AWS Cloud Development Kit (CDK)](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html); this Infrastructure as Code (IaC) toolkit will deploy the app environment for us.
+1. Install the CLI of [Angular](https://angular.io/guide/setup-local#install-the-angular-cli) and [Ionic](https://ionicframework.com/docs/cli); they are our development frameworks and we need them to compile our project's code.
 
 ## Deployment
 
@@ -80,6 +81,7 @@ The suggested IDE is [Visual Studio Code](https://code.visualstudio.com/); we in
 1. From Visual Studio Code menu:
    1. "Terminal > Run build task", select "Deploy back-end environment" and select a stage you've created.
    1. "Terminal > Run build task", select "Deploy front-end environment" and select a stage you've created.
+      - Note: since the app supports development and production back-and (API) stages, **you need decide which to use when you run or release the front-end**; in `/front-end/src/environments/environment.idea.ts` you can switch between "dev" and "prod" with the variable `STAGE`. Note: _dev_ and _prod_ environment have their own databases; this means that the app's contents will be different based on which environment you’re referring to with the variable `STAGE`. Finally: **if you are releasing the development front-end, you should target the development back-end** (API) by setting the previously mentioned `STAGE` to "dev".
 1. Feel free to commit the few changed files in the forked GitHub repository (or branch). _Please, if you make any changes to the source code, commit them to the forked repository (or branch) so that other NOs can take advantage of your improvements._
 1. **Note well.** The first user to access a given app environment will automatically be administrator.
 1. Some of the internal features require the sending of email messages. To enable our AWS account to send emails (through the [SES service](https://aws.amazon.com/ses/)), we need to request to AWS to be taken out of the default sandbox of SES. [Read here for more information](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html). To do this, you can start by running the following command in the terminal, then follow AWS instructions (you will receive a follow-up email within a day or two) accordingly. Basically, you have to prove that you can handle the project's email sending without generating too much SPAM or receiving too many email bounces.
@@ -105,7 +107,7 @@ If you want to have your production environment available to a custom domain (e.
 
 If you're following this guide on behalf of another National Organization, you may want to use [this email template](https://docs.google.com/document/d/1o9HHcC_hKjlFrVs9g53jh_VfJwZaNsg7qnL7tT-Hzug/edit#heading=h.9jlqqqv3bhun).
 
-1. We need to create an SSL certificate that is linked to the custom domain; note: the certificate must be always created in the region `us-east-1`, regardless of the region where you deployed the application. The `{CUSTOM_DOMAIN_NAME}` it's the full custom domain name you chose: `assembly.esn.it`. You can achieve this by running the following command in the terminal:
+1. We need to create an SSL certificate that is linked to the custom domain (to ensure an HTTPS secure connection); note: the certificate must be always created in the region `us-east-1`, regardless of the region where you deployed the application. The `{CUSTOM_DOMAIN_NAME}` it's the full custom domain name you chose: `assembly.esn.it`. You can achieve this by running the following command in the terminal:
 
    ```
    aws --profile {AWS_PROFILE} --region us-east-1 acm request-certificate \
