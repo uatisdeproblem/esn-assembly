@@ -12,6 +12,7 @@
 - Subject: an ESNer or an ESN section/country target of a Q&A topic.
 - Communication: news related to the Assembly.
 - Deadline: a date and time indicating some actions that have to be done by someone before it.
-- Useful link: a valuable URL to quickly get access to important information regarding the Assembly.
+- Useful link: a valuable URL to quickly access important information regarding the Assembly.
 - Badge: achievements of a User for specific interactions within the platform.
 - Opportunity: open calls to which users can apply.
+- Voting: sessions in which users can vote (publicly or secretly).
