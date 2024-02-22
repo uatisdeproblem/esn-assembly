@@ -106,10 +106,16 @@ If you want to have your production environment available to a custom domain (e.
 If you're following this guide on behalf of another National Organization, you may want to use [this email template](https://docs.google.com/document/d/1o9HHcC_hKjlFrVs9g53jh_VfJwZaNsg7qnL7tT-Hzug/edit#heading=h.9jlqqqv3bhun).
 
 1. We need to create an SSL certificate that is linked to the custom domain; note: the certificate must be always created in the region `us-east-1`, regardless of the region where you deployed the application. The `{CUSTOM_DOMAIN_NAME}` it's the full custom domain name you chose: `assembly.esn.it`. You can achieve this by running the following command in the terminal:
+
    ```
    aws --profile {AWS_PROFILE} --region us-east-1 acm request-certificate \
-   --domain-name {CUSTOM_DOMAIN_NAME} --validation-method DNS
+   --validation-method DNS --domain-name "{DOMAIN_YOU_BOUGHT}" --subject-alternative-names "*.{DOMAIN_YOU_BOUGHT}" "{CUSTOM_DOMAIN_NAME}"
+
+   # example
+   aws --profile esn-assembly-italy --region us-east-1 acm request-certificate \
+   --validation-method DNS --domain-name "esn-assembly-italy.link" --subject-alternative-names "*.esn-assembly-italy.link" "assembly.esn.it"
    ```
+
 1. Once the certificate is created, it needs to be validated: we need to prove to AWS that we own the custom domain we specified. To do so, we have to add two domain records to the custom domain's DNS. First of all, we gather the first CNAME record to put in the custom domain's DNS. Run terminal command below. The `{CERTIFICATE_ARN}` is the ARN that was in the output of the previous command (e.g. `arn:aws:acm:us-east-1:111111111111:certificate/xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). _In case you've lost it, you can still recovering it through the AWS Console in the service ACM (AWS Certificate Manager)._
 
    ```sh
@@ -144,10 +150,20 @@ If you're following this guide on behalf of another National Organization, you m
    ```
 
 1. Add (or ask to add) the two CNAME records that we gathered in the previous steps. Once you did, or you receive confirmation that the records have been successfully implemented, we can go on with the last few steps.
-1. Open the file `/back-end/deploy/environments.ts` and fix the `PROD_CUSTOM_DOMAIN` value with your chosen custom domain, e.g.:
-   ```typescript
-   export const PROD_CUSTOM_DOMAIN = 'assembly.esn.it';
-   ```
+1. Open the file `/back-end/deploy/environments.ts` and:
+   1. Fix the `PROD_CUSTOM_DOMAIN` value with your chosen custom domain, e.g.:
+      ```typescript
+      export const PROD_CUSTOM_DOMAIN = 'assembly.esn.it';
+      ```
+   1. In the `parameters`, replace the SSL certificate ARN with the one created earlier, e.g.:
+      ```typescript
+      export const parameters: Parameters = {
+         ...
+         frontEndCertificateARN: PROD_CUSTOM_DOMAIN
+            ? '{CERTIFICATE_ARN}'
+            : undefined
+         };
+      ```
 1. From Visual Studio Code menu: "Terminal > Run build task", select "Deploy back-end environment" and select "prod". _Note: this deploy will fail in case the certificate hasn't been validated yet._
 1. Wait a few minutes and your production environment should be available at the new custom domain: well done!
 1. Don't forget to commit this changes in the forked repository (or branch).
