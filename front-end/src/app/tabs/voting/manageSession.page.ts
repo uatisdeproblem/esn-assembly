@@ -493,6 +493,27 @@ export class ManageVotingSessionPage implements OnDestroy {
   // START
   //
 
+  private getDuplicatesOfList(list: string[], includeEmptyElements = false): string[] {
+    if (!includeEmptyElements) list = list.filter(x => x);
+    const uniqueStack = new Set(list);
+    return Array.from(
+      new Set(
+        list.filter(x => {
+          if (uniqueStack.has(x)) uniqueStack.delete(x);
+          else return true;
+        })
+      )
+    );
+  }
+  getVotersDuplicatedIds(): string[] {
+    return this.getDuplicatesOfList(this.votingSession.voters.map(x => x.id?.trim()));
+  }
+  getVotersDuplicatedNames(): string[] {
+    return this.getDuplicatesOfList(this.votingSession.voters.map(x => x.name?.trim().toLowerCase()));
+  }
+  getVotersDuplicatedEmails(): string[] {
+    return this.getDuplicatesOfList(this.votingSession.voters.map(x => x.email?.trim().toLowerCase()));
+  }
   getNameOfVotersWithoutEmail(): string[] {
     return this.votingSession.voters.filter(x => !x.email).map(x => x.name);
   }

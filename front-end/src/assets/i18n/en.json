@@ -108,7 +108,7 @@
     "LIVE_ON": "Live on",
     "STATUS": "Status",
     "STATUSES": {
-      "DRAFT":"Draft",
+      "DRAFT": "Draft",
       "OPEN": "Open",
       "CLOSED": "Closed"
     },
@@ -773,6 +773,8 @@
     "VOTERS_AUDIT": "Voters audit",
     "ABSENT": "Absent",
     "PARTICIPATION": "Participation",
+    "DUPLICATED_EMAILS_AVOID_CONFUSION": "There are repeated emails",
+    "DUPLICATED_EMAILS_AVOID_CONFUSION_I": "Receiving two or more voting links to the same email addresses may lead to confusion; it's suggested that each voter use a different email address.",
     "THESE_VOTERS_WONT_RECEIVE_VOTING_LINK": "The following voters won't receive a voting link:",
     "NO_VOTING_MEANS_ABSENT": "No vote means absent",
     "NO_VOTING_MEANS_ABSENT_I": "Without voting link, the voters won't be able to vote. That means they will count as absent.",

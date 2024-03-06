@@ -269,7 +269,10 @@
               [icon]="hasFieldAnError('voters.duplicatedIds') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('voters.duplicatedIds') ? 'danger' : 'success'"
             />
-            <ion-label class="ion-text-wrap">{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_IDS' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">
+              {{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_IDS' | translate }}
+              <p>{{ getVotersDuplicatedIds().join(', ') }}</p>
+            </ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
@@ -277,15 +280,27 @@
               [icon]="hasFieldAnError('voters.duplicatedNames') ? 'close' : 'checkmark'"
               [color]="hasFieldAnError('voters.duplicatedNames') ? 'danger' : 'success'"
             />
-            <ion-label class="ion-text-wrap">{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_NAMES' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">
+              {{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_NAMES' | translate }}
+              <p>{{ getVotersDuplicatedNames().join(', ') }}</p>
+            </ion-label>
           </ion-item>
           <ion-item>
             <ion-icon
               slot="start"
-              [icon]="hasFieldAnError('voters.duplicatedEmails') ? 'close' : 'checkmark'"
-              [color]="hasFieldAnError('voters.duplicatedEmails') ? 'danger' : 'success'"
+              [icon]="getVotersDuplicatedEmails().length ? 'warning' : 'checkmark'"
+              [color]="getVotersDuplicatedEmails().length ? 'warning' : 'success'"
             />
-            <ion-label class="ion-text-wrap">{{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_EMAILS' | translate }}</ion-label>
+            <ion-label class="ion-text-wrap">
+              {{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_EMAILS' | translate }}
+              <p>{{ getVotersDuplicatedEmails().join(', ') }}</p>
+            </ion-label>
+            <idea-show-hint-button
+              slot="end"
+              hint="VOTING.DUPLICATED_EMAILS_AVOID_CONFUSION"
+              *ngIf="getVotersDuplicatedEmails().length"
+              translate
+            />
           </ion-item>
           <ion-item>
             <ion-icon

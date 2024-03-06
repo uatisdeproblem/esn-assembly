@@ -141,12 +141,10 @@ export class VotingSession extends Resource {
         e.push('publishedSince');
       if (this.iE(this.ballots)) e.push('ballots');
       if (this.iE(this.voters)) e.push('voters');
-      const votersIds = this.voters.map(x => x.id);
-      const votersNames = this.voters.map(x => x.name);
-      const votersEmails = this.voters.map(x => x.email?.toLowerCase()).filter(x => x);
+      const votersIds = this.voters.map(x => x.id?.trim());
+      const votersNames = this.voters.map(x => x.name?.trim().toLowerCase());
       if (votersIds.length !== new Set(votersIds).size) e.push('voters.duplicatedIds');
       if (votersNames.length !== new Set(votersNames).size) e.push('voters.duplicatedNames');
-      if (votersEmails.length !== new Set(votersEmails).size) e.push('voters.duplicatedEmails');
       if (this.startsAt) {
         const tenMinutes = new Date();
         tenMinutes.setMinutes(tenMinutes.getMinutes() + 10);
