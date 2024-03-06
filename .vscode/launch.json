@@ -5,7 +5,6 @@
       "type": "node",
       "request": "launch",
       "name": "Start local app",
-      "noDebug": true,
       "console": "integratedTerminal",
       "cwd": "${workspaceRoot}/front-end",
       "runtimeExecutable": "npm",
