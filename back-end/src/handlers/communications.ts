@@ -42,7 +42,7 @@ class Communications extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.communications, Key: { communicationId: this.resourceId } })
       );
     } catch (err) {
-      throw new HandledError('Link not found');
+      throw new HandledError('Communication not found');
     }
   }
 

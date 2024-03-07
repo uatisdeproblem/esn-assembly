@@ -42,7 +42,7 @@ class Deadlines extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.deadlines, Key: { deadlineId: this.resourceId } })
       );
     } catch (err) {
-      throw new HandledError('Link not found');
+      throw new HandledError('Deadline not found');
     }
   }
 
