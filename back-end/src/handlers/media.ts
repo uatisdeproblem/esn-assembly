@@ -33,7 +33,8 @@ class Media extends ResourceController {
   }
 
   protected async checkAuthBeforeRequest(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
   }
 
   protected async postResources(): Promise<SignedURL> {

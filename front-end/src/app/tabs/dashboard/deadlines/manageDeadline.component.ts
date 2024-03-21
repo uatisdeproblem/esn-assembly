@@ -52,11 +52,11 @@ import { Deadline } from '@models/deadline.model';
           </ion-label>
           <ion-input [(ngModel)]="deadline.name"></ion-input>
         </ion-item>
-        <ion-item [class.fieldHasError]="hasFieldAnError('action')">
+        <ion-item [class.fieldHasError]="hasFieldAnError('action')" counter>
           <ion-label position="stacked">
             {{ 'DEADLINES.ACTION' | translate }}
           </ion-label>
-          <ion-input [(ngModel)]="deadline.action"></ion-input>
+          <ion-input [(ngModel)]="deadline.action" maxlength="15"></ion-input>
         </ion-item>
         <ion-item *ngIf="deadline.action" [class.fieldHasError]="hasFieldAnError('actionColor')">
           <ion-label position="stacked">

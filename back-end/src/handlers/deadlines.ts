@@ -42,7 +42,7 @@ class Deadlines extends ResourceController {
         await ddb.get({ TableName: DDB_TABLES.deadlines, Key: { deadlineId: this.resourceId } })
       );
     } catch (err) {
-      throw new HandledError('Link not found');
+      throw new HandledError('Deadline not found');
     }
   }
 
@@ -83,7 +83,8 @@ class Deadlines extends ResourceController {
   }
 
   protected async postResources(): Promise<Deadline> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     this.deadline = new Deadline(this.body);
     this.deadline.deadlineId = await ddb.IUNID(PROJECT);
@@ -97,7 +98,8 @@ class Deadlines extends ResourceController {
   }
 
   protected async putResource(): Promise<Deadline> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     const oldDeadline = new Deadline(this.deadline);
     this.deadline.safeLoad(this.body, oldDeadline);
@@ -106,7 +108,8 @@ class Deadlines extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.deadlines, Key: { deadlineId: this.deadline.deadlineId } });
   }

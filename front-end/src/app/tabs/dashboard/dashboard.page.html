@@ -173,7 +173,12 @@
     </ion-row>
   </ion-grid>
 </ion-content>
-<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="end"
+  *ngIf="(app.user.isAdministrator || app.user.canManageDashboard)"
+>
   <ion-fab-button color="ESNgreen" size="small" [title]="'COMMON.MANAGE' | translate" (click)="editMode = !editMode">
     <ion-icon [icon]="editMode ?'checkmark' : 'build'"></ion-icon>
   </ion-fab-button>
