@@ -89,12 +89,12 @@ export class User extends Resource {
    * A change in this permission will require a new sign-in to take full place.
    */
   canManageOpportunities: boolean;
-
   /**
    * Whether the user can manage the dashboard, based on the platform's configurations.
    * A change in this permission will require a new sign-in to take full place.
    */
   canManageDashboard: boolean;
+
   /**
    * Whether the user has one of the allowed roles.
    */
