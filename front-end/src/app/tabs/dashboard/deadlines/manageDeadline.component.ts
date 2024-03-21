@@ -52,7 +52,7 @@ import { Deadline } from '@models/deadline.model';
           </ion-label>
           <ion-input [(ngModel)]="deadline.name"></ion-input>
         </ion-item>
-        <ion-item [class.fieldHasError]="hasFieldAnError('action')" [counter]="true">
+        <ion-item [class.fieldHasError]="hasFieldAnError('action')" counter>
           <ion-label position="stacked">
             {{ 'DEADLINES.ACTION' | translate }}
           </ion-label>
@@ -182,9 +182,5 @@ export class ManageDeadlineComponent {
     ];
     const alert = await this.alertCtrl.create({ header, subHeader, buttons });
     alert.present();
-  }
-
-  customCounterFormatter(inputLength: number, maxLength: number) {
-    return `${maxLength - inputLength} characters remaining`;
   }
 }
