@@ -53,7 +53,7 @@
             </ion-label>
             <ion-button
               color="ESNpink"
-              *ngIf="(app.user.isAdministrator || app.user.canManageDashboard)  && !editMode"
+              *ngIf="app.user.isAdministrator   && !editMode"
               (click)="openCommunicationsArchive()"
             >
               <ion-icon icon="archive-outline" slot="icon-only" *ngIf="app.isInMobileMode()" />
@@ -75,7 +75,7 @@
           >
             <p class="ion-text-right">
               <app-statistics-button
-                *ngIf="(app.user.isAdministrator || app.user.canManageDashboard) && !editMode"
+                *ngIf="app.user.isAdministrator  && !editMode"
                 [entityType]="SET.COMMUNICATIONS"
                 [entityId]="communication.communicationId"
                 [title]="communication.name"
@@ -138,7 +138,7 @@
             (select)="openUsefulLink(link)"
           >
             <app-statistics-button
-              *ngIf="(app.user.isAdministrator || app.user.canManageDashboard) && !editMode"
+              *ngIf="app.user.isAdministrator && !editMode"
               slot="end"
               [entityType]="SET.USEFUL_LINKS"
               [entityId]="link.linkId"
