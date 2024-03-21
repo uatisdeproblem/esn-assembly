@@ -1,15 +1,15 @@
 /**
  * The codename of the project.
  */
-export const PROJECT = 'esn-italian-qt';
+export const PROJECT = 'esn-ga';
 /**
  * The purchased domain to use.
  */
-export const DOMAIN = 'esn-qt.org';
+export const DOMAIN = 'esn-ga.link';
 /**
  * An additional custom domain to use.
  */
-export const PROD_CUSTOM_DOMAIN: string | null = null;
+export const PROD_CUSTOM_DOMAIN: string | null = 'ga.esn.org'; // in case of first creation, use: `null`
 
 export const parameters: Parameters = {
   project: PROJECT,
