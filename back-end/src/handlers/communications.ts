@@ -83,7 +83,8 @@ class Communications extends ResourceController {
   }
 
   protected async postResources(): Promise<Communication> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     this.communication = new Communication(this.body);
     this.communication.communicationId = await ddb.IUNID(PROJECT);
@@ -97,7 +98,8 @@ class Communications extends ResourceController {
   }
 
   protected async putResource(): Promise<Communication> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     const oldCommunication = new Communication(this.communication);
     this.communication.safeLoad(this.body, oldCommunication);
@@ -116,7 +118,8 @@ class Communications extends ResourceController {
     }
   }
   private async manageArchive(archive: boolean): Promise<Communication> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     if (archive) this.communication.archivedAt = new Date().toISOString();
     else delete this.communication.archivedAt;
@@ -126,7 +129,8 @@ class Communications extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     await ddb.delete({
       TableName: DDB_TABLES.communications,

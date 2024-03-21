@@ -47,6 +47,9 @@ export class ConfigurationsPage implements OnInit {
   addOpportunitiesManager(): void {
     this.addUserToList('opportunitiesManagersIds', 'ADD_OPPORTUNITIES_MANAGER');
   }
+  addDashboardManager(): void {
+    this.addUserToList('dashboardManagersIds', 'ADD_DASHBOARD_MANAGER');
+  }
   addBannedUser(): void {
     this.addUserToList('bannedUsersIds', 'ADD_BANNED_USER');
   }
@@ -75,6 +78,9 @@ export class ConfigurationsPage implements OnInit {
   }
   removeOpportunitiesManagerById(userId: string): void {
     this.removeUserFromListById(userId, 'opportunitiesManagersIds');
+  }
+  removeDashboardManagerById(userId: string): void {
+    this.removeUserFromListById(userId, 'dashboardManagersIds');
   }
   removeBannedUserById(userId: string): void {
     this.removeUserFromListById(userId, 'bannedUsersIds');

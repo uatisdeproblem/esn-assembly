@@ -77,7 +77,8 @@ class UsefulLinks extends ResourceController {
   }
 
   protected async postResources(): Promise<UsefulLink> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     this.usefulLink = new UsefulLink(this.body);
     this.usefulLink.linkId = await ddb.IUNID(PROJECT);
@@ -91,7 +92,8 @@ class UsefulLinks extends ResourceController {
   }
 
   protected async putResource(): Promise<UsefulLink> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     const oldLink = new UsefulLink(this.usefulLink);
     this.usefulLink.safeLoad(this.body, oldLink);
@@ -126,7 +128,8 @@ class UsefulLinks extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
 
     await ddb.delete({ TableName: DDB_TABLES.usefulLinks, Key: { linkId: this.usefulLink.linkId } });
   }
