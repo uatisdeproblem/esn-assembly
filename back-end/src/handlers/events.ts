@@ -67,8 +67,7 @@ class GAEvents extends ResourceController {
   }
 
   protected async postResources(): Promise<GAEvent> {
-    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
-      throw new HandledError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     this.gaEvent = new GAEvent(this.body);
     this.gaEvent.eventId = await ddb.IUNID(PROJECT);
@@ -81,8 +80,7 @@ class GAEvents extends ResourceController {
   }
 
   protected async putResource(): Promise<GAEvent> {
-    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
-      throw new HandledError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const oldEvent = new GAEvent(this.gaEvent);
     this.gaEvent.safeLoad(this.body, oldEvent);
@@ -101,8 +99,7 @@ class GAEvents extends ResourceController {
     }
   }
   private async manageArchive(archive: boolean): Promise<GAEvent> {
-    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
-      throw new HandledError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     if (archive) this.gaEvent.archivedAt = new Date().toISOString();
     else delete this.gaEvent.archivedAt;
@@ -112,8 +109,7 @@ class GAEvents extends ResourceController {
   }
 
   protected async deleteResource(): Promise<void> {
-    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
-      throw new HandledError('Unauthorized');
+    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
 
     const topics: Topic[] = await ddb.scan({ TableName: DDB_TABLES.topics, IndexName: 'topicId-meta-index' });
     const topicsWithEvent = topics.filter(x => x.event.eventId === this.gaEvent.eventId);
