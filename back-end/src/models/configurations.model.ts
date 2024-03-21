@@ -17,6 +17,10 @@ export class Configurations extends Resource {
    */
   administratorsIds: string[];
   /**
+   * The IDs of the users that can manage the dashboard.
+   */
+  dashboardManagersIds: string[];
+  /**
    * The IDs of the users that can open and manage opportunities.
    */
   opportunitiesManagersIds: string[];
@@ -75,6 +79,7 @@ export class Configurations extends Resource {
     super.load(x);
     this.administratorsIds = this.cleanArray(x.administratorsIds, String).map(x => x.toLowerCase());
     this.opportunitiesManagersIds = this.cleanArray(x.opportunitiesManagersIds, String).map(x => x.toLowerCase());
+    this.dashboardManagersIds = this.cleanArray(x.dashboardManagersIds, String).map(x => x.toLowerCase());
     this.bannedUsersIds = this.cleanArray(x.bannedUsersIds, String).map(x => x.toLowerCase());
 
     this.appTitle = this.clean(x.appTitle, String, 'Assembly app');

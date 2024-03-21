@@ -53,7 +53,7 @@
             </ion-label>
             <ion-button
               color="ESNpink"
-              *ngIf="app.user.isAdministrator && !editMode"
+              *ngIf="(app.user.isAdministrator || app.user.canManageDashboard)  && !editMode"
               (click)="openCommunicationsArchive()"
             >
               <ion-icon icon="archive-outline" slot="icon-only" *ngIf="app.isInMobileMode()" />
@@ -75,7 +75,7 @@
           >
             <p class="ion-text-right">
               <app-statistics-button
-                *ngIf="app.user.isAdministrator && !editMode"
+                *ngIf="(app.user.isAdministrator || app.user.canManageDashboard) && !editMode"
                 [entityType]="SET.COMMUNICATIONS"
                 [entityId]="communication.communicationId"
                 [title]="communication.name"
@@ -138,7 +138,7 @@
             (select)="openUsefulLink(link)"
           >
             <app-statistics-button
-              *ngIf="app.user.isAdministrator && !editMode"
+              *ngIf="(app.user.isAdministrator || app.user.canManageDashboard) && !editMode"
               slot="end"
               [entityType]="SET.USEFUL_LINKS"
               [entityId]="link.linkId"
@@ -173,7 +173,12 @@
     </ion-row>
   </ion-grid>
 </ion-content>
-<ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="app.user.isAdministrator">
+<ion-fab
+  slot="fixed"
+  vertical="bottom"
+  horizontal="end"
+  *ngIf="(app.user.isAdministrator || app.user.canManageDashboard)"
+>
   <ion-fab-button color="ESNgreen" size="small" [title]="'COMMON.MANAGE' | translate" (click)="editMode = !editMode">
     <ion-icon [icon]="editMode ?'checkmark' : 'build'"></ion-icon>
   </ion-fab-button>
