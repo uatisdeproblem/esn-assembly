@@ -681,7 +681,7 @@
       "RELATIVE": "Relative Majority",
       "RELATIVE_I": "The proposal with the highest percentage of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority.",
       "SIMPLE": "Simple Majority",
-      "SIMPLE_I": "The proposal  which obtains more than fifty percent (50 %) of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority.",
+      "SIMPLE_I": "The proposal which obtains more than fifty percent (50 %) of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority.",
       "TWO_THIRDS": "Two-Thirds Majority",
       "TWO_THIRDS_I": "The proposal which obtains two-thirds (2/3) + one (1) vote of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority."
     },
