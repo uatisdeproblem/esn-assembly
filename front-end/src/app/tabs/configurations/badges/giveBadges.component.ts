@@ -1,20 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AlertController, ModalController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { BadgesService } from '../../profile/badges/badges.service';
 
-import { Badges, UserBadge } from '@models/userBadge.model';
+import { Badge, UserBadge } from '@models/badge.model';
 
 @Component({
   selector: 'app-give-badges',
   templateUrl: 'giveBadges.component.html',
   styleUrls: ['giveBadges.component.scss']
 })
-export class GiveBadgesComponent {
+export class GiveBadgesComponent implements OnInit {
   userId: string;
-  badges: UserBadge[];
+  badges: Badge[];
+  usersBadges: UserBadge[];
 
   constructor(
     private modalCtrl: ModalController,
@@ -25,14 +26,17 @@ export class GiveBadgesComponent {
     public _badges: BadgesService,
     public app: AppService
   ) {}
+  async ngOnInit(): Promise<void> {
+    this.badges = await this._badges.getList({ force: true });
+  }
 
   async getUserBadges(userId: string): Promise<void> {
     if (!userId) return;
     userId = userId.toLowerCase();
-    this.badges = null;
+    this.usersBadges = null;
     try {
       await this.loading.show();
-      this.badges = await this._badges.getList({ userId, force: true });
+      this.usersBadges = await this._badges.getListOfUserById(userId);
     } catch (error) {
       this.message.error('COMMON.SOMETHING_WENT_WRONG');
     } finally {
@@ -46,7 +50,7 @@ export class GiveBadgesComponent {
       try {
         await this.loading.show();
         await this._badges.removeBadgeFromUser(userId, userBadge.badge);
-        this.badges.splice(this.badges.indexOf(userBadge), 1);
+        this.usersBadges.splice(this.usersBadges.indexOf(userBadge), 1);
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');
@@ -65,17 +69,13 @@ export class GiveBadgesComponent {
     userId = userId.toLowerCase();
     const header = this.t._('CONFIGURATIONS.GIVE_A_BADGE');
     const subHeader = userId;
-    const inputs: any[] = Object.values(Badges).map(badge => ({
-      type: 'radio',
-      value: badge,
-      label: this.t._('PROFILE.BADGES.'.concat(badge))
-    }));
+    const inputs: any[] = this.badges.map(badge => ({ type: 'radio', value: badge.badgeId, label: badge.name }));
 
-    const doAdd = async (badge: Badges): Promise<void> => {
+    const doAdd = async (badge: string): Promise<void> => {
       try {
         await this.loading.show();
         await this._badges.addBadgeToUser(userId, badge);
-        this.badges.unshift(new UserBadge({ userId, badge }));
+        this.usersBadges.unshift(new UserBadge({ userId, badge }));
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (error) {
         this.message.error('COMMON.OPERATION_FAILED');

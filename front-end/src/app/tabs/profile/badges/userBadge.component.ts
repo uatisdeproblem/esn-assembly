@@ -4,7 +4,7 @@ import { PopoverController } from '@ionic/angular';
 import { AppService } from '@app/app.service';
 import { BadgesService } from './badges.service';
 
-import { UserBadge } from '@models/userBadge.model';
+import { Badge, UserBadge } from '@models/badge.model';
 
 @Component({
   selector: 'user-badge',
@@ -17,9 +17,12 @@ export class UserBadgeComponent implements OnInit {
    */
   @Input() userBadge: UserBadge;
 
+  badge: Badge;
+
   constructor(private popoverCtrl: PopoverController, public _badges: BadgesService, public app: AppService) {}
   async ngOnInit(): Promise<void> {
-    await this._badges.getById(this.userBadge.badge);
+    await this._badges.getUserBadgeById(this.userBadge.badge);
+    this.badge = this._badges.getBadgeDetail(this.userBadge);
   }
 
   close(): void {

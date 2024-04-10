@@ -4,63 +4,132 @@ import { IDEAApiService } from '@idea-ionic/common';
 
 import { UserBadgeComponent } from './userBadge.component';
 
-import { UserBadge } from '@models/userBadge.model';
+import { AppService } from '@app/app.service';
+
+import { Badge, UserBadge } from '@models/badge.model';
 
 @Injectable({ providedIn: 'root' })
 export class BadgesService {
-  private badges: UserBadge[];
-
-  constructor(private popoverCtrl: PopoverController, private api: IDEAApiService) {}
+  private badges: Badge[];
 
   /**
-   * Load the user's badges from the back-end.
+   * The number of badges to consider for the pagination, when active.
    */
-  private async loadList(userId?: string): Promise<void> {
-    const params: any = {};
-    if (userId) params.userId = userId;
-    const badges: UserBadge[] = await this.api.getResource('badges', { params });
-    this.badges = badges.map(x => new UserBadge(x));
+  MAX_PAGE_SIZE = 24;
+
+  constructor(private popoverCtrl: PopoverController, private api: IDEAApiService, private app: AppService) {}
+
+  /**
+   * Load the list of badges from the back-end.
+   */
+  private async loadList(): Promise<void> {
+    const badges: UserBadge[] = await this.api.getResource('badges');
+    this.badges = badges.map(b => new Badge(b));
   }
   /**
-   * Get the list of the user's badges.
+   * Get the list of badges.
    * Note: it's a slice of the array.
    */
-  async getList(options: { userId?: string; force?: boolean } = {}): Promise<UserBadge[]> {
-    if (!this.badges || options.force || options.userId) await this.loadList(options.userId);
+  async getList(
+    options: {
+      force?: boolean;
+      search?: string;
+      withPagination?: boolean;
+      startPaginationAfterId?: string;
+    } = {}
+  ): Promise<Badge[]> {
+    if (!this.badges || options.force) await this.loadList();
     if (!this.badges) return null;
-    return this.badges.slice();
-  }
 
+    options.search = options.search ? String(options.search).toLowerCase() : '';
+
+    let filteredList = this.badges.slice();
+
+    if (options.search)
+      filteredList = filteredList.filter(x =>
+        options.search
+          .split(' ')
+          .every(searchTerm => [x.name, x.description].filter(f => f).some(f => f.toLowerCase().includes(searchTerm)))
+      );
+
+    if (options.withPagination && filteredList.length > this.MAX_PAGE_SIZE) {
+      let indexOfLastOfPreviousPage = 0;
+      if (options.startPaginationAfterId)
+        indexOfLastOfPreviousPage = filteredList.findIndex(x => x.badgeId === options.startPaginationAfterId) || 0;
+      filteredList = filteredList.slice(0, indexOfLastOfPreviousPage + this.MAX_PAGE_SIZE);
+    }
+
+    return filteredList;
+  }
   /**
    * Get a badge by its id.
    */
-  async getById(badge: string): Promise<UserBadge> {
-    return new UserBadge(await this.api.getResource(['badges', badge]));
+  async getById(badge: string): Promise<Badge> {
+    return new Badge(await this.api.getResource(['badges', badge]));
+  }
+  /**
+   * Add a badge.
+   */
+  async add(badge: Badge): Promise<Badge> {
+    return new Badge(await this.api.postResource(['badges'], { body: badge }));
+  }
+  /**
+   * Edit a badge.
+   */
+  async update(badge: Badge): Promise<Badge> {
+    return new Badge(await this.api.putResource(['badges', badge.badgeId], { body: badge }));
+  }
+  /**
+   * Delete a badge.
+   */
+  async delete(badge: Badge): Promise<void> {
+    await this.api.deleteResource(['badges', badge.badgeId]);
   }
 
+  /**
+   * Get the detail of a badge from a user badge.
+   */
+  getBadgeDetail(userBadge: UserBadge): Badge | null {
+    return this.badges?.find(x => x.badgeId === userBadge.badge);
+  }
+  /**
+   * Get the list of the user's badges.
+   */
+  async getListOfUserById(userId: string): Promise<UserBadge[]> {
+    const params = { userId };
+    const badges: UserBadge[] = await this.api.getResource('usersBadges', { params });
+    return badges.map(x => new UserBadge(x));
+  }
+  /**
+   * Get a user badge by its id.
+   */
+  async getUserBadgeById(badge: string): Promise<UserBadge> {
+    return new UserBadge(await this.api.getResource(['usersBadges', badge]));
+  }
   /**
    * Remove a badge from a user.
    */
   async removeBadgeFromUser(userId: string, badge: string): Promise<void> {
     const params = { userId };
-    await this.api.deleteResource(['badges', badge], { params });
+    await this.api.deleteResource(['usersBadges', badge], { params });
   }
   /**
    * Add a badge to a user.
    */
   async addBadgeToUser(userId: string, badge: string): Promise<void> {
     const params = { userId };
-    await this.api.postResource(['badges', badge], { params });
+    await this.api.postResource(['usersBadges', badge], { params });
   }
 
   //
   // UI
   //
 
-  getBadgeImage(userBadge: UserBadge): string {
-    return 'assets/imgs/badges/' + userBadge.badge + '.svg';
+  getUserBadgeImage(userBadge: UserBadge): string {
+    const badge = this.badges?.find(x => x.badgeId === userBadge.badge);
+    return badge ? this.app.getImageURLByURI(badge.imageURI) : null;
   }
-  async openBadgeDetails(userBadge: UserBadge): Promise<void> {
+  async openUserBadgeDetails(userBadge: UserBadge): Promise<void> {
     const popover = await this.popoverCtrl.create({
       component: UserBadgeComponent,
       componentProps: { userBadge },

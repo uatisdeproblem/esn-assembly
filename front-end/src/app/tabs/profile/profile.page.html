@@ -26,20 +26,20 @@
       <ion-list-header>
         <ion-label><h2>{{ 'PROFILE.YOUR_BADGES' | translate }}</h2></ion-label>
       </ion-list-header>
-      <ion-item lines="full" class="noBadges" *ngIf="badges && !badges.length">
+      <ion-item lines="full" class="noBadges" *ngIf="userBadges && !userBadges.length">
         <ion-icon slot="start" icon="sad-outline"></ion-icon>
         <ion-label class="ion-text-wrap">{{ 'PROFILE.NO_BADGES' | translate }}</ion-label>
       </ion-item>
       <ion-grid class="badgesGrid">
         <ion-row class="ion-justify-content-center ion-align-items-center">
-          <ion-col *ngIf="!badges">
+          <ion-col *ngIf="!userBadges">
             <ion-skeleton-text animated></ion-skeleton-text>
           </ion-col>
-          <ion-col *ngFor="let badge of badges">
+          <ion-col *ngFor="let userBadge of userBadges">
             <ion-img
               class="tappable"
-              [src]="_badges.getBadgeImage(badge)"
-              (click)="_badges.openBadgeDetails(badge)"
+              [src]="_badges.getUserBadgeImage(userBadge)"
+              (click)="_badges.openUserBadgeDetails(userBadge)"
             ></ion-img>
           </ion-col>
         </ion-row>

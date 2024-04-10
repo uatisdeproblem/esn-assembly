@@ -37,9 +37,12 @@
     </ion-item>
     <ion-grid class="ion-margin-top badgesGrid" *ngIf="badges">
       <ion-row class="ion-justify-content-center ion-align-items-center">
-        <ion-col class="ion-text-center" *ngFor="let badge of badges">
-          <ion-img [src]="_badges.getBadgeImage(badge)" (click)="_badges.openBadgeDetails(badge)"></ion-img>
-          <ion-button fill="clear" color="danger" (click)="removeBadgeFromUser(userId, badge)">
+        <ion-col class="ion-text-center" *ngFor="let userBadge of usersBadges">
+          <ion-img
+            [src]="_badges.getUserBadgeImage(userBadge)"
+            (click)="_badges.openUserBadgeDetails(userBadge)"
+          ></ion-img>
+          <ion-button fill="clear" color="danger" (click)="removeBadgeFromUser(userId, userBadge)">
             <ion-icon slot="icon-only" icon="trash"></ion-icon>
           </ion-button>
         </ion-col>

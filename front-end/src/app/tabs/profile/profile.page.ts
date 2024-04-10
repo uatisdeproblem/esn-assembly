@@ -1,25 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IDEATranslationsService } from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { BadgesService } from './badges/badges.service';
 
 import { environment as env } from '@env';
-import { UserBadge } from '@models/userBadge.model';
+import { UserBadge } from '@models/badge.model';
 
 @Component({
   selector: 'profile',
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss']
 })
-export class ProfilePage {
+export class ProfilePage implements OnInit {
   version = env.idea.app.version;
 
-  badges: UserBadge[];
+  userBadges: UserBadge[];
 
   constructor(private t: IDEATranslationsService, public _badges: BadgesService, public app: AppService) {}
+  async ngOnInit(): Promise<void> {
+    await this._badges.getList();
+  }
   async ionViewDidEnter(): Promise<void> {
-    this.badges = await this._badges.getList({ force: true });
+    this.userBadges = await this._badges.getListOfUserById(this.app.user.userId);
   }
 
   async sendFeedback(): Promise<void> {

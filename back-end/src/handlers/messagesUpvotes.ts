@@ -4,12 +4,11 @@
 
 import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
-import { addBadgeToUser } from './badges';
+import { addBadgeToUser } from './usersBadges';
 
 import { Topic, TopicTypes } from '../models/topic.model';
 import { Message, MessageUpvote } from '../models/message.model';
 import { User } from '../models/user.model';
-import { Badges } from '../models/userBadge.model';
 import { Subject } from '../models/subject.model';
 
 ///
@@ -87,9 +86,9 @@ class MessagesUpvotesRC extends ResourceController {
     this.message.numOfUpvotes = await this.getLiveNumUpvotes();
     await ddb.put({ TableName: DDB_TABLES.messages, Item: this.message });
 
-    await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.NEWCOMER);
+    await addBadgeToUser(ddb, this.galaxyUser.userId, 'NEWCOMER');
     if ((await this.getNumMessagesUpvotedByUser()) >= 15)
-      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.LOVE_GIVER);
+      await addBadgeToUser(ddb, this.galaxyUser.userId, 'LOVE_GIVER');
   }
 
   protected async deleteResources(): Promise<void> {

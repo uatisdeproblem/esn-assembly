@@ -5,13 +5,12 @@
 import { DynamoDB, HandledError, ResourceController, SES } from 'idea-aws';
 
 import { isEmailInBlockList } from './sesNotifications';
-import { addBadgeToUser } from './badges';
+import { addBadgeToUser } from './usersBadges';
 
 import { Topic, TopicTypes } from '../models/topic.model';
 import { Question } from '../models/question.model';
 import { Answer } from '../models/answer.model';
 import { User } from '../models/user.model';
-import { Badges } from '../models/userBadge.model';
 import { Subject } from '../models/subject.model';
 import { Configurations } from '../models/configurations.model';
 
@@ -122,9 +121,9 @@ class Questions extends ResourceController {
 
     await this.sendNotificationToTopicSubjects(this.topic, this.question);
 
-    await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.FIRST_QUESTION);
+    await addBadgeToUser(ddb, this.galaxyUser.userId, 'FIRST_QUESTION');
     if ((await this.getNumQuestionsMadeByUser()) >= 10)
-      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.QUESTIONS_MASTER);
+      await addBadgeToUser(ddb, this.galaxyUser.userId, 'QUESTIONS_MASTER');
 
     return this.question;
   }
