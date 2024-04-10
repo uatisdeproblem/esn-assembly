@@ -387,6 +387,9 @@ paths:
                 attachmentId:
                   type: string
                   description: (GET_ATTACHMENT_DOWNLOAD_URL)
+                filename:
+                  type: string
+                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'
