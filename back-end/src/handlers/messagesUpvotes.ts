@@ -9,6 +9,7 @@ import { addBadgeToUser } from './usersBadges';
 import { Topic, TopicTypes } from '../models/topic.model';
 import { Message, MessageUpvote } from '../models/message.model';
 import { User } from '../models/user.model';
+import { BuiltInBadges } from '../models/badge.model';
 import { Subject } from '../models/subject.model';
 
 ///
@@ -86,9 +87,9 @@ class MessagesUpvotesRC extends ResourceController {
     this.message.numOfUpvotes = await this.getLiveNumUpvotes();
     await ddb.put({ TableName: DDB_TABLES.messages, Item: this.message });
 
-    await addBadgeToUser(ddb, this.galaxyUser.userId, 'NEWCOMER');
+    await addBadgeToUser(ddb, this.galaxyUser.userId, BuiltInBadges.NEWCOMER);
     if ((await this.getNumMessagesUpvotedByUser()) >= 15)
-      await addBadgeToUser(ddb, this.galaxyUser.userId, 'LOVE_GIVER');
+      await addBadgeToUser(ddb, this.galaxyUser.userId, BuiltInBadges.LOVE_GIVER);
   }
 
   protected async deleteResources(): Promise<void> {

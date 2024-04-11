@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PopoverController } from '@ionic/angular';
 import { IDEAApiService } from '@idea-ionic/common';
-
-import { UserBadgeComponent } from './userBadge.component';
 
 import { AppService } from '@app/app.service';
 
@@ -17,7 +14,11 @@ export class BadgesService {
    */
   MAX_PAGE_SIZE = 24;
 
-  constructor(private popoverCtrl: PopoverController, private api: IDEAApiService, private app: AppService) {}
+  constructor(private api: IDEAApiService, private app: AppService) {}
+
+  //
+  // BADGES
+  //
 
   /**
    * Load the list of badges from the back-end.
@@ -86,12 +87,10 @@ export class BadgesService {
     await this.api.deleteResource(['badges', badge.badgeId]);
   }
 
-  /**
-   * Get the detail of a badge from a user badge.
-   */
-  getBadgeDetail(userBadge: UserBadge): Badge | null {
-    return this.badges?.find(x => x.badgeId === userBadge.badge);
-  }
+  //
+  // USERS BADGES
+  //
+
   /**
    * Get the list of the user's badges.
    */
@@ -101,9 +100,9 @@ export class BadgesService {
     return badges.map(x => new UserBadge(x));
   }
   /**
-   * Get a user badge by its id.
+   * Get a user badge by its id and mark it as seen.
    */
-  async getUserBadgeById(badge: string): Promise<UserBadge> {
+  async markUserBadgeAsSeen(badge: string): Promise<UserBadge> {
     return new UserBadge(await this.api.getResource(['usersBadges', badge]));
   }
   /**
@@ -125,16 +124,18 @@ export class BadgesService {
   // UI
   //
 
-  getUserBadgeImage(userBadge: UserBadge): string {
-    const badge = this.badges?.find(x => x.badgeId === userBadge.badge);
-    return badge ? this.app.getImageURLByURI(badge.imageURI) : null;
+  /**
+   * Get the detail of a badge from a user badge.
+   */
+  getDetailOfUserBadge(userBadge: UserBadge): Badge | null {
+    return this.badges?.find(x => x.badgeId === userBadge.badge) ?? null;
   }
-  async openUserBadgeDetails(userBadge: UserBadge): Promise<void> {
-    const popover = await this.popoverCtrl.create({
-      component: UserBadgeComponent,
-      componentProps: { userBadge },
-      cssClass: 'largePopover'
-    });
-    popover.present();
+  /**
+   * Get the image of a user badge.
+   */
+  getImageURLOfUserBadge(userBadge: UserBadge): string | null {
+    if (Badge.isBuiltIn(userBadge.badge)) return 'assets/imgs/badges/' + userBadge.badge + '.svg';
+    const badge = this.getDetailOfUserBadge(userBadge);
+    return badge ? this.app.getImageURLByURI(badge.imageURI) : null;
   }
 }

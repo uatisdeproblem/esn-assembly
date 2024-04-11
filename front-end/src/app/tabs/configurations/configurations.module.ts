@@ -8,7 +8,7 @@ import { ConfigurationsRoutingModule } from './configurations.routing.module';
 import { ConfigurationsPage } from './configurations.page';
 
 import { EmailTemplateModule } from './emailTemplate/emailTemplate.module';
-import { GiveBadgesModule } from './badges/giveBadges.module';
+import { GiveBadgesComponent } from './badges/giveBadges.component';
 
 @NgModule({
   imports: [
@@ -19,7 +19,7 @@ import { GiveBadgesModule } from './badges/giveBadges.module';
     IDEAShowHintButtonModule,
     ConfigurationsRoutingModule,
     EmailTemplateModule,
-    GiveBadgesModule
+    GiveBadgesComponent
   ],
   declarations: [ConfigurationsPage]
 })

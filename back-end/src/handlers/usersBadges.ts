@@ -5,7 +5,7 @@
 import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
 import { User } from '../models/user.model';
-import { UserBadge } from '../models/badge.model';
+import { Badge, UserBadge } from '../models/badge.model';
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -74,10 +74,12 @@ class UsersBadgesRC extends ResourceController {
     if (!userId) throw new HandledError('No target user');
     if (!badge) throw new HandledError('No target badge');
 
-    try {
-      await ddb.get({ TableName: DDB_TABLES.badges, Key: { badgeId: badge } });
-    } catch (error) {
-      throw new HandledError('Target badge not found');
+    if (!Badge.isBuiltIn(badge)) {
+      try {
+        await ddb.get({ TableName: DDB_TABLES.badges, Key: { badgeId: badge } });
+      } catch (error) {
+        throw new HandledError('Target badge not found');
+      }
     }
 
     await addBadgeToUser(ddb, userId, badge);

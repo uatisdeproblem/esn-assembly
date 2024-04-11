@@ -54,6 +54,7 @@ class BadgesRC extends ResourceController {
 
     this.badge = new Badge(this.body);
     this.badge.badgeId = await ddb.IUNID(PROJECT);
+    if (this.badge.isBuiltIn()) throw new HandledError('Built-in badges cannot be created');
 
     await this.putSafeResource({ noOverwrite: true });
 

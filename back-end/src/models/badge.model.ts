@@ -42,22 +42,43 @@ export class Badge extends Resource {
     return e;
   }
 
-  isSpecial(): boolean {
-    return SpecialBadges.includes(this.badgeId);
+  /**
+   * Whether the badge is built-in or custom.
+   */
+  static isBuiltIn(badgeId: string): boolean {
+    return Object.keys(BuiltInBadges).includes(badgeId);
+  }
+  /**
+   * Whether the current badge is built-in or custom.
+   */
+  isBuiltIn(): boolean {
+    return Badge.isBuiltIn(this.badgeId);
   }
 }
 
 /**
- * The special badges to earn automatically while performing actions in the platform.
+ * The built-in badges to earn while performing actions in the platform.
  */
-export const SpecialBadges = [
-  'NEWCOMER',
-  'FIRST_QUESTION',
-  'QUESTIONS_MASTER',
-  'LOVE_GIVER',
-  'CHEERGIVER',
-  'RISING_STAR'
-];
+export enum BuiltInBadges {
+  CHAIRING_WIZARD = 'CHAIRING_WIZARD',
+  CHEERGIVER = 'CHEERGIVER',
+  ENERGY_DRIVER = 'ENERGY_DRIVER',
+  FABULOUS_SCRIBE = 'FABULOUS_SCRIBE',
+  FIRST_QUESTION = 'FIRST_QUESTION',
+  JOKER = 'JOKER',
+  KNOW_IT_ALL = 'KNOW_IT_ALL',
+  LOVE_GIVER = 'LOVE_GIVER',
+  MIC_CATCHER = 'MIC_CATCHER',
+  NEWCOMER = 'NEWCOMER',
+  ONLOOKER = 'ONLOOKER',
+  PLENARIES_RUNNER = 'PLENARIES_RUNNER',
+  POKEMON_HUNTER = 'POKEMON_HUNTER',
+  QUESTIONS_MASTER = 'QUESTIONS_MASTER',
+  RAPID_ROCKET_SPEAKER = 'RAPID_ROCKET_SPEAKER',
+  RISING_STAR = 'RISING_STAR',
+  SHOW_MAKER = 'SHOW_MAKER',
+  SPECTATOR = 'SPECTATOR'
+}
 
 /**
  * The badge earned by a user.
