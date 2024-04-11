@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: ESN Assembly app
-  version: 1.8.7
+  version: 1.9.0
   contact:
     name: Matteo Carbone
     email: email@matteocarbone.com
@@ -385,6 +385,9 @@ paths:
                   type: string
                   enum: [GET_ATTACHMENT_UPLOAD_URL, GET_ATTACHMENT_DOWNLOAD_URL]
                 attachmentId:
+                  type: string
+                  description: (GET_ATTACHMENT_DOWNLOAD_URL)
+                filename:
                   type: string
                   description: (GET_ATTACHMENT_DOWNLOAD_URL)
       responses:
@@ -1357,16 +1360,33 @@ paths:
           $ref: '#/components/responses/OperationCompleted'
   /badges:
     get:
-      summary: Get the user's earned badges
+      summary: Get the badges available in the platform
       tags: [Badges]
       security:
         - AuthFunction: []
       responses:
         200:
           $ref: '#/components/responses/Badges'
+    post:
+      summary: Add a badge
+      description: Requires to be Administrator
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Badge'
+      responses:
+        200:
+          $ref: '#/components/responses/Badge'
+        400:
+          $ref: '#/components/responses/BadParameters'
   /badges/{badge}:
     get:
-      summary: Get the badge earned (if so) by the user (and mark as seen)
+      summary: Get the detail of a badge
       tags: [Badges]
       security:
         - AuthFunction: []
@@ -1380,6 +1400,86 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/Badge'
+    put:
+      summary: Edit a badge
+      description: Requires to be Administrator
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: badge
+          in: path
+          description: Badge
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Badge'
+      responses:
+        200:
+          $ref: '#/components/responses/Badge'
+        400:
+          $ref: '#/components/responses/BadParameters'
+    delete:
+      summary: Delete a badge
+      description: Requires to be Administrator
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: badge
+          in: path
+          description: Badge
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/OperationCompleted'
+        400:
+          $ref: '#/components/responses/BadParameters'
+  /usersBadges:
+    get:
+      summary: Get the user's earned badges
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: userId
+          in: query
+          description: Get another user's badges (only administrators)
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/UserBadges'
+  /usersBadges/{badge}:
+    get:
+      summary: Get the badge earned (if so) by the user (and mark as seen)
+      tags: [Badges]
+      security:
+        - AuthFunction: []
+      parameters:
+        - name: badge
+          in: path
+          description: Badge
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: Get another user's badges (only administrators)
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/UserBadge'
     post:
       summary: Add the badge to a user
       description: Requires to be Administrator
@@ -1401,7 +1501,7 @@ paths:
             type: string
       responses:
         200:
-          $ref: '#/components/responses/Badge'
+          $ref: '#/components/responses/UserBadge'
         400:
           $ref: '#/components/responses/BadParameters'
     delete:
@@ -2403,6 +2503,9 @@ components:
     Badge:
       type: object
       additionalProperties: {}
+    UserBadge:
+      type: object
+      additionalProperties: {}
     UsefulLink:
       type: object
       additionalProperties: {}
@@ -2547,6 +2650,21 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Badge'
+    UserBadge:
+      description: A badge earned by a user
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/UserBadge'
+    UserBadges:
+      description: The badges earned by a user
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UserBadge'
     UsefulLink:
       description: A useful link
       content:

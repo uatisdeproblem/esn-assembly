@@ -277,9 +277,6 @@
       "VOTING_INSTRUCTIONS": "Voting instructions",
       "VOTING_CONFIRMATION": "Confirmation that a vote has been received"
     },
-    "GIVE_BADGES": "Give badges",
-    "GIVE_BADGES_I": "Badges are usually earned through automatic actions, but here you can force them.",
-    "GIVE_A_BADGE": "Give a badge",
     "USER_ID": "User ID (ESN Accounts)",
     "DISPLAY_OPTIONS": "Display options",
     "DISPLAY_OPTIONS_I": "Personalise the interface the following options.",
@@ -307,6 +304,7 @@
     "PAGE_SECTIONS": {
       "CONTENTS": "Contents",
       "USERS": "Users",
+      "USERS_BADGES": "Badges",
       "TEMPLATES": "Templates",
       "OPTIONS": "Options"
     },
@@ -362,14 +360,18 @@
   "PROFILE": {
     "MANAGE_ON_ESN_ACCOUNTS": "Profile on ESN Accounts",
     "FEEDBACK_OR_HELP": "Send feedback or ask for help",
-    "FEEDBACK_EMAIL_SUBJECT": "ESN Assembly app - Feedback",
+    "FEEDBACK_EMAIL_SUBJECT": "ESN Assembly app - Feedback"
+  },
+  "BADGES": {
+    "GIVE_BADGES": "Give badges",
+    "GIVE_BADGES_I": "Badges are usually earned through automatic actions, but here you can force them.",
+    "GIVE_A_BADGE": "Give a badge",
     "YOUR_BADGES": "Your badges",
     "NO_BADGES": "No badges so far. While you're using the app, you will earn some. Go get them all and make your ESNer friends envy you!",
     "YOU_EARNED_A_BADGE": "Congrats!! You've earned a shiny new badge!",
     "BADGE_EARNED": "Earned",
-    "BADGES": {
+    "BUILT_IN_BADGES": {
       "FIRST_QUESTION": "First question",
-      "PEER_PRESSURE_MINHO": "Peer pressure",
       "QUESTIONS_MASTER": "Question Master",
       "NEWCOMER": "Newcomer",
       "KNOW_IT_ALL": "Know-It-All Streak",
@@ -386,12 +388,10 @@
       "ONLOOKER": "Onlooker",
       "PLENARIES_RUNNER": "Plenaries Runner",
       "SPECTATOR": "Spectator",
-      "MEDUSA_ONE": "Medusa",
       "RAPID_ROCKET_SPEAKER": "Rapid rocket speaker"
     },
-    "BADGES_I": {
+    "BUILT_IN_BADGES_I": {
       "FIRST_QUESTION": "Congrats for starting your way into the app!",
-      "PEER_PRESSURE_MINHO": "Pedro asks, you deliver. Just in time before GA Minho's deadline.",
       "QUESTIONS_MASTER": "This is the way! Asking lots of healthy questions help the Network grow stronger.",
       "NEWCOMER": "You're finally acclimating to the tool. We are happy about it!",
       "KNOW_IT_ALL": "Soooo many questions, but you saw it through. Amazing job!",
@@ -408,9 +408,19 @@
       "ONLOOKER": "Nothing escapes your sight! Thanks for sharing your superpower with us.",
       "PLENARIES_RUNNER": "Such legwork: how many calories did you burn? Thank you!",
       "SPECTATOR": "Maybe you're not in the centre of the action, but damn, such a spectator. Enjoy, my friend!",
-      "MEDUSA_ONE": "A unique badge for a unique person. Stay amazing as you are!",
       "RAPID_ROCKET_SPEAKER": "Faster than the speed of sound. Eminem is that you?"
-    }
+    },
+    "BUILT_IN_BADGE": "Built-in badge",
+    "CUSTOM_BADGE": "Custom badge",
+    "CUSTOM_BADGES": "Custom badges",
+    "CUSTOM_BADGES_I": "Besides the built-in badges, you can create new custom ones.",
+    "NO_CUSTOM_BADGES_FOUND": "No custom badge found",
+    "MANAGE_BADGE": "Manage badge",
+    "NEW_BADGE": "New badge",
+    "NAME": " Name",
+    "DESCRIPTION": "Description",
+    "IMAGE_URL": "Image URL",
+    "DELETE_BADGE_WARNING": "By deleting a badge, all users who earned it won't see it anymore."
   },
   "USER_ROLES": {
     "INTERNATIONAL_BOARD": "International Board",
@@ -681,7 +691,7 @@
       "RELATIVE": "Relative Majority",
       "RELATIVE_I": "The proposal with the highest percentage of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority.",
       "SIMPLE": "Simple Majority",
-      "SIMPLE_I": "The proposal  which obtains more than fifty percent (50 %) of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority.",
+      "SIMPLE_I": "The proposal which obtains more than fifty percent (50 %) of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority.",
       "TWO_THIRDS": "Two-Thirds Majority",
       "TWO_THIRDS_I": "The proposal which obtains two-thirds (2/3) + one (1) vote of the votes cast wins. Abstentions, blank or invalid votes are not taken into account for the calculation of the majority."
     },
