@@ -17,16 +17,16 @@ export class Badge extends Resource {
    */
   description: string;
   /**
-   * The URI to the image representing the badge.
+   * The URL to the image representing the badge.
    */
-  imageURI: string;
+  imageURL: string;
 
   load(x: any): void {
     super.load(x);
     this.badgeId = this.clean(x.badgeId, String);
     this.name = this.clean(x.name, String);
     this.description = this.clean(x.description, String);
-    this.imageURI = this.clean(x.imageURI, String);
+    this.imageURL = this.clean(x.imageURL, String);
   }
 
   safeLoad(newData: any, safeData: any): void {
@@ -38,7 +38,7 @@ export class Badge extends Resource {
     const e = super.validate();
     if (this.iE(this.name)) e.push('name');
     if (this.iE(this.description)) e.push('description');
-    if (this.iE(this.imageURI)) e.push('imageURI');
+    if (this.iE(this.imageURL)) e.push('imageURL');
     return e;
   }
 

@@ -81,7 +81,8 @@ export class UserBadgeComponent implements OnInit {
   _app = inject(AppService);
 
   async ngOnInit(): Promise<void> {
-    await this._badges.markUserBadgeAsSeen(this.userBadge.badge);
+    if (this.userBadge.userId === this._app.user.userId) await this._badges.markUserBadgeAsSeen(this.userBadge.badge);
+
     this.badge = Badge.isBuiltIn(this.userBadge.badge)
       ? new Badge({
           badgeId: this.userBadge.badge,

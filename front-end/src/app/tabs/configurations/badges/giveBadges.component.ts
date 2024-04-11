@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule, ModalController, PopoverController } from '@ionic/angular';
 import { Suggestion } from 'idea-toolbox';
 import {
@@ -15,8 +17,6 @@ import { AppService } from '@app/app.service';
 import { BadgesService } from './badges.service';
 
 import { Badge, BuiltInBadges, UserBadge } from '@models/badge.model';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
@@ -92,6 +92,7 @@ import { FormsModule } from '@angular/forms';
   styles: [
     `
       ion-grid.badgesGrid ion-img {
+        cursor: pointer;
         margin: 0 auto;
         width: 100px;
         height: 100px;
@@ -164,8 +165,31 @@ export class GiveBadgesComponent implements OnInit {
           description: this.t._('BADGES.BUILT_IN_BADGES_I.'.concat(badge))
         })
     );
+    const data = [...builtInBadges, ...this.badges]
+      .map(
+        badge =>
+          new Suggestion({
+            value: badge.badgeId,
+            name: badge.name,
+            description: badge.description,
+            category1: Badge.isBuiltIn(badge.badgeId)
+              ? this.t._('BADGES.BUILT_IN_BADGE')
+              : this.t._('BADGES.CUSTOM_BADGE')
+          })
+      )
+      .filter(x => !this.usersBadges?.some(ub => ub.badge === x.value));
 
-    const doAdd = async (badge: string): Promise<void> => {
+    const componentProps = {
+      data,
+      sortData: true,
+      searchPlaceholder: this.t._('BADGES.GIVE_A_BADGE'),
+      hideIdFromUI: true,
+      hideClearButton: true
+    };
+    const modal = await this.modalCtrl.create({ component: IDEASuggestionsComponent, componentProps });
+    modal.onDidDismiss().then(async ({ data }): Promise<void> => {
+      const badge = data?.value;
+      if (!badge) return;
       try {
         await this.loading.show();
         await this._badges.addBadgeToUser(userId, badge);
@@ -176,30 +200,6 @@ export class GiveBadgesComponent implements OnInit {
       } finally {
         this.loading.hide();
       }
-    };
-
-    const data = [...builtInBadges, ...this.badges].map(
-      badge =>
-        new Suggestion({
-          value: badge.badgeId,
-          name: badge.name,
-          description: badge.description,
-          category1: Badge.isBuiltIn(badge.badgeId)
-            ? this.t._('BADGES.BUILT_IN_BADGE')
-            : this.t._('BADGES.CUSTOM_BADGE')
-        })
-    );
-
-    const componentProps = {
-      data,
-      sortData: true,
-      searchPlaceholder: this.t._('BADGES.GIVE_A_BADGE'),
-      hideIdFromUI: true,
-      hideClearButton: true
-    };
-    const modal = await this.modalCtrl.create({ component: IDEASuggestionsComponent, componentProps });
-    modal.onDidDismiss().then(({ data }): void => {
-      if (data?.value) doAdd(data.value);
     });
     modal.present();
   }

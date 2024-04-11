@@ -304,6 +304,7 @@
     "PAGE_SECTIONS": {
       "CONTENTS": "Contents",
       "USERS": "Users",
+      "USERS_BADGES": "Badges",
       "TEMPLATES": "Templates",
       "OPTIONS": "Options"
     },
@@ -410,7 +411,16 @@
       "RAPID_ROCKET_SPEAKER": "Faster than the speed of sound. Eminem is that you?"
     },
     "BUILT_IN_BADGE": "Built-in badge",
-    "CUSTOM_BADGE": "Custom badge"
+    "CUSTOM_BADGE": "Custom badge",
+    "CUSTOM_BADGES": "Custom badges",
+    "CUSTOM_BADGES_I": "Besides the built-in badges, you can create new custom ones.",
+    "NO_CUSTOM_BADGES_FOUND": "No custom badge found",
+    "MANAGE_BADGE": "Manage badge",
+    "NEW_BADGE": "New badge",
+    "NAME": " Name",
+    "DESCRIPTION": "Description",
+    "IMAGE_URL": "Image URL",
+    "DELETE_BADGE_WARNING": "By deleting a badge, all users who earned it won't see it anymore."
   },
   "USER_ROLES": {
     "INTERNATIONAL_BOARD": "International Board",

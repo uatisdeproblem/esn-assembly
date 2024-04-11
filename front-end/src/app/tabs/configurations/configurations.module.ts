@@ -9,6 +9,7 @@ import { ConfigurationsPage } from './configurations.page';
 
 import { EmailTemplateModule } from './emailTemplate/emailTemplate.module';
 import { GiveBadgesComponent } from './badges/giveBadges.component';
+import { ManageBadgesComponent } from './badges/manageBadges.component';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { GiveBadgesComponent } from './badges/giveBadges.component';
     IDEAShowHintButtonModule,
     ConfigurationsRoutingModule,
     EmailTemplateModule,
-    GiveBadgesComponent
+    GiveBadgesComponent,
+    ManageBadgesComponent
   ],
   declarations: [ConfigurationsPage]
 })

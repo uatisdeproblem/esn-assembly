@@ -1448,6 +1448,13 @@ paths:
       tags: [Badges]
       security:
         - AuthFunction: []
+      parameters:
+        - name: userId
+          in: query
+          description: Get another user's badges (only administrators)
+          required: true
+          schema:
+            type: string
       responses:
         200:
           $ref: '#/components/responses/UserBadges'
@@ -1461,6 +1468,12 @@ paths:
         - name: badge
           in: path
           description: Badge
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: Get another user's badges (only administrators)
           required: true
           schema:
             type: string

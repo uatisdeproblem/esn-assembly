@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IDEAApiService } from '@idea-ionic/common';
 
-import { AppService } from '@app/app.service';
-
 import { Badge, UserBadge } from '@models/badge.model';
 
 /**
@@ -19,21 +17,21 @@ export class BadgesService {
    */
   MAX_PAGE_SIZE = 24;
 
-  constructor(private api: IDEAApiService, private app: AppService) {}
+  constructor(private api: IDEAApiService) {}
 
   //
   // BADGES
   //
 
   /**
-   * Load the list of badges from the back-end.
+   * Load the list of (custom) badges from the back-end.
    */
   private async loadList(): Promise<void> {
     const badges: UserBadge[] = await this.api.getResource('badges');
     this.badges = badges.map(b => new Badge(b));
   }
   /**
-   * Get the list of badges.
+   * Get the list of (custom) badges.
    * Note: it's a slice of the array.
    */
   async getList(
@@ -76,7 +74,7 @@ export class BadgesService {
   /**
    * Add a badge.
    */
-  async add(badge: Badge): Promise<Badge> {
+  async insert(badge: Badge): Promise<Badge> {
     return new Badge(await this.api.postResource(['badges'], { body: badge }));
   }
   /**
@@ -141,7 +139,7 @@ export class BadgesService {
   getImageURLOfUserBadge(userBadge: UserBadge): string | null {
     if (Badge.isBuiltIn(userBadge.badge)) return 'assets/imgs/badges/' + userBadge.badge + '.svg';
     const badge = this.getDetailOfUserBadge(userBadge);
-    return badge ? this.app.getImageURLByURI(badge.imageURI) : BADGE_NOT_FOUND_URL;
+    return badge ? badge.imageURL : BADGE_NOT_FOUND_URL;
   }
   /**
    * Load a fallback URL when a badge is missing.

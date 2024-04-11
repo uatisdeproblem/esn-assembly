@@ -42,22 +42,22 @@ class UsersBadgesRC extends ResourceController {
   }
 
   protected async getResource(): Promise<UserBadge> {
+    const userId =
+      this.queryParams.userId && this.galaxyUser.isAdministrator ? this.queryParams.userId : this.galaxyUser.userId;
+
     try {
       this.userBadge = new UserBadge(
-        await ddb.get({
-          TableName: DDB_TABLES.usersBadges,
-          Key: { userId: this.galaxyUser.userId, badge: this.resourceId }
-        })
+        await ddb.get({ TableName: DDB_TABLES.usersBadges, Key: { userId, badge: this.resourceId } })
       );
     } catch (err) {
       throw new HandledError('Badge not found');
     }
 
-    if (!this.userBadge.firstSeenAt) {
+    if (!this.userBadge.firstSeenAt && userId === this.galaxyUser.userId) {
       this.userBadge.firstSeenAt = new Date().toISOString();
       await ddb.update({
         TableName: DDB_TABLES.usersBadges,
-        Key: { userId: this.galaxyUser.userId, badge: this.resourceId },
+        Key: { userId, badge: this.resourceId },
         UpdateExpression: 'SET firstSeenAt = :firstSeenAt',
         ExpressionAttributeValues: { ':firstSeenAt': this.userBadge.firstSeenAt }
       });
