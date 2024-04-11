@@ -5,6 +5,11 @@ import { AppService } from '@app/app.service';
 
 import { Badge, UserBadge } from '@models/badge.model';
 
+/**
+ * A local fallback URL for the missing badges.
+ */
+const BADGE_NOT_FOUND_URL = 'assets/imgs/badges/NOT_FOUND.svg';
+
 @Injectable({ providedIn: 'root' })
 export class BadgesService {
   private badges: Badge[];
@@ -136,6 +141,12 @@ export class BadgesService {
   getImageURLOfUserBadge(userBadge: UserBadge): string | null {
     if (Badge.isBuiltIn(userBadge.badge)) return 'assets/imgs/badges/' + userBadge.badge + '.svg';
     const badge = this.getDetailOfUserBadge(userBadge);
-    return badge ? this.app.getImageURLByURI(badge.imageURI) : null;
+    return badge ? this.app.getImageURLByURI(badge.imageURI) : BADGE_NOT_FOUND_URL;
+  }
+  /**
+   * Load a fallback URL when a badge is missing.
+   */
+  fallbackBadgeImage(targetImg: any): void {
+    if (targetImg && targetImg.src !== BADGE_NOT_FOUND_URL) targetImg.src = BADGE_NOT_FOUND_URL;
   }
 }

@@ -26,7 +26,10 @@ import { Badge, UserBadge } from '@models/badge.model';
       </ion-card-header>
       <ion-card-content>
         <p class="ion-text-center">{{ badge.description }}</p>
-        <ion-img [src]="_badges.getImageURLOfUserBadge(userBadge)" />
+        <ion-img
+          [src]="_badges.getImageURLOfUserBadge(userBadge)"
+          (ionError)="_badges.fallbackBadgeImage($event?.target)"
+        />
         <p class="ion-text-center ion-padding-bottom">
           <ion-badge color="light">
             {{ 'BADGES.BADGE_EARNED' | translate }}: {{ userBadge.earnedAt | dateTz }}
@@ -45,12 +48,12 @@ import { Badge, UserBadge } from '@models/badge.model';
       ion-card-subtitle {
         margin-top: 15px;
         margin-bottom: 30px;
-        ion-item {
-          border-radius: 4px;
-          ion-label {
-            font-weight: 500;
-          }
-        }
+      }
+      ion-card-subtitle ion-item {
+        border-radius: 4px;
+      }
+      ion-card-subtitle ion-item ion-label {
+        font-weight: 500;
       }
       ion-card-title {
         margin-top: 15px;
@@ -85,7 +88,8 @@ export class UserBadgeComponent implements OnInit {
           name: this._t._('BADGES.BUILT_IN_BADGES.'.concat(this.userBadge.badge)),
           description: this._t._('BADGES.BUILT_IN_BADGES_I.'.concat(this.userBadge.badge))
         })
-      : await this._badges.getDetailOfUserBadge(this.userBadge);
+      : this._badges.getDetailOfUserBadge(this.userBadge);
+    if (!this.badge) this.badge = new Badge({ badgeId: 'NOT_FOUND', name: this._t._('COMMON.NOT_FOUND') });
   }
 
   close(): void {

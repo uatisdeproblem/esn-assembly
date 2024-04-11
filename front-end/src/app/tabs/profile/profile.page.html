@@ -39,6 +39,7 @@
             <ion-img
               class="tappable"
               [src]="_badges.getImageURLOfUserBadge(userBadge)"
+              (ionError)="_badges.fallbackBadgeImage($event?.target)"
               (click)="openUserBadgeDetails(userBadge)"
             />
           </ion-col>

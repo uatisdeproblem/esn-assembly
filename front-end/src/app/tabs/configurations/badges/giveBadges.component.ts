@@ -70,7 +70,11 @@ import { FormsModule } from '@angular/forms';
         <ion-grid class="ion-margin-top badgesGrid" *ngIf="usersBadges">
           <ion-row class="ion-justify-content-center ion-align-items-center">
             <ion-col class="ion-text-center" *ngFor="let userBadge of usersBadges">
-              <ion-img [src]="_badges.getImageURLOfUserBadge(userBadge)" (click)="openUserBadgeDetails(userBadge)" />
+              <ion-img
+                [src]="_badges.getImageURLOfUserBadge(userBadge)"
+                (ionError)="_badges.fallbackBadgeImage($event?.target)"
+                (click)="openUserBadgeDetails(userBadge)"
+              />
               <ion-button fill="clear" color="danger" (click)="removeBadgeFromUser(userId, userBadge)">
                 <ion-icon slot="icon-only" icon="trash" />
               </ion-button>
@@ -87,12 +91,10 @@ import { FormsModule } from '@angular/forms';
   `,
   styles: [
     `
-      ion-grid.badgesGrid {
-        ion-img {
-          margin: 0 auto;
-          width: 100px;
-          height: 100px;
-        }
+      ion-grid.badgesGrid ion-img {
+        margin: 0 auto;
+        width: 100px;
+        height: 100px;
       }
     `
   ]
