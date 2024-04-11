@@ -314,7 +314,6 @@ export class ManageTopicPage {
     try {
       await this.loading.show();
       const imageURI = await this._media.uploadImage(file);
-      await sleepForNumSeconds(5);
       subject.avatarURL = this.app.getImageURLByURI(imageURI);
     } catch (error) {
       this.message.error('COMMON.OPERATION_FAILED');
@@ -342,6 +341,3 @@ export enum PublishingOptions {
   PUBLISH = 'PUBLISH',
   SCHEDULE = 'SCHEDULE'
 }
-
-const sleepForNumSeconds = (numSeconds = 1): Promise<void> =>
-  new Promise(resolve => setTimeout((): void => resolve(null), 1000 * numSeconds));

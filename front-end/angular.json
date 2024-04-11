@@ -42,8 +42,8 @@
             "extractLicenses": false,
             "buildOptimizer": false,
             "sourceMap": true,
-            "optimization": false,
             "namedChunks": true,
+            "optimization": { "styles": { "inlineCritical": false } },
             "allowedCommonJsDependencies": [
               "idea-toolbox",
               "isomorphic-unfetch",
@@ -66,7 +66,6 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,

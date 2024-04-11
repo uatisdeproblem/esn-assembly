@@ -4,13 +4,13 @@
 
 import { DynamoDB, HandledError, ResourceController } from 'idea-aws';
 
-import { addBadgeToUser } from './badges';
+import { addBadgeToUser } from './usersBadges';
 
 import { Topic, TopicTypes } from '../models/topic.model';
 import { Question } from '../models/question.model';
 import { Answer, AnswerClap } from '../models/answer.model';
 import { User } from '../models/user.model';
-import { Badges } from '../models/userBadge.model';
+import { BuiltInBadges } from '../models/badge.model';
 import { Subject } from '../models/subject.model';
 
 ///
@@ -102,7 +102,7 @@ class AnswersClaps extends ResourceController {
     await ddb.put({ TableName: DDB_TABLES.questions, Item: this.question });
 
     if ((await this.getNumAnswersClappedByUser()) >= 15)
-      await addBadgeToUser(ddb, this.galaxyUser.userId, Badges.CHEERGIVER);
+      await addBadgeToUser(ddb, this.galaxyUser.userId, BuiltInBadges.CHEERGIVER);
   }
 
   protected async deleteResources(): Promise<void> {

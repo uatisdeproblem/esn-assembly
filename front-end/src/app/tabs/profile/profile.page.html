@@ -1,7 +1,7 @@
-<ion-header class="ion-no-border" *ngIf="app.isInMobileMode()">
+<ion-header class="ion-no-border" *ngIf="_app.isInMobileMode()">
   <ion-toolbar color="ideaToolbar">
     <ion-buttons slot="start">
-      <ion-img [src]="app.getIcon(true)"></ion-img>
+      <ion-img [src]="_app.getIcon(true)" />
     </ion-buttons>
     <ion-title>{{ 'TABS.PROFILE' | translate }}</ion-title>
   </ion-toolbar>
@@ -11,36 +11,37 @@
     <p>
       <ion-avatar>
         <ion-img
-          [src]="app.user.avatarURL ?? app.getAvatarFallbackURL()"
-          (ionError)="app.fallbackAvatar($event?.target)"
-        ></ion-img>
+          [src]="_app.user.avatarURL ?? _app.getAvatarFallbackURL()"
+          (ionError)="_app.fallbackAvatar($event?.target)"
+        />
       </ion-avatar>
     </p>
     <ion-item>
       <ion-label class="ion-text-center">
-        {{ app.user.firstName }} {{ app.user.lastName }}
-        <p>{{ app.user.getOrigin() }}</p>
+        {{ _app.user.firstName }} {{ _app.user.lastName }}
+        <p>{{ _app.user.getOrigin() }}</p>
       </ion-label>
     </ion-item>
-    <ng-container *ngIf="!app.configurations.hideBadges">
+    <ng-container *ngIf="!_app.configurations.hideBadges">
       <ion-list-header>
-        <ion-label><h2>{{ 'PROFILE.YOUR_BADGES' | translate }}</h2></ion-label>
+        <ion-label><h2>{{ 'BADGES.YOUR_BADGES' | translate }}</h2></ion-label>
       </ion-list-header>
-      <ion-item lines="full" class="noBadges" *ngIf="badges && !badges.length">
-        <ion-icon slot="start" icon="sad-outline"></ion-icon>
-        <ion-label class="ion-text-wrap">{{ 'PROFILE.NO_BADGES' | translate }}</ion-label>
+      <ion-item lines="full" class="noBadges" *ngIf="userBadges && !userBadges.length">
+        <ion-icon slot="start" icon="sad-outline" />
+        <ion-label class="ion-text-wrap">{{ 'BADGES.NO_BADGES' | translate }}</ion-label>
       </ion-item>
       <ion-grid class="badgesGrid">
         <ion-row class="ion-justify-content-center ion-align-items-center">
-          <ion-col *ngIf="!badges">
-            <ion-skeleton-text animated></ion-skeleton-text>
+          <ion-col *ngIf="!userBadges">
+            <ion-skeleton-text animated />
           </ion-col>
-          <ion-col *ngFor="let badge of badges">
+          <ion-col *ngFor="let userBadge of userBadges">
             <ion-img
               class="tappable"
-              [src]="_badges.getBadgeImage(badge)"
-              (click)="_badges.openBadgeDetails(badge)"
-            ></ion-img>
+              [src]="_badges.getImageURLOfUserBadge(userBadge)"
+              (ionError)="_badges.fallbackBadgeImage($event?.target)"
+              (click)="openUserBadgeDetails(userBadge)"
+            />
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -48,16 +49,16 @@
     <ion-list-header>
       <ion-label><h2>{{ 'COMMON.ACTIONS' | translate }}</h2></ion-label>
     </ion-list-header>
-    <ion-item button (click)="app.openUserProfileById(app.user.userId)">
-      <ion-icon name="person-outline" slot="start"></ion-icon>
+    <ion-item button (click)="_app.openUserProfileById(_app.user.userId)">
+      <ion-icon name="person-outline" slot="start" />
       <ion-label>{{ 'PROFILE.MANAGE_ON_ESN_ACCOUNTS' | translate }}</ion-label>
     </ion-item>
-    <ion-item button *ngIf="app.configurations.supportEmail" (click)="sendFeedback()">
-      <ion-icon name="help-buoy-outline" slot="start"></ion-icon>
+    <ion-item *ngIf="_app.configurations.supportEmail" button (click)="sendFeedback()">
+      <ion-icon name="help-buoy-outline" slot="start" />
       <ion-label>{{ 'PROFILE.FEEDBACK_OR_HELP' | translate }}</ion-label>
     </ion-item>
-    <ion-item button (click)="app.logout()">
-      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+    <ion-item button (click)="_app.logout()">
+      <ion-icon name="log-out-outline" slot="start" />
       <ion-label>{{ 'COMMON.LOGOUT' | translate }}</ion-label>
     </ion-item>
     <p class="ion-text-center version">v{{ version }}</p>
