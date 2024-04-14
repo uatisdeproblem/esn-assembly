@@ -49,7 +49,7 @@ import { Voter, VotingSession } from '@models/votingSession.model';
           </ion-label>
           <ion-input [disabled]="!editMode" [(ngModel)]="voter.name" />
         </ion-item>
-        <ion-item [class.fieldHasError]="hasFieldAnError('email')">
+        <ion-item *ngIf="votingSession.isForm()" [class.fieldHasError]="hasFieldAnError('email')">
           <ion-label position="stacked">{{ 'VOTING.VOTER_EMAIL' | translate }}</ion-label>
           <ion-input type="email" [disabled]="!editMode" [(ngModel)]="voter.email" />
         </ion-item>

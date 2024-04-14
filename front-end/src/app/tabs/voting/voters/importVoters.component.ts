@@ -123,7 +123,7 @@ export class ImportVotersStandaloneComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.compatibleVotingSessions = (await this._voting.getActiveList()).filter(
       x =>
-        x.isSecret === this.votingSession.isSecret &&
+        x.type === this.votingSession.type &&
         x.isWeighted === this.votingSession.isWeighted &&
         x.sessionId !== this.votingSession.sessionId
     );

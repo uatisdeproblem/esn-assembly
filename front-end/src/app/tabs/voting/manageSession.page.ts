@@ -18,10 +18,16 @@ import { ImportVotersStandaloneComponent } from './voters/importVoters.component
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
-import { VotingMajorityTypes, VotingBallot, VotingSession, Voter } from '@models/votingSession.model';
+import {
+  VotingMajorityTypes,
+  VotingBallot,
+  VotingSession,
+  Voter,
+  VotingSessionTypes
+} from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
-import { VotingResults } from '@models/votingResult.model';
+import { VotingResultForBallotOption, VotingResults } from '@models/votingResult.model';
 
 @Component({
   selector: 'manage-voting-session',
@@ -29,7 +35,7 @@ import { VotingResults } from '@models/votingResult.model';
   styleUrls: ['manageSession.page.scss']
 })
 export class ManageVotingSessionPage implements OnDestroy {
-  @Input() sessionId = 'new';
+  @Input() sessionId = VotingSessionTypes.FORM_PUBLIC;
   votingSession: VotingSession;
 
   editMode = UXMode.VIEW;
@@ -39,6 +45,7 @@ export class ManageVotingSessionPage implements OnDestroy {
 
   publishingOption = PublishingOptions.DRAFT;
   PublishingOptions = PublishingOptions;
+  VotingSessionTypes = VotingSessionTypes;
 
   pageSection = PageSections.GENERAL;
   PageSections = PageSections;
@@ -70,6 +77,9 @@ export class ManageVotingSessionPage implements OnDestroy {
   results: VotingResults;
   showRawResults = true;
 
+  rollCallInProgress = false;
+  rollCall: Record<string, boolean> = {};
+
   constructor(
     private location: Location,
     private alertCtrl: AlertController,
@@ -88,7 +98,8 @@ export class ManageVotingSessionPage implements OnDestroy {
   async ionViewWillEnter(): Promise<void> {
     try {
       await this.loading.show();
-      if (this.sessionId !== 'new') {
+      const isNew = Object.keys(VotingSessionTypes).includes(this.sessionId);
+      if (!isNew) {
         this.votingSession = await this._voting.getById(this.sessionId);
         if (!this.votingSession.canUserManage(this.app.user)) return this.app.closePage('COMMON.UNAUTHORIZED');
         if (this.votingSession.hasStarted()) {
@@ -103,7 +114,7 @@ export class ManageVotingSessionPage implements OnDestroy {
         this.editMode = UXMode.VIEW;
       } else {
         if (!this.app.user.isAdministrator) return this.app.closePage('COMMON.UNAUTHORIZED');
-        this.votingSession = new VotingSession();
+        this.votingSession = new VotingSession({ type: this.sessionId });
         this.editMode = UXMode.INSERT;
       }
     } catch (error) {
@@ -148,7 +159,8 @@ export class ManageVotingSessionPage implements OnDestroy {
   enterEditMode(): void {
     this.entityBeforeChange = new VotingSession(this.votingSession);
     this.editMode = UXMode.EDIT;
-    if (this.pageSection === PageSections.START) this.pageSection = PageSections.GENERAL;
+    if ([PageSections.START, PageSections.IMMEDIATE, PageSections.ROLL_CALL].includes(this.pageSection))
+      this.pageSection = PageSections.GENERAL;
   }
   async exitEditMode(): Promise<void> {
     const doExit = (): void => {
@@ -184,6 +196,11 @@ export class ManageVotingSessionPage implements OnDestroy {
         this.publishingOption = PublishingOptions.SCHEDULE;
       else this.publishingOption = PublishingOptions.PUBLISH;
     } else this.publishingOption = PublishingOptions.DRAFT;
+    if (this.votingSession.type === VotingSessionTypes.ROLL_CALL) {
+      this.rollCall = {};
+      if (this.votingSession.participantVoters)
+        this.votingSession.participantVoters.forEach(x => (this.rollCall[x] = true));
+    }
   }
 
   handleChangeOfPublishingOption(): void {
@@ -375,7 +392,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     }
     this.col.push({ prop: 'id', name: this.t._('VOTING.VOTER_ID'), maxWidth: 150 });
     this.col.push({ prop: 'name', name: this.t._('VOTING.VOTER_NAME') });
-    this.col.push({ prop: 'email', name: this.t._('VOTING.VOTER_EMAIL') });
+    if (this.votingSession.isForm()) this.col.push({ prop: 'email', name: this.t._('VOTING.VOTER_EMAIL') });
     if (this.votingSession.isWeighted)
       this.col.push({ prop: 'voteWeight', name: this.t._('VOTING.VOTE_WEIGHT'), maxWidth: 150 });
 
@@ -519,43 +536,50 @@ export class ManageVotingSessionPage implements OnDestroy {
   }
   async startSession(): Promise<void> {
     const session = new VotingSession(this.votingSession);
-    session.startsAt = new Date().toISOString();
+    if (this.votingSession.isForm()) session.startsAt = new Date().toISOString();
 
     this.errors = new Set(session.validate());
     if (this.errors.size) return this.message.warning('COMMON.FORM_HAS_ERROR_TO_CHECK');
 
-    const doStart = async (): Promise<void> => {
-      try {
-        await this.loading.show();
-        this.votingSession.load(await this._voting.start(session));
-        this.message.success('VOTING.VOTE_IS_STARTING');
-        this.pageSection = PageSections.ANALYTICS;
-        this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
-        this.openWebSocketForVotingTicketsStatus();
-      } catch (error) {
-        this.message.error('COMMON.OPERATION_FAILED');
-      } finally {
-        this.loading.hide();
-      }
-    };
-    const header = this.t._('COMMON.ARE_YOU_SURE');
-    const message = this.t._('VOTING.START_SESSION_I');
-    const buttons = [
-      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.CONFIRM'), handler: doStart }
-    ];
-    const alert = await this.alertCtrl.create({ header, message, buttons });
-    alert.present();
+    if (this.votingSession.type === VotingSessionTypes.ROLL_CALL) {
+      this.pageSection = PageSections.ROLL_CALL;
+      this.rollCallInProgress = true;
+    } else {
+      const doStart = async (): Promise<void> => {
+        try {
+          await this.loading.show();
+          this.votingSession.load(await this._voting.start(session));
+          this.message.success('VOTING.VOTE_IS_STARTING');
+          this.pageSection = PageSections.ANALYTICS;
+          this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
+          this.openWebSocketForVotingTicketsStatus();
+        } catch (error) {
+          this.message.error('COMMON.OPERATION_FAILED');
+        } finally {
+          this.loading.hide();
+        }
+      };
+      const header = this.t._('COMMON.ARE_YOU_SURE');
+      const message = this.t._('VOTING.START_SESSION_I');
+      const buttons = [
+        { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+        { text: this.t._('COMMON.CONFIRM'), handler: doStart }
+      ];
+      const alert = await this.alertCtrl.create({ header, message, buttons });
+      alert.present();
+    }
   }
   canSessionStart(): boolean {
     this.errors = new Set(this.votingSession.validate(true));
 
-    if (!this.votingSession.endsAt) {
-      const now = new Date();
-      now.setMinutes(now.getMinutes() + 30);
-      this.votingSession.endsAt = now.toISOString();
+    if (this.votingSession.isForm()) {
+      if (!this.votingSession.endsAt) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 30);
+        this.votingSession.endsAt = now.toISOString();
+      }
+      if (!this.votingSession.timezone) this.votingSession.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
-    if (!this.votingSession.timezone) this.votingSession.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     return this.errors.size === 0;
   }
@@ -661,7 +685,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     const doPublish = async (): Promise<void> => {
       try {
         await this.loading.show();
-        this.votingSession.load(await this._voting.publishVotingResults(this.votingSession));
+        this.votingSession.load(await this._voting.publishVotingFormResults(this.votingSession));
         this.results = this.votingSession.results;
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (error) {
@@ -693,6 +717,69 @@ export class ManageVotingSessionPage implements OnDestroy {
     const filename = `${sessionName} - ${this.t._('VOTING.VOTERS_AUDIT')}.xlsx`;
     this._voting.downloadVotersAuditSpreadsheet(filename, this.votingTickets);
   }
+
+  //
+  // IMMEDIATE
+  //
+
+  //
+  // ROLL CALL
+  //
+
+  getNumVoterPresentToRollCall(): number {
+    return this.votingSession.voters.filter(x => this.rollCall[x.name]).length;
+  }
+  async cancelRollCall(): Promise<void> {
+    const doCancel = (): void => {
+      this.rollCallInProgress = false;
+      this.rollCall = {};
+      if (this.votingSession.participantVoters)
+        this.votingSession.participantVoters.forEach(x => (this.rollCall[x] = true));
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const subHeader = this.t._('COMMON.ALL_CHANGES_WILL_BE_LOST');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doCancel }
+    ];
+    const alert = await this.alertCtrl.create({ header, subHeader, buttons });
+    alert.present();
+  }
+  async saveRollCall(): Promise<void> {
+    const doConfirm = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const votingSession = new VotingSession(this.votingSession);
+        // roll calls have a static 1-ballot 1-option in terms of data structure
+        votingSession.results = [[new VotingResultForBallotOption()]];
+        votingSession.participantVoters = [];
+        this.votingSession.voters
+          .filter(x => this.rollCall[x.name])
+          .forEach(x => {
+            votingSession.participantVoters.push(x.name);
+            votingSession.results[0][0].value++;
+          });
+        this.votingSession.load(await this._voting.setImmediateResults(votingSession));
+        this.rollCallInProgress = false;
+        this.rollCall = {};
+        if (this.votingSession.participantVoters)
+          this.votingSession.participantVoters.forEach(x => (this.rollCall[x] = true));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_DONE');
+    const subHeader = this.t._('VOTING.YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.SAVE'), role: 'destructive', handler: doConfirm }
+    ];
+    const alert = await this.alertCtrl.create({ header, subHeader, buttons });
+    alert.present();
+  }
 }
 
 enum UXMode {
@@ -712,5 +799,7 @@ enum PageSections {
   BALLOTS = 'BALLOTS',
   VOTERS = 'VOTERS',
   START = 'START',
-  ANALYTICS = 'ANALYTICS'
+  ANALYTICS = 'ANALYTICS',
+  IMMEDIATE = 'IMMEDIATE',
+  ROLL_CALL = 'ROLL_CALL'
 }

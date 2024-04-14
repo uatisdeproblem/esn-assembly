@@ -79,7 +79,10 @@
     "DUPLICATE": "Duplicate",
     "ERROR": "Error",
     "OR": "Or",
-    "COPY": "Copy"
+    "COPY": "Copy",
+    "OF": "Of",
+    "ALL_CHANGES_WILL_BE_LOST": "All changes will be lost.",
+    "ARE_YOU_DONE": "Are you done?"
   },
   "LANGUAGES": {
     "EN": "English"
@@ -664,7 +667,12 @@
       "SCHEDULE": "Schedule publishing"
     },
     "PUBLISH_ON": "Publish on",
-    "IS_SECRET": "Secret vote",
+    "TYPES": {
+      "FORM_PUBLIC": "Public form",
+      "FORM_SECRET": "Secret form",
+      "IMMEDIATE": "Immediate",
+      "ROLL_CALL": "Roll call"
+    },
     "IS_WEIGHTED": "Weighted vote",
     "BALLOTS": "Ballots",
     "BALLOTS_I": "The elements voted on in the current session.",
@@ -800,6 +808,13 @@
     "SHOW_VOTING_TOKEN": "Show voting token",
     "RESEND_VOTING_LINK": "Resend voting link",
     "RAW_RESULTS": "Casted votes",
-    "NO_OPTION_RECEIVED_ENOUGH_VOTES": "No option received enough votes"
+    "NO_OPTION_RECEIVED_ENOUGH_VOTES": "No option received enough votes",
+    "CHOOSE_TYPE": "Choose a type",
+    "ROLL_CALL": "Roll call",
+    "IMMEDIATE": "Immediate vote",
+    "VOTERS_PRESENT": "Voters present",
+    "VOTERS_PRESENT_TAB_HINT": "Keyboard tips: move down (TAB) and up (SHIFT+TAB); mark a voter present (SPACE).",
+    "NO_VOTERS_YET": "No voters yet.",
+    "YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN": "You can change the contents at any time by starting the session again (the current values will be preserved)."
   }
 }

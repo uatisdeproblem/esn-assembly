@@ -4,16 +4,14 @@
       <p class="eventName">{{ votingSession.event?.name }}</p>
       {{ votingSession.name }}
       <p class="itemDetails">
-        <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
-          {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
-        </ion-badge>
+        <ion-badge [color]="getColorByType()">{{ 'VOTING.TYPES.' + votingSession.type | translate }}</ion-badge>
         <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
           {{ 'VOTING.IN_PROGRESS' | translate }}
         </ion-badge>
         <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
           {{ 'VOTING.ENDED' | translate }}
         </ion-badge>
-        <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.results">
+        <ion-badge color="light" *ngIf="votingSession.results">
           {{ 'VOTING.RESULTS' | translate }}
         </ion-badge>
       </p>
@@ -45,9 +43,7 @@
     </ion-col>
     <ion-col class="ion-hide-xl-down" [sizeXl]="2">{{ votingSession.event?.name }}</ion-col>
     <ion-col [sizeLg]="3" [sizeXl]="2">
-      <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
-        {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
-      </ion-badge>
+      <ion-badge [color]="getColorByType()">{{ 'VOTING.TYPES.' + votingSession.type | translate }}</ion-badge>
     </ion-col>
     <ion-col [sizeLg]="2" [sizeXl]="1">
       <ng-container *ngIf="!votingSession.isArchived()">
@@ -58,7 +54,7 @@
         <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
           {{ 'VOTING.ENDED' | translate }}
         </ion-badge>
-        <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.results">
+        <ion-badge color="light" *ngIf="votingSession.results">
           {{ 'VOTING.RESULTS' | translate }}
         </ion-badge>
       </ng-container>

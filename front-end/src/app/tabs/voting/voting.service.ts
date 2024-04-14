@@ -261,9 +261,22 @@ export class VotingService {
   /**
    * Publish the results for everyone to see.
    */
-  async publishVotingResults(votingSession: VotingSession): Promise<VotingSession> {
+  async publishVotingFormResults(votingSession: VotingSession): Promise<VotingSession> {
     const path = ['voting-sessions', votingSession.sessionId];
     const body = { action: 'PUBLISH_RESULTS' };
+    return new VotingSession(await this.api.patchResource(path, { body }));
+  }
+
+  /**
+   * Set the results for an immediate/roll-call voting.
+   */
+  async setImmediateResults(votingSession: VotingSession): Promise<VotingSession> {
+    const path = ['voting-sessions', votingSession.sessionId];
+    const body = {
+      action: 'SET_RESULTS',
+      results: votingSession.results,
+      participantVoters: votingSession.participantVoters
+    };
     return new VotingSession(await this.api.patchResource(path, { body }));
   }
 
@@ -277,7 +290,7 @@ export class VotingService {
     const wb: WorkBook = { SheetNames: [], Sheets: {} };
     const sheetRows = [];
 
-    if (votingSession.isSecret) {
+    if (votingSession.isSecret()) {
       votingSession.ballots.forEach((ballot, bIndex): void => {
         sheetRows.push([ballot.text]);
         [...ballot.options, 'Abstain', 'Absent'].forEach((option, oIndex): void => {
@@ -342,7 +355,8 @@ export class VotingService {
 
     const exportableVoters: ExportableVoter[] = [];
     votingSession.voters.forEach(x => {
-      const voter: ExportableVoter = { Name: x.name, 'Voter Identifier': x.id, Email: x.email };
+      const voter: ExportableVoter = { Name: x.name, 'Voter Identifier': x.id };
+      if (votingSession.isForm()) voter.Email = x.email;
       if (votingSession.isWeighted) voter['Vote Weight'] = x.voteWeight;
       exportableVoters.push(voter);
     });

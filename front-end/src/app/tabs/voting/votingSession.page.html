@@ -20,9 +20,7 @@
             <ion-card-subtitle *ngIf="votingSession.event">{{ votingSession.event?.name }}</ion-card-subtitle>
             <ion-card-title>{{ votingSession.name }}</ion-card-title>
             <p class="badges">
-              <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
-                {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
-              </ion-badge>
+              <ion-badge [color]="getColorByType()">{{ 'VOTING.TYPES.' + votingSession.type | translate }}</ion-badge>
               <ion-badge color="medium" *ngIf="votingSession.isWeighted">
                 {{ 'VOTING.WEIGHTED_VOTE' | translate }}
               </ion-badge>
@@ -32,9 +30,7 @@
               <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
                 {{ 'VOTING.ENDED' | translate }}
               </ion-badge>
-              <ion-badge color="light" *ngIf="votingSession.hasEnded() && votingSession.results">
-                {{ 'VOTING.RESULTS' | translate }}
-              </ion-badge>
+              <ion-badge color="light" *ngIf="votingSession.results">{{ 'VOTING.RESULTS' | translate }}</ion-badge>
               <ion-badge *ngIf="votingSession.isDraft()" color="medium">{{ 'VOTING.DRAFT' | translate }}</ion-badge>
               <ion-badge color="warning" *ngIf="votingSession.isArchived()">
                 {{ 'COMMON.ARCHIVED' | translate }}
@@ -50,7 +46,7 @@
                   {{ votingSession.voters.length }}
                 </ion-label>
               </ion-item>
-              <ion-item *ngIf="votingSession.results && votingSession.isSecret">
+              <ion-item *ngIf="votingSession.results && votingSession.isSecret()">
                 <ion-icon slot="start" icon="golf-outline" />
                 <ion-label>
                   <p>{{ 'VOTING.PARTICIPATION' | translate }}</p>
@@ -58,7 +54,7 @@
                   '1.0-2' }}
                 </ion-label>
               </ion-item>
-              <ion-accordion-group *ngIf="votingSession.results && !votingSession.isSecret">
+              <ion-accordion-group *ngIf="votingSession.results && !votingSession.isSecret()">
                 <ion-accordion value="participation">
                   <ion-item slot="header">
                     <ion-icon slot="start" icon="golf-outline" />
@@ -102,7 +98,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col [size]="12" [sizeLg]="6">
+      <ion-col [size]="12" [sizeLg]="6" *ngIf="votingSession.type !== VotingSessionTypes.ROLL_CALL">
         <ion-list class="aList" style="max-width: 600px">
           <ion-list-header>
             <ion-label class="ion-margin-start">

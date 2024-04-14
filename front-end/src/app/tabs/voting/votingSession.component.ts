@@ -8,7 +8,7 @@ import { DateTimezonePipe } from '@common/dateTimezone.pipe';
 
 import { AppService } from '@app/app.service';
 
-import { VotingSession } from '@models/votingSession.model';
+import { VotingSession, VotingSessionTypes } from '@models/votingSession.model';
 
 @Component({
   standalone: true,
@@ -36,4 +36,11 @@ export class VotingSessionStandaloneComponent {
   @Output() select = new EventEmitter<void>();
 
   constructor(public app: AppService) {}
+
+  getColorByType(): string {
+    if (this.votingSession.type === VotingSessionTypes.FORM_SECRET) return 'ESNpink';
+    if (this.votingSession.type === VotingSessionTypes.IMMEDIATE) return 'ESNcyan';
+    if (this.votingSession.type === VotingSessionTypes.ROLL_CALL) return 'secondary';
+    return 'ESNdarkBlue';
+  }
 }
