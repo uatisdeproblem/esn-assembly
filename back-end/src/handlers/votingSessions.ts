@@ -159,7 +159,7 @@ class VotingSessionsRC extends ResourceController {
       case 'GET_VOTING_TOKEN':
         return await this.getVotingTokenOfVoter(this.body.voterId);
       case 'GET_RESULTS':
-        return await this.getVotingFormResults();
+        return await this.getFormVotingResults();
       case 'PUBLISH_RESULTS':
         return await this.publishFormVotingResults();
       case 'SET_RESULTS':
@@ -326,7 +326,7 @@ class VotingSessionsRC extends ResourceController {
     });
     return this.votingSession;
   }
-  private async getVotingFormResults(): Promise<VotingResults> {
+  private async getFormVotingResults(): Promise<VotingResults> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
     if (!this.votingSession.isForm()) throw new HandledError('Session is immediate');
@@ -370,7 +370,7 @@ class VotingSessionsRC extends ResourceController {
     if (this.votingSession.resultsPublished) throw new HandledError('Already public');
 
     this.votingSession.resultsPublished = true;
-    this.votingSession.results = await this.getVotingFormResults();
+    this.votingSession.results = await this.getFormVotingResults();
 
     await ddb.update({
       TableName: DDB_TABLES.votingSessions,
