@@ -170,12 +170,7 @@ export class ImportVotersStandaloneComponent implements OnInit {
   }
 
   importFromOtherSession(): void {
-    const voters = this.votingSessionToCopy.voters.map(x => new Voter(x));
-    if (this.votingSession.isWeighted && !this.votingSessionToCopy.isWeighted) voters.forEach(v => (v.voteWeight = 1));
-    if (!this.votingSession.isWeighted && this.votingSessionToCopy.isWeighted)
-      voters.forEach(v => (v.voteWeight = null));
-    if (!this.votingSession.isForm() && this.votingSessionToCopy.isForm()) voters.forEach(v => (v.email = null));
-    this.modalCtrl.dismiss(voters);
+    this.modalCtrl.dismiss(this.votingSessionToCopy.voters.map(x => new Voter(x, this.votingSession)));
   }
 
   close(): void {
