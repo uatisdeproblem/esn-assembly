@@ -191,7 +191,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
     const oResults = Object.values(this.results[bIndex]);
     const oResultsNoAbstainAndAbsent = oResults.slice(0, oResults.length - 2);
     const totNoAbstainAndAbsent = oResultsNoAbstainAndAbsent.reduce((tot, acc): number => (tot += acc.value), 0);
-    return this.results[bIndex][oIndex].value / totNoAbstainAndAbsent;
+    return totNoAbstainAndAbsent > 0 ? this.results[bIndex][oIndex].value / totNoAbstainAndAbsent : 0;
   }
   getWinningBallotOptionIndex(bIndex: number): number | -1 {
     const oResults = Object.values(this.results[bIndex]);
