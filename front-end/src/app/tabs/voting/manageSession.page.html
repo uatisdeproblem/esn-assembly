@@ -670,12 +670,12 @@
           <ion-label>
             <h2>{{ 'VOTING.VOTERS_PRESENT' | translate }}</h2>
             <p *ngIf="rollCallInProgress">{{ 'VOTING.ROLL_CALL_TAB_HINT' | translate }}</p>
-            <p *ngIf="!rollCallInProgress">
+            <p *ngIf="!rollCallInProgress && results">
               {{ (votingSession.resultsPublished ? 'VOTING.RESULTS_ARE_PUBLISHED' :
               'VOTING.RESULTS_ARE_NOT_PUBLISHED_YET') | translate }}
             </p>
           </ion-label>
-          <ion-button color="dark" *ngIf="!votingSession.resultsPublished" (click)="saveRollCall(true)">
+          <ion-button color="dark" *ngIf="!votingSession.resultsPublished && results" (click)="saveRollCall(true)">
             {{ 'VOTING.PUBLISH_RESULTS' | translate }} <ion-icon slot="end" icon="share" />
           </ion-button>
         </ion-list-header>
