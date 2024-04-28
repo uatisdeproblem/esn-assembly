@@ -42,6 +42,10 @@ export class VotingSessionPage {
   private async loadResources(): Promise<void> {
     this.votingSession = await this._voting.getById(this.sessionId);
     if (this.votingSession.resultsPublished) this.absentVoters = this.votingSession.getAbsentVoters();
+    else {
+      delete this.votingSession.results;
+      delete this.votingSession.participantVoters;
+    }
   }
   async handleRefresh(refresh: IonRefresher): Promise<void> {
     await this.loadResources();

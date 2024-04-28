@@ -76,6 +76,7 @@ export class VotingSession extends Resource {
   timezone: string;
   /**
    * Whether the results have been published.
+   * NOTE: for immediate sessions the result is public and immediate anyway.
    */
   resultsPublished: boolean;
   /**
