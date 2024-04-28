@@ -147,7 +147,9 @@ export class ManageVotingSessionPage implements OnDestroy {
       if (this.editMode === UXMode.INSERT) result = await this._voting.insert(this.votingSession);
       else result = await this._voting.update(this.votingSession);
       this.votingSession.load(result);
-      this.location.replaceState(this.location.path().replace('/new', '/'.concat(this.votingSession.sessionId)));
+      this.location.replaceState(
+        this.location.path().replace('/'.concat(this.votingSession.type), '/'.concat(this.votingSession.sessionId))
+      );
       this.editMode = UXMode.VIEW;
       this.message.success('COMMON.OPERATION_COMPLETED');
     } catch (err) {
