@@ -1,7 +1,7 @@
 import { Component, HostListener, Input, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ColumnMode, DatatableComponent, SelectionType, TableColumn } from '@swimlane/ngx-datatable';
-import { AlertController, IonSearchbar, ModalController } from '@ionic/angular';
+import { AlertController, IonAccordionGroup, IonSearchbar, ModalController } from '@ionic/angular';
 import { epochISOString } from 'idea-toolbox';
 import {
   IDEAActionSheetController,
@@ -18,7 +18,13 @@ import { ImportVotersStandaloneComponent } from './voters/importVoters.component
 import { AppService } from '@app/app.service';
 import { VotingService } from './voting.service';
 
-import { VotingMajorityTypes, VotingBallot, VotingSession, Voter } from '@models/votingSession.model';
+import {
+  VotingMajorityTypes,
+  VotingBallot,
+  VotingSession,
+  Voter,
+  VotingSessionTypes
+} from '@models/votingSession.model';
 import { VotingTicket } from '@models/votingTicket.model';
 import { WebSocketConnectionTypes, WebSocketMessage } from '@models/webSocket.model';
 import { VotingResults } from '@models/votingResult.model';
@@ -29,7 +35,7 @@ import { VotingResults } from '@models/votingResult.model';
   styleUrls: ['manageSession.page.scss']
 })
 export class ManageVotingSessionPage implements OnDestroy {
-  @Input() sessionId = 'new';
+  @Input() sessionId = VotingSessionTypes.FORM_PUBLIC;
   votingSession: VotingSession;
 
   editMode = UXMode.VIEW;
@@ -39,6 +45,7 @@ export class ManageVotingSessionPage implements OnDestroy {
 
   publishingOption = PublishingOptions.DRAFT;
   PublishingOptions = PublishingOptions;
+  VotingSessionTypes = VotingSessionTypes;
 
   pageSection = PageSections.GENERAL;
   PageSections = PageSections;
@@ -70,6 +77,13 @@ export class ManageVotingSessionPage implements OnDestroy {
   results: VotingResults;
   showRawResults = true;
 
+  rollCallInProgress = false;
+  rollCall: Record<string, boolean> = {};
+
+  immediateInProgress = false;
+  immediateByBallot: Record<string, number>[] = [];
+  @ViewChild('immediateAccordion') immediateAccordion: IonAccordionGroup;
+
   constructor(
     private location: Location,
     private alertCtrl: AlertController,
@@ -88,7 +102,8 @@ export class ManageVotingSessionPage implements OnDestroy {
   async ionViewWillEnter(): Promise<void> {
     try {
       await this.loading.show();
-      if (this.sessionId !== 'new') {
+      const isNew = Object.keys(VotingSessionTypes).includes(this.sessionId);
+      if (!isNew) {
         this.votingSession = await this._voting.getById(this.sessionId);
         if (!this.votingSession.canUserManage(this.app.user)) return this.app.closePage('COMMON.UNAUTHORIZED');
         if (this.votingSession.hasStarted()) {
@@ -103,7 +118,7 @@ export class ManageVotingSessionPage implements OnDestroy {
         this.editMode = UXMode.VIEW;
       } else {
         if (!this.app.user.isAdministrator) return this.app.closePage('COMMON.UNAUTHORIZED');
-        this.votingSession = new VotingSession();
+        this.votingSession = new VotingSession({ type: this.sessionId });
         this.editMode = UXMode.INSERT;
       }
     } catch (error) {
@@ -132,7 +147,9 @@ export class ManageVotingSessionPage implements OnDestroy {
       if (this.editMode === UXMode.INSERT) result = await this._voting.insert(this.votingSession);
       else result = await this._voting.update(this.votingSession);
       this.votingSession.load(result);
-      this.location.replaceState(this.location.path().replace('/new', '/'.concat(this.votingSession.sessionId)));
+      this.location.replaceState(
+        this.location.path().replace('/'.concat(this.votingSession.type), '/'.concat(this.votingSession.sessionId))
+      );
       this.editMode = UXMode.VIEW;
       this.message.success('COMMON.OPERATION_COMPLETED');
     } catch (err) {
@@ -148,7 +165,8 @@ export class ManageVotingSessionPage implements OnDestroy {
   enterEditMode(): void {
     this.entityBeforeChange = new VotingSession(this.votingSession);
     this.editMode = UXMode.EDIT;
-    if (this.pageSection === PageSections.START) this.pageSection = PageSections.GENERAL;
+    if ([PageSections.START, PageSections.IMMEDIATE, PageSections.ROLL_CALL].includes(this.pageSection))
+      this.pageSection = PageSections.GENERAL;
   }
   async exitEditMode(): Promise<void> {
     const doExit = (): void => {
@@ -184,6 +202,9 @@ export class ManageVotingSessionPage implements OnDestroy {
         this.publishingOption = PublishingOptions.SCHEDULE;
       else this.publishingOption = PublishingOptions.PUBLISH;
     } else this.publishingOption = PublishingOptions.DRAFT;
+    if (this.votingSession.type === VotingSessionTypes.ROLL_CALL)
+      this.setRollCallFromParticipantVoters(this.votingSession.participantVoters);
+    if (this.votingSession.type === VotingSessionTypes.IMMEDIATE) this.setImmediateFromResults(this.results);
   }
 
   handleChangeOfPublishingOption(): void {
@@ -375,7 +396,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     }
     this.col.push({ prop: 'id', name: this.t._('VOTING.VOTER_ID'), maxWidth: 150 });
     this.col.push({ prop: 'name', name: this.t._('VOTING.VOTER_NAME') });
-    this.col.push({ prop: 'email', name: this.t._('VOTING.VOTER_EMAIL') });
+    if (this.votingSession.isForm()) this.col.push({ prop: 'email', name: this.t._('VOTING.VOTER_EMAIL') });
     if (this.votingSession.isWeighted)
       this.col.push({ prop: 'voteWeight', name: this.t._('VOTING.VOTE_WEIGHT'), maxWidth: 150 });
 
@@ -519,43 +540,53 @@ export class ManageVotingSessionPage implements OnDestroy {
   }
   async startSession(): Promise<void> {
     const session = new VotingSession(this.votingSession);
-    session.startsAt = new Date().toISOString();
+    if (this.votingSession.isForm()) session.startsAt = new Date().toISOString();
 
     this.errors = new Set(session.validate());
     if (this.errors.size) return this.message.warning('COMMON.FORM_HAS_ERROR_TO_CHECK');
 
-    const doStart = async (): Promise<void> => {
-      try {
-        await this.loading.show();
-        this.votingSession.load(await this._voting.start(session));
-        this.message.success('VOTING.VOTE_IS_STARTING');
-        this.pageSection = PageSections.ANALYTICS;
-        this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
-        this.openWebSocketForVotingTicketsStatus();
-      } catch (error) {
-        this.message.error('COMMON.OPERATION_FAILED');
-      } finally {
-        this.loading.hide();
-      }
-    };
-    const header = this.t._('COMMON.ARE_YOU_SURE');
-    const message = this.t._('VOTING.START_SESSION_I');
-    const buttons = [
-      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.CONFIRM'), handler: doStart }
-    ];
-    const alert = await this.alertCtrl.create({ header, message, buttons });
-    alert.present();
+    if (this.votingSession.type === VotingSessionTypes.IMMEDIATE) {
+      this.pageSection = PageSections.IMMEDIATE;
+      this.immediateInProgress = true;
+    } else if (this.votingSession.type === VotingSessionTypes.ROLL_CALL) {
+      this.pageSection = PageSections.ROLL_CALL;
+      this.rollCallInProgress = true;
+    } else {
+      const doStart = async (): Promise<void> => {
+        try {
+          await this.loading.show();
+          this.votingSession.load(await this._voting.start(session));
+          this.message.success('VOTING.VOTE_IS_STARTING');
+          this.pageSection = PageSections.ANALYTICS;
+          this.votingTickets = await this._voting.getVotingTicketsStatus(this.votingSession);
+          this.openWebSocketForVotingTicketsStatus();
+        } catch (error) {
+          this.message.error('COMMON.OPERATION_FAILED');
+        } finally {
+          this.loading.hide();
+        }
+      };
+      const header = this.t._('COMMON.ARE_YOU_SURE');
+      const message = this.t._('VOTING.START_SESSION_I');
+      const buttons = [
+        { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+        { text: this.t._('COMMON.CONFIRM'), handler: doStart }
+      ];
+      const alert = await this.alertCtrl.create({ header, message, buttons });
+      alert.present();
+    }
   }
   canSessionStart(): boolean {
     this.errors = new Set(this.votingSession.validate(true));
 
-    if (!this.votingSession.endsAt) {
-      const now = new Date();
-      now.setMinutes(now.getMinutes() + 30);
-      this.votingSession.endsAt = now.toISOString();
+    if (this.votingSession.isForm()) {
+      if (!this.votingSession.endsAt) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 30);
+        this.votingSession.endsAt = now.toISOString();
+      }
+      if (!this.votingSession.timezone) this.votingSession.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
-    if (!this.votingSession.timezone) this.votingSession.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     return this.errors.size === 0;
   }
@@ -661,7 +692,7 @@ export class ManageVotingSessionPage implements OnDestroy {
     const doPublish = async (): Promise<void> => {
       try {
         await this.loading.show();
-        this.votingSession.load(await this._voting.publishVotingResults(this.votingSession));
+        this.votingSession.load(await this._voting.publishVotingFormResults(this.votingSession));
         this.results = this.votingSession.results;
         this.message.success('COMMON.OPERATION_COMPLETED');
       } catch (error) {
@@ -693,6 +724,181 @@ export class ManageVotingSessionPage implements OnDestroy {
     const filename = `${sessionName} - ${this.t._('VOTING.VOTERS_AUDIT')}.xlsx`;
     this._voting.downloadVotersAuditSpreadsheet(filename, this.votingTickets);
   }
+
+  //
+  // IMMEDIATE
+  //
+
+  getImmediateOfBallot(bIndex: number): Record<string, number> {
+    if (!this.immediateByBallot[bIndex]) this.immediateByBallot[bIndex] = {};
+    return this.immediateByBallot[bIndex];
+  }
+  getNumVotersPresentToImmediateBallotByIndex(bIndex: number): number {
+    const immediateOfBallot = this.getImmediateOfBallot(bIndex);
+    const absentIndex = this.votingSession.ballots[bIndex].options.length + 1;
+    return this.votingSession.voters.filter(
+      x => immediateOfBallot[x.id] !== undefined && Number(immediateOfBallot[x.id]) !== absentIndex
+    ).length;
+  }
+  getResultsAndParticipantsFromImmediate(): { results: VotingResults; participantVoters: string[] } {
+    const results: VotingResults = [];
+    const participantVoters = new Set<string>();
+    const sumOfWeights = this.votingSession.getTotWeights();
+    const balancedWeights: Record<string, number> = {};
+    this.votingSession.voters.forEach(
+      voter => (balancedWeights[voter.id] = (this.votingSession.isWeighted ? voter.voteWeight : 1) / sumOfWeights)
+    );
+    this.votingSession.ballots.forEach((_, bIndex): void => {
+      results[bIndex] = [];
+      [...this.votingSession.ballots[bIndex].options, 'Abstain', 'Absent'].forEach((_, oIndex): void => {
+        results[bIndex][oIndex] = { value: 0, voters: [] };
+      });
+      const immediateOfBallot = this.getImmediateOfBallot(bIndex);
+      const absentIndex = this.votingSession.ballots[bIndex].options.length + 1;
+      this.votingSession.voters.forEach(voter => {
+        const oResult = immediateOfBallot[voter.id] ?? absentIndex;
+        const vRes = results[bIndex][oResult];
+        vRes.value += balancedWeights[voter.id];
+        vRes.voters.push(voter.name);
+        if (oResult !== absentIndex) participantVoters.add(voter.name);
+      });
+    });
+    return { results, participantVoters: Array.from(participantVoters) };
+  }
+  setImmediateFromResults(results: VotingResults): void {
+    this.immediateByBallot = [];
+    if (!results) return;
+    results.forEach((bResult, bIndex): void => {
+      this.immediateByBallot[bIndex] = {};
+      bResult.forEach((oResult, oIndex): void => {
+        oResult.voters.forEach(voterName => {
+          const voter = this.votingSession.voters.find(x => x.name === voterName);
+          if (voter) this.immediateByBallot[bIndex][voter.id] = oIndex;
+        });
+      });
+    });
+  }
+  async cancelImmediate(): Promise<void> {
+    const doCancel = (): void => {
+      this.immediateInProgress = false;
+      this.setImmediateFromResults(this.results);
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const subHeader = this.t._('COMMON.ALL_CHANGES_WILL_BE_LOST');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doCancel }
+    ];
+    const alert = await this.alertCtrl.create({ header, subHeader, buttons });
+    alert.present();
+  }
+  async saveImmediate(publish = false, nextIndex?: number): Promise<void> {
+    const doSave = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const { results, participantVoters } = this.getResultsAndParticipantsFromImmediate();
+        const votingSession = new VotingSession({ ...this.votingSession, results, participantVoters });
+        this.votingSession.load(await this._voting.setImmediateResults(votingSession, publish));
+        this.results = this.votingSession.results;
+        if (!publish && nextIndex !== undefined) {
+          if (this.immediateAccordion) this.immediateAccordion.value = String(nextIndex);
+        } else {
+          this.immediateInProgress = false;
+          this.setImmediateFromResults(this.results);
+          this.message.success('COMMON.OPERATION_COMPLETED');
+        }
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE');
+    const subHeader = this.t._(publish ? 'COMMON.ARE_YOU_DONE' : 'COMMON.ARE_YOU_SURE');
+    const message = publish
+      ? this.t._('VOTING.CANT_CHANGE_PUBLISHED_VOTING')
+      : nextIndex !== undefined
+      ? undefined
+      : this.t._('VOTING.YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE'), handler: doSave }
+    ];
+    const alert = await this.alertCtrl.create({ header, subHeader, message, buttons });
+    alert.present();
+  }
+
+  //
+  // ROLL CALL
+  //
+
+  getNumVotersPresentToRollCall(): number {
+    return this.votingSession.voters.filter(x => this.rollCall[x.id]).length;
+  }
+  getResultsAndParticipantsFromRollCall(): { results: VotingResults; participantVoters: string[] } {
+    const increment = 1 / this.votingSession.voters.length;
+    // roll calls have a static 1-ballot 1-option in terms of data structure
+    const results: VotingResults = [[{ value: 0, voters: [] }]];
+    const participantVoters = [];
+    this.votingSession.voters
+      .filter(x => this.rollCall[x.id])
+      .forEach(x => {
+        participantVoters.push(x.name);
+        results[0][0].value += increment;
+      });
+    return { results, participantVoters };
+  }
+  setRollCallFromParticipantVoters(participantVoters: string[]): void {
+    this.rollCall = {};
+    if (!participantVoters) return;
+    participantVoters.forEach(voterName => {
+      const voter = this.votingSession.voters.find(x => x.name === voterName);
+      if (voter) this.rollCall[voter.id] = true;
+    });
+  }
+  async cancelRollCall(): Promise<void> {
+    const doCancel = (): void => {
+      this.rollCallInProgress = false;
+      this.setRollCallFromParticipantVoters(this.votingSession.participantVoters);
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const subHeader = this.t._('COMMON.ALL_CHANGES_WILL_BE_LOST');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doCancel }
+    ];
+    const alert = await this.alertCtrl.create({ header, subHeader, buttons });
+    alert.present();
+  }
+  async saveRollCall(publish = false): Promise<void> {
+    const doSave = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const { results, participantVoters } = this.getResultsAndParticipantsFromRollCall();
+        const votingSession = new VotingSession({ ...this.votingSession, results, participantVoters });
+        this.votingSession.load(await this._voting.setImmediateResults(votingSession, publish));
+        this.results = this.votingSession.results;
+        this.rollCallInProgress = false;
+        this.setRollCallFromParticipantVoters(this.votingSession.participantVoters);
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+    const header = this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE');
+    const subHeader = this.t._(publish ? 'COMMON.ARE_YOU_DONE' : 'COMMON.ARE_YOU_SURE');
+    const message = publish
+      ? this.t._('VOTING.CANT_CHANGE_PUBLISHED_VOTING')
+      : this.t._('VOTING.YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE'), handler: doSave }
+    ];
+    const alert = await this.alertCtrl.create({ header, subHeader, message, buttons });
+    alert.present();
+  }
 }
 
 enum UXMode {
@@ -712,5 +918,7 @@ enum PageSections {
   BALLOTS = 'BALLOTS',
   VOTERS = 'VOTERS',
   START = 'START',
-  ANALYTICS = 'ANALYTICS'
+  ANALYTICS = 'ANALYTICS',
+  IMMEDIATE = 'IMMEDIATE',
+  ROLL_CALL = 'ROLL_CALL'
 }

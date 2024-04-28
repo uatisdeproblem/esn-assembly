@@ -20,7 +20,11 @@ export class PublicAttachmentsService {
    * Download a public attachment.
    */
   async download(attachment: Attachment): Promise<string> {
-    const body = { action: 'GET_ATTACHMENT_DOWNLOAD_URL', attachmentId: attachment.attachmentId };
+    const body = {
+      action: 'GET_ATTACHMENT_DOWNLOAD_URL',
+      attachmentId: attachment.attachmentId,
+      filename: attachment.name.concat('.', attachment.format)
+    };
     const { url } = await this.api.patchResource('public-attachments', { body });
     return url;
   }

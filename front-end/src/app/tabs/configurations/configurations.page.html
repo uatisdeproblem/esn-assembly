@@ -170,17 +170,6 @@
     </ion-list>
 
     <ion-list class="aList" *ngIf="pageSection === PageSections.USERS">
-      <ng-container *ngIf="!configurations.hideBadges">
-        <ion-list-header>
-          <ion-label>
-            <h2>{{ 'CONFIGURATIONS.GIVE_BADGES' | translate }}</h2>
-            <p>{{ 'CONFIGURATIONS.GIVE_BADGES_I' | translate }}</p>
-          </ion-label>
-        </ion-list-header>
-        <p class="ion-text-center">
-          <ion-button (click)="openBadgesModal()">{{ 'CONFIGURATIONS.GIVE_A_BADGE' | translate }}</ion-button>
-        </p>
-      </ng-container>
       <ion-list-header class="ion-padding-top">
         <ion-label>
           <h2>{{ 'CONFIGURATIONS.ADMINISTRATORS' | translate }}</h2>
@@ -316,6 +305,44 @@
           {{ 'CONFIGURATIONS.EMAIL_TEMPLATES_TYPES.VOTING_CONFIRMATION' | translate }}
         </ion-label>
       </ion-item>
+    </ion-list>
+
+    <ion-list class="aList" *ngIf="pageSection === PageSections.USERS_BADGES">
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'BADGES.GIVE_BADGES' | translate }}</h2>
+          <p>{{ 'BADGES.GIVE_BADGES_I' | translate }}</p>
+        </ion-label>
+      </ion-list-header>
+      <p class="ion-text-center">
+        <ion-button (click)="openBadgesModal()">{{ 'BADGES.GIVE_A_BADGE' | translate }}</ion-button>
+      </p>
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'BADGES.CUSTOM_BADGES' | translate }}</h2>
+          <p>{{ 'BADGES.CUSTOM_BADGES_I' | translate }}</p>
+        </ion-label>
+        <ion-button (click)="addCustomBadge()">{{ 'COMMON.ADD' | translate }}</ion-button>
+      </ion-list-header>
+      <ion-searchbar #badgesSearchbar (ionInput)="filterBadges($event.target.value)" />
+      <ion-item *ngIf="!badges">
+        <ion-label><ion-skeleton-text animated /></ion-label>
+      </ion-item>
+      <ion-item class="noElements" *ngIf="badges && !badges.length">
+        <ion-label>{{ 'BADGES.NO_CUSTOM_BADGES_FOUND' | translate }}</ion-label>
+      </ion-item>
+      <ion-item button detail *ngFor="let badge of badges" (click)="manageCustomBadge(badge)">
+        <ion-thumbnail slot="start">
+          <ion-img [src]="badge.imageURL" (ionError)="_badges.fallbackBadgeImage($event?.target)" />
+        </ion-thumbnail>
+        <ion-label>
+          {{ badge.name }}
+          <p>{{ badge.description }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-infinite-scroll (ionInfinite)="filterBadges(badgesSearchbar.value, $event.target)">
+        <ion-infinite-scroll-content />
+      </ion-infinite-scroll>
     </ion-list>
   </div>
 </ion-content>

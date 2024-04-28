@@ -181,7 +181,8 @@ class ApplicationsRC extends ResourceController {
     const userId = this.opportunity.canUserManage(this.galaxyUser) ? this.application.userId : this.galaxyUser.userId;
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachment.attachmentId}-${userId}`;
-    return await s3.signedURLGet(S3_BUCKET_MEDIA, key);
+    const filename = attachment.name.concat('.', attachment.format);
+    return await s3.signedURLGet(S3_BUCKET_MEDIA, key, { filename });
   }
   private async reviewApplication(approve: boolean, message: string): Promise<Application> {
     if (this.opportunity.isArchived()) throw new HandledError('Opportunity is archived');

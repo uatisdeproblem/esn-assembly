@@ -56,8 +56,8 @@ import { Deadline } from '@models/deadline.model';
         font-size: 0.8em;
       }
       ion-item ion-badge.deadlineDate {
-        width: 100px;
-        padding: 2px 8px;
+        width: 106px;
+        padding: 2px 5px;
       }
       ion-item ion-badge.deadlineDate.mobile {
         width: 120px;

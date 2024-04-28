@@ -206,7 +206,18 @@ div.internalPSpacing p {
 .largePopover {
   --width: 700px;
   @media only screen and (max-width: 767px) {
-    --width: 400px;
+    --width: 350px;
+  }
+}
+.badgePopover {
+  --width: 500px;
+  @media only screen and (max-width: 767px) {
+    --width: 350px;
+  }
+  &::part(content) {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
   }
 }
 
@@ -373,5 +384,14 @@ ion-segment[scrollable] {
   }
   .datatable-body-cell-label span {
     line-height: 1;
+  }
+}
+
+.alert-wrapper {
+  .alert-button-role-cancel {
+    color: var(--ion-color-medium);
+  }
+  .alert-button-role-destructive {
+    color: var(--ion-color-danger);
   }
 }
