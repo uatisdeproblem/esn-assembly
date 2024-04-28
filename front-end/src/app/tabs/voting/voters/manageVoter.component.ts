@@ -152,7 +152,10 @@ export class ManageVoterStandaloneComponent implements OnInit {
         this.loading.hide();
       }
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.SEND'), handler: doSend }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.SEND'), handler: doSend }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }
