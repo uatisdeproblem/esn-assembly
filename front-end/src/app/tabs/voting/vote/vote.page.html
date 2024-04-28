@@ -26,8 +26,8 @@
         <ion-label>
           <h4>{{ 'VOTING.HERE_YOU_CAN_VOTE_FOR' | translate }}:</h4>
           <h1>{{ votingSession.name }}</h1>
-          <ion-badge [color]="votingSession.isSecret ? 'ESNpink' : 'primary'">
-            {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
+          <ion-badge [color]="votingSession.isSecret() ? 'ESNpink' : 'ESNdarkBlue'">
+            {{ (votingSession.isSecret() ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
           </ion-badge>
         </ion-label>
       </ion-list-header>

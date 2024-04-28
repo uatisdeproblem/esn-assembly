@@ -115,6 +115,7 @@ class VotingSessionsRC extends ResourceController {
     delete this.votingSession.startsAt;
     delete this.votingSession.endsAt;
     delete this.votingSession.timezone;
+    delete this.votingSession.resultsPublished;
     delete this.votingSession.results;
     delete this.votingSession.participantVoters;
 
@@ -158,9 +159,11 @@ class VotingSessionsRC extends ResourceController {
       case 'GET_VOTING_TOKEN':
         return await this.getVotingTokenOfVoter(this.body.voterId);
       case 'GET_RESULTS':
-        return await this.getVotingResults();
+        return await this.getFormVotingResults();
       case 'PUBLISH_RESULTS':
-        return await this.publishVotingResults();
+        return await this.publishFormVotingResults();
+      case 'SET_RESULTS':
+        return await this.setImmediateVotingResults(this.body.results, this.body.participantVoters, this.body.publish);
       case 'ARCHIVE':
         return await this.manageArchive(true);
       case 'UNARCHIVE':
@@ -172,6 +175,7 @@ class VotingSessionsRC extends ResourceController {
   private async startVotingSession(endsAt: epochISOString, timezone: string): Promise<VotingSession> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
+    if (!this.votingSession.isForm()) throw new HandledError('Voting session is immediate');
     if (this.votingSession.hasStarted()) throw new HandledError("Can't be changed after start");
 
     this.votingSession.startsAt = new Date().toISOString();
@@ -322,9 +326,10 @@ class VotingSessionsRC extends ResourceController {
     });
     return this.votingSession;
   }
-  private async getVotingResults(): Promise<VotingResults> {
+  private async getFormVotingResults(): Promise<VotingResults> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
 
+    if (!this.votingSession.isForm()) throw new HandledError('Session is immediate');
     if (!this.votingSession.hasEnded()) throw new HandledError('Session has not ended');
 
     const resultsForBallotOption = (
@@ -339,18 +344,18 @@ class VotingSessionsRC extends ResourceController {
     this.votingSession.ballots.forEach((ballot, bIndex): void => {
       votingResults[bIndex] = [...ballot.options, 'Abstain'].map((): { value: number; voters?: string[] } => ({
         value: 0,
-        voters: this.votingSession.isSecret ? undefined : []
+        voters: this.votingSession.isSecret() ? undefined : []
       }));
     });
     resultsForBallotOption.forEach(x => {
       const { bIndex, oIndex } = x.getIndexesFromSK();
       votingResults[bIndex][oIndex].value = x.value;
-      if (!this.votingSession.isSecret) votingResults[bIndex][oIndex].voters = x.voters ?? [];
+      if (!this.votingSession.isSecret()) votingResults[bIndex][oIndex].voters = x.voters ?? [];
     });
     votingResults.forEach(ballotResult => {
       const totValue = ballotResult.reduce((tot, acc): number => (tot += acc.value), 0);
       const absent: { value: number; voters?: string[] } = { value: 1 - totValue };
-      if (!this.votingSession.isSecret) {
+      if (!this.votingSession.isSecret()) {
         const votersPresent = new Set(this.votingSession.participantVoters);
         absent.voters = this.votingSession.voters.map(x => x.name).filter(x => !votersPresent.has(x));
       }
@@ -359,17 +364,46 @@ class VotingSessionsRC extends ResourceController {
 
     return votingResults;
   }
-  private async publishVotingResults(): Promise<VotingSession> {
-    if (this.votingSession.results) throw new HandledError('Already public');
+  private async publishFormVotingResults(): Promise<VotingSession> {
+    if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
+    if (!this.votingSession.isForm()) throw new HandledError('Session is immediate');
+    if (this.votingSession.resultsPublished) throw new HandledError('Already public');
 
-    this.votingSession.results = await this.getVotingResults();
+    this.votingSession.resultsPublished = true;
+    this.votingSession.results = await this.getFormVotingResults();
 
     await ddb.update({
       TableName: DDB_TABLES.votingSessions,
       Key: { sessionId: this.votingSession.sessionId },
-      UpdateExpression: 'SET results = :results',
-      ExpressionAttributeValues: { ':results': this.votingSession.results }
+      UpdateExpression: 'SET results = :results, resultsPublished = :true',
+      ExpressionAttributeValues: { ':results': this.votingSession.results, ':true': true }
     });
+
+    return this.votingSession;
+  }
+  private async setImmediateVotingResults(
+    results: VotingResults,
+    participantVoters: string[],
+    publish: boolean
+  ): Promise<VotingSession> {
+    if (this.votingSession.isForm()) throw new HandledError('Session is form-like');
+    if (this.votingSession.resultsPublished) throw new HandledError('Already public');
+
+    this.votingSession.resultsPublished = !!publish;
+    this.votingSession.results = results;
+    this.votingSession.participantVoters = participantVoters;
+
+    await ddb.update({
+      TableName: DDB_TABLES.votingSessions,
+      Key: { sessionId: this.votingSession.sessionId },
+      UpdateExpression: 'SET resultsPublished = :publish, results = :results, participantVoters = :pv',
+      ExpressionAttributeValues: {
+        ':publish': this.votingSession.resultsPublished,
+        ':results': this.votingSession.results,
+        ':pv': this.votingSession.participantVoters
+      }
+    });
+
     return this.votingSession;
   }
   private async manageArchive(archive: boolean): Promise<VotingSession> {

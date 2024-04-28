@@ -61,3 +61,14 @@ ion-toggle {
   font-size: 0.9em;
   color: var(--ion-color-step-600);
 }
+
+ion-accordion-group.immediateBallotsGroup ion-accordion {
+  ion-item[slot='header'] ion-label {
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+  div[slot='content'] {
+    background-color: var(--ion-color-white);
+    border-bottom: 1px solid var(--ion-color-step-100);
+  }
+}

@@ -386,3 +386,12 @@ ion-segment[scrollable] {
     line-height: 1;
   }
 }
+
+.alert-wrapper {
+  .alert-button-role-cancel {
+    color: var(--ion-color-medium);
+  }
+  .alert-button-role-destructive {
+    color: var(--ion-color-danger);
+  }
+}
