@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: ESN Assembly app
-  version: 1.9.0
+  version: 1.10.0
   contact:
     name: Matteo Carbone
     email: email@matteocarbone.com
@@ -2382,6 +2382,7 @@ paths:
                       CHECK_EARLY_END,
                       GET_RESULTS,
                       PUBLISH_RESULTS,
+                      SET_RESULTS,
                       ARCHIVE,
                       UNARCHIVE
                     ]
@@ -2397,6 +2398,15 @@ paths:
                 email:
                   type: string
                   description: (RESEND_VOTING_LINK)
+                results:
+                  type: object
+                  description: (SET_RESULTS)
+                participantVoters:
+                  type: string
+                  description: (SET_RESULTS)
+                publish:
+                  type: boolean
+                  description: (SET_RESULTS)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'

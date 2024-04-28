@@ -104,7 +104,7 @@ export class ConfigurationsPage implements OnInit {
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.REMOVE'), handler: doRemove }
+      { text: this.t._('COMMON.REMOVE'), role: 'destructive', handler: doRemove }
     ];
     const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();
@@ -138,7 +138,10 @@ export class ConfigurationsPage implements OnInit {
       newConfigurations.appTitle = appTitle;
       await this.updateConfigurations(newConfigurations);
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doChange }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }
@@ -151,7 +154,10 @@ export class ConfigurationsPage implements OnInit {
       newConfigurations.appSubtitle = appSubtitle;
       await this.updateConfigurations(newConfigurations);
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doChange }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }
@@ -164,7 +170,10 @@ export class ConfigurationsPage implements OnInit {
       newConfigurations.supportEmail = supportEmail;
       await this.updateConfigurations(newConfigurations);
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doChange }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }

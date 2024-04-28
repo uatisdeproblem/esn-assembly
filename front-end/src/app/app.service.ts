@@ -2,13 +2,7 @@ import { Injectable } from '@angular/core';
 import { Params } from '@angular/router';
 import { AlertController, NavController, Platform } from '@ionic/angular';
 import { Browser } from '@capacitor/browser';
-import {
-  IDEAActionSheetController,
-  IDEAApiService,
-  IDEAMessageService,
-  IDEAStorageService,
-  IDEATranslationsService
-} from '@idea-ionic/common';
+import { IDEAApiService, IDEAMessageService, IDEAStorageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { environment as env } from '@env';
 import { User } from '@models/user.model';
@@ -52,7 +46,6 @@ export class AppService {
     private alertCtrl: AlertController,
     private message: IDEAMessageService,
     private storage: IDEAStorageService,
-    private actionSheetCtrl: IDEAActionSheetController,
     private api: IDEAApiService,
     private t: IDEATranslationsService
   ) {
@@ -144,19 +137,6 @@ export class AppService {
   }
 
   /**
-   * Actions on the current user.
-   */
-  async openUserPreferences(): Promise<void> {
-    const header = this.user.firstName;
-    const buttons = [
-      { text: this.t._('COMMON.LOGOUT'), icon: 'log-out', handler: (): Promise<void> => this.logout() },
-      { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
-    ];
-
-    const actions = await this.actionSheetCtrl.create({ header, buttons });
-    actions.present();
-  }
-  /**
    * Show some app's info.
    */
   async info(): Promise<void> {
@@ -166,7 +146,7 @@ export class AppService {
     const message = this.t._('COMMON.VERSION', { v: env.idea.app.version });
     const buttons = [
       { text: this.t._('IDEA_AUTH.PRIVACY_POLICY'), handler: openPrivacyPolicy },
-      { text: this.t._('COMMON.CLOSE') }
+      { text: this.t._('COMMON.CLOSE'), role: 'cancel' }
     ];
 
     const alert = await this.alertCtrl.create({ header, message, buttons });
@@ -184,18 +164,13 @@ export class AppService {
 
     const header = this.t._('COMMON.LOGOUT');
     const message = this.t._('COMMON.ARE_YOU_SURE');
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.LOGOUT'), handler: doLogout }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.LOGOUT'), handler: doLogout }
+    ];
 
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
-  }
-
-  /**
-   * Utility to generate a numeric array.
-   * Useful for skeleton interfaces.
-   */
-  generateNumericArray(length: number): number[] {
-    return [...Array(length).keys()];
   }
 
   /**

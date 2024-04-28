@@ -149,7 +149,10 @@ export class GiveBadgesComponent implements OnInit {
     };
 
     const header = this.t._('COMMON.ARE_YOU_SURE');
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doRemove }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doRemove }
+    ];
     const alert = await this.alertCtrl.create({ header, buttons });
     await alert.present();
   }
