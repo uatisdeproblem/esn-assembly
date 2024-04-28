@@ -33,15 +33,13 @@
         [creator]="answer.creator"
         [isSender]="question.creator.id !== answer.creator.id"
       >
-        <p
-          class="ion-text-right ion-padding-end"
-          *ngIf="question.creator.id !== answer.creator.id && answer.creator.id !== app.user.userId"
-        >
+        <p class="ion-text-right ion-padding-end">
           <ion-button fill="clear" color="medium" (click)="seeAnswerClappers(answer, $event)">
             {{ 'QUESTIONS.SEE_CLAPPERS' | translate }} <ion-icon slot="end" icon="eye"></ion-icon>
           </ion-button>
           <ion-button
             fill="clear"
+            *ngIf="question.creator.id !== answer.creator.id && answer.creator.id !== app.user.userId"
             [color]="userClapped[answer.answerId] ? 'medium' : 'ESNpink'"
             (click)="clapAnswer(!userClapped[answer.answerId], answer)"
           >

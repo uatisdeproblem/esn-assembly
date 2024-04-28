@@ -391,7 +391,8 @@
       "ONLOOKER": "Onlooker",
       "PLENARIES_RUNNER": "Plenaries Runner",
       "SPECTATOR": "Spectator",
-      "RAPID_ROCKET_SPEAKER": "Rapid rocket speaker"
+      "RAPID_ROCKET_SPEAKER": "Rapid rocket speaker",
+      "FIRST_DANCE": "First dance"
     },
     "BUILT_IN_BADGES_I": {
       "FIRST_QUESTION": "Congrats for starting your way into the app!",
@@ -411,7 +412,8 @@
       "ONLOOKER": "Nothing escapes your sight! Thanks for sharing your superpower with us.",
       "PLENARIES_RUNNER": "Such legwork: how many calories did you burn? Thank you!",
       "SPECTATOR": "Maybe you're not in the centre of the action, but damn, such a spectator. Enjoy, my friend!",
-      "RAPID_ROCKET_SPEAKER": "Faster than the speed of sound. Eminem is that you?"
+      "RAPID_ROCKET_SPEAKER": "Faster than the speed of sound. Eminem is that you?",
+      "FIRST_DANCE": "You are paving the way for others and have no shame in being the first to intervene. We like you!"
     },
     "BUILT_IN_BADGE": "Built-in badge",
     "CUSTOM_BADGE": "Custom badge",

@@ -118,13 +118,15 @@ class Questions extends ResourceController {
 
     await this.putSafeResource({ noOverwrite: true });
 
-    await this.updateCountersOfTopic();
+    const numQuestionsForTopic = (await this.getResources()).length;
+    await this.updateCountersOfTopic(numQuestionsForTopic);
 
     await this.sendNotificationToTopicSubjects(this.topic, this.question);
 
     await addBadgeToUser(ddb, this.galaxyUser.userId, BuiltInBadges.FIRST_QUESTION);
     if ((await this.getNumQuestionsMadeByUser()) >= 10)
       await addBadgeToUser(ddb, this.galaxyUser.userId, BuiltInBadges.QUESTIONS_MASTER);
+    if (numQuestionsForTopic === 1) await addBadgeToUser(ddb, this.galaxyUser.userId, BuiltInBadges.FIRST_DANCE);
 
     return this.question;
   }
@@ -174,7 +176,7 @@ class Questions extends ResourceController {
       Key: { topicId: this.topic.topicId, questionId: this.question.questionId }
     });
 
-    await this.updateCountersOfTopic();
+    await this.updateCountersOfTopic((await this.getResources()).length);
   }
 
   private async questionHasAnswers(): Promise<boolean> {
@@ -185,15 +187,13 @@ class Questions extends ResourceController {
     });
     return answersToQuestion.length > 0;
   }
-  private async updateCountersOfTopic(): Promise<void> {
+  private async updateCountersOfTopic(numOfQuestionsInTopic: number): Promise<void> {
     try {
-      const questionsOfTopic = await this.getResources();
-
       await ddb.update({
         TableName: DDB_TABLES.topics,
         Key: { topicId: this.topic.topicId },
         UpdateExpression: 'SET numOfQuestions = :num',
-        ExpressionAttributeValues: { ':num': questionsOfTopic.length }
+        ExpressionAttributeValues: { ':num': numOfQuestionsInTopic }
       });
     } catch (error) {
       this.logger.warn('Counters not updated', error, { topicId: this.topic.topicId });
