@@ -800,7 +800,7 @@ export class ManageVotingSessionPage implements OnDestroy {
         const votingSession = new VotingSession({ ...this.votingSession, results, participantVoters });
         this.votingSession.load(await this._voting.setImmediateResults(votingSession, publish));
         this.results = this.votingSession.results;
-        if (nextIndex !== undefined) {
+        if (!publish && nextIndex !== undefined) {
           if (this.immediateAccordion) this.immediateAccordion.value = String(nextIndex);
         } else {
           this.immediateInProgress = false;
@@ -815,8 +815,11 @@ export class ManageVotingSessionPage implements OnDestroy {
     };
     const header = this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE');
     const subHeader = this.t._(publish ? 'COMMON.ARE_YOU_DONE' : 'COMMON.ARE_YOU_SURE');
-    const message =
-      nextIndex !== undefined ? undefined : this.t._('VOTING.YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN');
+    const message = publish
+      ? this.t._('VOTING.CANT_CHANGE_PUBLISHED_VOTING')
+      : nextIndex !== undefined
+      ? undefined
+      : this.t._('VOTING.YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
       { text: this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE'), handler: doSave }
@@ -886,7 +889,9 @@ export class ManageVotingSessionPage implements OnDestroy {
     };
     const header = this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE');
     const subHeader = this.t._(publish ? 'COMMON.ARE_YOU_DONE' : 'COMMON.ARE_YOU_SURE');
-    const message = this.t._('VOTING.YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN');
+    const message = publish
+      ? this.t._('VOTING.CANT_CHANGE_PUBLISHED_VOTING')
+      : this.t._('VOTING.YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
       { text: this.t._(publish ? 'VOTING.PUBLISH_RESULTS' : 'COMMON.SAVE'), handler: doSave }

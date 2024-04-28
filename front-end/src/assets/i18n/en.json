@@ -815,10 +815,11 @@
     "VOTERS_PRESENT": "Voters present",
     "ROLL_CALL_TAB_HINT": "Keyboard tips: move down (TAB) and up (SHIFT+TAB); mark a voter present (SPACE).",
     "NO_VOTERS_YET": "No voters yet.",
-    "YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN": "You can change the contents at any time by resuming the session (the current values will be preserved).",
+    "YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN": "Before they are published, you can change the contents at any time by resuming the session (the current values will be preserved).",
     "IMMEDIATE_TAB_HINT": "Keyboard tips: move down (TAB) and up (SHIFT+TAB) the voters list; choose an option by its corresponding number or use the arrows.",
     "RESUME_SESSION": "Resume session",
     "RESUME": "Resume",
-    "SAVE_AND_NEXT": "Save and proceed to the next ballot"
+    "SAVE_AND_NEXT": "Save and proceed to the next ballot",
+    "CANT_CHANGE_PUBLISHED_VOTING": "You won't be able to change the voting after the results are published."
   }
 }

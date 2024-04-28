@@ -25,7 +25,7 @@
         </ion-label>
       </ion-segment-button>
       <ion-segment-button
-        *ngIf="!editMode && !votingSession.hasStarted() && !rollCallInProgress && !immediateInProgress"
+        *ngIf="!editMode && !votingSession.hasStarted() && !rollCallInProgress && !immediateInProgress && !votingSession.resultsPublished"
         [value]="PageSections.START"
       >
         <ion-label>{{ (votingSession.results ? 'VOTING.RESUME' : 'VOTING.START') | translate }}</ion-label>

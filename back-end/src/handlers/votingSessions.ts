@@ -387,6 +387,7 @@ class VotingSessionsRC extends ResourceController {
     publish: string | boolean
   ): Promise<VotingSession> {
     if (this.votingSession.isForm()) throw new HandledError('Session is form-like');
+    if (this.votingSession.resultsPublished) throw new HandledError('Already public');
 
     this.votingSession.resultsPublished = !!publish;
     this.votingSession.results = results;
