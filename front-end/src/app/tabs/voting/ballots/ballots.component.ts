@@ -240,7 +240,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
           plugins: {
             legend: { display: false },
             tooltip: {
-              callbacks: { label: tooltipItem => `${(Number(tooltipItem.formattedValue) * 100).toFixed(2)}%` }
+              callbacks: { label: tooltipItem => `${(Number(tooltipItem.parsed) * 100).toFixed(2)}%` }
             }
           }
         }
