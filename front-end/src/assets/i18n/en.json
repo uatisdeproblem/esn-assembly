@@ -785,7 +785,7 @@
     "SUMMARY_I": "Check one last time before to proceed.",
     "RESULTS_ARE_PUBLISHED": "Results are published.",
     "RESULTS_ARE_NOT_PUBLISHED_YET": "Results are not published yet.",
-    "PUBLISH_RESULTS": "Publish results",
+    "PUBLISH_RESULTS": "Publish",
     "PUBLISH_RESULTS_I": "Once the results are published, everyone will be able to see them. You can't go back from this choice.",
     "NO_ONE": "No one",
     "VOTERS_FOR": "Voters for",
@@ -813,8 +813,12 @@
     "ROLL_CALL": "Roll call",
     "IMMEDIATE": "Immediate vote",
     "VOTERS_PRESENT": "Voters present",
-    "VOTERS_PRESENT_TAB_HINT": "Keyboard tips: move down (TAB) and up (SHIFT+TAB); mark a voter present (SPACE).",
+    "ROLL_CALL_TAB_HINT": "Keyboard tips: move down (TAB) and up (SHIFT+TAB); mark a voter present (SPACE).",
     "NO_VOTERS_YET": "No voters yet.",
-    "YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN": "You can change the contents at any time by starting the session again (the current values will be preserved)."
+    "YOU_CAN_CHANGE_CONTENTS_STARTING_SESSION_AGAIN": "You can change the contents at any time by resuming the session (the current values will be preserved).",
+    "IMMEDIATE_TAB_HINT": "Keyboard tips: move down (TAB) and up (SHIFT+TAB) the voters list; choose an option by its corresponding number or use the arrows.",
+    "RESUME_SESSION": "Resume session",
+    "RESUME": "Resume",
+    "SAVE_AND_NEXT": "Save and proceed to the next ballot"
   }
 }

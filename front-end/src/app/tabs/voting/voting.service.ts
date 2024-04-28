@@ -268,14 +268,15 @@ export class VotingService {
   }
 
   /**
-   * Set the results for an immediate/roll-call voting.
+   * Set the results for an immediate/roll-call voting; optionally, make the results public.
    */
-  async setImmediateResults(votingSession: VotingSession): Promise<VotingSession> {
+  async setImmediateResults(votingSession: VotingSession, publish = false): Promise<VotingSession> {
     const path = ['voting-sessions', votingSession.sessionId];
     const body = {
       action: 'SET_RESULTS',
       results: votingSession.results,
-      participantVoters: votingSession.participantVoters
+      participantVoters: votingSession.participantVoters,
+      publish
     };
     return new VotingSession(await this.api.patchResource(path, { body }));
   }

@@ -75,6 +75,10 @@ export class VotingSession extends Resource {
    */
   timezone: string;
   /**
+   * Whether the results have been published.
+   */
+  resultsPublished: boolean;
+  /**
    * The results of the voting session, in case they are published.
    */
   results?: VotingResults;
@@ -112,10 +116,14 @@ export class VotingSession extends Resource {
     }
     this.scrutineersIds = this.cleanArray(x.scrutineersIds, String).map(x => x.toLowerCase());
     if (this.isForm() && !this.hasEnded()) {
+      this.resultsPublished = false;
       delete this.results;
       delete this.participantVoters;
     } else {
-      if (x.results) this.results = x.results;
+      if (x.results) {
+        this.resultsPublished = this.clean(x.resultsPublished, Boolean, false);
+        this.results = x.results;
+      } else this.resultsPublished = false;
       if (x.participantVoters)
         this.participantVoters = this.cleanArray(x.participantVoters, String)?.sort((a, b): number =>
           a.localeCompare(b)
@@ -133,6 +141,7 @@ export class VotingSession extends Resource {
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     this.startsAt = safeData.startsAt;
+    this.resultsPublished = safeData.resultsPublished;
     if (safeData.results) this.results = safeData.results;
     if (safeData.participantVoters) this.participantVoters = safeData.participantVoters;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;

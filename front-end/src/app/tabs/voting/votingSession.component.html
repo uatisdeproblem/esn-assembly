@@ -8,10 +8,10 @@
         <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
           {{ 'VOTING.IN_PROGRESS' | translate }}
         </ion-badge>
-        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
+        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.resultsPublished">
           {{ 'VOTING.ENDED' | translate }}
         </ion-badge>
-        <ion-badge color="light" *ngIf="votingSession.results">
+        <ion-badge color="light" *ngIf="votingSession.resultsPublished">
           {{ 'VOTING.RESULTS' | translate }}
         </ion-badge>
       </p>
@@ -51,10 +51,10 @@
         <ion-badge color="ESNgreen" *ngIf="votingSession.isInProgress()">
           {{ 'VOTING.IN_PROGRESS' | translate }}
         </ion-badge>
-        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.results">
+        <ion-badge color="ESNorange" *ngIf="votingSession.hasEnded() && !votingSession.resultsPublished">
           {{ 'VOTING.ENDED' | translate }}
         </ion-badge>
-        <ion-badge color="light" *ngIf="votingSession.results">
+        <ion-badge color="light" *ngIf="votingSession.resultsPublished">
           {{ 'VOTING.RESULTS' | translate }}
         </ion-badge>
       </ng-container>

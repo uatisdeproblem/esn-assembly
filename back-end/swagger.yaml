@@ -2404,6 +2404,9 @@ paths:
                 participantVoters:
                   type: string
                   description: (SET_RESULTS)
+                publish:
+                  type: boolean
+                  description: (SET_RESULTS)
       responses:
         200:
           $ref: '#/components/responses/OperationCompleted'

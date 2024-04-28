@@ -115,6 +115,7 @@ class VotingSessionsRC extends ResourceController {
     delete this.votingSession.startsAt;
     delete this.votingSession.endsAt;
     delete this.votingSession.timezone;
+    delete this.votingSession.resultsPublished;
     delete this.votingSession.results;
     delete this.votingSession.participantVoters;
 
@@ -162,7 +163,7 @@ class VotingSessionsRC extends ResourceController {
       case 'PUBLISH_RESULTS':
         return await this.publishFormVotingResults();
       case 'SET_RESULTS':
-        return await this.setImmediateVotingResults(this.body.results, this.body.participantVoters);
+        return await this.setImmediateVotingResults(this.body.results, this.body.participantVoters, this.body.publish);
       case 'ARCHIVE':
         return await this.manageArchive(true);
       case 'UNARCHIVE':
@@ -366,30 +367,37 @@ class VotingSessionsRC extends ResourceController {
   private async publishFormVotingResults(): Promise<VotingSession> {
     if (!this.votingSession.canUserManage(this.galaxyUser)) throw new HandledError('Unauthorized');
     if (!this.votingSession.isForm()) throw new HandledError('Session is immediate');
-    if (this.votingSession.results) throw new HandledError('Already public');
+    if (this.votingSession.resultsPublished) throw new HandledError('Already public');
 
+    this.votingSession.resultsPublished = true;
     this.votingSession.results = await this.getVotingFormResults();
 
     await ddb.update({
       TableName: DDB_TABLES.votingSessions,
       Key: { sessionId: this.votingSession.sessionId },
-      UpdateExpression: 'SET results = :results',
-      ExpressionAttributeValues: { ':results': this.votingSession.results }
+      UpdateExpression: 'SET results = :results, resultsPublished = :true',
+      ExpressionAttributeValues: { ':results': this.votingSession.results, ':true': true }
     });
 
     return this.votingSession;
   }
-  private async setImmediateVotingResults(results: VotingResults, participantVoters: string[]): Promise<VotingSession> {
+  private async setImmediateVotingResults(
+    results: VotingResults,
+    participantVoters: string[],
+    publish: string | boolean
+  ): Promise<VotingSession> {
     if (this.votingSession.isForm()) throw new HandledError('Session is form-like');
 
+    this.votingSession.resultsPublished = !!publish;
     this.votingSession.results = results;
     this.votingSession.participantVoters = participantVoters;
 
     await ddb.update({
       TableName: DDB_TABLES.votingSessions,
       Key: { sessionId: this.votingSession.sessionId },
-      UpdateExpression: 'SET results = :results, participantVoters = :pv',
+      UpdateExpression: 'SET resultsPublished = :publish, results = :results, participantVoters = :pv',
       ExpressionAttributeValues: {
+        ':publish': this.votingSession.resultsPublished,
         ':results': this.votingSession.results,
         ':pv': this.votingSession.participantVoters
       }
