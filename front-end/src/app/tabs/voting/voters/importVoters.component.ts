@@ -80,7 +80,7 @@ import { ExportableVoter, Voter, VotingSession } from '@models/votingSession.mod
             [placeholder]="('VOTING.IMPORT_FROM_OTHER_SESSION' | translate) + '...'"
             [(ngModel)]="votingSessionToCopy"
           >
-            <ion-select-option *ngFor="let os of compatibleVotingSessions" [value]="os">
+            <ion-select-option *ngFor="let os of otherVotingSessions" [value]="os">
               {{ os.name }}
             </ion-select-option>
           </ion-select>
@@ -110,7 +110,7 @@ export class ImportVotersStandaloneComponent implements OnInit {
 
   indexesOfRowsWithErr: number[] = [];
 
-  compatibleVotingSessions: VotingSession[];
+  otherVotingSessions: VotingSession[];
   votingSessionToCopy: VotingSession;
 
   constructor(
@@ -121,11 +121,8 @@ export class ImportVotersStandaloneComponent implements OnInit {
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
-    this.compatibleVotingSessions = (await this._voting.getActiveList()).filter(
-      x =>
-        x.type === this.votingSession.type &&
-        x.isWeighted === this.votingSession.isWeighted &&
-        x.sessionId !== this.votingSession.sessionId
+    this.otherVotingSessions = (await this._voting.getActiveList()).filter(
+      x => x.sessionId !== this.votingSession.sessionId
     );
   }
 
@@ -173,7 +170,12 @@ export class ImportVotersStandaloneComponent implements OnInit {
   }
 
   importFromOtherSession(): void {
-    this.modalCtrl.dismiss(this.votingSessionToCopy.voters);
+    const voters = this.votingSessionToCopy.voters.map(x => new Voter(x));
+    if (this.votingSession.isWeighted && !this.votingSessionToCopy.isWeighted) voters.forEach(v => (v.voteWeight = 1));
+    if (!this.votingSession.isWeighted && this.votingSessionToCopy.isWeighted)
+      voters.forEach(v => (v.voteWeight = null));
+    if (!this.votingSession.isForm() && this.votingSessionToCopy.isForm()) voters.forEach(v => (v.email = null));
+    this.modalCtrl.dismiss(voters);
   }
 
   close(): void {
