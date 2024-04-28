@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: ESN Assembly app
-  version: 1.9.0
+  version: 1.10.0
   contact:
     name: Matteo Carbone
     email: email@matteocarbone.com
