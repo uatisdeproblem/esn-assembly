@@ -44,7 +44,7 @@ import { VotingResults } from '@models/votingResult.model';
                 <ion-item
                   lines="none"
                   *ngFor="let option of getOptionsOfBallotIncludingAbstainAndAbsentByIndex(bIndex); let oIndex = index"
-                  [button]="results && !votingSession.isSecret"
+                  [button]="results && !votingSession.isSecret()"
                   (click)="openBallotVotesDetailPopover(bIndex, oIndex, option, $event)"
                 >
                   <ion-badge slot="start" color="light" *ngIf="!results">{{ oIndex + 1 }}</ion-badge>
@@ -191,7 +191,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
     const oResults = Object.values(this.results[bIndex]);
     const oResultsNoAbstainAndAbsent = oResults.slice(0, oResults.length - 2);
     const totNoAbstainAndAbsent = oResultsNoAbstainAndAbsent.reduce((tot, acc): number => (tot += acc.value), 0);
-    return this.results[bIndex][oIndex].value / totNoAbstainAndAbsent;
+    return totNoAbstainAndAbsent > 0 ? this.results[bIndex][oIndex].value / totNoAbstainAndAbsent : 0;
   }
   getWinningBallotOptionIndex(bIndex: number): number | -1 {
     const oResults = Object.values(this.results[bIndex]);
@@ -240,7 +240,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
           plugins: {
             legend: { display: false },
             tooltip: {
-              callbacks: { label: tooltipItem => `${(Number(tooltipItem.formattedValue) * 100).toFixed(2)}%` }
+              callbacks: { label: tooltipItem => `${(Number(tooltipItem.parsed) * 100).toFixed(2)}%` }
             }
           }
         }
@@ -254,7 +254,7 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
     option: string,
     event: Event
   ): Promise<void> {
-    if (!this.results || this.votingSession.isSecret) return;
+    if (!this.results || this.votingSession.isSecret()) return;
     const componentProps = {
       ballotOption: option,
       resultValue: this.getResultOfBallotOptionBasedOnRaw(ballotIndex, optionIndex),

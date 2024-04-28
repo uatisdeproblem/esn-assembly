@@ -5,7 +5,7 @@
 import { DynamoDB, HandledError, ResourceController, S3 } from 'idea-aws';
 import { Attachment } from 'idea-toolbox';
 
-import { addBadgeToUser } from './badges';
+import { addBadgeToUser } from './usersBadges';
 import { addStatisticEntry } from './statistics';
 
 import { TopicCategoryAttached } from '../models/category.model';
@@ -13,7 +13,7 @@ import { GAEventAttached } from '../models/event.model';
 import { Topic, TopicTypes } from '../models/topic.model';
 import { RelatedTopic } from '../models/relatedTopic.model';
 import { User } from '../models/user.model';
-import { Badges } from '../models/userBadge.model';
+import { BuiltInBadges } from '../models/badge.model';
 import { SubjectTypes } from '../models/subject.model';
 import { StatisticEntityTypes } from '../models/statistic.model';
 import { Application } from '../models/application.model';
@@ -123,7 +123,7 @@ class Topics extends ResourceController {
     await this.putSafeResource({ noOverwrite: true });
 
     const userSubjects = this.topic.subjects.filter(s => s.type === SubjectTypes.USER);
-    for (const user of userSubjects) await addBadgeToUser(ddb, user.id, Badges.RISING_STAR);
+    for (const user of userSubjects) await addBadgeToUser(ddb, user.id, BuiltInBadges.RISING_STAR);
 
     return this.topic;
   }
@@ -184,7 +184,7 @@ class Topics extends ResourceController {
 
     await this.putSafeResource({ noOverwrite: true });
 
-    await addBadgeToUser(ddb, application.subject.id, Badges.RISING_STAR);
+    await addBadgeToUser(ddb, application.subject.id, BuiltInBadges.RISING_STAR);
 
     return this.topic;
   }

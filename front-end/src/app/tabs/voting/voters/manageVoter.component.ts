@@ -49,7 +49,7 @@ import { Voter, VotingSession } from '@models/votingSession.model';
           </ion-label>
           <ion-input [disabled]="!editMode" [(ngModel)]="voter.name" />
         </ion-item>
-        <ion-item [class.fieldHasError]="hasFieldAnError('email')">
+        <ion-item *ngIf="votingSession.isForm()" [class.fieldHasError]="hasFieldAnError('email')">
           <ion-label position="stacked">{{ 'VOTING.VOTER_EMAIL' | translate }}</ion-label>
           <ion-input type="email" [disabled]="!editMode" [(ngModel)]="voter.email" />
         </ion-item>
@@ -152,7 +152,10 @@ export class ManageVoterStandaloneComponent implements OnInit {
         this.loading.hide();
       }
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.SEND'), handler: doSend }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.SEND'), handler: doSend }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }

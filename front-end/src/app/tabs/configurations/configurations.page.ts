@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController, IonInfiniteScroll, IonSearchbar, ModalController } from '@ionic/angular';
 import { IDEALoadingService, IDEAMessageService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { EmailTemplateComponent } from './emailTemplate/emailTemplate.component';
 import { GiveBadgesComponent } from './badges/giveBadges.component';
+import { ManageBadgesComponent } from './badges/manageBadges.component';
 
 import { AppService } from '@app/app.service';
 import { ConfigurationsService } from './configurations.service';
+import { BadgesService } from './badges/badges.service';
 import { MediaService } from '@app/common/media.service';
 
 import { Configurations, EmailTemplates, UsersOriginDisplayOptions } from '@models/configurations.model';
+import { Badge } from '@models/badge.model';
 
 @Component({
   selector: 'configurations',
@@ -27,6 +30,10 @@ export class ConfigurationsPage implements OnInit {
 
   timezones = (Intl as any).supportedValuesOf('timeZone');
 
+  badges: Badge[];
+
+  @ViewChild('badgesSearchbar') badgesSearchbar: IonSearchbar;
+
   constructor(
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
@@ -35,10 +42,12 @@ export class ConfigurationsPage implements OnInit {
     private t: IDEATranslationsService,
     private _configurations: ConfigurationsService,
     private _media: MediaService,
+    public _badges: BadgesService,
     public app: AppService
   ) {}
   async ngOnInit(): Promise<void> {
     this.configurations = await this._configurations.get();
+    this.filterBadges(null, null, true);
   }
 
   addAdministrator(): void {
@@ -95,7 +104,7 @@ export class ConfigurationsPage implements OnInit {
     const header = this.t._('COMMON.ARE_YOU_SURE');
     const buttons = [
       { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
-      { text: this.t._('COMMON.REMOVE'), handler: doRemove }
+      { text: this.t._('COMMON.REMOVE'), role: 'destructive', handler: doRemove }
     ];
     const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();
@@ -120,11 +129,6 @@ export class ConfigurationsPage implements OnInit {
     await modal.present();
   }
 
-  async openBadgesModal(): Promise<void> {
-    const modal = await this.modalCtrl.create({ component: GiveBadgesComponent });
-    await modal.present();
-  }
-
   async changeAppTitle(): Promise<void> {
     const header = this.t._('CONFIGURATIONS.APP_TITLE');
     const inputs: any[] = [{ name: 'appTitle', type: 'text', value: this.configurations.appTitle }];
@@ -134,7 +138,10 @@ export class ConfigurationsPage implements OnInit {
       newConfigurations.appTitle = appTitle;
       await this.updateConfigurations(newConfigurations);
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doChange }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }
@@ -147,7 +154,10 @@ export class ConfigurationsPage implements OnInit {
       newConfigurations.appSubtitle = appSubtitle;
       await this.updateConfigurations(newConfigurations);
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doChange }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }
@@ -160,7 +170,10 @@ export class ConfigurationsPage implements OnInit {
       newConfigurations.supportEmail = supportEmail;
       await this.updateConfigurations(newConfigurations);
     };
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doChange }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), handler: doChange }
+    ];
     const alert = await this.alertCtrl.create({ header, inputs, buttons });
     await alert.present();
   }
@@ -171,7 +184,6 @@ export class ConfigurationsPage implements OnInit {
     try {
       await this.loading.show();
       const imageURI = await this._media.uploadImage(file);
-      await sleepForNumSeconds(5);
       const newConfigurations = new Configurations(this.configurations);
       if (darkMode) newConfigurations.appLogoURLDarkMode = this.app.getImageURLByURI(imageURI);
       else newConfigurations.appLogoURL = this.app.getImageURLByURI(imageURI);
@@ -219,14 +231,38 @@ export class ConfigurationsPage implements OnInit {
     newConfigurations.hideBadges = !show;
     await this.updateConfigurations(newConfigurations);
   }
+
+  async filterBadges(search = '', scrollToNextPage?: IonInfiniteScroll, force = false): Promise<void> {
+    let startPaginationAfterId = null;
+    if (scrollToNextPage && this.badges?.length) startPaginationAfterId = this.badges[this.badges.length - 1].badgeId;
+
+    this.badges = await this._badges.getList({ force, search, withPagination: true, startPaginationAfterId });
+
+    if (scrollToNextPage) setTimeout((): Promise<void> => scrollToNextPage.complete(), 100);
+  }
+  async openBadgesModal(): Promise<void> {
+    const modal = await this.modalCtrl.create({ component: GiveBadgesComponent });
+    await modal.present();
+  }
+  async addCustomBadge(): Promise<void> {
+    await this.manageCustomBadge(new Badge());
+  }
+  async manageCustomBadge(badge: Badge): Promise<void> {
+    const componentProps = { badge };
+    const modal = await this.modalCtrl.create({ component: ManageBadgesComponent, componentProps });
+    modal.onDidDismiss().then(({ data }): void => {
+      if (!data) return;
+      this.badges = null;
+      this.filterBadges(this.badgesSearchbar?.value, null, true);
+    });
+    modal.present();
+  }
 }
 
 enum PageSections {
   CONTENTS = 'CONTENTS',
   USERS = 'USERS',
+  USERS_BADGES = 'USERS_BADGES',
   TEMPLATES = 'TEMPLATES',
   OPTIONS = 'OPTIONS'
 }
-
-const sleepForNumSeconds = (numSeconds = 1): Promise<void> =>
-  new Promise(resolve => setTimeout((): void => resolve(null), 1000 * numSeconds));

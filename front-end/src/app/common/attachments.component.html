@@ -1,12 +1,13 @@
 <ion-item class="attachmentItem" *ngFor="let att of attachments" [lines]="editMode ? 'inset' : 'none'">
-  <ion-label>{{ att.name }}.{{ att.format }}</ion-label>
+  <ion-input [disabled]="!editMode" [(ngModel)]="att.name" />
+  <ion-note slot="end">.{{ att.format }}</ion-note>
   <ion-spinner
     size="small"
     color="medium"
     slot="end"
     *ngIf="!att.attachmentId"
     [title]="t._('ATTACHMENTS.UPLOADING')"
-  ></ion-spinner>
+  />
   <ion-button
     slot="end"
     color="danger"
@@ -15,7 +16,7 @@
     [title]="t._('ATTACHMENTS.REMOVE_ATTACHMENT')"
     (click)="removeAttachment(att)"
   >
-    <ion-icon icon="remove" slot="icon-only"></ion-icon>
+    <ion-icon icon="remove" slot="icon-only" />
   </ion-button>
   <ion-button
     slot="end"
@@ -24,7 +25,7 @@
     [title]="t._('ATTACHMENTS.DOWNLOAD_ATTACHMENT')"
     (click)="downloadAttachment(att)"
   >
-    <ion-icon icon="cloud-download-outline" slot="icon-only"></ion-icon>
+    <ion-icon icon="cloud-download-outline" slot="icon-only" />
   </ion-button>
 </ion-item>
 <!----->
@@ -55,7 +56,7 @@
       [title]="t._('ATTACHMENTS.HIDE_ERROR')"
       (click)="removeErrorFromList(err)"
     >
-      <ion-icon name="close" slot="icon-only"></ion-icon>
+      <ion-icon name="close" slot="icon-only" />
     </ion-button>
   </ion-item>
 </div>

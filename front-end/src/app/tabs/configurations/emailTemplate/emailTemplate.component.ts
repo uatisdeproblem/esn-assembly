@@ -97,7 +97,10 @@ export class EmailTemplateComponent implements OnInit {
     };
 
     const header = this.t._('COMMON.ARE_YOU_SURE');
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.CONFIRM'), handler: doReset }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.CONFIRM'), role: 'destructive', handler: doReset }
+    ];
     const alert = await this.alertCtrl.create({ header, buttons });
     alert.present();
   }
@@ -132,7 +135,10 @@ export class EmailTemplateComponent implements OnInit {
 
     const header = this.t._('EMAIL_TEMPLATE.TEST_TEMPLATE');
     const message = this.t._('EMAIL_TEMPLATE.TEST_TEMPLATE_I');
-    const buttons = [{ text: this.t._('COMMON.CANCEL') }, { text: this.t._('COMMON.SEND'), handler: doSend }];
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.SEND'), handler: doSend }
+    ];
 
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();

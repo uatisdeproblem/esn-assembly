@@ -53,11 +53,12 @@ class PublicAttachmentsRC extends ResourceController {
     return signedURL;
   }
   private async getSignedURLToDownloadAttachment(): Promise<SignedURL> {
-    const { attachmentId } = this.body;
+    const { attachmentId, filename } = this.body;
     if (!attachmentId) throw new HandledError('Missing attachment ID');
     if (!attachmentId.startsWith(ATTACHMENTS_PREFIX)) throw new HandledError('Not found');
 
     const key = `${S3_ATTACHMENTS_FOLDER}/${attachmentId}`;
-    return await s3.signedURLGet(S3_BUCKET_MEDIA, key);
+    const options = filename ? { filename } : {};
+    return await s3.signedURLGet(S3_BUCKET_MEDIA, key, options);
   }
 }

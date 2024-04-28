@@ -62,8 +62,9 @@
                 button
                 (click)="downloadOpportunityAttachment(attachment)"
               >
-                <ion-icon name="attach" slot="start"></ion-icon>
-                <ion-label class="ion-text-wrap">{{ attachment.name }}.{{ attachment.format }}</ion-label>
+                <ion-icon name="attach" slot="start" />
+                <ion-label class="ion-text-wrap">{{ attachment.name }}</ion-label>
+                <ion-note slot="end">.{{ attachment.format }}</ion-note>
               </ion-item>
             </ion-list>
           </ion-card-content>
