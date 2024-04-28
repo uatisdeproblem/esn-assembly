@@ -2,7 +2,7 @@
   <app-edit-mode-buttons
     [title]="'VOTING.MANAGE_SESSION' | translate"
     [editMode]="!!editMode"
-    [noInteraction]="!!votingSession?.hasStarted()"
+    [noInteraction]="!!votingSession?.hasStarted() || rollCallInProgress || immediateInProgress"
     (enter)="enterEditMode()"
     (exit)="exitEditMode()"
     (save)="save()"
@@ -12,7 +12,7 @@
       <ion-segment-button [value]="PageSections.GENERAL">
         <ion-label>{{ 'VOTING.GENERAL' | translate }}</ion-label>
       </ion-segment-button>
-      <ion-segment-button [value]="PageSections.BALLOTS">
+      <ion-segment-button *ngIf="votingSession.type !== VotingSessionTypes.ROLL_CALL" [value]="PageSections.BALLOTS">
         <ion-label>
           {{ 'VOTING.BALLOTS' | translate }}
           <ion-text class="smaller" *ngIf="votingSession.ballots.length">({{ votingSession.ballots.length }})</ion-text>
@@ -24,12 +24,27 @@
           <ion-text class="smaller" *ngIf="votingSession.voters.length">({{ votingSession.voters.length }})</ion-text>
         </ion-label>
       </ion-segment-button>
-      <ion-segment-button *ngIf="!editMode && !votingSession.hasStarted()" [value]="PageSections.START">
-        <ion-label>{{ 'VOTING.START' | translate }}</ion-label>
+      <ion-segment-button
+        *ngIf="!editMode && !votingSession.hasStarted() && !rollCallInProgress && !immediateInProgress && !votingSession.resultsPublished"
+        [value]="PageSections.START"
+      >
+        <ion-label>{{ (votingSession.results ? 'VOTING.RESUME' : 'VOTING.START') | translate }}</ion-label>
       </ion-segment-button>
       <ion-segment-button *ngIf="!editMode && votingSession.hasStarted()" [value]="PageSections.ANALYTICS">
         <ion-label *ngIf="votingSession.isInProgress()">{{ 'VOTING.IN_PROGRESS' | translate }}</ion-label>
         <ion-label *ngIf="votingSession.hasEnded()">{{ 'VOTING.ENDED' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button
+        *ngIf="!editMode && votingSession.type === VotingSessionTypes.IMMEDIATE"
+        [value]="PageSections.IMMEDIATE"
+      >
+        <ion-label>{{ 'VOTING.IMMEDIATE' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button
+        *ngIf="!editMode && votingSession.type === VotingSessionTypes.ROLL_CALL"
+        [value]="PageSections.ROLL_CALL"
+      >
+        <ion-label>{{ 'VOTING.ROLL_CALL' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
@@ -55,9 +70,11 @@
         [editMode]="!!editMode"
         [(event)]="votingSession.event"
       />
-      <ion-item [class.fieldHasError]="hasFieldAnError('isSecret')">
-        <ion-checkbox slot="end" [(ngModel)]="votingSession.isSecret" [disabled]="!editMode" />
-        <ion-label>{{ 'VOTING.IS_SECRET' | translate }}</ion-label>
+      <ion-item [class.fieldHasError]="hasFieldAnError('type')">
+        <ion-label position="stacked">
+          {{ 'VOTING.TYPE' | translate }} <ion-text class="obligatoryDot"></ion-text>
+        </ion-label>
+        <ion-input readonly>{{ ('VOTING.TYPES.' + votingSession.type) | translate }}</ion-input>
       </ion-item>
       <ion-item [class.fieldHasError]="hasFieldAnError('isWeighted')">
         <ion-checkbox
@@ -160,10 +177,17 @@
       <ion-toolbar id="votersTableToolbar" color="ideaToolbar">
         <ion-searchbar #votersSearchbar (ionInput)="filterVoters($event.target.value)" />
         <ion-buttons slot="end">
-          <ion-button *ngIf="editMode && votingSession.voters.length < 1000" (click)="addVoter()">
+          <ion-button
+            fill="solid"
+            color="ESNcyan"
+            *ngIf="editMode && votingSession.voters.length < 1000"
+            (click)="addVoter()"
+          >
             {{ 'COMMON.ADD' | translate }}
           </ion-button>
-          <ion-button (click)="actionsOnVoters()"><ion-icon icon="ellipsis-horizontal" slot="icon-only" /></ion-button>
+          <ion-button fill="solid" color="medium" (click)="actionsOnVoters()">
+            <ion-icon icon="ellipsis-horizontal" slot="icon-only" />
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
       <ngx-datatable
@@ -200,7 +224,9 @@
               <ng-container>
                 <span><strong>{{ 'VOTING.MISSING_EMAILS' | translate }}</strong>: {{ numMissingEmails }}</span>
                 <span><strong>{{ 'VOTING.DUPLICATED_NAMES' | translate }}</strong>: {{ numDuplicatedNames }}</span>
-                <span><strong>{{ 'VOTING.DUPLICATED_EMAILS' | translate }}</strong>: {{ numDuplicatedEmails }}</span>
+                <span *ngIf="votingSession.isForm()">
+                  <strong>{{ 'VOTING.DUPLICATED_EMAILS' | translate }}</strong>: {{ numDuplicatedEmails }}
+                </span>
                 <span *ngIf="votingSession.isWeighted">
                   <strong>{{ 'VOTING.TOTAL_WEIGHTS' | translate }}</strong>: {{ totalWeights }}
                 </span>
@@ -247,7 +273,7 @@
             />
             <ion-label class="ion-text-wrap">{{ 'VOTING.SESSION_IS_PUBLISHED' | translate }}</ion-label>
           </ion-item>
-          <ion-item>
+          <ion-item *ngIf="votingSession.type !== VotingSessionTypes.ROLL_CALL">
             <ion-icon
               slot="start"
               [icon]="hasFieldAnError('ballots') ? 'close' : 'checkmark'"
@@ -285,41 +311,43 @@
               <p>{{ getVotersDuplicatedNames().join(', ') }}</p>
             </ion-label>
           </ion-item>
-          <ion-item>
-            <ion-icon
-              slot="start"
-              [icon]="getVotersDuplicatedEmails().length ? 'warning' : 'checkmark'"
-              [color]="getVotersDuplicatedEmails().length ? 'warning' : 'success'"
-            />
-            <ion-label class="ion-text-wrap">
-              {{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_EMAILS' | translate }}
-              <p>{{ getVotersDuplicatedEmails().join(', ') }}</p>
-            </ion-label>
-            <idea-show-hint-button
-              slot="end"
-              hint="VOTING.DUPLICATED_EMAILS_AVOID_CONFUSION"
-              *ngIf="getVotersDuplicatedEmails().length"
-              translate
-            />
-          </ion-item>
-          <ion-item>
-            <ion-icon
-              slot="start"
-              [icon]="getNameOfVotersWithoutEmail().length ? 'warning' : 'checkmark'"
-              [color]="getNameOfVotersWithoutEmail().length ? 'warning' : 'success'"
-            />
-            <ion-label class="ion-text-wrap">
-              {{ (getNameOfVotersWithoutEmail().length ? 'VOTING.THESE_VOTERS_WONT_RECEIVE_VOTING_LINK' :
-              'VOTING.THERE_ARE_NO_MISSING_VOTERS_EMAILS') | translate }}
-              <p>{{ getNameOfVotersWithoutEmail().join(', ') }}</p>
-            </ion-label>
-            <idea-show-hint-button
-              slot="end"
-              hint="VOTING.NO_VOTING_MEANS_ABSENT"
-              *ngIf="getNameOfVotersWithoutEmail().length"
-              translate
-            />
-          </ion-item>
+          <ng-container *ngIf="votingSession.isForm()">
+            <ion-item>
+              <ion-icon
+                slot="start"
+                [icon]="getVotersDuplicatedEmails().length ? 'warning' : 'checkmark'"
+                [color]="getVotersDuplicatedEmails().length ? 'warning' : 'success'"
+              />
+              <ion-label class="ion-text-wrap">
+                {{ 'VOTING.THERE_ARE_NO_DUPLICATE_VOTERS_EMAILS' | translate }}
+                <p>{{ getVotersDuplicatedEmails().join(', ') }}</p>
+              </ion-label>
+              <idea-show-hint-button
+                slot="end"
+                hint="VOTING.DUPLICATED_EMAILS_AVOID_CONFUSION"
+                *ngIf="getVotersDuplicatedEmails().length"
+                translate
+              />
+            </ion-item>
+            <ion-item>
+              <ion-icon
+                slot="start"
+                [icon]="getNameOfVotersWithoutEmail().length ? 'warning' : 'checkmark'"
+                [color]="getNameOfVotersWithoutEmail().length ? 'warning' : 'success'"
+              />
+              <ion-label class="ion-text-wrap">
+                {{ (getNameOfVotersWithoutEmail().length ? 'VOTING.THESE_VOTERS_WONT_RECEIVE_VOTING_LINK' :
+                'VOTING.THERE_ARE_NO_MISSING_VOTERS_EMAILS') | translate }}
+                <p>{{ getNameOfVotersWithoutEmail().join(', ') }}</p>
+              </ion-label>
+              <idea-show-hint-button
+                slot="end"
+                hint="VOTING.NO_VOTING_MEANS_ABSENT"
+                *ngIf="getNameOfVotersWithoutEmail().length"
+                translate
+              />
+            </ion-item>
+          </ng-container>
         </ion-card-content>
       </ion-card>
       <ion-list-header class="ion-padding-top">
@@ -329,10 +357,8 @@
         </ion-label>
       </ion-list-header>
       <ion-item>
-        <ion-icon slot="start" [icon]="votingSession.isSecret ? 'eye-off-outline' : 'eye-outline'" />
-        <ion-label>
-          {{ (votingSession.isSecret ? 'VOTING.SECRET_VOTE' : 'VOTING.PUBLIC_VOTE') | translate }}
-        </ion-label>
+        <ion-icon slot="start" icon="information-circle-outline" />
+        <ion-label> {{ ('VOTING.TYPES.' + votingSession.type) | translate }} </ion-label>
       </ion-item>
       <ion-item *ngIf="votingSession.isWeighted">
         <ion-icon slot="start" icon="options-outline" />
@@ -345,49 +371,52 @@
         <ion-icon slot="start" icon="ticket-outline" />
         <ion-label>
           <b>{{ votingSession.voters.length }}</b> {{ 'VOTING.VOTERS' | translate | lowercase }}
-          <p *ngIf="getNameOfVotersWithoutEmail().length">
+          <p *ngIf="votingSession.isForm() && getNameOfVotersWithoutEmail().length">
             <b>{{ getNameOfVotersWithoutEmail().length }}</b> {{ 'VOTING.OF_WHICH_NUM_WITHOUT_EMAIL' | translate |
             lowercase }}
           </p>
         </ion-label>
       </ion-item>
-      <ion-item>
+      <ion-item *ngIf="votingSession.type !== VotingSessionTypes.ROLL_CALL">
         <ion-icon slot="start" icon="trail-sign-outline" />
         <ion-label><b>{{ votingSession.ballots.length }}</b> {{ 'VOTING.BALLOTS' | translate | lowercase }}</ion-label>
       </ion-item>
-      <ion-list-header>
-        <ion-label>
-          <h2>{{ 'VOTING.START_END_INTERVAL' | translate }}</h2>
-          <p>{{ 'VOTING.START_END_INTERVAL_I' | translate }}</p>
-          <p>{{ 'VOTING.START_END_INTERVAL_II' | translate }}</p>
-          <p>{{ 'VOTING.START_END_INTERVAL_III' | translate }}</p>
-        </ion-label>
-      </ion-list-header>
-      <ion-row class="ion-align-items-start" style="background-color: var(--ion-color-white)">
-        <ion-col>
-          <app-datetime-timezone
-            lines="none"
-            [label]="'VOTING.ENDS_AT' | translate"
-            [class.fieldHasError]="hasFieldAnError('endsAt')"
-            [timezone]="votingSession.timezone"
-            [(date)]="votingSession.endsAt"
-          />
-        </ion-col>
-        <ion-col>
-          <idea-select
-            lines="none"
-            [data]="timezones"
-            [description]="votingSession.timezone"
-            [label]="'VOTING.TIMEZONE' | translate"
-            [hideClearButton]="true"
-            [class.fieldHasError]="hasFieldAnError('timezone')"
-            (select)="votingSession.timezone = $event.value"
-          />
-        </ion-col>
-      </ion-row>
+      <ng-container *ngIf="votingSession.isForm()">
+        <ion-list-header>
+          <ion-label>
+            <h2>{{ 'VOTING.START_END_INTERVAL' | translate }}</h2>
+            <p>{{ 'VOTING.START_END_INTERVAL_I' | translate }}</p>
+            <p>{{ 'VOTING.START_END_INTERVAL_II' | translate }}</p>
+            <p>{{ 'VOTING.START_END_INTERVAL_III' | translate }}</p>
+          </ion-label>
+        </ion-list-header>
+        <ion-row class="ion-align-items-start" style="background-color: var(--ion-color-white)">
+          <ion-col>
+            <app-datetime-timezone
+              lines="none"
+              [label]="'VOTING.ENDS_AT' | translate"
+              [class.fieldHasError]="hasFieldAnError('endsAt')"
+              [timezone]="votingSession.timezone"
+              [(date)]="votingSession.endsAt"
+            />
+          </ion-col>
+          <ion-col>
+            <idea-select
+              lines="none"
+              [data]="timezones"
+              [description]="votingSession.timezone"
+              [label]="'VOTING.TIMEZONE' | translate"
+              [hideClearButton]="true"
+              [class.fieldHasError]="hasFieldAnError('timezone')"
+              (select)="votingSession.timezone = $event.value"
+            />
+          </ion-col>
+        </ion-row>
+      </ng-container>
       <p class="ion-margin-top ion-text-center">
         <ion-button [disabled]="!sessionReady" (click)="startSession()">
-          {{ 'VOTING.START_SESSION' | translate }} <ion-icon slot="end" icon="send" />
+          {{ (votingSession.results ? 'VOTING.RESUME_SESSION' : 'VOTING.START_SESSION') | translate }}
+          <ion-icon slot="end" icon="rocket" />
         </ion-button>
       </p>
     </ion-list>
@@ -511,17 +540,20 @@
           <ion-label>
             <h2>{{ 'VOTING.RESULTS' | translate }}</h2>
             <p>
-              {{ (votingSession.results ? 'VOTING.RESULTS_ARE_PUBLISHED' : 'VOTING.RESULTS_ARE_NOT_PUBLISHED_YET') |
-              translate }}
+              {{ (votingSession.resultsPublished ? 'VOTING.RESULTS_ARE_PUBLISHED' :
+              'VOTING.RESULTS_ARE_NOT_PUBLISHED_YET') | translate }}
             </p>
           </ion-label>
-          <ion-button color="dark" *ngIf="!votingSession.results" (click)="publishResults()">
+          <ion-button
+            color="dark"
+            class="ion-margin-end"
+            *ngIf="!votingSession.resultsPublished"
+            (click)="publishResults()"
+          >
             {{ 'VOTING.PUBLISH_RESULTS' | translate }} <ion-icon slot="end" icon="share" />
           </ion-button>
-        </ion-list-header>
-        <div class="ion-text-end ion-padding-end">
           <ion-toggle [(ngModel)]="showRawResults">{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
-        </div>
+        </ion-list-header>
         <app-voting-ballots [votingSession]="votingSession" [results]="results" [raw]="showRawResults" />
         <ion-row>
           <ion-col>
@@ -533,6 +565,153 @@
             <ion-button color="medium" (click)="downloadVotersAudit()">
               {{ 'VOTING.DOWNLOAD_VOTERS_AUDIT' | translate }} <ion-icon slot="end" icon="download" />
             </ion-button>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+    </ion-list>
+    <ion-list class="aList maxWidthContainer" *ngIf="pageSection === PageSections.IMMEDIATE">
+      <ion-item class="noElements" *ngIf="!votingSession.voters.length">
+        <ion-label class="ion-text-wrap">{{ 'VOTING.NO_VOTERS_YET' | translate }}</ion-label>
+      </ion-item>
+      <ion-item class="noElements" *ngIf="!votingSession.ballots.length">
+        <ion-label class="ion-text-wrap">{{ 'VOTING.NO_BALLOTS_YET' | translate }}</ion-label>
+      </ion-item>
+      <ng-container *ngIf="votingSession.voters.length && votingSession.ballots.length && immediateByBallot">
+        <ion-list-header>
+          <ion-label>
+            <h2>{{ 'VOTING.BALLOTS' | translate }}</h2>
+            <p *ngIf="immediateInProgress">{{ 'VOTING.IMMEDIATE_TAB_HINT' | translate }}</p>
+          </ion-label>
+        </ion-list-header>
+        <ion-accordion-group #immediateAccordion class="immediateBallotsGroup">
+          <ion-accordion
+            *ngFor="let ballot of votingSession.ballots; let bIndex = index; let bLast = last"
+            [value]="bIndex"
+          >
+            <ion-item slot="header">
+              <ion-label class="ion-text-wrap">
+                {{ votingSession.ballots[bIndex].text }}
+                <p>{{ 'VOTING.MAJORITY_TYPES.' + ballot.majorityType | translate }}</p>
+              </ion-label>
+            </ion-item>
+            <div slot="content" class="ion-padding">
+              <ion-item *ngFor="let voter of votingSession.voters">
+                <ion-label class="ion-text-wrap">{{ voter.name }}</ion-label>
+                <select [(ngModel)]="getImmediateOfBallot(bIndex)[voter.id]" [disabled]="!immediateInProgress">
+                  <option
+                    *ngFor="let option of votingSession.ballots[bIndex].options; let oIndex = index"
+                    [value]="oIndex"
+                  >
+                    {{ oIndex + 1 }}. {{ votingSession.ballots[bIndex].options[oIndex] }}
+                  </option>
+                  <option [value]="votingSession.ballots[bIndex].options.length">
+                    {{ votingSession.ballots[bIndex].options.length + 1 }}. {{ 'VOTING.ABSTAIN' | translate }}
+                  </option>
+                  <option [value]="votingSession.ballots[bIndex].options.length + 1">
+                    {{ votingSession.ballots[bIndex].options.length + 2 }}. {{ 'VOTING.ABSENT' | translate }}
+                  </option>
+                </select>
+              </ion-item>
+              <ion-item class="ion-margin" color="transparent" lines="none">
+                <ion-label class="ion-text-wrap ion-text-end">
+                  <b>{{ 'VOTING.VOTERS_PRESENT' | translate }}</b>
+                </ion-label>
+                <ion-badge slot="end" color="medium" style="width: 80px">
+                  {{ getNumVotersPresentToImmediateBallotByIndex(bIndex) }} {{ 'COMMON.OF' | translate | lowercase }} {{
+                  votingSession.voters.length }}
+                </ion-badge>
+                <ion-badge slot="end" style="width: 60px">
+                  {{ getNumVotersPresentToImmediateBallotByIndex(bIndex) / votingSession.voters.length | percent }}
+                </ion-badge>
+              </ion-item>
+              <p class="ion-text-end" *ngIf="immediateInProgress && !bLast">
+                <ion-button fill="clear" style="text-transform: none" (click)="saveImmediate(false, bIndex + 1)">
+                  {{ 'VOTING.SAVE_AND_NEXT' | translate }} <ion-icon icon="arrow-forward" slot="end" />
+                </ion-button>
+              </p>
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+        <ion-row class="ion-padding-top ion-margin-top" *ngIf="immediateInProgress">
+          <ion-col>
+            <ion-button color="danger" (click)="cancelImmediate()">{{ 'COMMON.CANCEL' | translate }}</ion-button>
+          </ion-col>
+          <ion-col class="ion-text-end">
+            <ion-button color="success" (click)="saveImmediate()">{{ 'COMMON.SAVE' | translate }}</ion-button>
+          </ion-col>
+        </ion-row>
+        <ng-container *ngIf="!immediateInProgress && results">
+          <ion-list-header>
+            <ion-label>
+              <h2>{{ 'VOTING.RESULTS' | translate }}</h2>
+              <p>
+                {{ (votingSession.resultsPublished ? 'VOTING.RESULTS_ARE_PUBLISHED' :
+                'VOTING.RESULTS_ARE_NOT_PUBLISHED_YET') | translate }}
+              </p>
+            </ion-label>
+            <ion-button
+              color="dark"
+              class="ion-margin-end"
+              *ngIf="!votingSession.resultsPublished"
+              (click)="saveImmediate(true)"
+            >
+              {{ 'VOTING.PUBLISH_RESULTS' | translate }} <ion-icon slot="end" icon="share" />
+            </ion-button>
+            <ion-toggle [(ngModel)]="showRawResults">{{ 'VOTING.RAW_RESULTS' | translate }}</ion-toggle>
+          </ion-list-header>
+          <app-voting-ballots [votingSession]="votingSession" [results]="results" [raw]="showRawResults" />
+          <p class="ion-text-end">
+            <ion-button color="medium" (click)="downloadResults()">
+              {{ 'VOTING.DOWNLOAD_CASTED_VOTES' | translate }} <ion-icon slot="end" icon="download" />
+            </ion-button>
+          </p>
+        </ng-container>
+      </ng-container>
+    </ion-list>
+    <ion-list class="aList maxWidthContainer" *ngIf="pageSection === PageSections.ROLL_CALL">
+      <ion-item class="noElements" *ngIf="!votingSession.voters.length">
+        <ion-label class="ion-text-wrap">{{ 'VOTING.NO_VOTERS_YET' | translate }}</ion-label>
+      </ion-item>
+      <ng-container *ngIf="votingSession.voters.length && rollCall">
+        <ion-list-header>
+          <ion-label>
+            <h2>{{ 'VOTING.VOTERS_PRESENT' | translate }}</h2>
+            <p *ngIf="rollCallInProgress">{{ 'VOTING.ROLL_CALL_TAB_HINT' | translate }}</p>
+            <p *ngIf="!rollCallInProgress && results">
+              {{ (votingSession.resultsPublished ? 'VOTING.RESULTS_ARE_PUBLISHED' :
+              'VOTING.RESULTS_ARE_NOT_PUBLISHED_YET') | translate }}
+            </p>
+          </ion-label>
+          <ion-button color="dark" *ngIf="!votingSession.resultsPublished && results" (click)="saveRollCall(true)">
+            {{ 'VOTING.PUBLISH_RESULTS' | translate }} <ion-icon slot="end" icon="share" />
+          </ion-button>
+        </ion-list-header>
+        <ion-card>
+          <ion-card-content>
+            <ion-item *ngFor="let voter of votingSession.voters">
+              <ion-checkbox slot="end" [(ngModel)]="rollCall[voter.id]" [disabled]="!rollCallInProgress" />
+              <ion-label class="ion-text-wrap">{{ voter.name }}</ion-label>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+        <ion-item class="ion-margin" color="transparent" lines="none">
+          <ion-label class="ion-text-wrap ion-text-end">
+            <b>{{ 'VOTING.VOTERS_PRESENT' | translate }}</b>
+          </ion-label>
+          <ion-badge slot="end" color="medium" style="width: 80px">
+            {{ getNumVotersPresentToRollCall() }} {{ 'COMMON.OF' | translate | lowercase }} {{
+            votingSession.voters.length }}
+          </ion-badge>
+          <ion-badge slot="end" style="width: 60px">
+            {{ getNumVotersPresentToRollCall() / votingSession.voters.length | percent }}
+          </ion-badge>
+        </ion-item>
+        <ion-row class="ion-padding-top ion-margin-top" *ngIf="rollCallInProgress">
+          <ion-col>
+            <ion-button color="danger" (click)="cancelRollCall()">{{ 'COMMON.CANCEL' | translate }}</ion-button>
+          </ion-col>
+          <ion-col class="ion-text-end">
+            <ion-button color="success" (click)="saveRollCall()">{{ 'COMMON.SAVE' | translate }}</ion-button>
           </ion-col>
         </ion-row>
       </ng-container>

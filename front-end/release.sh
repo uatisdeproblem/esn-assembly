@@ -7,8 +7,7 @@ DOMAIN_DEV='dev.esn-assembly-spain.link'
 
 # other parameters
 ACTION=$1
-SRC_FOLDER="${PWD}/src"
-BACK_END_FOLDER="back-end"
+SRC_FOLDER="src/"
 C='\033[4;32m' # color
 NC='\033[0m'   # reset (no color)
 

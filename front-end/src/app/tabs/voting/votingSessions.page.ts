@@ -7,7 +7,7 @@ import { VotingService, VotingSessionsSortBy } from './voting.service';
 import { GAEventsService } from '../configurations/events/events.service';
 
 import { GAEvent } from '@models/event.model';
-import { VotingSession } from '@models/votingSession.model';
+import { VotingSession, VotingSessionTypes } from '@models/votingSession.model';
 
 @Component({
   selector: 'voting-sessions',
@@ -71,6 +71,32 @@ export class VotingSessionsPage implements OnInit {
     this.app.goToInTabs(['voting', votingSession.sessionId]);
   }
   async addVotingSession(): Promise<void> {
-    this.app.goToInTabs(['voting', 'new', 'manage']);
+    const header = this.t._('VOTING.CHOOSE_TYPE');
+    const buttons = [
+      {
+        text: this.t._('VOTING.TYPES.FORM_PUBLIC'),
+        icon: 'document-text',
+        handler: (): void => this.app.goToInTabs(['voting', VotingSessionTypes.FORM_PUBLIC, 'manage'])
+      },
+      {
+        text: this.t._('VOTING.TYPES.FORM_SECRET'),
+        icon: 'document-lock',
+        handler: (): void => this.app.goToInTabs(['voting', VotingSessionTypes.FORM_SECRET, 'manage'])
+      },
+      {
+        text: this.t._('VOTING.TYPES.IMMEDIATE'),
+        icon: 'chatbox',
+        handler: (): void => this.app.goToInTabs(['voting', VotingSessionTypes.IMMEDIATE, 'manage'])
+      },
+      {
+        text: this.t._('VOTING.TYPES.ROLL_CALL'),
+        icon: 'hand-right',
+        handler: (): void => this.app.goToInTabs(['voting', VotingSessionTypes.ROLL_CALL, 'manage'])
+      },
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
+    ];
+
+    const actions = await this.actionsCtrl.create({ header, buttons });
+    actions.present();
   }
 }

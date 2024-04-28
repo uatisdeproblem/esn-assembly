@@ -54,6 +54,7 @@ class VoteRC extends ResourceController {
       throw new HandledError('Voting session not found');
     }
 
+    if (!this.votingSession.isForm()) throw new HandledError('Not a form-type voting session');
     if (!this.votingSession.isInProgress()) throw new HandledError('Voting session not in progress');
   }
 
@@ -118,7 +119,7 @@ class VoteRC extends ResourceController {
         UpdateExpression: 'SET #v = if_not_exists(#v, :zero) + :value',
         ExpressionAttributeValues: { ':value': votingTicket.weight, ':zero': 0 }
       };
-      if (!this.votingSession.isSecret) {
+      if (!this.votingSession.isSecret()) {
         updateParams.UpdateExpression += ', voters = list_append(if_not_exists(voters, :emptyArr), :voters)';
         updateParams.ExpressionAttributeValues[':voters'] = [votingTicket.voterName];
         updateParams.ExpressionAttributeValues[':emptyArr'] = [] as string[];

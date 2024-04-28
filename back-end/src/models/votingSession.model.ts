@@ -21,9 +21,9 @@ export class VotingSession extends Resource {
    */
   description: string;
   /**
-   * Whether the session is secret or public.
+   * The type of voting session.
    */
-  isSecret: boolean;
+  type: VotingSessionTypes;
   /**
    * Whether the voting is weighted or not.
    */
@@ -62,16 +62,23 @@ export class VotingSession extends Resource {
   voters: Voter[];
   /**
    * The timestamp when the voting session started. If not set, or in the future, the session hasn't started yet.
+   * Only form-like sessions have a start and an end.
    */
   startsAt: epochISOString | null;
   /**
    * The timestamp of end of the voting session. If set and past, the voting session has ended.
+   * Only form-like sessions have a start and an end.
    */
   endsAt: epochISOString | null;
   /**
    * A timezone for the timestamps of start and end of the voting session.
    */
   timezone: string;
+  /**
+   * Whether the results have been published.
+   * NOTE: for immediate sessions the result is public (though hidden from the UI) and immediate anyway.
+   */
+  resultsPublished: boolean;
   /**
    * The results of the voting session, in case they are published.
    */
@@ -90,24 +97,34 @@ export class VotingSession extends Resource {
     this.sessionId = this.clean(x.sessionId, String);
     this.name = this.clean(x.name, String);
     this.description = this.clean(x.description, String);
-    this.isSecret = this.clean(x.isSecret, Boolean, false);
+    this.type = this.clean(x.type, String, VotingSessionTypes.FORM_PUBLIC);
+    if (!x.type && x.isSecret) this.type = VotingSessionTypes.FORM_SECRET; // backwards compatibility prior #88
     this.isWeighted = this.clean(x.isWeighted, Boolean, false);
     this.event = x.event?.eventId ? new GAEventAttached(x.event) : null;
     this.createdAt = this.clean(x.createdAt, d => new Date(d).toISOString(), new Date().toISOString());
     if (x.updatedAt) this.updatedAt = this.clean(x.updatedAt, d => new Date(d).toISOString());
     if (x.publishedSince) this.publishedSince = this.clean(x.publishedSince, d => new Date(d).toISOString());
     else delete this.publishedSince;
-    this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b)).slice(0, 50);
-    this.voters = this.cleanArray(x.voters, v => new Voter(v, this)).slice(0, 1000);
-    this.startsAt = this.clean(x.startsAt, d => new Date(d).toISOString());
-    this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
-    this.timezone = this.clean(x.timezone, String);
+    if (this.type === VotingSessionTypes.ROLL_CALL) this.ballots = [];
+    else this.ballots = this.cleanArray(x.ballots, b => new VotingBallot(b)).slice(0, 50);
+    this.voters = this.cleanArray(x.voters, v => new Voter(v, this))
+      .slice(0, 1000)
+      .sort((a, b): number => a.name.localeCompare(b.name));
+    if (this.isForm()) {
+      this.startsAt = this.clean(x.startsAt, d => new Date(d).toISOString());
+      this.endsAt = this.clean(x.endsAt, d => new Date(d).toISOString());
+      this.timezone = this.clean(x.timezone, String);
+    }
     this.scrutineersIds = this.cleanArray(x.scrutineersIds, String).map(x => x.toLowerCase());
-    if (!this.hasEnded()) {
+    if (this.isForm() && !this.hasEnded()) {
+      this.resultsPublished = false;
       delete this.results;
       delete this.participantVoters;
     } else {
-      if (x.results) this.results = x.results;
+      if (x.results) {
+        this.resultsPublished = this.clean(x.resultsPublished, Boolean, false);
+        this.results = x.results;
+      } else this.resultsPublished = false;
       if (x.participantVoters)
         this.participantVoters = this.cleanArray(x.participantVoters, String)?.sort((a, b): number =>
           a.localeCompare(b)
@@ -119,10 +136,13 @@ export class VotingSession extends Resource {
   safeLoad(newData: any, safeData: any): void {
     super.safeLoad(newData, safeData);
     this.sessionId = safeData.sessionId;
+    this.type = safeData.type;
+    if (!this.type) this.type = safeData.isSecret ? VotingSessionTypes.FORM_SECRET : VotingSessionTypes.FORM_PUBLIC; // backwards compatibility prior #88
     this.isWeighted = safeData.isWeighted;
     this.createdAt = safeData.createdAt;
     if (safeData.updatedAt) this.updatedAt = safeData.updatedAt;
     this.startsAt = safeData.startsAt;
+    this.resultsPublished = safeData.resultsPublished;
     if (safeData.results) this.results = safeData.results;
     if (safeData.participantVoters) this.participantVoters = safeData.participantVoters;
     if (safeData.archivedAt) this.archivedAt = safeData.archivedAt;
@@ -131,6 +151,7 @@ export class VotingSession extends Resource {
   validate(checkIfReady = false): string[] {
     const e = super.validate();
     if (this.iE(this.name)) e.push('name');
+    if (!Object.values(VotingSessionTypes).includes(this.type)) e.push('type');
     this.ballots.forEach((b, i): void => b.validate().forEach(ea => e.push(`ballots[${i}].${ea}`)));
     if (this.ballots.length > 50) e.push('ballots');
     this.voters.forEach((v, i): void => v.validate(this).forEach(ea => e.push(`voters[${i}].${ea}`)));
@@ -139,7 +160,7 @@ export class VotingSession extends Resource {
     if (checkIfReady || this.startsAt) {
       if (this.iE(this.publishedSince, 'date') || this.publishedSince > new Date().toISOString())
         e.push('publishedSince');
-      if (this.iE(this.ballots)) e.push('ballots');
+      if (this.type !== VotingSessionTypes.ROLL_CALL && this.iE(this.ballots)) e.push('ballots');
       if (this.iE(this.voters)) e.push('voters');
       const votersIds = this.voters.map(x => x.id?.trim());
       const votersNames = this.voters.map(x => x.name?.trim().toLowerCase());
@@ -154,6 +175,20 @@ export class VotingSession extends Resource {
       }
     }
     return e;
+  }
+
+  /**
+   * Whether the voting session is secret.
+   */
+  isSecret(): boolean {
+    return this.type === VotingSessionTypes.FORM_SECRET;
+  }
+
+  /**
+   * Whether the voting session happens through a form.
+   */
+  isForm(): boolean {
+    return [VotingSessionTypes.FORM_PUBLIC, VotingSessionTypes.FORM_SECRET].includes(this.type);
   }
 
   /**
@@ -235,6 +270,16 @@ export class VotingSession extends Resource {
 }
 
 /**
+ * The types of voting sessions.
+ */
+export enum VotingSessionTypes {
+  FORM_PUBLIC = 'FORM_PUBLIC',
+  FORM_SECRET = 'FORM_SECRET',
+  IMMEDIATE = 'IMMEDIATE',
+  ROLL_CALL = 'ROLL_CALL'
+}
+
+/**
  * A voting ballot.
  */
 export class VotingBallot extends Resource {
@@ -290,10 +335,10 @@ export class Voter extends Resource {
    */
   name: string;
   /**
-   * The email address to which the voting tokens will be sent.
+   * The email address to which the voting tokens will be sent (in case of form-type voting sessions).
    * If not set, no email will be sent; without a voting link, the voter can't vote and will result absent.
    */
-  email: string;
+  email: string | null;
   /**
    * A number with high precision that represents the weight of the voter.
    * If the vote is not weighted, it equals `null`.
@@ -304,7 +349,7 @@ export class Voter extends Resource {
     super.load(x);
     this.id = this.clean(x.id, String, Math.random().toString(36).slice(-7).toUpperCase());
     this.name = this.clean(x.name, String);
-    this.email = this.clean(x.email, String);
+    if (votingSession.isForm()) this.email = this.clean(x.email, String);
     if (votingSession.isWeighted) this.voteWeight = this.clean(x.voteWeight, w => Math.round(Number(w)));
     else this.voteWeight = null;
   }
@@ -313,7 +358,7 @@ export class Voter extends Resource {
     const e = super.validate();
     if (this.iE(this.id)) e.push('id');
     if (this.iE(this.name)) e.push('name');
-    if (this.email && this.iE(this.email, 'email')) e.push('email');
+    if (votingSession.isForm() && this.email && this.iE(this.email, 'email')) e.push('email');
     if (votingSession.isWeighted && (this.voteWeight < 1 || this.voteWeight > 999_999)) e.push('voteWeight');
     return e;
   }
@@ -325,6 +370,6 @@ export class Voter extends Resource {
 export interface ExportableVoter {
   Name: string;
   'Voter Identifier': string;
-  Email: string;
+  Email?: string;
   'Vote Weight'?: number;
 }
