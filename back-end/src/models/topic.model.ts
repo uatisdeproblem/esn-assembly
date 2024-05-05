@@ -57,6 +57,7 @@ export class Topic extends Resource {
   willCloseAt?: epochISOString;
   /**
    * The timestamp when the topic was closed. A topic which is closed cannot accept new interactions.
+   * Note: `TopicTypes.LIVE` topics are closed when they are created and opened when needed.
    */
   closedAt?: epochISOString;
   /**

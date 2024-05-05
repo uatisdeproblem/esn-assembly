@@ -262,7 +262,8 @@ export class ManageTopicPage {
         copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
         delete copy.publishedSince;
         delete copy.willCloseAt;
-        delete copy.closedAt;
+        if (copy.type === TopicTypes.LIVE) this.topic.closedAt = new Date().toISOString();
+        else delete copy.closedAt;
         delete copy.archivedAt;
         copy.load(await this._topics.insert(copy));
         this.message.success('COMMON.OPERATION_COMPLETED');
