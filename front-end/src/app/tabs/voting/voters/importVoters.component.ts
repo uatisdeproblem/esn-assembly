@@ -129,7 +129,7 @@ export class ImportVotersStandaloneComponent implements OnInit {
   downloadTemplate(): void {
     const filename = `${this.t._('VOTING.IMPORT_VOTERS')}.xlsx`;
     const session = new VotingSession(this.votingSession);
-    session.voters = [new Voter({ id: ' ' })];
+    session.voters = [new Voter({ id: ' ' }, session)];
     this._voting.downloadVotersSpreadsheet(filename, session);
   }
   async import({ target }): Promise<void> {
