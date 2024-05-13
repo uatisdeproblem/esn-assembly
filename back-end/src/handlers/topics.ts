@@ -117,6 +117,7 @@ class Topics extends ResourceController {
 
     this.topic = new Topic(this.body);
     this.topic.topicId = await ddb.IUNID(PROJECT);
+    this.topic.createdAt = new Date().toISOString();
     delete this.topic.updatedAt;
     delete this.topic.numOfQuestions;
 
