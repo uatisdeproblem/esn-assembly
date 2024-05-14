@@ -43,7 +43,7 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "namedChunks": true,
-            "optimization": { "styles": { "inlineCritical": false } },
+            "optimization": false,
             "allowedCommonJsDependencies": [
               "idea-toolbox",
               "isomorphic-unfetch",
@@ -73,6 +73,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
+              "optimization": { "styles": { "inlineCritical": false } },
               "budgets": [
                 {
                   "type": "initial",
