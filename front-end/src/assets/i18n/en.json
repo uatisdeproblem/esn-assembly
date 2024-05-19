@@ -157,6 +157,11 @@
     "CANT_DELETE_IF_LINKED_ERROR": "Unlink all related topics first",
     "DRAFT": "Draft",
     "ANSWERS": "Answers",
+    "ACTIONS": {
+      "ARCHIVE":"Archive",
+      "DUPLICATE":"Duplicate",
+      "DELETE":"Delete"
+    },
     "QUESTIONS_UNTIL": "Questions until",
     "ANSWERS_UNTIL": "Answers until",
     "PUBLISHING_OPTIONS": "Topic visibility",
@@ -169,6 +174,7 @@
     "CLOSE_TOPIC": "Close topic",
     "OPEN_TOPIC": "Open topic",
     "CHOOSE_TYPE": "Choose a type",
+    "CHOOSE_ACTION": "Choose an action",
     "LIVE_OPTIONS": "Options for live Q&A",
     "LIVE_OPTIONS_I": "Choose your messaging preferences for the topic",
     "SHOULD_BE_LIVE_ON": "It should be live on",

@@ -43,7 +43,7 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "namedChunks": true,
-            "optimization": { "styles": { "inlineCritical": false } },
+            "optimization": false,
             "allowedCommonJsDependencies": [
               "idea-toolbox",
               "isomorphic-unfetch",

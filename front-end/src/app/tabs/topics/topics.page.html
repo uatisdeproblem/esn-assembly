@@ -6,7 +6,10 @@
     <ion-title>{{ 'TABS.TOPICS' | translate }}</ion-title>
   </ion-toolbar>
   <ion-toolbar class="filtersBar" color="ideaToolbar">
-    <ion-searchbar
+    <ion-button slot="start" fill="solid" color="dark" *ngIf="app.user.isAdministrator && selectedList.size" (click)="actionOnSelected()">
+      <ion-icon icon="cog" slot="icon-only" color="light"></ion-icon>
+    </ion-button>
+  <ion-searchbar
       #searchbar
       [placeholder]="'TOPICS.FILTER_ACTIVE_TOPICS' | translate"
       (ionInput)="filter($event.target.value)"
@@ -87,12 +90,12 @@
     </ion-item>
     <ng-container *ngIf="app.isInMobileMode()">
       <app-topic *ngIf="!topics"></app-topic>
-      <app-topic *ngFor="let topic of topics" [topic]="topic" (select)="openTopic(topic)"></app-topic>
+      <app-topic *ngFor="let topic of topics" [topic]="topic" (select)="openTopic(topic)" (checkboxChange)="handleSelection($event,topic)"></app-topic>
     </ng-container>
     <ion-grid *ngIf="!app.isInMobileMode()">
       <app-topic *ngIf="!topics" [row]="true"></app-topic>
       <app-topic *ngIf="topics?.length" [row]="true" [header]="true"></app-topic>
-      <app-topic *ngFor="let topic of topics" [topic]="topic" [row]="true" (select)="openTopic(topic)"></app-topic>
+      <app-topic *ngFor="let topic of topics" [topic]="topic" [row]="true" (select)="openTopic(topic)" (checkboxChange)="handleSelection($event,topic)"></app-topic>
     </ion-grid>
     <ion-infinite-scroll (ionInfinite)="filter(searchbar.value, $event.target)">
       <ion-infinite-scroll-content></ion-infinite-scroll-content>

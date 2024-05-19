@@ -191,6 +191,30 @@ export class TopicsService {
     return new Topic(await this.api.patchResource('topics', { body }));
   }
 
+/**
+ * duplicate a topic
+ */
+ async duplicateTopic(): Promise<void> {
+    const doDuplicate = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        const copy = new Topic(this.topic);
+        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+        delete copy.publishedSince;
+        delete copy.willCloseAt;
+        if (copy.type === TopicTypes.LIVE) this.topic.closedAt = new Date().toISOString();
+        else delete copy.closedAt;
+        delete copy.archivedAt;
+        copy.load(await this._topics.insert(copy));
+        this.message.success('COMMON.OPERATION_COMPLETED');
+        this.app.goToInTabs(['topics', copy.topicId, 'manage'], { root: true });
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+      }
+    };
+
   /**
    * Update a topic.
    */
@@ -217,6 +241,12 @@ export class TopicsService {
   async archive(topic: Topic): Promise<void> {
     await this.api.patchResource(['topics', topic.topicId], { body: { action: 'ARCHIVE' } });
   }
+    /**
+   * Archive a topic using ID.
+   */
+    async archiveById(topicId: string): Promise<void> {
+      await this.api.patchResource(['topics', topicId], { body: { action: 'ARCHIVE' } });
+    }
   /**
    * Unarchive a topic.
    */
@@ -230,6 +260,13 @@ export class TopicsService {
   async delete(topic: Topic): Promise<void> {
     await this.api.deleteResource(['topics', topic.topicId]);
   }
+
+ /**
+   * Delete a topic using ID
+   */
+ async deleteById(topicId: string): Promise<void> {
+  await this.api.deleteResource(['topics', topicId]);
+}
 
   /**
    * Get the related topics.

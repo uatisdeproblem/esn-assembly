@@ -38,6 +38,7 @@ export class TopicsPage implements OnInit {
   TopicsSortBy = TopicsSortBy;
 
   SET = StatisticEntityTypes;
+  selectedList = new Set<string> ();
 
   constructor(
     private actionsCtrl: IDEAActionSheetController,
@@ -85,6 +86,12 @@ export class TopicsPage implements OnInit {
   openTopic(topic: Topic): void {
     this.app.goToInTabs(['topics', topic.topicId, topic.type === TopicTypes.LIVE ? 'live' : 'standard']);
   }
+
+  handleSelection(event,topic:Topic){
+    if (event) this.selectedList.add (topic.topicId);
+    else this.selectedList.delete (topic.topicId);
+    console.log(this.selectedList)
+  }
   async addTopic(): Promise<void> {
     const header = this.t._('TOPICS.CHOOSE_TYPE');
     const buttons = [
@@ -104,4 +111,49 @@ export class TopicsPage implements OnInit {
     const actions = await this.actionsCtrl.create({ header, buttons });
     actions.present();
   }
+
+  async actionOnSelected(): Promise<void> {
+    const header = this.t._('TOPICS.CHOOSE_ACTIONS');
+    const buttons = [
+      {
+        text: this.t._('TOPICS.ACTIONS.ARCHIVE'),
+        icon: 'archive',
+        handler: async() => await this.archiveSelected()
+      },
+      {
+        text: this.t._('TOPICS.ACTIONS.DUPLICATE'),
+        icon: 'documents',
+        handler: async() => await this.duplicateSelected()
+      },
+      {
+        text: this.t._('TOPICS.ACTIONS.DELETE'),
+        icon: 'trash',
+        handler: async() => await this.deleteSelected()
+      },
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
+    ];
+    const actions = await this.actionsCtrl.create({ header, buttons });
+    actions.present();
+  }
+
+async archiveSelected(){
+this.selectedList.forEach(async(topicId)=> {
+  await this._topics.archiveById(topicId)
+})
+await this.loadResources();
+}
+async deleteSelected(){
+  this.selectedList.forEach(async(topicId)=> {
+    await this._topics.deleteById(topicId)
+  })
+  await this.loadResources();
+  }
+  async duplicateSelected(){
+    this.selectedList.forEach(async(topicId)=> {
+      await this._topics.duplicateById(topicId)
+    })
+    await this.loadResources();
+    }
+
+
 }
