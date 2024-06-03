@@ -6,7 +6,7 @@
     <ion-title>{{ 'TABS.TOPICS' | translate }}</ion-title>
   </ion-toolbar>
   <ion-toolbar class="filtersBar" color="ideaToolbar">
-    <ion-button slot="start" fill="solid" color="dark" *ngIf="app.user.isAdministrator && selectedList.size" (click)="actionOnSelected()">
+    <ion-button slot="start" fill="solid" color="ESNorange" *ngIf="app.user.isAdministrator && selectedList.size > 0" (click)="actionOnSelected()">
       <ion-icon icon="cog" slot="icon-only" color="light"></ion-icon>
     </ion-button>
   <ion-searchbar

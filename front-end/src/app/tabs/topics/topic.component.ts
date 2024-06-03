@@ -38,7 +38,26 @@ export class TopicComponent {
 
   constructor(public app: AppService) {}
 
-  onCheckboxChange(event){this.checkboxChange.emit(this.selected);
+  onCheckboxChange(event: any) {
+    this.selected = event.detail.checked;
+    this.checkboxChange.emit(this.selected);
+
+    // Emitting select event when checkbox is changed
+    //if (this.selected) {
+     // this.select.emit();
+
+ // onCheckboxChange(event){this.checkboxChange.emit(this.selected);
   }
+ //}
+ onTopicClick() {
+  this.select.emit();
+ }
+
+
+ //onTopicClick() {
+ // if (!this.selected) {
+//  this.select.emit();
+//  }
+//}
 
 }

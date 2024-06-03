@@ -30,6 +30,8 @@ import { QuestionModule } from './questions/question.module';
     IonicModule,
     IDEATranslationsModule,
     IDEACheckerModule,
+    EventsPickerComponent,
+    CategoriesPickerComponent,
     TopicsRoutingModule,
     TopicModule,
     QuestionModule,
@@ -37,12 +39,10 @@ import { QuestionModule } from './questions/question.module';
     EditModeButtonsModule,
     AttachmentsModule,
     HTMLEditorModule,
-    EventsPickerComponent,
-    CategoriesPickerComponent,
     StatisticsModule,
     DateTimezonePipe,
     DatetimeWithTimezoneStandaloneComponent
   ],
-  declarations: [TopicsPage, StandardTopicPage, LiveTopicPage, ManageTopicPage]
+  declarations: [TopicsPage, StandardTopicPage, LiveTopicPage, ManageTopicPage],
 })
 export class TopicsModule {}

@@ -191,29 +191,7 @@ export class TopicsService {
     return new Topic(await this.api.patchResource('topics', { body }));
   }
 
-/**
- * duplicate a topic
- */
- async duplicateTopic(): Promise<void> {
-    const doDuplicate = async (): Promise<void> => {
-      try {
-        await this.loading.show();
-        const copy = new Topic(this.topic);
-        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
-        delete copy.publishedSince;
-        delete copy.willCloseAt;
-        if (copy.type === TopicTypes.LIVE) this.topic.closedAt = new Date().toISOString();
-        else delete copy.closedAt;
-        delete copy.archivedAt;
-        copy.load(await this._topics.insert(copy));
-        this.message.success('COMMON.OPERATION_COMPLETED');
-        this.app.goToInTabs(['topics', copy.topicId, 'manage'], { root: true });
-      } catch (error) {
-        this.message.error('COMMON.OPERATION_FAILED');
-      } finally {
-        this.loading.hide();
-      }
-    };
+
 
   /**
    * Update a topic.
@@ -267,6 +245,43 @@ export class TopicsService {
  async deleteById(topicId: string): Promise<void> {
   await this.api.deleteResource(['topics', topicId]);
 }
+
+/**
+ *  duplicate a topic
+ */
+async duplicate(topicId: string): Promise<void> {
+  try {
+    const originalTopic = await this.getById(topicId);
+    const newTopicData = {
+      ...originalTopic,
+      topicId: undefined,
+      name: originalTopic.name + ' - Copy'
+    };
+
+    const newTopic = new Topic(newTopicData);
+    await this.insert(newTopic);
+    console.log(`Duplicating topic with ID: ${topicId}`);
+  } catch (error) {
+    console.error(`Errore durante la duplicazione del topic con ID: ${topicId}`, error);
+    throw error;
+  }
+}
+
+/**
+ * duplicate more topics
+ */
+async duplicateTopics(topicIds: string[]): Promise<void> {
+  try {
+    for (const topicId of topicIds) {
+      await this.duplicate(topicId);
+    }
+    // Aggiornare la lista dei topic dopo la duplicazione
+    await this.loadActiveList();
+  } catch (error) {
+    console.error('Si è verificato un errore durante la duplicazione dei topic:', error);
+  }
+}
+
 
   /**
    * Get the related topics.

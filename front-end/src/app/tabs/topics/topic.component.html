@@ -1,9 +1,9 @@
 <ng-container *ngIf="!row">
-  <ion-item *ngIf="topic" button (click)="select.emit()">
+  <ion-item *ngIf="topic" button (click)="onTopicClick()" [class.selected]="selected">
     <ion-checkbox
       slot="start"
       aria-label="select"
-      [(ngModel)]="topic.selected"
+      [(ngModel)]="selected"
       (ionChange)="onCheckboxChange($event)"
       (click)="$event.stopPropagation()"
     ></ion-checkbox>
@@ -77,7 +77,7 @@
     <ion-col [sizeLg]="2" [sizeXl]="1">{{ 'TOPICS.STATUS' | translate }}</ion-col>
     <ion-col class="ion-hide-xl-down" [sizeLg]="1">{{ 'TOPICS.CREATED_AT' | translate }}</ion-col>
   </ion-row>
-  <ion-row class="ion-align-items-center row tappable" *ngIf="!header && topic" (click)="select.emit()">
+  <ion-row class="ion-align-items-center row tappable" *ngIf="!header && topic" (click)="onTopicClick()" [class.selected]="selected">
     <ion-col [sizeLg]="1" [sizeXl]="1">
       <ion-checkbox
         [(ngModel)]="selected"
