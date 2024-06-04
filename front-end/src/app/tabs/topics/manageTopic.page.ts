@@ -258,14 +258,7 @@ export class ManageTopicPage {
     const doDuplicate = async (): Promise<void> => {
       try {
         await this.loading.show();
-        const copy = new Topic(this.topic);
-        copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
-        delete copy.publishedSince;
-        delete copy.willCloseAt;
-        if (copy.type === TopicTypes.LIVE) this.topic.closedAt = new Date().toISOString();
-        else delete copy.closedAt;
-        delete copy.archivedAt;
-        copy.load(await this._topics.insert(copy));
+        const copy = (await this._topics.duplicate(this.topic));
         this.message.success('COMMON.OPERATION_COMPLETED');
         this.app.goToInTabs(['topics', copy.topicId, 'manage'], { root: true });
       } catch (error) {

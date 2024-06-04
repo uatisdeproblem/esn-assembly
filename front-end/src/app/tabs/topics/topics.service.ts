@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IDEAApiService } from '@idea-ionic/common';
+import { IDEAApiService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { Topic, TopicTypes } from '@models/topic.model';
 import { Application } from '@models/application.model';
@@ -17,7 +17,7 @@ export class TopicsService {
    */
   MAX_PAGE_SIZE = 24;
 
-  constructor(private api: IDEAApiService) {}
+  constructor(private api: IDEAApiService, private t: IDEATranslationsService) {}
 
   /**
    * Load the active topics from the back-end.
@@ -191,8 +191,6 @@ export class TopicsService {
     return new Topic(await this.api.patchResource('topics', { body }));
   }
 
-
-
   /**
    * Update a topic.
    */
@@ -219,12 +217,12 @@ export class TopicsService {
   async archive(topic: Topic): Promise<void> {
     await this.api.patchResource(['topics', topic.topicId], { body: { action: 'ARCHIVE' } });
   }
-    /**
+  /**
    * Archive a topic using ID.
    */
-    async archiveById(topicId: string): Promise<void> {
-      await this.api.patchResource(['topics', topicId], { body: { action: 'ARCHIVE' } });
-    }
+  async archiveById(topicId: string): Promise<void> {
+    await this.api.patchResource(['topics', topicId], { body: { action: 'ARCHIVE' } });
+  }
   /**
    * Unarchive a topic.
    */
@@ -239,49 +237,41 @@ export class TopicsService {
     await this.api.deleteResource(['topics', topic.topicId]);
   }
 
- /**
+  /**
    * Delete a topic using ID
    */
- async deleteById(topicId: string): Promise<void> {
-  await this.api.deleteResource(['topics', topicId]);
-}
+  async deleteById(topicId: string): Promise<void> {
+    await this.api.deleteResource(['topics', topicId]);
+  }
 
-/**
- *  duplicate a topic
- */
-async duplicate(topicId: string): Promise<void> {
-  try {
+  async duplicate(topic: Topic): Promise<Topic> {
+    const copy = new Topic(topic);
+    copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+    delete copy.publishedSince;
+    delete copy.willCloseAt;
+    if (copy.type === TopicTypes.LIVE) topic.closedAt = new Date().toISOString();
+    else delete copy.closedAt;
+    delete copy.archivedAt;
+    return (await this.insert(copy)) as Topic;
+  }
+  /**
+   *  duplicate a topic
+   */
+  async duplicateById(topicId: string): Promise<void> {
     const originalTopic = await this.getById(topicId);
-    const newTopicData = {
-      ...originalTopic,
-      topicId: undefined,
-      name: originalTopic.name + ' - Copy'
-    };
-
-    const newTopic = new Topic(newTopicData);
-    await this.insert(newTopic);
-    console.log(`Duplicating topic with ID: ${topicId}`);
-  } catch (error) {
-    console.error(`Errore durante la duplicazione del topic con ID: ${topicId}`, error);
-    throw error;
+    this.duplicate(originalTopic);
   }
-}
 
-/**
- * duplicate more topics
- */
-async duplicateTopics(topicIds: string[]): Promise<void> {
-  try {
+  /**
+   * duplicate more topics
+   */
+  async duplicateTopics(topicIds: string[]): Promise<void> {
     for (const topicId of topicIds) {
-      await this.duplicate(topicId);
+      await this.duplicateById(topicId);
     }
-    // Aggiornare la lista dei topic dopo la duplicazione
+    // Update topic list
     await this.loadActiveList();
-  } catch (error) {
-    console.error('Si è verificato un errore durante la duplicazione dei topic:', error);
   }
-}
-
 
   /**
    * Get the related topics.

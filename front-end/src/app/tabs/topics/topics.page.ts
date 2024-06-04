@@ -1,6 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
-import { IDEAActionSheetController, IDEATranslationsService } from '@idea-ionic/common';
+import { AlertController, IonInfiniteScroll, IonRefresher, IonSearchbar } from '@ionic/angular';
+import {
+  IDEAActionSheetController,
+  IDEALoadingService,
+  IDEAMessageService,
+  IDEATranslationsService
+} from '@idea-ionic/common';
 
 import { AppService } from '@app/app.service';
 import { TopicsService, TopicsSortBy, TopicsFilterByStatus } from './topics.service';
@@ -39,7 +44,7 @@ export class TopicsPage implements OnInit {
   TopicsSortBy = TopicsSortBy;
 
   SET = StatisticEntityTypes;
-  selectedList = new Set<string> ();
+  selectedList = new Set<string>();
 
   constructor(
     private actionsCtrl: IDEAActionSheetController,
@@ -47,15 +52,20 @@ export class TopicsPage implements OnInit {
     private _topics: TopicsService,
     private _categories: TopicCategoryService,
     private _events: GAEventsService,
-    public app: AppService
+    public app: AppService,
+    private loading: IDEALoadingService,
+    private message: IDEAMessageService,
+    private alertCtrl: AlertController
   ) {}
   async ngOnInit(): Promise<void> {
     await this.loadResources();
   }
   ionViewDidEnter(): void {
     this.filter(null, null, true);
+
   }
   private async loadResources(): Promise<void> {
+    this.selectedList.clear();
     this.topics = await this._topics.getActiveList({ force: true, withPagination: true });
     [this.categories, this.events] = await Promise.all([this._categories.getList(), this._events.getList()]);
   }
@@ -88,15 +98,15 @@ export class TopicsPage implements OnInit {
     this.app.goToInTabs(['topics', topic.topicId, topic.type === TopicTypes.LIVE ? 'live' : 'standard']);
   }
 
-  handleSelection(event,topic:Topic){
+  handleSelection(event, topic: Topic) {
     if (event) {
       this.selectedTopicId = topic.topicId;
-      this.selectedList.add (topic.topicId);
+      this.selectedList.add(topic.topicId);
     } else {
-      this.selectedList.delete (topic.topicId);
+      this.selectedList.delete(topic.topicId);
       this.selectedTopicId = null;
     }
-    console.log(this.selectedList)
+    console.log(this.selectedList);
   }
   async addTopic(): Promise<void> {
     const header = this.t._('TOPICS.CHOOSE_TYPE');
@@ -124,20 +134,17 @@ export class TopicsPage implements OnInit {
       {
         text: this.t._('TOPICS.ACTIONS.ARCHIVE'),
         icon: 'archive',
-        handler: async() => await this.archiveSelected()
+        handler: async () => await this.archiveSelected()
       },
       {
         text: this.t._('TOPICS.ACTIONS.DUPLICATE'),
         icon: 'documents',
-        handler: async() => {
-          const TopicIds = Array.from(this.selectedList);
-        await this._topics.duplicateTopics(TopicIds);
-        }
+        handler: async () => await this.duplicateSelected()
       },
       {
         text: this.t._('TOPICS.ACTIONS.DELETE'),
         icon: 'trash',
-        handler: async() => await this.deleteSelected()
+        handler: async () => await this.deleteSelected()
       },
       { text: this.t._('COMMON.CANCEL'), role: 'cancel', icon: 'arrow-undo' }
     ];
@@ -146,66 +153,83 @@ export class TopicsPage implements OnInit {
     actions.present();
   }
 
-async archiveSelected(){
-  const archivePromises = Array.from(this.selectedList).map(async (topicId) => {await this._topics.archiveById(topicId);
-  });
-  await Promise.all(archivePromises);
-  this.topics = this.topics.filter(topic => !this.selectedList.has(topic.topicId));
-
-  this.selectedList.clear();
-}
-async deleteSelected(){
-  const deletePromises = Array.from(this.selectedList).map(async (topicId) => {
-    await this._topics.deleteById(topicId);
-  });
-  await Promise.all(deletePromises);
-
-  this.topics = this.topics.filter(topic => !this.selectedList.has(topic.topicId));
-
-  this.selectedList.clear();
+  async archiveSelected() {
+    const topicIds = Array.from(this.selectedList);
+    const doArchive = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        for (const topicId of topicIds) {
+          await this._topics.archiveById(topicId);
+          this.selectedList.delete(topicId);
+        }
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        if (error.message === 'Unlink related topics first') this.message.error('TOPICS.CANT_DELETE_IF_LINKED_ERROR');
+        else this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+        this.loadResources();
+      }
+    };
+    this.selectedList.clear();
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.ARCHIVE'), role: 'destructive', handler: doArchive }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
   }
-//}
+  async deleteSelected() {
+    const topicIds = Array.from(this.selectedList);
+    const doDelete = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        for (const topicId of topicIds) {
+          await this._topics.deleteById(topicId);
+          this.selectedList.delete(topicId);
+        }
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        if (error.message === 'Unlink related topics first') this.message.error('TOPICS.CANT_DELETE_IF_LINKED_ERROR');
+        else this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+        this.loadResources();
+      }
+    };
+    this.selectedList.clear();
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const message = this.t._('COMMON.ACTION_IS_IRREVERSIBLE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DELETE'), role: 'destructive', handler: doDelete }
+    ];
+    const alert = await this.alertCtrl.create({ header, message, buttons });
+    alert.present();
+  }
+  //}
 
-
- // duplicate a topic
-
- async duplicateTopics(topicIds: string[]): Promise<void> {
-  try {
-    const duplicatePromises = topicIds.map(async (topicId) => {
-const originalTopic = await this._topics.getById(topicId);
-const newTopicData = new Topic({
-  ...originalTopic,
-  topicId: undefined,
-  name: "${originalTopic.name} - Copy",
-});
-await this._topics.insert(newTopicData);
-    });
-    await Promise.all(duplicatePromises);
-   // Dopo aver duplicato i topic, ricarichiamo la lista dei topic attivi
-   this.topics = await this._topics.getActiveList({ force: true, withPagination: true });
-   this.selectedList.clear(); // Pulizia della selezione
- } catch (error) {
-   console.error('Si è verificato un errore durante la duplicazione dei topic:', error);
- }
-}
-/*
-
-      await this.loading.show();
-      const copy = new Topic(this.topic);
-      copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
-      delete copy.publishedSince;
-      delete copy.willCloseAt;
-      if (copy.type === TopicTypes.LIVE) this.topic.closedAt = new Date().toISOString();
-      else delete copy.closedAt;
-      delete copy.archivedAt;
-      copy.load(await this._topics.insert(copy));
-      this.message.success('COMMON.OPERATION_COMPLETED');
-      this.app.goToInTabs(['topics', copy.topicId, 'manage'], { root: true });
-    } catch (error) {
-      this.message.error('COMMON.OPERATION_FAILED');
-    } finally {
-      this.loading.hide();
-    }
-  };
-    */
+  async duplicateSelected(): Promise<void> {
+    const topicIds = Array.from(this.selectedList);
+    const doDuplicate = async (): Promise<void> => {
+      try {
+        await this.loading.show();
+        await this._topics.duplicateTopics(topicIds);
+        this.message.success('COMMON.OPERATION_COMPLETED');
+      } catch (error) {
+        this.message.error('COMMON.OPERATION_FAILED');
+      } finally {
+        this.loading.hide();
+        this.loadResources();
+      }
+    };
+    const header = this.t._('COMMON.ARE_YOU_SURE');
+    const buttons = [
+      { text: this.t._('COMMON.CANCEL'), role: 'cancel' },
+      { text: this.t._('COMMON.DUPLICATE'), handler: doDuplicate }
+    ];
+    const alert = await this.alertCtrl.create({ header, buttons });
+    alert.present();
+  }
 }
