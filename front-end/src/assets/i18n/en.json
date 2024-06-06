@@ -157,6 +157,11 @@
     "CANT_DELETE_IF_LINKED_ERROR": "Unlink all related topics first",
     "DRAFT": "Draft",
     "ANSWERS": "Answers",
+    "ACTIONS": {
+      "ARCHIVE":"Archive",
+      "DUPLICATE":"Duplicate",
+      "DELETE":"Delete"
+    },
     "QUESTIONS_UNTIL": "Questions until",
     "ANSWERS_UNTIL": "Answers until",
     "PUBLISHING_OPTIONS": "Topic visibility",
@@ -169,6 +174,7 @@
     "CLOSE_TOPIC": "Close topic",
     "OPEN_TOPIC": "Open topic",
     "CHOOSE_TYPE": "Choose a type",
+    "CHOOSE_ACTION": "Choose an action",
     "LIVE_OPTIONS": "Options for live Q&A",
     "LIVE_OPTIONS_I": "Choose your messaging preferences for the topic",
     "SHOULD_BE_LIVE_ON": "It should be live on",
@@ -597,7 +603,7 @@
     "DO_YOU_WANT_TO_APPLY": "Are you interested?",
     "DO_YOU_WANT_TO_APPLY_I": "Please, carefully read the content of the opportunity first.",
     "DO_YOU_WANT_TO_APPLY_II": "When you feel ready, here's what we need:",
-    "A_BRIEF_MOTIVATION": "A brief motivation for your application",
+    "A_BRIEF_MOTIVATION": "Short Description",
     "A_BRIEF_MOTIVATION_I": "Let us know why you would like to apply for this opportunity. Required.",
     "NOT_READY_YET": "I'm not ready yet",
     "TAP_TO_UPLOAD_ATTACHMENT": "Tap to upload an attachment...",

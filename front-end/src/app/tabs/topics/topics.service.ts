@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IDEAApiService } from '@idea-ionic/common';
+import { IDEAApiService, IDEATranslationsService } from '@idea-ionic/common';
 
 import { Topic, TopicTypes } from '@models/topic.model';
 import { Application } from '@models/application.model';
@@ -17,7 +17,7 @@ export class TopicsService {
    */
   MAX_PAGE_SIZE = 24;
 
-  constructor(private api: IDEAApiService) {}
+  constructor(private api: IDEAApiService, private t: IDEATranslationsService) {}
 
   /**
    * Load the active topics from the back-end.
@@ -218,6 +218,12 @@ export class TopicsService {
     await this.api.patchResource(['topics', topic.topicId], { body: { action: 'ARCHIVE' } });
   }
   /**
+   * Archive a topic using ID.
+   */
+  async archiveById(topicId: string): Promise<void> {
+    await this.api.patchResource(['topics', topicId], { body: { action: 'ARCHIVE' } });
+  }
+  /**
    * Unarchive a topic.
    */
   async unarchive(topic: Topic): Promise<void> {
@@ -229,6 +235,42 @@ export class TopicsService {
    */
   async delete(topic: Topic): Promise<void> {
     await this.api.deleteResource(['topics', topic.topicId]);
+  }
+
+  /**
+   * Delete a topic using ID
+   */
+  async deleteById(topicId: string): Promise<void> {
+    await this.api.deleteResource(['topics', topicId]);
+  }
+
+  async duplicate(topic: Topic): Promise<Topic> {
+    const copy = new Topic(topic);
+    copy.name = `${copy.name} - ${this.t._('COMMON.COPY')}`;
+    delete copy.publishedSince;
+    delete copy.willCloseAt;
+    if (copy.type === TopicTypes.LIVE) topic.closedAt = new Date().toISOString();
+    else delete copy.closedAt;
+    delete copy.archivedAt;
+    return (await this.insert(copy)) as Topic;
+  }
+  /**
+   *  duplicate a topic
+   */
+  async duplicateById(topicId: string): Promise<void> {
+    const originalTopic = await this.getById(topicId);
+    this.duplicate(originalTopic);
+  }
+
+  /**
+   * duplicate more topics
+   */
+  async duplicateTopics(topicIds: string[]): Promise<void> {
+    for (const topicId of topicIds) {
+      await this.duplicateById(topicId);
+    }
+    // Update topic list
+    await this.loadActiveList();
   }
 
   /**
