@@ -73,6 +73,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
+              "optimization": { "styles": { "inlineCritical": false } },
               "budgets": [
                 {
                   "type": "initial",

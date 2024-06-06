@@ -10,6 +10,12 @@ If you are a **National Organization (NO) of [Erasmus Student Network (ESN)](htt
 - **[How to contribute / developers guide](/CONTRIBUTING.md)**.
 - **[How to init (deploy) the project](/HOW-TO-DEPLOY.md)**.
 
+## Videos
+
+- **[Discover features and configurations](https://youtu.be/37Zfpyia79s)**.
+- **[Deploy/install](https://youtu.be/dukY5KEHW7s)**.
+- **[Develop and maintain (playlist)](https://www.youtube.com/playlist?list=PLsRwal5yO5i7R6sI8ClqMIbIfvVIKNRHo)**.
+
 ## Dictionary
 
 - Assembly: the body of ESN for which this platform was designed.
