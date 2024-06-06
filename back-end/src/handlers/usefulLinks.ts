@@ -110,7 +110,8 @@ class UsefulLinks extends ResourceController {
     }
   }
   private async swapSort(otherLinkId: string): Promise<void> {
-    if (!this.galaxyUser.isAdministrator) throw new HandledError('Unauthorized');
+    if (!(this.galaxyUser.isAdministrator || this.galaxyUser.canManageDashboard))
+      throw new HandledError('Unauthorized');
     if (this.usefulLink.linkId === otherLinkId) throw new HandledError('Same link');
 
     const otherLink = new UsefulLink(
