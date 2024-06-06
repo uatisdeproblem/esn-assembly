@@ -106,7 +106,6 @@ export class TopicsPage implements OnInit {
       this.selectedList.delete(topic.topicId);
       this.selectedTopicId = null;
     }
-    console.log(this.selectedList);
   }
   async addTopic(): Promise<void> {
     const header = this.t._('TOPICS.CHOOSE_TYPE');
@@ -208,7 +207,6 @@ export class TopicsPage implements OnInit {
     const alert = await this.alertCtrl.create({ header, message, buttons });
     alert.present();
   }
-  //}
 
   async duplicateSelected(): Promise<void> {
     const topicIds = Array.from(this.selectedList);

@@ -28,6 +28,9 @@ export class TopicComponent {
    * Trigger when a topic is selected.
    */
   @Output() select = new EventEmitter<void>();
+  /**
+   * Trigger when a topic's checkbox is changed
+   */
   @Output() checkboxChange = new EventEmitter<boolean>();
 
   TopicTypes = TopicTypes;
@@ -41,23 +44,9 @@ export class TopicComponent {
   onCheckboxChange(event: any) {
     this.selected = event.detail.checked;
     this.checkboxChange.emit(this.selected);
-
-    // Emitting select event when checkbox is changed
-    //if (this.selected) {
-     // this.select.emit();
-
- // onCheckboxChange(event){this.checkboxChange.emit(this.selected);
   }
- //}
- onTopicClick() {
-  this.select.emit();
- }
 
-
- //onTopicClick() {
- // if (!this.selected) {
-//  this.select.emit();
-//  }
-//}
-
+  onTopicClick() {
+    this.select.emit();
+  }
 }
