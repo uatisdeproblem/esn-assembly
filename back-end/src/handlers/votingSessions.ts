@@ -11,6 +11,8 @@ import { User } from '../models/user.model';
 import { VotingTicket } from '../models/votingTicket.model';
 import { Configurations } from '../models/configurations.model';
 import { VotingResultForBallotOption, VotingResults } from '../models/votingResult.model';
+import { randomUUID } from 'crypto';
+import brevo = require('@getbrevo/brevo');
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER
@@ -226,6 +228,7 @@ class VotingSessionsRC extends ResourceController {
   }
   private async sendVotingTicketToVoter(ticket: VotingTicket, email = ticket.voterEmail): Promise<void> {
     const template = `notify-voting-instructions-${STAGE}`;
+
     const templateData = {
       user: ticket.voterName,
       title: this.votingSession.name,

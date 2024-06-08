@@ -1,15 +1,15 @@
 /**
  * The codename of the project.
  */
-export const PROJECT = 'esn-ga';
+export const PROJECT = 'esn-assembly-armenia';
 /**
  * The purchased domain to use.
  */
-export const DOMAIN = 'esn-ga.link';
+export const DOMAIN = 'esn-assembly-armenia.link';
 /**
  * An additional custom domain to use.
  */
-export const PROD_CUSTOM_DOMAIN: string | null = 'ga.esn.org'; // in case of first creation, use: `null`
+export const PROD_CUSTOM_DOMAIN: string | null = null; // in case of first creation, use: `null`
 
 export const parameters: Parameters = {
   project: PROJECT,
