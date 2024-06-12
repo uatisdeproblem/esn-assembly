@@ -11,8 +11,6 @@ import { User } from '../models/user.model';
 import { VotingTicket } from '../models/votingTicket.model';
 import { Configurations } from '../models/configurations.model';
 import { VotingResultForBallotOption, VotingResults } from '../models/votingResult.model';
-import { randomUUID } from 'crypto';
-import brevo = require('@getbrevo/brevo');
 
 ///
 /// CONSTANTS, ENVIRONMENT VARIABLES, HANDLER

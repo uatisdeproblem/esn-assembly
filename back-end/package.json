@@ -8,7 +8,6 @@
     "cdk": "cdk"
   },
   "dependencies": {
-    "@getbrevo/brevo": "^2.1.1",
     "axios": "^1.4.0",
     "date-fns": "^2.30.0",
     "idea-aws": "4.3.4",
