@@ -193,6 +193,12 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
     const totNoAbstainAndAbsent = oResultsNoAbstainAndAbsent.reduce((tot, acc): number => (tot += acc.value), 0);
     return totNoAbstainAndAbsent > 0 ? this.results[bIndex][oIndex].value / totNoAbstainAndAbsent : 0;
   }
+  getAbsoluteResultOfBallotOptionBasedOnRaw(bIndex: number, oIndex: number): number {
+    if (this.raw) return this.results[bIndex][oIndex].value;
+    const oResults = Object.values(this.results[bIndex]);
+    const tot = oResults.reduce((tot, acc): number => (tot += acc.value), 0);
+    return tot > 0 ? this.results[bIndex][oIndex].value / tot : 0;
+  }
   getWinningBallotOptionIndex(bIndex: number): number | -1 {
     const oResults = Object.values(this.results[bIndex]);
     const oResultsNoAbstainAndAbsent = oResults.slice(0, oResults.length - 2);
@@ -217,6 +223,8 @@ export class BallotsStandaloneComponent implements OnChanges, OnDestroy {
     if (this.votingSession.ballots[bIndex].majorityType === VotingMajorityTypes.TWO_THIRDS)
       // @todo this majority should be fixed in the Statutes (it's not possible to calculate "+1" with weighted voting)
       return this.getResultOfBallotOptionBasedOnRaw(bIndex, winnerOptionIndex) > 2 / 3 ? winnerOptionIndex : -1;
+    if (this.votingSession.ballots[bIndex].majorityType === VotingMajorityTypes.ABSOLUTE)
+      return this.getAbsoluteResultOfBallotOptionBasedOnRaw(bIndex, winnerOptionIndex) > 1 / 2 ? winnerOptionIndex: -1;
   }
 
   handleBallotReorder({ detail }): void {
