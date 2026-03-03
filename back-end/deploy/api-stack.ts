@@ -449,11 +449,13 @@ export class ApiStack extends cdk.Stack {
       autoDeploy: true
     });
 
+    const webSocketApiStageCfn = webSocketApiStage.node.defaultChild as ApiGw.CfnStage;
+
     new ApiGw.CfnApiMapping(this, 'WebSocketApiMapping', {
       domainName: params.apiDomain,
       apiId: webSocketApi.apiId,
       apiMappingKey: params.stage,
-      stage: webSocketApiStage.stageName
+      stage: webSocketApiStageCfn.ref
     });
 
     return { webSocketApi, ddbTableConnections, lambdaFnWebSocket };
